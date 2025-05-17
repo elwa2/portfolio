@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>خدماتنا - صفقة</title>
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- ملفات CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+      /* أنماط خاصة بصفحة الخدمات */
+      :root {
+        --card-bg-light: #ffffff;
+        --card-bg-dark: #1e1e2d;
+        --card-shadow-light: 0 10px 30px rgba(0, 0, 0, 0.05);
+        --card-shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.2);
+        --card-hover-shadow-light: 0 15px 40px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow-dark: 0 15px 40px rgba(0, 0, 0, 0.3);
+        --icon-bg-1: linear-gradient(135deg, #6a11cb, #2575fc);
+        --icon-bg-2: linear-gradient(135deg, #ff4e50, #f9d423);
+        --icon-bg-3: linear-gradient(135deg, #11998e, #38ef7d);
+        --icon-bg-4: linear-gradient(135deg, #8e2de2, #4a00e0);
+      }
+
+      [data-theme="dark"] {
+        --card-bg: var(--card-bg-dark);
+        --card-shadow: var(--card-shadow-dark);
+        --card-hover-shadow: var(--card-hover-shadow-dark);
+      }
+
+      [data-theme="light"] {
+        --card-bg: var(--card-bg-light);
+        --card-shadow: var(--card-shadow-light);
+        --card-hover-shadow: var(--card-hover-shadow-light);
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+      }
+
+      .service-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        padding: 40px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+      }
+
+      .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--card-hover-shadow);
+      }
+
+      .service-card:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--icon-bg);
+      }
+
+      .service-card:nth-child(1):before {
+        background: var(--icon-bg-1);
+      }
+
+      .service-card:nth-child(2):before {
+        background: var(--icon-bg-2);
+      }
+
+      .service-card:nth-child(3):before {
+        background: var(--icon-bg-3);
+      }
+
+      .service-card:nth-child(4):before {
+        background: var(--icon-bg-4);
+      }
+
+      .service-icon {
+        width: 80px;
+        height: 80px;
+        line-height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+      }
+
+      .service-card:nth-child(1) .service-icon {
+        background: var(--icon-bg-1);
+        box-shadow: 0 10px 20px rgba(106, 17, 203, 0.3);
+      }
+
+      .service-card:nth-child(2) .service-icon {
+        background: var(--icon-bg-2);
+        box-shadow: 0 10px 20px rgba(255, 78, 80, 0.3);
+      }
+
+      .service-card:nth-child(3) .service-icon {
+        background: var(--icon-bg-3);
+        box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+      }
+
+      .service-card:nth-child(4) .service-icon {
+        background: var(--icon-bg-4);
+        box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3);
+      }
+
+      .service-card h3 {
+        font-size: 1.8rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        position: relative;
+        display: inline-block;
+      }
+
+      .service-card h3:after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 3px;
+        background: var(--primary-color);
+        border-radius: 3px;
+      }
+
+      .service-card p {
+        margin-bottom: 25px;
+        line-height: 1.7;
+        color: var(--text-color);
+      }
+
+      .service-features {
+        text-align: right;
+        margin-bottom: 30px;
+        padding: 0 20px;
+      }
+
+      .service-features li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        color: var(--text-color);
+      }
+
+      .check-icon {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+
+      .service-card .btn {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .service-card .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(var(--primary-rgb), 0.4);
+      }
+
+      /* قسم الدعوة للتواصل */
+      .cta-content-centered {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 50px 30px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cta-content-centered:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: cover;
+      }
+
+      .cta-icon {
+        font-size: 3rem;
+        color: white;
+        margin-bottom: 20px;
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        line-height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .cta-content-centered h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      .cta-content-centered p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .btn-primary-glow {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary-glow:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent
+        );
+        transform: translateX(-100%);
+        animation: glow 3s infinite;
+        z-index: -1;
+      }
+
+      @keyframes glow {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .btn-primary-glow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      @media (max-width: 992px) {
+        .services-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .service-card {
+          padding: 30px 20px;
+        }
+
+        .service-icon {
+          width: 70px;
+          height: 70px;
+          line-height: 70px;
+          font-size: 1.8rem;
+        }
+
+        .service-card h3 {
+          font-size: 1.6rem;
+        }
+
+        .cta-content-centered {
+          padding: 40px 20px;
+        }
+
+        .cta-icon {
+          width: 80px;
+          height: 80px;
+          line-height: 80px;
+          font-size: 2.5rem;
+        }
+
+        .cta-content-centered h2 {
+          font-size: 2rem;
+        }
+
+        .cta-content-centered p {
+          font-size: 1.1rem;
+        }
+
+        .btn-primary-glow {
+          padding: 12px 25px;
+          font-size: 1.1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- القائمة العلوية -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="index.html">
+              <img src="/assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="index.html">الرئيسية</a></li>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="services.html" class="active">خدماتنا</a></li>
+              <li><a href="portfolio.html">أعمالنا</a></li>
+              <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <a href="https://wa.me/201002241591" class="contact-btn">
+              <i class="fab fa-whatsapp"></i> تواصل معنا
+            </a>
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <i class="fas fa-moon"></i>
+            </div>
+            <div class="mobile-toggle">
+              <i class="fas fa-bars"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- القسم الرئيسي -->
+    <main>
+      <!-- عنوان الصفحة -->
+      <div class="page-header">
+        <div class="container">
+          <h1>خدماتنا</h1>
+        </div>
+      </div>
+
+      <!-- قسم المقدمة -->
+      <section class="section services-intro-section">
+        <div class="container">
+          <div class="section-title">
+            <h2>نقدم خدمات متكاملة في مجال التجارة الإلكترونية</h2>
+            <p>
+              نساعدك على بناء وتطوير متجرك الإلكتروني وتحقيق النجاح في عالم
+              التجارة الإلكترونية
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الخدمات -->
+      <section class="section services-list-section">
+        <div class="container">
+          <div class="services-grid">
+            <!-- باقة الانشاء -->
+            <div class="service-card">
+              <div class="service-icon">
+                <i class="fas fa-store"></i>
+              </div>
+              <h3>باقة الانشاء</h3>
+              <p>
+                إنشاء متجر إلكتروني احترافي مع تصميم فريد وواجهة سهلة الاستخدام
+              </p>
+              <ul class="service-features">
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تصميم متجر إلكتروني احترافي</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>واجهة مستخدم سهلة وجذابة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>توافق مع جميع الأجهزة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>ربط بوابات الدفع</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>إعداد المنتجات الأساسية</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تدريب على إدارة المتجر</span>
+                </li>
+              </ul>
+              <a href="https://wa.me/201002241591" class="btn"> طلب الخدمة </a>
+            </div>
+
+            <!-- باقة رواد الأعمال -->
+            <div class="service-card">
+              <div class="service-icon">
+                <i class="fas fa-rocket"></i>
+              </div>
+              <h3>باقة رواد الأعمال</h3>
+              <p>خدمات متكاملة لرواد الأعمال تشمل التصميم والتطوير والتسويق</p>
+              <ul class="service-features">
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تصميم هوية بصرية كاملة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>إنشاء متجر إلكتروني احترافي</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>استضافة لمدة سنة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>إعداد وسائل التواصل الاجتماعي</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>حملة تسويقية أساسية</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>دعم فني لمدة 3 أشهر</span>
+                </li>
+              </ul>
+              <a href="https://wa.me/201002241591" class="btn"> طلب الخدمة </a>
+            </div>
+
+            <!-- باقة السوشيال ميديا -->
+            <div class="service-card">
+              <div class="service-icon">
+                <i class="fas fa-hashtag"></i>
+              </div>
+              <h3>السوشيال ميديا</h3>
+              <p>إدارة منصات التواصل الاجتماعي وتصميم المحتوى الإبداعي</p>
+              <ul class="service-features">
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>إدارة حسابات التواصل الاجتماعي</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تصميم محتوى إبداعي</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>جدولة المنشورات</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تحليل الأداء وتقارير شهرية</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>إدارة الإعلانات المدفوعة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>التفاعل مع الجمهور</span>
+                </li>
+              </ul>
+              <a href="https://wa.me/201002241591" class="btn"> طلب الخدمة </a>
+            </div>
+
+            <!-- الباقة الكاملة -->
+            <div class="service-card">
+              <div class="service-icon">
+                <i class="fas fa-crown"></i>
+              </div>
+              <h3>الباقة الكاملة</h3>
+              <p>
+                حلول شاملة للتجارة الإلكترونية من الإنشاء إلى التسويق والمبيعات
+              </p>
+              <ul class="service-features">
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>جميع مميزات الباقات السابقة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>استراتيجية تسويقية متكاملة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>حملات إعلانية مدفوعة</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تحسين محركات البحث SEO</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تصوير المنتجات بجودة عالية</span>
+                </li>
+                <li>
+                  <i class="fas fa-check check-icon"></i>
+                  <span>تقارير أداء شهرية</span>
+                </li>
+              </ul>
+              <a href="https://wa.me/201002241591" class="btn"> طلب الخدمة </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الشركاء -->
+      <section class="section partners-section">
+        <div class="container">
+          <div class="section-title">
+            <h2>شركاء درب النجاح</h2>
+            <p>نفخر بالتعاون مع أفضل العلامات التجارية</p>
+          </div>
+          <div class="partners-grid">
+            <div class="partner-logo">
+              <img src="assets/images/logos/1.png" alt="شريك 1" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/2.webp" alt="شريك 2" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/3.webp" alt="شريك 3" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/4.png" alt="شريك 4" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/5.webp" alt="شريك 5" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/6.png" alt="شريك 6" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/7.png" alt="شريك 6" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/8.png" alt="شريك 8" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/9.png" alt="شريك 9" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/10.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/11.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/12.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/13.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/14.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/15.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/16.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/17.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/18.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/19.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/20.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/21.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/22.png" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الدعوة للتواصل -->
+      <section class="section cta-section">
+        <div class="container">
+          <div class="cta-content-centered">
+            <div class="cta-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <h2>هل تحتاج إلى خدمة مخصصة؟</h2>
+            <p>تواصل معنا لمناقشة احتياجاتك الخاصة وسنقدم لك الحل المناسب</p>
+            <a href="https://wa.me/201002241591" class="btn-primary-glow">
+              <i class="fab fa-whatsapp"></i> تواصل معنا الآن
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="/assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميزاً. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="/assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="index.html">الرئيسية</a></li>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="services.html">خدماتنا</a></li>
+              <li><a href="portfolio.html">أعمالنا</a></li>
+              <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>مصر</span>
+              </li>
+              <li>
+                <i class="fas fa-phone"></i>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <i class="fab fa-telegram"></i>
+              </a>
+              <a href="https://www.youtube.com/@customcss296" target="_blank">
+                <i class="fab fa-youtube"></i>
+              </a>
+              <a href="https://www.pinterest.com/salla1zid" target="_blank">
+                <i class="fab fa-pinterest"></i>
+              </a>
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <i class="fab fa-behance"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            مصمم منصة زد وسلة
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- ملفات JavaScript -->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

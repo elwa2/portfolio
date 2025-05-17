@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أعمالنا - Ali Ahmed | مصمم منصة زد وسلة Custom Css Salla zid</title>
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ملفات CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* أنماط خاصة بصفحة الأعمال */
+        .portfolio-filter {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .portfolio-filter button {
+            background-color: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: var(--border-radius); font-family: "Tajawal", sans-serif;
+        }
+
+        .portfolio-filter button:hover {
+            color: var(--accent-color);
+        }
+
+        .portfolio-filter button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .portfolio-item {
+            display: block;
+        }
+
+        .portfolio-item.hide {
+            display: none;
+        }
+
+        /* تعديل تأثير hover للصور الطويلة */
+        .portfolio-image {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            transition: top 1s ease-in-out;
+            max-height: none; /* إزالة الحد الأقصى للارتفاع */
+        }
+
+        /* تم إزالة portfolio-overlay */
+
+        .portfolio-item:hover .portfolio-image img {
+            top: calc(-100% + -346px)
+ /* تحريك الصورة لأسفل بالكامل مع ترك ارتفاع العنصر فقط */
+        }
+
+        @media (max-width: 768px) {
+            .portfolio-filter {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .portfolio-image {
+                height: 200px;
+            }
+
+            .portfolio-image img {
+                max-height: none;
+            }
+
+            .portfolio-item:hover .portfolio-image img {
+                top: calc(-100% + -346px)
+
+            }
+        }
+
+        @media (max-width: 576px) {
+            .portfolio-image {
+                height: 180px;
+            }
+
+            .portfolio-image img {
+                max-height: none;
+            }
+
+            .portfolio-item:hover .portfolio-image img {
+                top: calc(-100% + -346px)
+            }
+        }
+
+        /* أنماط قسم المواقع المميزة */
+        .featured-sites-section {
+            background-color: var(--bg-color-alt);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-sites-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .packages-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 40px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .package-tab {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .package-tab:hover {
+            background-color: rgba(var(--primary-rgb), 0.1);
+        }
+
+        .package-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .sites-list {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sites-list.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .site-card {
+            background-color: var(--card-bg, white);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-purple));
+            transition: all 0.3s ease;
+        }
+
+        .site-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .site-card:hover::before {
+            height: 8px;
+        }
+
+        .site-icon {
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .site-card h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .site-url {
+            color: var(--text-color-light);
+            font-size: 0.9rem;
+            direction: ltr;
+            display: block;
+        }
+
+        /* تعديلات الوضع الداكن */
+        [data-theme="dark"] .site-card {
+            background-color: var(--card-bg-dark, #1e1e2d);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .site-card:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* تعديلات للشاشات المتوسطة والصغيرة */
+        @media (max-width: 992px) {
+            .packages-tabs {
+                gap: 10px;
+            }
+
+            .package-tab {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+
+            .sites-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .packages-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .package-tab {
+                width: 100%;
+                max-width: 250px;
+                text-align: center;
+            }
+
+            .sites-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .site-card {
+                padding: 20px 15px;
+            }
+
+            .site-icon {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .site-card h3 {
+                font-size: 1rem;
+            }
+
+            .site-url {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- القائمة العلوية -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="/assets/images/logo.svg" alt="Ali Ahmed">
+                    </a>
+                </div>
+
+                <nav class="nav">
+                    <ul class="nav-links">
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="about.html">من نحن</a></li>
+                        <li><a href="services.html">خدماتنا</a></li>
+                        <li><a href="portfolio.html" class="active">أعمالنا</a></li>
+                        <li><a href="contact.html">تواصل معنا</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="https://wa.me/201002241591" class="contact-btn">
+                        <i class="fab fa-whatsapp"></i> تواصل معنا
+                    </a>
+                    <div class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div class="mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- القسم الرئيسي -->
+    <main>
+        <!-- عنوان الصفحة -->
+        <div class="page-header">
+            <div class="container">
+                <h1>أعمالنا</h1>
+            </div>
+        </div>
+
+        <!-- قسم المحتوى -->
+        <section class="section portfolio-content-section">
+            <div class="container">
+                <div class="portfolio-filter">
+                    <button class="filter-btn active" data-filter="all">الكل</button>
+                    <button class="filter-btn" data-filter="ecommerce">المتاجر الإلكترونية</button>
+                    <button class="filter-btn" data-filter="marketing">الحملات التسويقية</button>
+                </div>
+
+                <div class="portfolio-grid">
+                    <!-- المتاجر الإلكترونية -->
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/1.jpeg" alt="متجر إلكتروني 1">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/2.jpeg" alt="متجر إلكتروني 2">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/3.jpeg" alt="متجر إلكتروني 3">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/4.jpeg" alt="متجر إلكتروني 4">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/5.jpeg" alt="متجر إلكتروني 5">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/6.jpeg" alt="متجر إلكتروني 6">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/7.jpeg" alt="متجر إلكتروني 7">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/8.jpeg" alt="متجر إلكتروني 8">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/9.jpeg" alt="متجر إلكتروني 9">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/10.jpeg" alt="متجر إلكتروني 10">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/11.jpeg" alt="متجر إلكتروني 11">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/12.jpeg" alt="متجر إلكتروني 12">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/13.jpeg" alt="متجر إلكتروني 13">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/14.jpeg" alt="متجر إلكتروني 14">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/15.jpeg" alt="متجر إلكتروني 15">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/16.jpeg" alt="متجر إلكتروني 16">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/17.jpeg" alt="متجر إلكتروني 17">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/18.jpeg" alt="متجر إلكتروني 18">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/19.jpeg" alt="متجر إلكتروني 19">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/20.jpeg" alt="متجر إلكتروني 20">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/21.jpeg" alt="متجر إلكتروني 21">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="ecommerce">
+                        <a href="#" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/prt/22.jpeg" alt="متجر إلكتروني 22">
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- الحملات التسويقية -->
+                    <div class="portfolio-item" data-category="marketing">
+                        <a href="https://example.com" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/حملات/Screenshot 2024-04-06 124958_0000_Screenshot 2024-04-17 144450.jpg" alt="حملة تسويقية 1">
+                                <div class="portfolio-overlay">
+                                    <h3>حملة تسويقية 1</h3>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="marketing">
+                        <a href="https://example.com" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/حملات/Screenshot 2024-04-06 124958_0001_Screenshot 2024-04-17 144237.jpg" alt="حملة تسويقية 2">
+                                <div class="portfolio-overlay">
+                                    <h3>حملة تسويقية 2</h3>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="portfolio-item" data-category="marketing">
+                        <a href="https://example.com" target="_blank">
+                            <div class="portfolio-image">
+                                <img src="assets/images/حملات/Screenshot 2024-04-06 124958_0002_Screenshot 2024-04-17 144156.jpg" alt="حملة تسويقية 3">
+                                <div class="portfolio-overlay">
+                                    <h3>حملة تسويقية 3</h3>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم المواقع المميزة -->
+        <section class="section featured-sites-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>مواقع مميزة</h2>
+                    <p>مجموعة مختارة من المواقع المميزة التي قمت بتصميمها على مختلف الباقات</p>
+                </div>
+
+                <!-- تبويبات الباقات -->
+                <div class="packages-tabs">
+                    <button class="package-tab active" data-package="plus">باقة بلس - سلة</button>
+                    <button class="package-tab" data-package="pro">باقة برو - سلة</button>
+                    <button class="package-tab" data-package="basic-zid">باقة أساسية - زد</button>
+                    <button class="package-tab" data-package="growth-zid">باقة نمو - زد</button>
+                </div>
+
+                <!-- قائمة المواقع - باقة بلس -->
+                <div class="sites-list active" id="plus-sites">
+                    <div class="sites-grid">
+                        <a href="https://bashouri.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-store"></i></div>
+                            <h3>Bashouri</h3>
+                            <span class="site-url">bashouri.com</span>
+                        </a>
+                        <a href="https://yeha-alqhwh.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-coffee"></i></div>
+                            <h3>يها القهوة</h3>
+                            <span class="site-url">yeha-alqhwh.com</span>
+                        </a>
+                        <a href="https://anwarshope.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-shopping-bag"></i></div>
+                            <h3>Anwar Shop</h3>
+                            <span class="site-url">anwarshope.com</span>
+                        </a>
+                        <a href="https://mikkka.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-tshirt"></i></div>
+                            <h3>Mikkka</h3>
+                            <span class="site-url">mikkka.com</span>
+                        </a>
+                        <a href="https://abu-suhail.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <h3>أبو سهيل</h3>
+                            <span class="site-url">abu-suhail.com</span>
+                        </a>
+                        <a href="https://alkindarsa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <h3>الكندرسة</h3>
+                            <span class="site-url">alkindarsa.com</span>
+                        </a>
+                        <a href="https://rawanstationery.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-pencil-alt"></i></div>
+                            <h3>روان للقرطاسية</h3>
+                            <span class="site-url">rawanstationery.com</span>
+                        </a>
+                        <a href="https://woody27.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-chair"></i></div>
+                            <h3>Woody27</h3>
+                            <span class="site-url">woody27.com</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- قائمة المواقع - باقة برو -->
+                <div class="sites-list" id="pro-sites">
+                    <div class="sites-grid">
+                        <a href="https://hadaiqalteeb.sa/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-seedling"></i></div>
+                            <h3>حدائق الطيب</h3>
+                            <span class="site-url">hadaiqalteeb.sa</span>
+                        </a>
+                        <a href="https://woceanstore.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-water"></i></div>
+                            <h3>Wocean Store</h3>
+                            <span class="site-url">woceanstore.com</span>
+                        </a>
+                        <a href="https://arwmed.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-heartbeat"></i></div>
+                            <h3>Arwmed</h3>
+                            <span class="site-url">arwmed.com</span>
+                        </a>
+                        <a href="https://fireplaces-su4o1.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-fire"></i></div>
+                            <h3>Fireplaces</h3>
+                            <span class="site-url">fireplaces-su4o1.com</span>
+                        </a>
+                        <a href="https://volt-visions.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-bolt"></i></div>
+                            <h3>Volt Visions</h3>
+                            <span class="site-url">volt-visions.com</span>
+                        </a>
+                        <a href="https://mlika-sa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-crown"></i></div>
+                            <h3>متجر ملكة</h3>
+                            <span class="site-url">mlika-sa.com</span>
+                        </a>
+                        <a href="https://ofuqaljawal.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <h3>أفق الجوال</h3>
+                            <span class="site-url">ofuqaljawal.com</span>
+                        </a>
+                        <a href="https://grippysa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-hand-rock"></i></div>
+                            <h3>قريبي</h3>
+                            <span class="site-url">grippysa.com</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- قائمة المواقع - باقة أساسية زد -->
+                <div class="sites-list" id="basic-zid-sites">
+                    <div class="sites-grid">
+                        <a href="https://hawraaabaya.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-female"></i></div>
+                            <h3>حوراء عباية</h3>
+                            <span class="site-url">hawraaabaya.com</span>
+                        </a>
+                        <a href="https://newinsa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <h3>New in SA</h3>
+                            <span class="site-url">newinsa.com</span>
+                        </a>
+                        <a href="https://rassmah.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-paint-brush"></i></div>
+                            <h3>رسمة</h3>
+                            <span class="site-url">rassmah.com</span>
+                        </a>
+                        <a href="https://nb3alhayah.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-leaf"></i></div>
+                            <h3>نبع الحياة</h3>
+                            <span class="site-url">nb3alhayah.com</span>
+                        </a>
+                        <a href="https://nadidah.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-gem"></i></div>
+                            <h3>نديدة</h3>
+                            <span class="site-url">nadidah.com</span>
+                        </a>
+                        <a href="https://albsmh.sa/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-smile"></i></div>
+                            <h3>البسمة</h3>
+                            <span class="site-url">albsmh.sa</span>
+                        </a>
+                        <a href="https://nokttain.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-ellipsis-h"></i></div>
+                            <h3>نقطتين</h3>
+                            <span class="site-url">nokttain.com</span>
+                        </a>
+                        <a href="https://mobcogroup.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-building"></i></div>
+                            <h3>Mobco Group</h3>
+                            <span class="site-url">mobcogroup.com</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- قائمة المواقع - باقة نمو زد -->
+                <div class="sites-list" id="growth-zid-sites">
+                    <div class="sites-grid">
+                        <a href="https://ghaith.info/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-cloud-rain"></i></div>
+                            <h3>غيث</h3>
+                            <span class="site-url">ghaith.info</span>
+                        </a>
+                        <a href="https://almuhaideb.net/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-home"></i></div>
+                            <h3>المهيدب</h3>
+                            <span class="site-url">almuhaideb.net</span>
+                        </a>
+                        <a href="https://dr-store-ksa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-stethoscope"></i></div>
+                            <h3>Dr Store</h3>
+                            <span class="site-url">dr-store-ksa.com</span>
+                        </a>
+                        <a href="https://kesho-ksa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-magic"></i></div>
+                            <h3>Kesho KSA</h3>
+                            <span class="site-url">kesho-ksa.com</span>
+                        </a>
+                        <a href="https://lapeausa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-spa"></i></div>
+                            <h3>Lapea USA</h3>
+                            <span class="site-url">lapeausa.com</span>
+                        </a>
+                        <a href="https://tha-sa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-gift"></i></div>
+                            <h3>THA SA</h3>
+                            <span class="site-url">tha-sa.com</span>
+                        </a>
+                        <a href="https://oilplus-sa.com/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-oil-can"></i></div>
+                            <h3>Oil Plus</h3>
+                            <span class="site-url">oilplus-sa.com</span>
+                        </a>
+                        <a href="https://brq.sa/" target="_blank" class="site-card">
+                            <div class="site-icon"><i class="fas fa-lightbulb"></i></div>
+                            <h3>BRQ</h3>
+                            <span class="site-url">brq.sa</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الدعوة للتواصل -->
+        <section class="section cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>هل تريد أن يكون متجرك ضمن قائمة أعمالي؟</h2>
+                    <p>تواصل معي الآن لبدء رحلة تطوير متجرك الإلكتروني</p>
+                    <a href="https://wa.me/201002241591" class="btn btn-lg">
+                        <i class="fab fa-whatsapp"></i> تواصل معي الآن
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="/assets/images/logo.svg" alt="Ali Ahmed">
+                    </div>
+                    <p class="about-text">
+                        مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميزاً. خبرة واسعة في تحسين واجهة المستخدم وتجربة التسوق لزيادة المبيعات.
+                    </p>
+                    <div class="footer-certificate">
+                        <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                            <img src="/assets/images/logo ico.svg" alt="Ali Ahmed">
+                            <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+                        </a>
+                    </div>
+                    <p class="footer-cr">Custom Css Salla zid</p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>روابط سريعة</h3>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="about.html">من نحن</a></li>
+                        <li><a href="services.html">خدماتنا</a></li>
+                        <li><a href="portfolio.html">أعمالنا</a></li>
+                        <li><a href="contact.html">تواصل معنا</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-contact">
+                    <h3>تواصل معنا</h3>
+                    <ul>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>مصر</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <span>+20 100 224 1591</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>salla1zid@gmail.com</span>
+                        </li>
+                    </ul>
+                    <div class="footer-social">
+                        <a href="https://wa.me/201002241591" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://twitter.com/salla1zid" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://t.me/cssfree1" target="_blank">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="https://www.youtube.com/@customcss296" target="_blank">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://www.pinterest.com/salla1zid" target="_blank">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                        <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                            <i class="fab fa-behance"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | مصمم منصة زد وسلة</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- ملفات JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // تصفية الأعمال
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // إزالة الفئة النشطة من جميع الأزرار
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+
+                    // إضافة الفئة النشطة للزر المحدد
+                    this.classList.add('active');
+
+                    // الحصول على فئة التصفية
+                    const filterValue = this.getAttribute('data-filter');
+
+                    // تصفية العناصر
+                    portfolioItems.forEach(item => {
+                        if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                            item.classList.remove('hide');
+                        } else {
+                            item.classList.add('hide');
+                        }
+                    });
+                });
+            });
+
+            // تبديل تبويبات المواقع المميزة
+            const packageTabs = document.querySelectorAll('.package-tab');
+            const sitesLists = document.querySelectorAll('.sites-list');
+
+            packageTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // إزالة الفئة النشطة من جميع التبويبات
+                    packageTabs.forEach(t => t.classList.remove('active'));
+
+                    // إخفاء جميع قوائم المواقع
+                    sitesLists.forEach(list => list.classList.remove('active'));
+
+                    // إضافة الفئة النشطة للتبويب المحدد
+                    this.classList.add('active');
+
+                    // إظهار قائمة المواقع المناسبة
+                    const packageValue = this.getAttribute('data-package');
+                    const targetList = document.getElementById(`${packageValue}-sites`);
+                    if (targetList) {
+                        targetList.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

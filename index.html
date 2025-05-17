@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ali Ahmed | مصمم منصة زد وسلة Custom Css Salla zid</title>
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Swiper CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"
+    />
+    <!-- ملفات CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/scrolling-logos.css" />
+    <link rel="stylesheet" href="assets/css/floating-whatsapp.css" />
+    <link rel="stylesheet" href="assets/css/help-section.css" />
+    <link rel="stylesheet" href="assets/css/contact-form.css" />
+    <style>
+      /* أنماط قسم من نحن المحسنة */
+      .about-section-centered {
+        padding: 80px 0;
+        background-color: var(--bg-color);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .about-section-centered:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="2" cy="2" r="1" fill="rgba(138, 125, 219, 0.1)"/></svg>');
+        opacity: 0.5;
+        z-index: 0;
+      }
+
+      .about-content-centered {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 40px 30px;
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        position: relative;
+        z-index: 1;
+      }
+
+      .about-icon-centered {
+        font-size: 2.5rem;
+        color: white;
+        margin-bottom: 20px;
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        line-height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .about-content-centered h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        position: relative;
+        display: inline-block;
+      }
+
+      .about-content-centered h2:after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(
+          to right,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        border-radius: 3px;
+      }
+
+      .about-content-centered p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 30px;
+        color: var(--text-color);
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .about-actions-centered {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn-primary-glow {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary-glow:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transform: translateX(-100%);
+        animation: glow 3s infinite;
+        z-index: -1;
+      }
+
+      .btn-outline-glow {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-outline-glow:hover {
+        background: var(--primary-color);
+        color: white;
+        box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        transform: translateY(-3px);
+      }
+
+      .btn-primary-glow:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(var(--primary-rgb), 0.4);
+      }
+
+      @keyframes glow {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      /* تصميم متجاوب */
+      @media (max-width: 768px) {
+        .about-content-centered {
+          padding: 30px 20px;
+        }
+
+        .about-icon-centered {
+          width: 70px;
+          height: 70px;
+          line-height: 70px;
+          font-size: 2rem;
+        }
+
+        .about-content-centered h2 {
+          font-size: 2rem;
+        }
+
+        .about-content-centered p {
+          font-size: 1rem;
+        }
+
+        .about-actions-centered {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .btn-primary-glow,
+        .btn-outline-glow {
+          width: 100%;
+          padding: 10px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- القائمة العلوية -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="index.html">
+              <img src="/assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="index.html" class="active">الرئيسية</a></li>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="services.html">خدماتنا</a></li>
+              <li><a href="portfolio.html">أعمالنا</a></li>
+              <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <i class="fas fa-moon"></i>
+            </div>
+            <div class="mobile-toggle">
+              <i class="fas fa-bars"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- القسم الرئيسي -->
+    <main>
+      <!-- قسم الترحيب -->
+      <section class="hero-section full-width">
+        <div class="hero-background"></div>
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">جاهزين للعمل على مشروعك</div>
+            <h1>نبدع في تصميم متجر رهيب لك!</h1>
+            <p>
+              لديك مشروع، وتريد بناء متجر أو موقع متكامل خاص به؟ نحن هنا لنبدع
+              في تصميم موقع احترافي خاص بك أو بمشروعك
+            </p>
+            <a href="https://wa.me/201002241591" class="hero-btn">
+              تواصل معنا الآن
+            </a>
+          </div>
+        </div>
+
+        <!-- شريط الشعارات المتحرك -->
+        <div class="partners-bar">
+          <div class="container">
+            <div class="scrolling-logos-container">
+              <div class="scrolling-logos">
+                <div class="logo-item">
+                  <img src="assets/images/salla.svg" alt="salla" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/zid.svg" alt="Logo 1" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo1.svg" alt="Logo 1" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo2.svg" alt="Logo 2" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo3.svg" alt="Logo 3" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo4.svg" alt="Logo 4" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo5.svg" alt="Logo 5" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo6.svg" alt="Logo 6" />
+                </div>
+                <!-- تكرار الشعارات لضمان استمرارية الحركة -->
+                <div class="logo-item">
+                  <img src="assets/images/salla.svg" alt="salla" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/zid.svg" alt="Logo 1" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo1.svg" alt="Logo 1" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo2.svg" alt="Logo 2" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo3.svg" alt="Logo 3" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo4.svg" alt="Logo 4" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo5.svg" alt="Logo 5" />
+                </div>
+                <div class="logo-item">
+                  <img src="assets/images/logo6.svg" alt="Logo 6" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم كيف يمكننا مساعدتك -->
+      <section class="help-section" id="help">
+        <div class="container">
+          <h2 class="help-title">كيف يمكننا مساعدتك!</h2>
+          <div class="help-cards">
+            <div class="help-card">
+              <div class="help-card-icon">
+                <i class="fas fa-desktop"></i>
+              </div>
+              <h3>تصميم المواقع</h3>
+              <p>
+                نقدم لك تصميم موقع احترافي يناسب رؤية شركتك. نقدم تصميمات مبتكرة
+                من خلال فريق مختص. نستخدم: ووردبريس، إلمنتور، دروبال.
+              </p>
+            </div>
+            <div class="help-card">
+              <div class="help-card-icon">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <h3>إدارة المواقع</h3>
+              <p>
+                نقدم موقع متكامل مع إدارة كاملة. نوفر لك موقع متكامل مع خدمات
+                الصيانة والتحديثات. نوفر دعم فني مع كل باقات الخدمة.
+              </p>
+            </div>
+            <div class="help-card">
+              <div class="help-card-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <h3>ضبط الـ SEO</h3>
+              <p>
+                نحرص على تقديم مواقع متوافقة مع محركات البحث. الظهور في الصفحات
+                الأولى من نتائج محركات البحث. التحسين على كلمات مفتاحية محددة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الخدمات -->
+      <section class="section services-section" id="features">
+        <div class="container">
+          <div class="section-title">
+            <h2>خدماتنا</h2>
+            <p>
+              نقدم مجموعة متكاملة من الخدمات لمساعدتك في بناء وتطوير متجرك
+              الإلكتروني
+            </p>
+          </div>
+          <div class="services-grid">
+            <div class="service-card">
+              <div class="service-icon"></div>
+              <h3>باقة الانشاء</h3>
+              <p>
+                إنشاء متجر إلكتروني احترافي مع تصميم فريد وواجهة سهلة الاستخدام
+              </p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon"></div>
+              <h3>باقة رواد الأعمال</h3>
+              <p>خدمات متكاملة لرواد الأعمال تشمل التصميم والتطوير والتسويق</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon"></div>
+              <h3>السوشيال الأعمال</h3>
+              <p>إدارة منصات التواصل الاجتماعي وتصميم المحتوى الإبداعي</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon"></div>
+              <h3>الباقة الكاملة</h3>
+              <p>
+                حلول شاملة للتجارة الإلكترونية من الإنشاء إلى التسويق والمبيعات
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الأعمال - سلايدر متحرك -->
+      <section class="portfolio-slider-section" id="stores">
+        <div class="container">
+          <div class="portfolio-slider-title">
+            <h2>بعض من أعمالنا</h2>
+            <p>نفخر بالعمل مع العديد من العلامات التجارية الناجحة</p>
+          </div>
+        </div>
+
+        <div class="portfolio-slider-container">
+          <!-- الصف الأول - يتحرك من اليمين إلى اليسار -->
+          <div class="portfolio-slider-row row1">
+              <a class="portfolio-slider-item">
+              <img src="assets/images/prt/11.jpeg" />
+            </a>  <a
+              href="#"
+              target="_blank"
+              target="_blank"
+              class="portfolio-slider-item"            >
+              <img src="assets/images/prt/1.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/2.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/3.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/4.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/5.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/6.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/7.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/8.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/9.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/10.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/12.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/13.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/14.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/15.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/16.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/17.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/18.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/18.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/19.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/20.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/21.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/22.jpeg" />
+            </a>
+           
+         
+          </div>
+
+          <!-- الصف الثاني - يتحرك من اليسار إلى اليمين -->
+          <div class="portfolio-slider-row row2">
+              <a class="portfolio-slider-item">
+              <img src="assets/images/prt/11.jpeg" />
+            </a>  <a
+              href="#"
+              target="_blank"
+              target="_blank"
+              class="portfolio-slider-item"
+            >
+              <img src="assets/images/prt/1.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/2.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/3.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/4.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/5.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/6.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/7.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/8.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/9.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/10.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/10.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/12.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/13.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/14.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/15.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/16.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/17.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/18.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/19.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/20.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/21.jpeg" />
+            </a>
+            <a class="portfolio-slider-item">
+              <img src="assets/images/prt/22.jpeg" />
+            </a>
+         
+          </div>
+        </div>
+
+        <div class="container">
+          <div
+            class="portfolio-action"
+            style="text-align: center; margin-top: 40px"
+          >
+            <a href="portfolio.html" class="btn">عرض المزيد من الأعمال</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم من نحن -->
+      <section class="section about-section-centered">
+        <div class="container">
+          <div class="about-content-centered">
+            <div class="about-icon-centered">
+              <i class="fas fa-code"></i>
+            </div>
+            <h2>من نحن</h2>
+            <p>
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميزاً. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات وتحويل زوار متجرك إلى عملاء دائمين.
+            </p>
+            <div class="about-actions-centered">
+              <a href="https://wa.me/201002241591" class="btn btn-primary-glow">
+                <i class="fab fa-whatsapp"></i> تواصل معنا
+              </a>
+              <a href="about.html" class="btn btn-outline-glow">معرفة المزيد</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم آراء العملاء -->
+      <section class="section testimonials-section">
+        <div class="container">
+          <div class="section-title">
+            <h2>اراء عملاؤنا</h2>
+            <p>ما يقوله عملاؤنا عن خدماتنا</p>
+          </div>
+          <div class="testimonials-grid">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  مشكور علي جهودكم والله ما قصرتم ما كنت متوقع كل هذه المبيعات
+                  ابي ادخال الاجهزة الصغيرة في الحملات الإعلانية الفترة القادمة
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-image">
+                  <img
+                    src="assets/images/avatar_male.webp"
+                    alt="محمد عبد الله الملحم"
+                  />
+                </div>
+                <h4>محمد عبد الله الملحم</h4>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  والله مبهورة جدا بشكل المتجر اكثر من رائع 😍 هنبدأ الحين في
+                  الإعلانات ؟
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-image">
+                  <img
+                    src="assets/images/avatar_female.webp"
+                    alt="مني الفراج"
+                  />
+                </div>
+                <h4>مني الفراج</h4>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  يعطيكم العافية المتجر روعة ايش تكلفة باقات التسويق الشاملة ؟
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-image">
+                  <img
+                    src="assets/images/avatar_male.webp"
+                    alt="محمد علي البراك"
+                  />
+                </div>
+                <h4>محمد علي البراك</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+       <!-- قسم الشركاء -->
+      <section class="section partners-section">
+        <div class="container">
+          <div class="section-title">
+            <h2>شركاء درب النجاح</h2>
+            <p>نفخر بالتعاون مع أفضل العلامات التجارية</p>
+          </div>
+          <div class="partners-grid">
+            <div class="partner-logo">
+              <img src="assets/images/logos/1.png" alt="شريك 1" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/2.webp" alt="شريك 2" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/3.webp" alt="شريك 3" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/4.png" alt="شريك 4" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/5.webp" alt="شريك 5" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/6.png" alt="شريك 6" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/7.png" alt="شريك 6" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/8.png" alt="شريك 8" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/9.png" alt="شريك 9" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/10.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/11.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/12.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/13.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/14.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/15.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/16.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/17.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/18.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/19.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/20.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/21.png" />
+            </div>
+            <div class="partner-logo">
+              <img src="assets/images/logos/22.png" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم التواصل -->
+      <section class="section contact-section" id="contact">
+        <div class="container">
+          <div class="contact-content">
+            <div class="contact-form-container">
+              <h2>تواصل معنا</h2>
+              <p>
+                فقط برجاء ملء بعض البيانات البسيطة وسنقوم بالتواصل معك في أسرع
+                وقت لمناقشة احتياجات مشروعك
+              </p>
+
+              <!-- نموذج الاتصال -->
+              <form id="contact-form" class="contact-form">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    id="contact-name"
+                    placeholder="الاسم"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="email"
+                    id="contact-email"
+                    placeholder="البريد الإلكتروني"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    id="contact-website"
+                    placeholder="الموقع الإلكتروني (اختياري)"
+                  />
+                </div>
+                <div class="form-group">
+                  <select id="contact-service" required>
+                    <option value="" disabled selected>اختر نوع الخدمة</option>
+                    <option value="تصميم موقع">تصميم موقع</option>
+                    <option value="تطوير متجر إلكتروني">
+                      تطوير متجر إلكتروني
+                    </option>
+                    <option value="تحسين SEO">تحسين SEO</option>
+                    <option value="إدارة مواقع">إدارة مواقع</option>
+                    <option value="خدمة أخرى">خدمة أخرى</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <textarea
+                    id="contact-message"
+                    placeholder="اكتب رسالتك هنا..."
+                    rows="4"
+                    required
+                  ></textarea>
+                </div>
+                <button type="submit" id="submit-button" class="submit-btn">
+                  <i class="fab fa-whatsapp"></i> إرسال عبر واتساب
+                  <span class="btn-shine"></span>
+                </button>
+              </form>
+
+              <!-- رسالة النجاح -->
+              <div id="success-message">
+                <i class="fas fa-check-circle"></i>
+                <h3>تم إرسال رسالتك بنجاح!</h3>
+                <p>شكراً لتواصلك معنا. سنقوم بالرد عليك في أقرب وقت ممكن.</p>
+                <button id="reset-form" class="success-btn">
+                  إرسال رسالة أخرى
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="/assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميزاً. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="/assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="index.html">الرئيسية</a></li>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="services.html">خدماتنا</a></li>
+              <li><a href="portfolio.html">أعمالنا</a></li>
+              <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>مصر</span>
+              </li>
+              <li>
+                <i class="fas fa-phone"></i>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <i class="fas fa-envelope"></i>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <i class="fab fa-telegram"></i>
+              </a>
+              <a href="https://www.youtube.com/@customcss296" target="_blank">
+                <i class="fab fa-youtube"></i>
+              </a>
+              <a href="https://www.pinterest.com/salla1zid" target="_blank">
+                <i class="fab fa-pinterest"></i>
+              </a>
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <i class="fab fa-behance"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            مصمم منصة زد وسلة
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <!-- ملفات JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/scrolling-logos.js"></script>
+    <script src="assets/js/contact-form.js"></script>
+
+    <!-- سكريبت السلايدر المتحرك مع دعم السحب -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // تحويل السلايدر الحالي إلى سلايدر Swiper
+        const portfolioSliderContainer = document.querySelector(
+          ".portfolio-slider-container"
+        );
+
+        // إنشاء عناصر Swiper جديدة
+        const createSwiper = (rowClass, direction) => {
+          const originalRow = document.querySelector(`.${rowClass}`);
+          if (!originalRow) return;
+
+          const items = originalRow.querySelectorAll(".portfolio-slider-item");
+          const swiperContainer = document.createElement("div");
+          swiperContainer.className = `swiper portfolio-swiper ${rowClass}-swiper`;
+
+          const swiperWrapper = document.createElement("div");
+          swiperWrapper.className = "swiper-wrapper";
+
+          // نقل العناصر إلى Swiper
+          items.forEach((item) => {
+            const slide = document.createElement("div");
+            slide.className = "swiper-slide";
+            slide.appendChild(item.cloneNode(true));
+            swiperWrapper.appendChild(slide);
+          });
+
+          swiperContainer.appendChild(swiperWrapper);
+
+          // استبدال الصف الأصلي بـ Swiper
+          originalRow.parentNode.replaceChild(swiperContainer, originalRow);
+
+          // تهيئة Swiper
+          return new Swiper(`.${rowClass}-swiper`, {
+            slidesPerView: "auto",
+            spaceBetween: 30,
+            loop: true,
+            grabCursor: true,
+            autoplay: {
+              delay: 0,
+              disableOnInteraction: false,
+              reverseDirection: direction === "rtl",
+            },
+            speed: 5000,
+            freeMode: {
+              enabled: true,
+              momentum: false,
+            },
+            on: {
+              touchStart: function () {
+                this.autoplay.stop();
+              },
+              touchEnd: function () {
+                this.autoplay.start();
+              },
+            },
+          });
+        };
+
+        // إنشاء سلايدرات Swiper
+        const swiper1 = createSwiper("row1", "ltr");
+        const swiper2 = createSwiper("row2", "rtl");
+
+        // إضافة أنماط CSS للسلايدر
+        const style = document.createElement("style");
+        style.textContent = `
+                .portfolio-swiper {
+                    overflow: visible;
+                    margin: 20px 0;
+                }
+                .swiper-slide {
+                    width: auto;
+                    height: auto;
+                }
+                .swiper-slide .portfolio-slider-item {
+                    margin: 0;
+                    width: 547px;
+                    height: 506px;
+                    display: block;
+                }
+                @media (max-width: 768px) {
+                    .swiper-slide .portfolio-slider-item {
+                        width: 250px;
+                        height: 180px;
+                    }
+                }
+                @media (max-width: 576px) {
+                    .swiper-slide .portfolio-slider-item {
+                        width: 200px;
+                        height: 150px;
+                    }
+                }
+            `;
+        document.head.appendChild(style);
+      });
+    </script>
+  </body>
+</html>
