@@ -1,10 +1,14 @@
+/* قسم كيف يمكننا مساعدتك - يدعم الوضع الداكن والفاتح */
 .help-section {
   padding: 80px 0;
   position: relative;
-  background-color: rgba(65, 47, 144, 0.03);
+  background-color: var(--bg-color-alt);
   border-radius: 20px;
   margin: 50px 0;
   overflow: hidden;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .help-section::before {
@@ -19,6 +23,16 @@
   background-position: center;
   opacity: 0.05;
   z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* تعديل الخلفية في الوضع المظلم */
+[data-theme="dark"] .help-section {
+  background-color: var(--bg-color-card);
+}
+
+[data-theme="dark"] .help-section::before {
+  opacity: 0.1;
 }
 
 .help-section .container {
@@ -31,8 +45,9 @@
   margin-bottom: 50px;
   font-size: 2.5rem;
   font-weight: 800;
-  color: #412f90;
+  color: var(--accent-color);
   position: relative;
+  transition: color 0.3s ease;
 }
 
 .help-title::after {
@@ -43,8 +58,9 @@
   transform: translateX(-50%);
   width: 80px;
   height: 4px;
-  background: linear-gradient(135deg, #8a7ddb 0%, #6c63ff 100%);
+  background: var(--primary-gradient);
   border-radius: 2px;
+  transition: background 0.3s ease;
 }
 
 .help-cards {
@@ -54,87 +70,247 @@
 }
 
 .help-card {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--bg-color-card);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 30px;
   text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* تأثير الخلفية للبطاقة */
+.help-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.03) 0%, rgba(var(--primary-rgb), 0.01) 100%);
+  z-index: -1;
+  transition: opacity 0.3s ease;
 }
 
 .help-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-hover);
+  border-color: var(--border-color-hover);
+}
+
+/* تأثير الحركة عند التحويم */
+.help-card:hover::before {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 
 .help-card-icon {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #8a7ddb 0%, #6c63ff 100%);
+  background: var(--primary-gradient);
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  color: white;
+  color: var(--white-color);
   font-size: 30px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.help-card:hover .help-card-icon {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
 }
 
 .help-card h3 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 15px;
-  color: #412f90;
+  color: var(--text-color-heading);
+  transition: color 0.3s ease;
 }
 
 .help-card p {
-  color: #666;
+  color: var(--text-color-muted);
   line-height: 1.6;
-  margin-bottom: 0;
+  margin-bottom: 20px;
   font-size: 0.95rem;
+  transition: color 0.3s ease;
 }
 
+/* تنسيق قائمة الميزات */
+.help-card-features {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: auto;
+  width: 100%;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.help-card-features span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-color-muted);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.help-card-features span i {
+  color: var(--accent-color);
+  font-size: 0.8rem;
+}
+
+.help-card:hover .help-card-features span {
+  transform: translateX(-3px);
+}
+
+/* تخصيص الوضع المظلم */
+[data-theme="dark"] .help-card {
+  background-color: var(--bg-color-card);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .help-card-icon {
+  box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.5);
+}
+
+[data-theme="dark"] .help-card-features {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .help-card-features span i {
+  color: var(--accent-color);
+}
+
+/* التصميم المتجاوب */
 @media (max-width: 992px) {
   .help-section {
     padding: 60px 0;
+    margin: 40px 0;
   }
-  
+
   .help-title {
     font-size: 2.2rem;
+  }
+
+  .help-card-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 26px;
   }
 }
 
 @media (max-width: 768px) {
   .help-section {
     padding: 50px 0;
+    margin: 30px 0;
+    border-radius: 15px;
   }
-  
+
   .help-title {
     font-size: 2rem;
   }
-  
+
+  .help-title::after {
+    width: 60px;
+    height: 3px;
+    bottom: -12px;
+  }
+
   .help-cards {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .help-card {
+    padding: 25px;
+  }
+
+  .help-card h3 {
+    font-size: 1.3rem;
+  }
+
+  .help-card-features {
+    padding-top: 12px;
+    gap: 6px;
+  }
+
+  .help-card-features span {
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 576px) {
   .help-section {
     padding: 40px 0;
+    margin: 20px 0;
+    border-radius: 12px;
   }
-  
+
   .help-title {
     font-size: 1.8rem;
+    margin-bottom: 40px;
   }
-  
+
   .help-cards {
     grid-template-columns: 1fr;
+  }
+
+  .help-card {
+    padding: 20px;
+  }
+
+  .help-card-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .help-card h3 {
+    margin-bottom: 10px;
+  }
+
+  .help-card p {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .help-card-features {
+    padding-top: 10px;
+    gap: 5px;
+  }
+
+  .help-card-features span {
+    font-size: 0.8rem;
+  }
+
+  .help-card-features span i {
+    font-size: 0.75rem;
   }
 }
