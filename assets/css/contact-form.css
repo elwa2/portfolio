@@ -314,6 +314,7 @@ html:not([data-theme="light"]) .submit-btn {
   letter-spacing: 0.5px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: 'Cairo', sans-serif;
 }
 
 [data-theme="dark"] .submit-btn:hover,
@@ -333,7 +334,7 @@ html:not([data-theme="light"]) .submit-btn:active {
 [data-theme="light"] .submit-btn {
   background: linear-gradient(45deg, #5e3bee, #7d56f9);
   color: white;
-  box-shadow: 0 8px 20px -5px rgba(94, 59, 238, 0.4);
+  box-shadow: 0 8px 20px -5px rgba(94, 59, 238, 0.4);  font-family: 'Cairo', sans-serif;
 }
 
 [data-theme="light"] .submit-btn:hover {
