@@ -257,6 +257,116 @@
                 font-size: 25px;
             }
         }
+
+        /* أنماط التبويبات */
+        .contact-tabs {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: none;
+            background-color: rgba(126, 86, 249, 0.2);
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: "Tajawal", sans-serif;
+            font-size: 1rem;
+            flex: 1;
+            max-width: 200px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #5e3bee, #7d56f9);
+            color: white;
+            box-shadow: 0 8px 20px rgba(94, 59, 238, 0.3);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(126, 86, 249, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 1;
+        }
+
+        .tab-btn.active:hover::before {
+            transform: translateX(100%);
+        }
+
+        .tab-content {
+            position: relative;
+            z-index: 0;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        [data-theme="dark"] .tab-btn {
+            background-color: rgba(126, 86, 249, 0.3);
+            color: white;
+        }
+
+        [data-theme="dark"] .tab-btn.active {
+            background: linear-gradient(135deg, #5e3bee, #7d56f9);
+            color: white;
+        }
+
+        @media (max-width: 576px) {
+            .tab-buttons {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .tab-btn {
+                width: 100%;
+                max-width: 100%;
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -371,39 +481,130 @@
                         <h2>أرسل رسالة</h2>
                         <p>يمكنك إرسال رسالة مباشرة وسأقوم بالرد عليك في أقرب وقت</p>
 
-                        <form class="contact-form" id="contactForm">
-                            <div class="form-group">
-                                <label for="name">الاسم</label>
-                                <input type="text" id="name" placeholder="أدخل اسمك" required>
+                        <!-- أزرار التبديل بين النموذجين -->
+                        <div class="contact-tabs">
+                            <div class="tab-buttons">
+                                <button type="button" class="tab-btn" id="generalFormBtn">استفسار عام</button>
+                                <button type="button" class="tab-btn active" id="pricingFormBtn">طلب تسعير خدمة</button>
                             </div>
-                            <div class="form-group">
-                                <label for="email">البريد الإلكتروني</label>
-                                <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
+
+                            <div class="tab-content">
+                                <!-- نموذج الاستفسار العام -->
+                                <div class="tab-pane" id="generalFormPane" style="display: none;">
+                                    <form class="contact-form" id="generalContactForm">
+                                        <div class="form-group">
+                                            <label for="general-name">الاسم</label>
+                                            <input type="text" id="general-name" placeholder="أدخل اسمك" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="general-email">البريد الإلكتروني</label>
+                                            <input type="email" id="general-email" placeholder="أدخل بريدك الإلكتروني" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="general-phone">رقم الهاتف</label>
+                                            <input type="tel" id="general-phone" placeholder="أدخل رقم هاتفك" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="general-subject">موضوع الرسالة</label>
+                                            <input type="text" id="general-subject" placeholder="أدخل موضوع الرسالة" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="general-message">الرسالة</label>
+                                            <textarea id="general-message" rows="5" placeholder="اكتب رسالتك هنا..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="submit-btn">
+                                            <i class="fab fa-whatsapp"></i> إرسال الرسالة
+                                            <span class="btn-shine"></span>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- نموذج طلب تسعير الخدمات -->
+                                <div class="tab-pane active" id="pricingFormPane">
+                                    <form class="contact-form" id="pricingContactForm">
+                                        <div class="form-group">
+                                            <label for="pricing-name">الاسم</label>
+                                            <input type="text" id="pricing-name" placeholder="أدخل اسمك" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-email">البريد الإلكتروني</label>
+                                            <input type="email" id="pricing-email" placeholder="أدخل بريدك الإلكتروني" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-phone">رقم الهاتف</label>
+                                            <input type="tel" id="pricing-phone" placeholder="أدخل رقم هاتفك" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-website">الموقع الإلكتروني (اختياري)</label>
+                                            <input type="url" id="pricing-website" placeholder="أدخل رابط موقعك إن وجد">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-store-url">🌐 رابط المتجر</label>
+                                            <input type="url" id="pricing-store-url" placeholder="أدخل رابط متجرك">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-platform">🛍️ نوع المنصة</label>
+                                            <select id="pricing-platform" required>
+                                                <option value="" disabled selected>اختر نوع المنصة</option>
+                                                <option value="سلة">سلة</option>
+                                                <option value="زد">زد</option>
+                                                <option value="أخرى">أخرى</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-package">🛒 نوع الباقة</label>
+                                            <select id="pricing-package">
+                                                <option value="" disabled selected>اختر نوع الباقة</option>
+                                                <option value="سلة برو">سلة برو</option>
+                                                <option value="سلة بلس">سلة بلس</option>
+                                                <option value="زد أساسية">زد أساسية</option>
+                                                <option value="زد متقدمة">زد متقدمة</option>
+                                                <option value="زد احترافية">زد احترافية</option>
+                                                <option value="أخرى">أخرى</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-domain">🌐 هل الدومين مدفوع؟</label>
+                                            <select id="pricing-domain">
+                                                <option value="" disabled selected>اختر الإجابة</option>
+                                                <option value="نعم">نعم</option>
+                                                <option value="لا">لا</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-logo">🧩 هل يوجد لديك شعار أو هوية بصرية؟</label>
+                                            <select id="pricing-logo">
+                                                <option value="" disabled selected>اختر الإجابة</option>
+                                                <option value="نعم">نعم</option>
+                                                <option value="لا">لا</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-competitor">متاجر منافسة أو متاجر تعجبك</label>
+                                            <input type="text" id="pricing-competitor" placeholder="أدخل أسماء المتاجر التي تعجبك تصميمها">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-service">نوع الخدمة</label>
+                                            <select id="pricing-service" required>
+                                                <option value="" disabled selected>اختر نوع الخدمة</option>
+                                                <option value="تصميم متجر">تصميم متجر</option>
+                                                <option value="تخصيص CSS">تخصيص CSS</option>
+                                                <option value="تطوير متجر">تطوير متجر</option>
+                                                <option value="خدمة أخرى">خدمة أخرى</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="pricing-message">تفاصيل إضافية</label>
+                                            <textarea id="pricing-message" rows="5" placeholder="اكتب أي تفاصيل إضافية تود إضافتها..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="submit-btn">
+                                            <i class="fab fa-whatsapp"></i> طلب تسعير الخدمة
+                                            <span class="btn-shine"></span>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="phone">رقم الهاتف</label>
-                                <input type="tel" id="phone" placeholder="أدخل رقم هاتفك" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="website">الموقع الإلكتروني (اختياري)</label>
-                                <input type="url" id="website" placeholder="أدخل رابط موقعك إن وجد">
-                            </div>
-                            <div class="form-group">
-                                <label for="service">نوع الخدمة</label>
-                                <select id="service" required>
-                                    <option value="" disabled selected>اختر نوع الخدمة</option>
-                                    <option value="تصميم متجر">تصميم متجر</option>
-                                    <option value="تخصيص CSS">تخصيص CSS</option>
-                                    <option value="تطوير متجر">تطوير متجر</option>
-                                    <option value="خدمة أخرى">خدمة أخرى</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="message">الرسالة</label>
-                                <textarea id="message" rows="5" placeholder="اكتب رسالتك هنا..." required></textarea>
-                            </div>
-                            <button type="submit" class="btn">إرسال الرسالة</button>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
@@ -508,38 +709,131 @@
     <!-- ملفات JavaScript -->
     <script src="assets/js/main.js"></script>
     <script>
-        // معالجة نموذج الاتصال وإرسال الرسائل إلى واتساب
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // التبديل بين النموذجين
+        document.addEventListener('DOMContentLoaded', function() {
+            const generalFormBtn = document.getElementById('generalFormBtn');
+            const pricingFormBtn = document.getElementById('pricingFormBtn');
+            const generalFormPane = document.getElementById('generalFormPane');
+            const pricingFormPane = document.getElementById('pricingFormPane');
+            const generalContactForm = document.getElementById('generalContactForm');
+            const pricingContactForm = document.getElementById('pricingContactForm');
 
-            // الحصول على قيم الحقول
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const website = document.getElementById('website').value || 'غير محدد';
-            const service = document.getElementById('service').value;
-            const message = document.getElementById('message').value;
+            // تعيين الحالة الافتراضية عند تحميل الصفحة
+            window.addEventListener('load', function() {
+                // تعيين نموذج طلب التسعير كنموذج افتراضي
+                pricingFormBtn.classList.add('active');
+                generalFormBtn.classList.remove('active');
+                pricingFormPane.classList.add('active');
+                generalFormPane.classList.remove('active');
+                pricingFormPane.style.display = 'block';
+                generalFormPane.style.display = 'none';
+            });
 
-            // تنسيق الرسالة
-            const formattedMessage = `*طلب جديد من موقع علي أحمد*%0A%0A` +
-                                    `*الاسم:* ${name}%0A` +
-                                    `*البريد الإلكتروني:* ${email}%0A` +
-                                    `*رقم الهاتف:* ${phone}%0A` +
-                                    `*الموقع الإلكتروني:* ${website}%0A` +
-                                    `*نوع الخدمة:* ${service}%0A%0A` +
-                                    `*الرسالة:*%0A${message}`;
+            // عند النقر على زر الاستفسار العام
+            generalFormBtn.addEventListener('click', function() {
+                generalFormBtn.classList.add('active');
+                pricingFormBtn.classList.remove('active');
+                generalFormPane.classList.add('active');
+                pricingFormPane.classList.remove('active');
+                generalFormPane.style.display = 'block';
+                pricingFormPane.style.display = 'none';
+            });
 
-            // رقم الواتساب
-            const whatsappNumber = '201002241591';
+            // عند النقر على زر طلب تسعير الخدمة
+            pricingFormBtn.addEventListener('click', function() {
+                pricingFormBtn.classList.add('active');
+                generalFormBtn.classList.remove('active');
+                pricingFormPane.classList.add('active');
+                generalFormPane.classList.remove('active');
+                pricingFormPane.style.display = 'block';
+                generalFormPane.style.display = 'none';
+            });
 
-            // إنشاء رابط واتساب
-            const whatsappLink = `https://wa.me/${whatsappNumber}?text=${formattedMessage}`;
+            // معالجة نموذج الاستفسار العام
+            generalContactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            // فتح رابط واتساب في نافذة جديدة
-            window.open(whatsappLink, '_blank');
+                // الحصول على قيم الحقول
+                const name = document.getElementById('general-name').value;
+                const email = document.getElementById('general-email').value;
+                const phone = document.getElementById('general-phone').value;
+                const subject = document.getElementById('general-subject').value;
+                const message = document.getElementById('general-message').value;
 
-            // إعادة تعيين النموذج
-            this.reset();
+                // تنسيق الرسالة
+                const formattedMessage = `*استفسار عام من موقع علي أحمد*%0A%0A` +
+                                        `*الاسم:* ${name}%0A` +
+                                        `*البريد الإلكتروني:* ${email}%0A` +
+                                        `*رقم الهاتف:* ${phone}%0A` +
+                                        `*الموضوع:* ${subject}%0A%0A` +
+                                        `*الرسالة:*%0A${message}%0A%0A` +
+                                        `سنقوم بالرد على رسالتك في أقرب فرصة ممكنة بإذن الله. 🌹`;
+
+                // رقم الواتساب
+                const whatsappNumber = '201002241591';
+
+                // إنشاء رابط واتساب
+                const whatsappLink = `https://wa.me/${whatsappNumber}?text=${formattedMessage}`;
+
+                // فتح رابط واتساب في نافذة جديدة
+                window.open(whatsappLink, '_blank');
+
+                // إعادة تعيين النموذج
+                this.reset();
+
+                // عرض رسالة نجاح
+                alert('تم إرسال رسالتك بنجاح! سيتم تحويلك إلى واتساب للتواصل المباشر.');
+            });
+
+            // معالجة نموذج طلب تسعير الخدمة
+            pricingContactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // الحصول على قيم الحقول
+                const name = document.getElementById('pricing-name').value;
+                const email = document.getElementById('pricing-email').value;
+                const phone = document.getElementById('pricing-phone').value;
+                const website = document.getElementById('pricing-website').value || 'غير محدد';
+                const storeUrl = document.getElementById('pricing-store-url').value || 'غير محدد';
+                const platform = document.getElementById('pricing-platform').value || 'غير محدد';
+                const packageType = document.getElementById('pricing-package').value || 'غير محدد';
+                const domain = document.getElementById('pricing-domain').value || 'غير محدد';
+                const logo = document.getElementById('pricing-logo').value || 'غير محدد';
+                const competitor = document.getElementById('pricing-competitor').value || 'غير محدد';
+                const service = document.getElementById('pricing-service').value;
+                const message = document.getElementById('pricing-message').value;
+
+                // تنسيق الرسالة
+                const formattedMessage = `*طلب تسعير خدمة من موقع علي أحمد*%0A%0A` +
+                                        `*الاسم:* ${name}%0A` +
+                                        `*البريد الإلكتروني:* ${email}%0A` +
+                                        `*رقم الهاتف:* ${phone}%0A` +
+                                        `*الموقع الإلكتروني:* ${website}%0A` +
+                                        `🌐 *رابط المتجر:* ${storeUrl}%0A` +
+                                        `🛍️ *نوع المنصة:* ${platform}%0A` +
+                                        `🛒 *نوع الباقة:* ${packageType}%0A` +
+                                        `🌐 *الدومين مدفوع:* ${domain}%0A` +
+                                        `🧩 *يوجد شعار أو هوية بصرية:* ${logo}%0A` +
+                                        `🏪 *متاجر منافسة:* ${competitor}%0A` +
+                                        `*نوع الخدمة:* ${service}%0A%0A` +
+                                        `*التفاصيل الإضافية:*%0A${message}%0A%0A` +
+                                        `سنقوم بالرد على طلبك في أقرب فرصة ممكنة بإذن الله. 🌹`;
+
+                // رقم الواتساب
+                const whatsappNumber = '201002241591';
+
+                // إنشاء رابط واتساب
+                const whatsappLink = `https://wa.me/${whatsappNumber}?text=${formattedMessage}`;
+
+                // فتح رابط واتساب في نافذة جديدة
+                window.open(whatsappLink, '_blank');
+
+                // إعادة تعيين النموذج
+                this.reset();
+
+                // عرض رسالة نجاح
+                alert('تم إرسال طلب التسعير بنجاح! سيتم تحويلك إلى واتساب للتواصل المباشر.');
+            });
         });
     </script>
 </body>
