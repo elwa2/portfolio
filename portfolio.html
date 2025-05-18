@@ -306,6 +306,263 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* أنماط قسم الفيديو */
+        .video-portfolio-item {
+            margin-bottom: 30px;
+        }
+
+        .video-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%; /* نسبة 16:9 */
+        }
+
+        .video-thumbnail video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.4);
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            z-index: 2;
+        }
+
+        .video-thumbnail:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 1;
+        }
+
+        .video-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .video-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .video-info p {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 0;
+        }
+
+        /* أنماط قسم معرض الفيديو */
+        .video-gallery-section {
+            background-color: var(--bg-color-alt);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-gallery-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .video-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .video-gallery-item {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .video-gallery-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-player {
+            position: relative;
+            overflow: hidden;
+            padding-top: 56.25%; /* نسبة 16:9 */
+        }
+
+        .video-player video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-details {
+            padding: 20px;
+        }
+
+        .video-details h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .video-details p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .video-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-color-light);
+        }
+
+        .video-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .add-video-card {
+            background-color: rgba(var(--primary-rgb), 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px dashed rgba(var(--primary-rgb), 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .add-video-content {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .add-video-content i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .add-video-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .add-video-content p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+        /* تعديلات الوضع الداكن */
+        [data-theme="dark"] .video-card,
+        [data-theme="dark"] .video-gallery-item {
+            background-color: var(--card-bg-dark, #1e1e2d);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .add-video-card {
+            background-color: rgba(var(--primary-rgb), 0.1);
+            border-color: rgba(var(--primary-rgb), 0.3);
+        }
+
+        /* تعديلات للشاشات المتوسطة والصغيرة */
+        @media (max-width: 992px) {
+            .video-gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .video-gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .video-details h3 {
+                font-size: 1.1rem;
+            }
+
+            .video-details p {
+                font-size: 0.9rem;
+            }
+
+            .video-meta {
+                font-size: 0.8rem;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .add-video-content i {
+                font-size: 2.5rem;
+            }
+
+            .add-video-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .add-video-content p {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -360,6 +617,7 @@
                     <button class="filter-btn active" data-filter="all">الكل</button>
                     <button class="filter-btn" data-filter="ecommerce">المتاجر الإلكترونية</button>
                     <button class="filter-btn" data-filter="marketing">الحملات التسويقية</button>
+                    <button class="filter-btn" data-filter="video">أعمال بالفيديو</button>
                 </div>
 
                 <div class="portfolio-grid">
@@ -549,6 +807,56 @@
                                 </div>
                             </div>
                         </a>
+                    </div>
+
+                    <!-- أعمال بالفيديو -->
+                    <div class="portfolio-item video-portfolio-item" data-category="video">
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <video src="assets/video/chrome_zBHpFjGFMe.mp4" poster="assets/images/video-thumbnail-1.jpg" preload="metadata"></video>
+                                <div class="play-button">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                            <div class="video-info">
+                                <h3>تصميم متجر إلكتروني</h3>
+                                <p>تصميم واجهة مستخدم متميزة لمتجر إلكتروني على منصة سلة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم معرض الفيديو -->
+        <section class="section video-gallery-section" id="video-gallery">
+            <div class="container">
+                <div class="section-title">
+                    <h2>معرض الفيديو</h2>
+                    <p>شاهد أعمالنا المميزة بالفيديو لتتعرف على مستوى الجودة والإبداع</p>
+                </div>
+
+                <div class="video-gallery-grid">
+                    <div class="video-gallery-item">
+                        <div class="video-player">
+                            <video src="assets/video/chrome_zBHpFjGFMe.mp4" poster="assets/images/video-thumbnail-1.jpg" controls preload="metadata"></video>
+                        </div>
+                        <div class="video-details">
+                            <h3>تصميم متجر إلكتروني</h3>
+                            <p>تصميم واجهة مستخدم متميزة لمتجر إلكتروني على منصة سلة مع تخصيص كامل للألوان والخطوط والتأثيرات الحركية.</p>
+                            <div class="video-meta">
+                                <span><i class="fas fa-calendar-alt"></i> تاريخ الإنجاز: 15 مارس 2024</span>
+                                <span><i class="fas fa-tag"></i> منصة سلة</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="add-video-card">
+                        <div class="add-video-content">
+                            <i class="fas fa-plus-circle"></i>
+                            <h3>قريباً المزيد من الفيديوهات</h3>
+                            <p>نعمل على إضافة المزيد من الفيديوهات لأعمالنا المميزة</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -906,6 +1214,124 @@
                     }
                 });
             });
+
+            // معالجة تشغيل الفيديوهات في قسم الأعمال
+            const videoThumbnails = document.querySelectorAll('.video-thumbnail');
+            videoThumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    const video = this.querySelector('video');
+                    const playButton = this.querySelector('.play-button');
+
+                    // إنشاء نافذة منبثقة لعرض الفيديو
+                    const videoModal = document.createElement('div');
+                    videoModal.className = 'video-modal';
+
+                    const modalContent = document.createElement('div');
+                    modalContent.className = 'video-modal-content';
+
+                    const closeButton = document.createElement('button');
+                    closeButton.className = 'video-modal-close';
+                    closeButton.innerHTML = '<i class="fas fa-times"></i>';
+
+                    const videoPlayer = document.createElement('video');
+                    videoPlayer.src = video.src;
+                    videoPlayer.controls = true;
+                    videoPlayer.autoplay = true;
+
+                    modalContent.appendChild(closeButton);
+                    modalContent.appendChild(videoPlayer);
+                    videoModal.appendChild(modalContent);
+                    document.body.appendChild(videoModal);
+
+                    // إضافة أنماط CSS للنافذة المنبثقة
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .video-modal {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0, 0, 0, 0.9);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 9999;
+                            animation: fadeIn 0.3s ease;
+                        }
+
+                        .video-modal-content {
+                            position: relative;
+                            width: 80%;
+                            max-width: 900px;
+                        }
+
+                        .video-modal-content video {
+                            width: 100%;
+                            border-radius: 10px;
+                            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                        }
+
+                        .video-modal-close {
+                            position: absolute;
+                            top: -40px;
+                            right: 0;
+                            background: none;
+                            border: none;
+                            color: white;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                            z-index: 10;
+                            transition: all 0.3s ease;
+                        }
+
+                        .video-modal-close:hover {
+                            transform: scale(1.2);
+                        }
+
+                        @keyframes fadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+
+                        @media (max-width: 768px) {
+                            .video-modal-content {
+                                width: 95%;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // إغلاق النافذة المنبثقة عند النقر على زر الإغلاق
+                    closeButton.addEventListener('click', function() {
+                        document.body.removeChild(videoModal);
+                        document.head.removeChild(style);
+                    });
+
+                    // إغلاق النافذة المنبثقة عند النقر خارج الفيديو
+                    videoModal.addEventListener('click', function(e) {
+                        if (e.target === videoModal) {
+                            document.body.removeChild(videoModal);
+                            document.head.removeChild(style);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- سكريبت إضافي لمعرض الفيديو -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // إضافة إمكانية تحميل فيديوهات جديدة
+            const addVideoSystem = () => {
+                // هذه الدالة ستكون مسؤولة عن إضافة فيديوهات جديدة في المستقبل
+                // يمكن استخدامها لإضافة واجهة تحميل الفيديوهات أو لعرض الفيديوهات المضافة حديثاً
+                console.log('نظام إضافة الفيديوهات جاهز للاستخدام');
+            };
+
+            // تهيئة النظام
+            addVideoSystem();
         });
     </script>
 </body>
