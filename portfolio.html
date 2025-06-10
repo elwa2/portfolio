@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أعمالنا - Ali Ahmed | مصمم منصة زد وسلة Custom Css Salla zid</title>    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml">
+    <title>أعمالنا - Ali Ahmed | مصمم منصة زد وسلة Custom Css Salla zid</title>
+    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml">
 
     <!-- الخطوط -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +17,7 @@
     <!-- Lightbox CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
     <style>
-        /* Estilos personalizados para Lightbox */
+        /* أنماط مخصصة لـ Lightbox */
         .lightbox .lb-image {
             border: none;
         }
@@ -27,8 +28,20 @@
         .lb-data .lb-number {
             font-family: "Tajawal", sans-serif;
         }
-    </style>
-    <style>
+
+        /* تحسين مظهر Lightbox */
+        .lightboxOverlay {
+            background-color: rgba(0, 0, 0, 0.9) !important;
+        }
+
+        .lightbox .lb-image {
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .lb-data .lb-close {
+            background-size: 20px 20px;
+        }
         /* أنماط خاصة بصفحة الأعمال */
         .portfolio-filter {
             display: flex;
@@ -60,6 +73,13 @@
 
         .portfolio-item {
             display: block;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         .portfolio-item.hide {
@@ -94,6 +114,14 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 10px;
+                margin-bottom: 30px;
+            }
+
+            .portfolio-filter button {
+                width: 100%;
+                max-width: 300px;
+                padding: 12px 20px;
+                font-size: 1rem;
             }
 
             .portfolio-image {
@@ -105,8 +133,11 @@
             }
 
             .portfolio-item:hover .portfolio-image img {
-                top: calc(-100% + -346px)
+                top: calc(-100% + -346px);
+            }
 
+            .portfolio-item:hover {
+                transform: translateY(-2px);
             }
         }
 
@@ -825,7 +856,7 @@
                         </a>
                     </div>
                     <div class="portfolio-item" data-category="social">
-                        <a href="assets/images/social/download (1).jpg" data-lightbox="social" data-title="تصميم سوشيال ميديا 3">
+                        <a href="assets/images/social/download (1).jpg" data-lightbox="social-designs" data-title="تصميم سوشيال ميديا 3">
                             <div class="portfolio-image">
                                 <img src="assets/images/social/download (1).jpg" alt="تصميم سوشيال ميديا 3">
                             </div>
@@ -942,22 +973,9 @@
                             <div class="video-info">
                                 <h3>تصميم متجر إلكتروني</h3>
                                 <p>تصميم واجهة مستخدم متميزة لمتجر إلكتروني على منصة سلة</p>
-                            </div> </div>
-                        </div>
-
-
-                        <div class="video-card">
-                            <div class="video-thumbnail">
-                                <video src="assets/video/msedge_UlwVNJ1ObK.mp4" poster="assets/images/video-thumbnail-1.jpg" preload="metadata"></video>
-                                <div class="play-button">
-                                    <i class="fas fa-play"></i>
-                                </div>
                             </div>
-                            <div class="video-info">
-                                <h3>تصميم متجر إلكتروني</h3>
-                                <p>تصميم واجهة مستخدم متميزة لمتجر إلكتروني على منصة سلة</p>
-                            </div> </div>
                         </div>
+                    </div>
 
 
                 </div>
@@ -1345,6 +1363,13 @@
                 // تحويل جميع روابط السوشيال ميديا لتعمل مع Lightbox
                 $('.portfolio-item[data-category="social"] a[data-lightbox="social"]').each(function() {
                     $(this).attr('data-lightbox', 'social-designs');
+                });
+
+                // تأكيد من أن جميع صور السوشيال ميديا تستخدم نفس المجموعة
+                $('.portfolio-item[data-category="social"] a').each(function() {
+                    if ($(this).attr('data-lightbox') && $(this).attr('data-lightbox') !== 'social-designs') {
+                        $(this).attr('data-lightbox', 'social-designs');
+                    }
                 });
             });
             // تصفية الأعمال

@@ -32,6 +32,193 @@
     <link rel="stylesheet" href="assets/css/help-section.css" />
     <link rel="stylesheet" href="assets/css/contact-form.css" />
     <style>
+      /* أنماط قسم الإحصائيات المتحركة */
+      .stats-section {
+        padding: 80px 0;
+        background-color: var(--bg-color-alt);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+        z-index: 0;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .stat-item {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        animation: slideUp 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      .stat-item:nth-child(1) { animation-delay: 0.1s; }
+      .stat-item:nth-child(2) { animation-delay: 0.2s; }
+      .stat-item:nth-child(3) { animation-delay: 0.3s; }
+      .stat-item:nth-child(4) { animation-delay: 0.4s; }
+
+      @keyframes slideUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-purple));
+        border-radius: 15px 15px 0 0;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .stat-item:hover::before {
+        transform: scaleX(1);
+      }
+
+      .stat-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-color: rgba(var(--primary-rgb), 0.2);
+      }
+
+      .stat-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        display: inline-block;
+        width: 70px;
+        height: 70px;
+        line-height: 70px;
+        border-radius: 50%;
+        background: rgba(var(--primary-rgb), 0.1);
+        border: 2px solid rgba(var(--primary-rgb), 0.15);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .stat-item:hover .stat-icon {
+        transform: scale(1.1);
+        background: rgba(var(--primary-rgb), 0.15);
+        border-color: rgba(var(--primary-rgb), 0.25);
+        color: var(--secondary-purple);
+      }
+
+      .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 10px;
+        font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .stat-item:hover .stat-number {
+        color: var(--primary-color);
+      }
+
+      .stat-label {
+        font-size: 1rem;
+        color: var(--text-color-light);
+        font-weight: 500;
+        font-family: 'Tajawal', sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .stat-item:hover .stat-label {
+        color: var(--text-color);
+      }
+
+      /* استجابة للشاشات الصغيرة */
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 25px;
+        }
+
+        .stat-item {
+          padding: 30px 20px;
+        }
+
+        .stat-icon {
+          font-size: 2.5rem;
+          width: 70px;
+          height: 70px;
+          line-height: 70px;
+          margin-bottom: 20px;
+        }
+
+        .stat-number {
+          font-size: 2.8rem;
+        }
+
+        .stat-label {
+          font-size: 1.1rem;
+        }
+
+        .stat-item:hover {
+          transform: translateY(-8px) scale(1.01);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .stats-section {
+          padding: 60px 0;
+        }
+
+        .stat-item {
+          padding: 25px 15px;
+        }
+
+        .stat-icon {
+          font-size: 2.2rem;
+          width: 60px;
+          height: 60px;
+          line-height: 60px;
+        }
+
+        .stat-number {
+          font-size: 2.5rem;
+        }
+
+        .stat-label {
+          font-size: 1rem;
+        }
+      }
+
       /* أنماط قسم من نحن المحسنة */
       .about-section-centered {
         padding: 80px 0;
@@ -224,7 +411,9 @@
           width: 100%;
           padding: 10px 20px;
         }
-      }
+      }[data-theme="light"] .stat-label {
+    color: #000;
+}
     </style>
   </head>
   <body>
@@ -418,6 +607,45 @@
               <p>
                 حلول شاملة للتجارة الإلكترونية من الإنشاء إلى التسويق والمبيعات
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- قسم الإحصائيات المتحركة -->
+      <section class="stats-section">
+        <div class="container">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-store"></i>
+              </div>
+              <div class="stat-number" data-target="150">0</div>
+              <div class="stat-label">متجر إلكتروني</div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-palette"></i>
+              </div>
+              <div class="stat-number" data-target="500">0</div>
+              <div class="stat-label">تصميم منجز</div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-number" data-target="200">0</div>
+              <div class="stat-label">عميل سعيد</div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div class="stat-number" data-target="5">0</div>
+              <div class="stat-label">سنوات خبرة</div>
             </div>
           </div>
         </div>
@@ -1150,6 +1378,72 @@
                 }
             `;
         document.head.appendChild(style);
+      });
+
+      // كود العدادات المتحركة
+      function animateCounters() {
+        const counters = document.querySelectorAll('.stat-number');
+
+        counters.forEach(counter => {
+          const target = +counter.getAttribute('data-target');
+          const duration = 3000; // مدة العد بالمللي ثانية (3 ثوان)
+          const startTime = performance.now();
+          const startValue = 0;
+
+          function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // استخدام easing function لجعل الحركة أكثر طبيعية
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const currentValue = Math.floor(startValue + (target - startValue) * easeOutQuart);
+
+            counter.innerText = currentValue;
+
+            if (progress < 1) {
+              requestAnimationFrame(updateCounter);
+            } else {
+              counter.innerText = target; // تأكيد الوصول للرقم النهائي
+            }
+          }
+
+          requestAnimationFrame(updateCounter);
+        });
+      }
+
+      // تشغيل العدادات عند ظهور القسم
+      function handleStatsAnimation() {
+        const statsSection = document.querySelector('.stats-section');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // إعادة تعيين جميع العدادات إلى 0
+              const counters = document.querySelectorAll('.stat-number');
+              counters.forEach(counter => {
+                counter.innerText = '0';
+              });
+
+              // بدء العد بعد تأخير ليظهر البطاقات أولاً
+              setTimeout(() => {
+                animateCounters();
+              }, 800);
+
+              // إيقاف مراقبة هذا العنصر بعد التشغيل
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.5 // يبدأ العد عندما يظهر 50% من القسم
+        });
+
+        if (statsSection) {
+          observer.observe(statsSection);
+        }
+      }
+
+      // تشغيل العدادات عند تحميل الصفحة
+      document.addEventListener('DOMContentLoaded', function() {
+        handleStatsAnimation();
       });
     </script>
   </body>
