@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>بيانات الدفع - Ali Ahmed</title>
+    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/payment.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="index.html">
+              <img src="assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="index.html">الرئيسية</a></li>
+              <li><a href="about.html">من نحن</a></li>
+              <li><a href="services.html">خدماتنا</a></li>
+              <li><a href="portfolio.html">أعمالنا</a></li>
+              <li><a href="contact.html">تواصل معنا</a></li>
+              <li><a href="payment.html" class="active">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <i class="fas fa-moon"></i>
+            </div>
+            <div class="mobile-toggle">
+              <i class="fas fa-bars"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-header">
+        <div class="container">
+          <h1>بيانات الدفع</h1>
+          <p>اختر طريقة الدفع المناسبة لك وانسخ البيانات بسهولة.</p>
+        </div>
+      </section>
+
+      <section class="section payment-section">
+        <div class="container">
+          <div class="payment-methods">
+            <!-- PayPal -->
+            <div class="payment-card">
+              <div class="payment-card-header">
+                <img src="assets/images/social/download (1).png" alt="PayPal" class="payment-icon">
+                <h3>تحويل PayPal</h3>
+              </div>
+              <div class="payment-card-body">
+                <div class="payment-info-item">
+                  <span>رابط الدفع المباشر:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="https://paypal.me/elwaaa" readonly id="paypal-link">
+                    <button class="copy-btn" onclick="copyToClipboard('paypal-link')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>البريد الإلكتروني:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="elwa2@hotmail.com" readonly id="paypal-email">
+                    <button class="copy-btn" onclick="copyToClipboard('paypal-email')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                 <div class="payment-info-item">
+                  <span>أو يمكنك طلب فاتورة بيبال للدفع بالفيزا مباشرة.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- STC Pay -->
+            <div class="payment-card">
+              <div class="payment-card-header">
+                <img src="assets/images/social/download.png" alt="STC Pay" class="payment-icon">
+                <h3>STC Pay (حوالة دولية)</h3>
+              </div>
+              <div class="payment-card-body">
+                <p>عبر MoneyGram (وليس ويسترن يونيون)</p>
+                <div class="payment-info-item">
+                  <span>الاسم:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="Ali Ahmed Abd elrazek Ahmed" readonly id="stc-name">
+                    <button class="copy-btn" onclick="copyToClipboard('stc-name')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>IBAN:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="EG070002023102310333000113743" readonly id="stc-iban">
+                    <button class="copy-btn" onclick="copyToClipboard('stc-iban')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>Bank Name:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="Banque Misr" readonly id="stc-bank-name">
+                    <button class="copy-btn" onclick="copyToClipboard('stc-bank-name')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                 <div class="payment-info-item">
+                  <span>Account Number:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="2310333000113743" readonly id="stc-account">
+                    <button class="copy-btn" onclick="copyToClipboard('stc-account')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                    <span>الغرض من التحويل:</span>
+                    <span>Family Support/Living Expenses</span>
+                </div>
+                 <div class="payment-info-item">
+                    <a href="assets/images/pay/stc.jpeg" target="_blank" class="btn-outline">صورة توضيحية</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Al Rajhi Bank -->
+            <div class="payment-card">
+              <div class="payment-card-header">
+                <img src="assets/images/social/download (2).png" alt="Al Rajhi Bank" class="payment-icon">
+                <h3>تحويل بنك الراجحي</h3>
+              </div>
+              <div class="payment-card-body">
+                 <div class="payment-info-item">
+                  <span>الاسم:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="على احمد عبدالرازق احمد" readonly id="rajhi-name">
+                    <button class="copy-btn" onclick="copyToClipboard('rajhi-name')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>IBAN:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="EG070002023102310333000113743" readonly id="rajhi-iban">
+                    <button class="copy-btn" onclick="copyToClipboard('rajhi-iban')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>SWIFT Code:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="BMISEGCXXXX" readonly id="rajhi-swift">
+                    <button class="copy-btn" onclick="copyToClipboard('rajhi-swift')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                  <span>Bank Name:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="Banque Misr" readonly id="rajhi-bank-name">
+                    <button class="copy-btn" onclick="copyToClipboard('rajhi-bank-name')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                    <a href="assets/images/pay/rajhi.jpeg" target="_blank" class="btn-outline">صورة توضيحية</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Vodafone Cash -->
+            <div class="payment-card">
+              <div class="payment-card-header">
+                <img src="assets/images/social/download (3).png" alt="Vodafone Cash" class="payment-icon">
+                <h3>فودافون كاش (مصر)</h3>
+              </div>
+              <div class="payment-card-body">
+                <div class="payment-info-item">
+                  <span>رقم الهاتف:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="01002241591" readonly id="vodafone-cash">
+                    <button class="copy-btn" onclick="copyToClipboard('vodafone-cash')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- InstaPay -->
+            <div class="payment-card">
+              <div class="payment-card-header">
+                <img src="assets/images/social/download (4).png" alt="InstaPay" class="payment-icon">
+                <h3>InstaPay (مصر)</h3>
+              </div>
+              <div class="payment-card-body">
+                <div class="payment-info-item">
+                  <span>عنوان الدفع:</span>
+                  <div class="copy-wrapper">
+                    <input type="text" value="elwa1@instapay" readonly id="instapay-address">
+                    <button class="copy-btn" onclick="copyToClipboard('instapay-address')"><i class="fas fa-copy"></i></button>
+                  </div>
+                </div>
+                <div class="payment-info-item">
+                    <a href="https://ipn.eg/S/elwa1/instapay/9rAzmu" target="_blank" class="btn-outline">رابط دفع مباشر</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="payment-footer">
+            <h3>ملاحظات هامة</h3>
+            <ul>
+              <li><i class="fas fa-check-circle"></i>بعد إتمام عملية التحويل، يرجى إرسال لقطة شاشة (Screenshot) للإيصال عبر الواتساب لتأكيد الدفع.</li>
+              <li><i class="fas fa-clock"></i>تستغرق الحوالات الدولية من يومين إلى 4 أيام عمل لتظهر في الحساب.</li>
+            </ul>
+            <a href="https://wa.me/201002241591" class="btn whatsapp-btn">
+              <i class="fab fa-whatsapp"></i> إرسال إثبات الدفع
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+            </div>
+            <div class="footer-bottom">
+            <p>
+                جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+                مصمم منصة زد وسلة
+            </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        
+        var tooltip = document.createElement("span");
+        tooltip.innerHTML = "تم النسخ!";
+        tooltip.className = "copy-tooltip";
+        
+        var button = copyText.nextElementSibling;
+        button.appendChild(tooltip);
+        
+        setTimeout(function(){
+            button.removeChild(tooltip);
+        }, 2000);
+      }
+
+      function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      }
+      
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
