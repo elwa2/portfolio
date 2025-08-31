@@ -1,4 +1,3 @@
-
 .discounts-section {
     padding: 80px 0;
 }
@@ -36,4 +35,68 @@
 
 .discount-card .btn {
     width: 100%;
+}
+
+.coupon-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.coupon-container p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.coupon-code {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.copy-btn .tooltip {
+    visibility: hidden;
+    width: 100px;
+    background-color: var(--primary-color);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -50px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.copy-btn .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--primary-color) transparent transparent transparent;
+}
+
+.copy-btn.copied .tooltip {
+    visibility: visible;
+    opacity: 1;
 }
