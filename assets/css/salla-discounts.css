@@ -100,3 +100,9 @@
     visibility: visible;
     opacity: 1;
 }
+
+.discount-card.full-width-card {
+    grid-column: 1 / -1;
+    background-color: var(--primary-color-light);
+    border: 2px solid var(--primary-color);
+}
