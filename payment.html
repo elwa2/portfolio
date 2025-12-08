@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>بيانات الدفع - Ali Ahmed</title>
-    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,6 +16,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+    <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="assets/css/payment.css" />
   </head>
   <body>
@@ -71,18 +73,38 @@
                 <div class="payment-info-item">
                   <span>رابط الدفع المباشر:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="https://paypal.me/elwaaa" readonly id="paypal-link">
-                    <button class="copy-btn" onclick="copyToClipboard('paypal-link')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="https://paypal.me/elwaaa"
+                      readonly
+                      id="paypal-link"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('paypal-link')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>البريد الإلكتروني:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="3lwaaa+5@gmail.com" readonly id="paypal-email">
-                    <button class="copy-btn" onclick="copyToClipboard('paypal-email')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="3lwaaa+5@gmail.com"
+                      readonly
+                      id="paypal-email"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('paypal-email')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
-                 <div class="payment-info-item">
+                <div class="payment-info-item">
                   <span>أو يمكنك طلب فاتورة بيبال للدفع بالفيزا مباشرة.</span>
                 </div>
               </div>
@@ -99,37 +121,82 @@
                 <div class="payment-info-item">
                   <span>الاسم:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Ali Ahmed Abd elrazek Ahmed" readonly id="stc-name">
-                    <button class="copy-btn" onclick="copyToClipboard('stc-name')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Ali Ahmed Abd elrazek Ahmed"
+                      readonly
+                      id="stc-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('stc-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>IBAN:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="EG070002023102310333000113743" readonly id="stc-iban">
-                    <button class="copy-btn" onclick="copyToClipboard('stc-iban')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="EG070002023102310333000113743"
+                      readonly
+                      id="stc-iban"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('stc-iban')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>Bank Name:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Banque Misr" readonly id="stc-bank-name">
-                    <button class="copy-btn" onclick="copyToClipboard('stc-bank-name')"><i class="fas fa-copy"></i></button>
-                  </div>
-                </div>
-                 <div class="payment-info-item">
-                  <span>Account Number:</span>
-                  <div class="copy-wrapper">
-                    <input type="text" value="2310333000113743" readonly id="stc-account">
-                    <button class="copy-btn" onclick="copyToClipboard('stc-account')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Banque Misr"
+                      readonly
+                      id="stc-bank-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('stc-bank-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
-                    <span>الغرض من التحويل:</span>
-                    <span>Family Support/Living Expenses</span>
+                  <span>Account Number:</span>
+                  <div class="copy-wrapper">
+                    <input
+                      type="text"
+                      value="2310333000113743"
+                      readonly
+                      id="stc-account"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('stc-account')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
                 </div>
-                 <div class="payment-info-item">
-                    <a href="assets/images/pay/stc.jpeg" target="_blank" class="btn-outline">صورة توضيحية</a>
+                <div class="payment-info-item">
+                  <span>الغرض من التحويل:</span>
+                  <span>Family Support/Living Expenses</span>
+                </div>
+                <div class="payment-info-item">
+                  <a
+                    href="assets/images/pay/stc.jpeg"
+                    target="_blank"
+                    class="btn-outline"
+                    >صورة توضيحية</a
+                  >
                 </div>
               </div>
             </div>
@@ -144,43 +211,103 @@
                 <div class="payment-info-item">
                   <span>الاسم الأول:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="على" readonly id="rajhi-first-name">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-first-name')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="على"
+                      readonly
+                      id="rajhi-first-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-first-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>اسم العائلة:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="احمد عبدالرازق احمد" readonly id="rajhi-last-name">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-last-name')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="احمد عبدالرازق احمد"
+                      readonly
+                      id="rajhi-last-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-last-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>IBAN:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="EG070002023102310333000113743" readonly id="rajhi-iban">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-iban')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="EG070002023102310333000113743"
+                      readonly
+                      id="rajhi-iban"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-iban')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>رقم الحساب:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="2310333000113743" readonly id="rajhi-account">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-account')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="2310333000113743"
+                      readonly
+                      id="rajhi-account"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-account')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>SWIFT Code:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="BMISEGCXXXX" readonly id="rajhi-swift">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-swift')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="BMISEGCXXXX"
+                      readonly
+                      id="rajhi-swift"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-swift')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>Bank Name:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Banque Misr" readonly id="rajhi-bank-name">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-bank-name')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Banque Misr"
+                      readonly
+                      id="rajhi-bank-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-bank-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
@@ -191,16 +318,36 @@
                   <span>عنوان الفرع:</span>
                   <span>مزلقان الانشاء والتعمير, Kafr El-Sheikh</span>
                 </div>
-                 <div class="payment-info-item">
+                <div class="payment-info-item">
                   <span>الرمز البريدي:</span>
-                   <div class="copy-wrapper">
-                    <input type="text" value="33513" readonly id="rajhi-postal-code">
-                    <button class="copy-btn" onclick="copyToClipboard('rajhi-postal-code')"><i class="fas fa-copy"></i></button>
+                  <div class="copy-wrapper">
+                    <input
+                      type="text"
+                      value="33513"
+                      readonly
+                      id="rajhi-postal-code"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('rajhi-postal-code')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
-                    <a href="assets/images/pay/rajhi.jpeg" target="_blank" class="btn-outline">صورة توضيحية 1</a>
-                    <a href="assets/images/pay/rajhi2.jpeg" target="_blank" class="btn-outline">صورة توضيحية 2</a>
+                  <a
+                    href="assets/images/pay/rajhi.jpeg"
+                    target="_blank"
+                    class="btn-outline"
+                    >صورة توضيحية 1</a
+                  >
+                  <a
+                    href="assets/images/pay/rajhi2.jpeg"
+                    target="_blank"
+                    class="btn-outline"
+                    >صورة توضيحية 2</a
+                  >
                 </div>
               </div>
             </div>
@@ -216,48 +363,108 @@
                 <div class="payment-info-item">
                   <span>المدينة حيث يوجد الفرع / City:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Kafr El-Sheikh" readonly id="bank-city">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-city')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Kafr El-Sheikh"
+                      readonly
+                      id="bank-city"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-city')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>اسم الشارع / Street Name:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Construction and reconstruction slides" readonly id="bank-street-name">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-street-name')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Construction and reconstruction slides"
+                      readonly
+                      id="bank-street-name"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-street-name')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>رقم الشارع / Street Number:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="15" readonly id="bank-street-number">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-street-number')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="15"
+                      readonly
+                      id="bank-street-number"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-street-number')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>صندوق البريد للمستفيد / P.O. Box:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="33513" readonly id="bank-po-box">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-po-box')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="33513"
+                      readonly
+                      id="bank-po-box"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-po-box')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>الرمز البريدي / Postal Code:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="33513" readonly id="bank-postal-code">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-postal-code')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="33513"
+                      readonly
+                      id="bank-postal-code"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-postal-code')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>الولاية / المدينة للمستفيد / State / City:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Kafr El-Sheikh" readonly id="bank-state">
-                    <button class="copy-btn" onclick="copyToClipboard('bank-state')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Kafr El-Sheikh"
+                      readonly
+                      id="bank-state"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('bank-state')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- Vodafone Cash -->
             <div class="payment-card">
               <div class="payment-card-header">
@@ -269,27 +476,62 @@
                 <div class="payment-info-item">
                   <span>الاسم:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="Ali Ahmed Abd elrazek Ahmed" readonly id="vodafone-name-barq">
-                    <button class="copy-btn" onclick="copyToClipboard('vodafone-name-barq')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="Ali Ahmed Abd elrazek Ahmed"
+                      readonly
+                      id="vodafone-name-barq"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('vodafone-name-barq')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
                   <span>رقم الهاتف:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="01002241591" readonly id="vodafone-phone-barq">
-                    <button class="copy-btn" onclick="copyToClipboard('vodafone-phone-barq')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="01002241591"
+                      readonly
+                      id="vodafone-phone-barq"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('vodafone-phone-barq')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
-                    <a href="assets/images/pay/barq.jpg" target="_blank" class="btn-outline">صورة توضيحية</a>
+                  <a
+                    href="assets/images/pay/barq.jpg"
+                    target="_blank"
+                    class="btn-outline"
+                    >صورة توضيحية</a
+                  >
                 </div>
-                <hr>
+                <hr />
                 <p>او التحويل من داخل مصر مباشرة</p>
                 <div class="payment-info-item">
                   <span>رقم الهاتف:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="01002241591" readonly id="vodafone-cash">
-                    <button class="copy-btn" onclick="copyToClipboard('vodafone-cash')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="01002241591"
+                      readonly
+                      id="vodafone-cash"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('vodafone-cash')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -305,12 +547,27 @@
                 <div class="payment-info-item">
                   <span>عنوان الدفع:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="elwa1@instapay" readonly id="instapay-address">
-                    <button class="copy-btn" onclick="copyToClipboard('instapay-address')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="elwa1@instapay"
+                      readonly
+                      id="instapay-address"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('instapay-address')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
-                    <a href="https://ipn.eg/S/elwa1/instapay/9rAzmu" target="_blank" class="btn-outline">رابط دفع مباشر</a>
+                  <a
+                    href="https://ipn.eg/S/elwa1/instapay/9rAzmu"
+                    target="_blank"
+                    class="btn-outline"
+                    >رابط دفع مباشر</a
+                  >
                 </div>
               </div>
             </div>
@@ -319,21 +576,46 @@
             <div class="payment-card">
               <div class="payment-card-header">
                 <i class="fas fa-qrcode payment-icon"></i>
-                <a href="https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=en&ref=GRO_28502_HWAZU&utm_source=default" target="_blank" style="color: inherit; text-decoration: none;"><h3>Binance</h3></a>
+                <a
+                  href="https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=en&ref=GRO_28502_HWAZU&utm_source=default"
+                  target="_blank"
+                  style="color: inherit; text-decoration: none"
+                  ><h3>Binance</h3></a
+                >
               </div>
               <div class="payment-card-body">
                 <div class="payment-info-item">
                   <span>Nickname:</span>
                   <div class="copy-wrapper">
-                    <input type="text" value="3lwaaa" readonly id="binance-nickname">
-                    <button class="copy-btn" onclick="copyToClipboard('binance-nickname')"><i class="fas fa-copy"></i></button>
+                    <input
+                      type="text"
+                      value="3lwaaa"
+                      readonly
+                      id="binance-nickname"
+                    />
+                    <button
+                      class="copy-btn"
+                      onclick="copyToClipboard('binance-nickname')"
+                    >
+                      <i class="fas fa-copy"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="payment-info-item">
-                    <a href="assets/images/pay/binance.jpg" target="_blank" class="btn-outline">عرض الباركود</a>
+                  <a
+                    href="assets/images/pay/binance.jpg"
+                    target="_blank"
+                    class="btn-outline"
+                    >عرض الباركود</a
+                  >
                 </div>
                 <div class="payment-info-item">
-                    <a href="https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=en&ref=GRO_28502_HWAZU&utm_source=default" target="_blank" class="btn">اشترك واربح من Binance</a>
+                  <a
+                    href="https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=en&ref=GRO_28502_HWAZU&utm_source=default"
+                    target="_blank"
+                    class="btn"
+                    >اشترك واربح من Binance</a
+                  >
                 </div>
               </div>
             </div>
@@ -342,8 +624,14 @@
           <div class="payment-footer">
             <h3>ملاحظات هامة</h3>
             <ul>
-              <li><i class="fas fa-check-circle"></i>بعد إتمام عملية التحويل، يرجى إرسال لقطة شاشة (Screenshot) للإيصال عبر الواتساب لتأكيد الدفع.</li>
-              <li><i class="fas fa-clock"></i>تستغرق الحوالات الدولية من يومين إلى 4 أيام عمل لتظهر في الحساب.</li>
+              <li>
+                <i class="fas fa-check-circle"></i>بعد إتمام عملية التحويل، يرجى
+                إرسال لقطة شاشة (Screenshot) للإيصال عبر الواتساب لتأكيد الدفع.
+              </li>
+              <li>
+                <i class="fas fa-clock"></i>تستغرق الحوالات الدولية من يومين إلى
+                4 أيام عمل لتظهر في الحساب.
+              </li>
             </ul>
             <a href="https://wa.me/201002241591" class="btn whatsapp-btn">
               <i class="fab fa-whatsapp"></i> إرسال إثبات الدفع
@@ -437,22 +725,24 @@
     </footer>
 
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/load-components.js"></script>
+    <script src="assets/js/interactions.js"></script>
     <script>
       function copyToClipboard(elementId) {
         var copyText = document.getElementById(elementId);
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
-        
+
         var tooltip = document.createElement("span");
         tooltip.innerHTML = "تم النسخ!";
         tooltip.className = "copy-tooltip";
-        
+
         var button = copyText.nextElementSibling;
         button.appendChild(tooltip);
-        
-        setTimeout(function(){
-            button.removeChild(tooltip);
+
+        setTimeout(function () {
+          button.removeChild(tooltip);
         }, 2000);
       }
     </script>

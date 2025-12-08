@@ -1,54 +1,103 @@
 :root {
-  --primary-color: #14102a;
-  --primary-dark: #0c0818;
-  --primary-light: #2a2a4a;
-  --primary-gradient: linear-gradient(135deg, #14102a, #0c0818);
+  /* Primary Colors - Enhanced */
+  --primary-color: #5e3bee;
+  --primary-dark: #4a2fbe;
+  --primary-light: #7d56f9;
+  --primary-gradient: linear-gradient(135deg, #5e3bee 0%, #7d56f9 100%);
+
+  /* Secondary Colors */
   --secondary-color: #2a2a4a;
-  --secondary-gradient: linear-gradient(135deg, #2a2a4a, #14102a);
-  --accent-color: #14102a;
-  --text-color: #333;
-  --light-color: #f5f5f5;
-  --dark-color: #14102a;
-  --border-radius: 8px;
-  --transition: all 0.3s ease;
+  --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* Accent Colors */
+  --accent-color: #5e3bee;
+  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+
+  /* Text Colors */
+  --text-color: #2d3748;
+  --text-color-light: #718096;
+  --text-color-muted: #a0aec0;
+
+  /* Background Colors */
+  --light-color: #f7fafc;
+  --dark-color: #1a202c;
   --bg-color: #ffffff;
-  --bg-color-alt: #f8f9fa;
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --box-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --border-color: #e9ecef;
+  --bg-color-alt: #f8faff;
+
+  /* UI Elements */
+  --border-radius: 12px;
+  --border-radius-lg: 20px;
+  --border-radius-full: 50px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s ease;
+  --transition-slow: all 0.5s ease;
+
+  /* Shadows - Enhanced */
+  --box-shadow: 0 4px 20px rgba(94, 59, 238, 0.1);
+  --box-shadow-hover: 0 12px 40px rgba(94, 59, 238, 0.2);
+  --shadow-color: rgba(94, 59, 238, 0.15);
+
+  /* Borders */
+  --border-color: #e2e8f0;
+
+  /* Cards & Inputs */
   --card-bg: #ffffff;
   --input-bg: #ffffff;
-  --primary-rgb: 20, 16, 42;
-  --light-purple: #8a7ddb;
-  --secondary-purple: #6c63ff;
+
+  /* RGB Values for rgba() usage */
+  --primary-rgb: 94, 59, 238;
+
+  /* Purple Palette */
+  --light-purple: #a78bfa;
+  --secondary-purple: #8b5cf6;
   --white-color: #ffffff;
 }
 
 /* وضع الظلام (Dark Mode) */
 [data-theme="dark"] {
-  --primary-color: #8a7ddb;
-  --primary-dark: #14102a;
-  --primary-light: #a99df2;
-  --primary-gradient: linear-gradient(135deg, #2a2a4a, #14102a);
-  --secondary-color: #a99df2;
-  --secondary-gradient: linear-gradient(135deg, #a99df2, #8a7ddb);
-  --accent-color: #a99df2;
-  --bg-color: #14102a;
-  --bg-color-alt: #1e1a33;
-  --text-color: #ffffff;
-  --text-color-muted: #d0d0d0;
-  --light-color: #a99df2;
-  --dark-color: #0c0818;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --border-color: #3a3a5a;
-  --card-bg: #1e1a33;
-  --input-bg: #2a2a4a;
-  --dark-input-bg: #2a2a4a;
-  --dark-border-color: #3a3a5a;
-  --primary-rgb: 138, 125, 219;
-  --light-purple: #6c63ff;
-  --secondary-purple: #8a7ddb;
+  /* Primary Colors */
+  --primary-color: #a78bfa;
+  --primary-dark: #1a1a2e;
+  --primary-light: #c4b5fd;
+  --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+
+  /* Secondary Colors */
+  --secondary-color: #c4b5fd;
+  --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+
+  /* Accent */
+  --accent-color: #a78bfa;
+  --accent-gradient: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+
+  /* Backgrounds */
+  --bg-color: #0f0f1a;
+  --bg-color-alt: #1a1a2e;
+
+  /* Text */
+  --text-color: #f1f5f9;
+  --text-color-light: #cbd5e1;
+  --text-color-muted: #94a3b8;
+
+  /* Other */
+  --light-color: #c4b5fd;
+  --dark-color: #0a0a14;
+  --shadow-color: rgba(139, 92, 246, 0.3);
+  --border-color: #2d2d44;
+  --card-bg: #1a1a2e;
+  --input-bg: #252538;
+  --dark-input-bg: #252538;
+  --dark-border-color: #2d2d44;
+
+  /* RGB */
+  --primary-rgb: 167, 139, 250;
+
+  /* Purples */
+  --light-purple: #8b5cf6;
+  --secondary-purple: #a78bfa;
+
+  /* Shadows */
+  --box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+  --box-shadow-hover: 0 12px 40px rgba(139, 92, 246, 0.25);
 }
 
 * {
@@ -1814,8 +1863,10 @@ img {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 50px;
-}.page-header {
-    margin: 8rem 0 0 0;
+}
+
+.page-header {
+  margin: 8rem 0 0 0;
 }
 
 /* قسم كاشف الثيمات */

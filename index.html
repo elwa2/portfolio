@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ali Ahmed | مصمم منصة زد وسلة Custom Css Salla zid</title>
     <!-- أيقونة الموقع (Favicon) -->
-    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml" />
     <!-- الخطوط -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,6 +31,8 @@
     <link rel="stylesheet" href="assets/css/floating-whatsapp.css" />
     <link rel="stylesheet" href="assets/css/help-section.css" />
     <link rel="stylesheet" href="assets/css/contact-form.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+    <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <style>
       /* أنماط قسم الإحصائيات المتحركة */
       .stats-section {
@@ -41,7 +43,7 @@
       }
 
       .stats-section::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -75,10 +77,18 @@
         transform: translateY(30px);
       }
 
-      .stat-item:nth-child(1) { animation-delay: 0.1s; }
-      .stat-item:nth-child(2) { animation-delay: 0.2s; }
-      .stat-item:nth-child(3) { animation-delay: 0.3s; }
-      .stat-item:nth-child(4) { animation-delay: 0.4s; }
+      .stat-item:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .stat-item:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .stat-item:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .stat-item:nth-child(4) {
+        animation-delay: 0.4s;
+      }
 
       @keyframes slideUp {
         to {
@@ -88,13 +98,17 @@
       }
 
       .stat-item::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 5px;
-        background: linear-gradient(90deg, var(--primary-color), var(--secondary-purple));
+        background: linear-gradient(
+          90deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
         border-radius: 15px 15px 0 0;
         transform: scaleX(0);
         transition: transform 0.3s ease;
@@ -137,7 +151,7 @@
         font-weight: 700;
         color: var(--text-color);
         margin-bottom: 10px;
-        font-family: 'Tajawal', sans-serif;
+        font-family: "Tajawal", sans-serif;
         transition: all 0.3s ease;
       }
 
@@ -149,7 +163,7 @@
         font-size: 1rem;
         color: var(--text-color-light);
         font-weight: 500;
-        font-family: 'Tajawal', sans-serif;
+        font-family: "Tajawal", sans-serif;
         transition: all 0.3s ease;
       }
 
@@ -411,9 +425,10 @@
           width: 100%;
           padding: 10px 20px;
         }
-      }[data-theme="light"] .stat-label {
-    color: #000;
-}
+      }
+      [data-theme="light"] .stat-label {
+        color: #000;
+      }
     </style>
   </head>
   <body>
@@ -480,17 +495,20 @@
                 </div>
                 <div class="logo-item">
                   <img src="assets/images/zid.svg" alt="Logo 1" />
-                </div> <div class="logo-item">
+                </div>
+                <div class="logo-item">
                   <img src="assets/images/salla.svg" alt="salla" />
                 </div>
                 <div class="logo-item">
                   <img src="assets/images/zid.svg" alt="Logo 1" />
-                </div> <div class="logo-item">
+                </div>
+                <div class="logo-item">
                   <img src="assets/images/salla.svg" alt="salla" />
                 </div>
                 <div class="logo-item">
                   <img src="assets/images/zid.svg" alt="Logo 1" />
-                </div> <div class="logo-item">
+                </div>
+                <div class="logo-item">
                   <img src="assets/images/salla.svg" alt="salla" />
                 </div>
                 <div class="logo-item">
@@ -514,7 +532,6 @@
                 <div class="logo-item">
                   <img src="assets/images/logo6.svg" alt="Logo 6" />
                 </div> -->
-
               </div>
             </div>
           </div>
@@ -529,17 +546,30 @@
             <p>حمل الإضافة الآن واعرف أسماء الثيمات في متاجر سلة بسهولة</p>
           </div>
           <div class="theme-detector-content">
-            <p>يمكنك الآن منافسة المتاجر الأخرى من خلال معرفة الثيم الذي يستخدمونه وشراءه لنفسك. حمل الإضافة الآن على متصفحك المفضل.</p>
+            <p>
+              يمكنك الآن منافسة المتاجر الأخرى من خلال معرفة الثيم الذي
+              يستخدمونه وشراءه لنفسك. حمل الإضافة الآن على متصفحك المفضل.
+            </p>
             <div class="theme-detector-buttons">
-              <a href="https://chromewebstore.google.com/detail/gegmcpkdknaegpinpjioccdhidpkjpnh/" target="_blank" class="btn btn-primary-glow">
+              <a
+                href="https://chromewebstore.google.com/detail/gegmcpkdknaegpinpjioccdhidpkjpnh/"
+                target="_blank"
+                class="btn btn-primary-glow"
+              >
                 <i class="fab fa-chrome"></i> تحميل لمتصفح جوجل كروم
               </a>
-              <a href="https://microsoftedge.microsoft.com/addons/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-sa/ogeapoamjpobcldlkjabjgmifgokplld" target="_blank" class="btn btn-outline-glow">
+              <a
+                href="https://microsoftedge.microsoft.com/addons/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-sa/ogeapoamjpobcldlkjabjgmifgokplld"
+                target="_blank"
+                class="btn btn-outline-glow"
+              >
                 <i class="fab fa-edge"></i> تحميل لمتصفح مايكروسوفت إيدج
               </a>
             </div>
             <div class="discounts-link">
-              <p>ولا تنسى استخدام أكواد الخصم الخاصة بنا للحصول على أفضل الأسعار!</p>
+              <p>
+                ولا تنسى استخدام أكواد الخصم الخاصة بنا للحصول على أفضل الأسعار!
+              </p>
               <a href="salla-discounts.html" class="btn">عرض أكواد الخصم</a>
             </div>
           </div>
@@ -592,7 +622,9 @@
               </p>
               <div class="help-card-features">
                 <span><i class="fas fa-check"></i> تحسين محركات البحث</span>
-                <span><i class="fas fa-check"></i> تحليل الكلمات المفتاحية</span>
+                <span
+                  ><i class="fas fa-check"></i> تحليل الكلمات المفتاحية</span
+                >
                 <span><i class="fas fa-check"></i> تقارير أداء</span>
               </div>
             </div>
@@ -690,13 +722,15 @@
         <div class="portfolio-slider-container">
           <!-- الصف الأول - يتحرك من اليمين إلى اليسار -->
           <div class="portfolio-slider-row row1">
-              <a class="portfolio-slider-item">
+            <a class="portfolio-slider-item">
               <img src="assets/images/prt/11.jpeg" />
-            </a>  <a
+            </a>
+            <a
               href="#"
               target="_blank"
               target="_blank"
-              class="portfolio-slider-item"            >
+              class="portfolio-slider-item"
+            >
               <img src="assets/images/prt/1.jpeg" />
             </a>
             <a class="portfolio-slider-item">
@@ -762,15 +796,14 @@
             <a class="portfolio-slider-item">
               <img src="assets/images/prt/22.jpeg" />
             </a>
-
-
           </div>
 
           <!-- الصف الثاني - يتحرك من اليسار إلى اليمين -->
           <div class="portfolio-slider-row row2">
-              <a class="portfolio-slider-item">
+            <a class="portfolio-slider-item">
               <img src="assets/images/prt/11.jpeg" />
-            </a>  <a
+            </a>
+            <a
               href="#"
               target="_blank"
               target="_blank"
@@ -841,7 +874,6 @@
             <a class="portfolio-slider-item">
               <img src="assets/images/prt/22.jpeg" />
             </a>
-
           </div>
         </div>
 
@@ -940,7 +972,7 @@
         </div>
       </section>
 
-       <!-- قسم الشركاء -->
+      <!-- قسم الشركاء -->
       <section class="section partners-section">
         <div class="container">
           <div class="section-title">
@@ -950,7 +982,8 @@
           <div class="partners-grid">
             <div class="partner-logo">
               <img src="assets/images/logos/111.png" alt="شريك 1" />
-            </div><div class="partner-logo">
+            </div>
+            <div class="partner-logo">
               <img src="assets/images/logos/1.png" alt="شريك 1" />
             </div>
             <div class="partner-logo">
@@ -1034,13 +1067,25 @@
               <!-- أزرار التبديل بين النموذجين -->
               <div class="contact-tabs">
                 <div class="tab-buttons">
-                  <button type="button" class="tab-btn" id="generalFormBtn">استفسار عام</button>
-                  <button type="button" class="tab-btn active" id="pricingFormBtn">طلب تسعير خدمة</button>
+                  <button type="button" class="tab-btn" id="generalFormBtn">
+                    استفسار عام
+                  </button>
+                  <button
+                    type="button"
+                    class="tab-btn active"
+                    id="pricingFormBtn"
+                  >
+                    طلب تسعير خدمة
+                  </button>
                 </div>
 
                 <div class="tab-content">
                   <!-- نموذج الاستفسار العام -->
-                  <div class="tab-pane" id="generalFormPane" style="display: none;">
+                  <div
+                    class="tab-pane"
+                    id="generalFormPane"
+                    style="display: none"
+                  >
                     <form class="contact-form" id="generalContactForm">
                       <div class="form-group">
                         <input
@@ -1092,100 +1137,114 @@
                   <!-- نموذج طلب تسعير الخدمات -->
                   <div class="tab-pane active" id="pricingFormPane">
                     <form class="contact-form" id="pricingContactForm">
-                <div class="form-group">
-                  <input
-                    type="text"
-                    id="contact-name"
-                    placeholder="الاسم"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <input
-                    type="email"
-                    id="contact-email"
-                    placeholder="البريد الإلكتروني"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <input
-                    type="text"
-                    id="contact-website"
-                    placeholder="الموقع الإلكتروني (اختياري)"
-                  />
-                </div>
-                <div class="form-group">
-                  <input
-                    type="text"
-                    id="contact-store-url"
-                    placeholder="🌐 رابط المتجر"
-                  />
-                </div>
-                <div class="form-group">
-                  <select id="contact-platform" required>
-                    <option value="" disabled selected>🛍️ نوع المنصة (سلة أو زد)</option>
-                    <option value="سلة">سلة</option>
-                    <option value="زد">زد</option>
-                    <option value="أخرى">أخرى</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <select id="contact-package">
-                    <option value="" disabled selected>🛒 نوع الباقة</option>
-                    <option value="سلة برو">سلة برو</option>
-                    <option value="سلة بلس">سلة بلس</option>
-                    <option value="زد أساسية">زد أساسية</option>
-                    <option value="زد متقدمة">زد متقدمة</option>
-                    <option value="زد احترافية">زد احترافية</option>
-                    <option value="أخرى">أخرى</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <select id="contact-domain">
-                    <option value="" disabled selected>🌐 هل الدومين مدفوع؟</option>
-                    <option value="نعم">نعم</option>
-                    <option value="لا">لا</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <select id="contact-logo">
-                    <option value="" disabled selected>🧩 هل يوجد لديك شعار أو هوية بصرية؟</option>
-                    <option value="نعم">نعم</option>
-                    <option value="لا">لا</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <input
-                    type="text"
-                    id="contact-competitor"
-                    placeholder="متاجر منافسة أو متاجر تعجبك تصميمها (اختياري)"
-                  />
-                </div>
-                <div class="form-group">
-                  <select id="contact-service" required>
-                    <option value="" disabled selected>اختر نوع الخدمة</option>
-                    <option value="تصميم موقع">تصميم موقع</option>
-                    <option value="تطوير متجر إلكتروني">
-                      تطوير متجر إلكتروني
-                    </option>
-                    <option value="تحسين SEO">تحسين SEO</option>
-                    <option value="إدارة مواقع">إدارة مواقع</option>
-                    <option value="خدمة أخرى">خدمة أخرى</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <textarea
-                    id="contact-message"
-                    placeholder="اكتب رسالتك هنا..."
-                    rows="4"
-                    required
-                  ></textarea>
-                </div>
-                <button type="submit" id="submit-button" class="submit-btn">
-                  <i class="fab fa-whatsapp"></i> طلب تسعير الخدمة
-                  <span class="btn-shine"></span>
-                </button>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          id="contact-name"
+                          placeholder="الاسم"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="email"
+                          id="contact-email"
+                          placeholder="البريد الإلكتروني"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          id="contact-website"
+                          placeholder="الموقع الإلكتروني (اختياري)"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          id="contact-store-url"
+                          placeholder="🌐 رابط المتجر"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <select id="contact-platform" required>
+                          <option value="" disabled selected>
+                            🛍️ نوع المنصة (سلة أو زد)
+                          </option>
+                          <option value="سلة">سلة</option>
+                          <option value="زد">زد</option>
+                          <option value="أخرى">أخرى</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <select id="contact-package">
+                          <option value="" disabled selected>
+                            🛒 نوع الباقة
+                          </option>
+                          <option value="سلة برو">سلة برو</option>
+                          <option value="سلة بلس">سلة بلس</option>
+                          <option value="زد أساسية">زد أساسية</option>
+                          <option value="زد متقدمة">زد متقدمة</option>
+                          <option value="زد احترافية">زد احترافية</option>
+                          <option value="أخرى">أخرى</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <select id="contact-domain">
+                          <option value="" disabled selected>
+                            🌐 هل الدومين مدفوع؟
+                          </option>
+                          <option value="نعم">نعم</option>
+                          <option value="لا">لا</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <select id="contact-logo">
+                          <option value="" disabled selected>
+                            🧩 هل يوجد لديك شعار أو هوية بصرية؟
+                          </option>
+                          <option value="نعم">نعم</option>
+                          <option value="لا">لا</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          id="contact-competitor"
+                          placeholder="متاجر منافسة أو متاجر تعجبك تصميمها (اختياري)"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <select id="contact-service" required>
+                          <option value="" disabled selected>
+                            اختر نوع الخدمة
+                          </option>
+                          <option value="تصميم موقع">تصميم موقع</option>
+                          <option value="تطوير متجر إلكتروني">
+                            تطوير متجر إلكتروني
+                          </option>
+                          <option value="تحسين SEO">تحسين SEO</option>
+                          <option value="إدارة مواقع">إدارة مواقع</option>
+                          <option value="خدمة أخرى">خدمة أخرى</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <textarea
+                          id="contact-message"
+                          placeholder="اكتب رسالتك هنا..."
+                          rows="4"
+                          required
+                        ></textarea>
+                      </div>
+                      <button
+                        type="submit"
+                        id="submit-button"
+                        class="submit-btn"
+                      >
+                        <i class="fab fa-whatsapp"></i> طلب تسعير الخدمة
+                        <span class="btn-shine"></span>
+                      </button>
                     </form>
                   </div>
                 </div>
@@ -1309,6 +1368,8 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/scrolling-logos.js"></script>
     <script src="assets/js/contact-form.js"></script>
+    <script src="assets/js/load-components.js"></script>
+    <script src="assets/js/interactions.js"></script>
 
     <!-- سكريبت السلايدر المتحرك مع دعم السحب -->
     <script>
@@ -1409,10 +1470,10 @@
 
       // كود العدادات المتحركة
       function animateCounters() {
-        const counters = document.querySelectorAll('.stat-number');
+        const counters = document.querySelectorAll(".stat-number");
 
-        counters.forEach(counter => {
-          const target = +counter.getAttribute('data-target');
+        counters.forEach((counter) => {
+          const target = +counter.getAttribute("data-target");
           const duration = 3000; // مدة العد بالمللي ثانية (3 ثوان)
           const startTime = performance.now();
           const startValue = 0;
@@ -1423,7 +1484,9 @@
 
             // استخدام easing function لجعل الحركة أكثر طبيعية
             const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-            const currentValue = Math.floor(startValue + (target - startValue) * easeOutQuart);
+            const currentValue = Math.floor(
+              startValue + (target - startValue) * easeOutQuart
+            );
 
             counter.innerText = currentValue;
 
@@ -1440,28 +1503,31 @@
 
       // تشغيل العدادات عند ظهور القسم
       function handleStatsAnimation() {
-        const statsSection = document.querySelector('.stats-section');
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              // إعادة تعيين جميع العدادات إلى 0
-              const counters = document.querySelectorAll('.stat-number');
-              counters.forEach(counter => {
-                counter.innerText = '0';
-              });
+        const statsSection = document.querySelector(".stats-section");
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                // إعادة تعيين جميع العدادات إلى 0
+                const counters = document.querySelectorAll(".stat-number");
+                counters.forEach((counter) => {
+                  counter.innerText = "0";
+                });
 
-              // بدء العد بعد تأخير ليظهر البطاقات أولاً
-              setTimeout(() => {
-                animateCounters();
-              }, 800);
+                // بدء العد بعد تأخير ليظهر البطاقات أولاً
+                setTimeout(() => {
+                  animateCounters();
+                }, 800);
 
-              // إيقاف مراقبة هذا العنصر بعد التشغيل
-              observer.unobserve(entry.target);
-            }
-          });
-        }, {
-          threshold: 0.5 // يبدأ العد عندما يظهر 50% من القسم
-        });
+                // إيقاف مراقبة هذا العنصر بعد التشغيل
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.5, // يبدأ العد عندما يظهر 50% من القسم
+          }
+        );
 
         if (statsSection) {
           observer.observe(statsSection);
@@ -1469,7 +1535,7 @@
       }
 
       // تشغيل العدادات عند تحميل الصفحة
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         handleStatsAnimation();
       });
     </script>
