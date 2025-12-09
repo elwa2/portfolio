@@ -61,6 +61,15 @@
     "fa-palette": "palette",
     "fa-users": "users",
     "fa-calendar-alt": "calendar-alt",
+    // Payment & Contact Icons
+    "fa-paypal": "paypal",
+    "fa-university": "university",
+    "fa-wallet": "wallet",
+    "fa-bolt": "bolt",
+    "fa-qrcode": "qrcode",
+    "fa-clock": "clock",
+    "fa-check-circle": "check-circle",
+    "fa-map-marker-alt": "map-marker-alt",
   };
 
   // تحويل عنصر Font Awesome إلى SVG
