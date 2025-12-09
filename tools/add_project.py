@@ -263,11 +263,12 @@ class AddProjectApp:
                 
                 self.log(f"جاري فتح: {url}", 30)
                 try:
-                    page.goto(url, wait_until="networkidle", timeout=60000)
-                except Exception as e:
-                    print(f"Time out error or other: {e}")
-                    # Try accessing anyway, sometimes it loads but network is persistent
-                    pass
+                    page.goto(url, wait_until="domcontentloaded", timeout=90000)
+                    # انتظار إضافي لتحميل المحتوى
+                    page.wait_for_timeout(3000)
+                except Exception as nav_error:
+                    print(f"Navigation warning: {nav_error}")
+                    # المتابعة على أي حال - الصفحة قد تكون محملة جزئياً
                 
                 # 1. Extract Name
                 self.log("جاري استخراج البيانات...", 50)
@@ -289,7 +290,19 @@ class AddProjectApp:
                 
                 self.log(f"تم العثور على: {project_name} ({category})", 60)
                 
-                # 3. Screenshot
+                # 3. Scroll down to load all products/images
+                self.log("جاري التمرير لتحميل كل المحتوى...", 65)
+                
+                # Scroll down gradually to trigger lazy loading
+                for i in range(5):
+                    page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i+1)/5})")
+                    page.wait_for_timeout(800)
+                
+                # Scroll back to top for screenshot
+                page.evaluate("window.scrollTo(0, 0)")
+                page.wait_for_timeout(500)
+                
+                # 4. Screenshot
                 self.log("جاري التقاط الصورة...", 70)
                 
                 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -300,11 +313,11 @@ class AddProjectApp:
                 page.screenshot(path=str(image_path), full_page=True)
                 browser.close()
                 
-                # 4. Optimize
+                # 5. Optimize
                 self.log("جاري تحسين الصورة...", 80)
                 PortfolioManager.optimize_image(image_path)
                 
-                # 5. Save Data
+                # 6. Save Data
                 self.log("جاري حفظ البيانات...", 90)
                 project_data = {
                     "name": project_name,
@@ -318,7 +331,7 @@ class AddProjectApp:
                 projects["projects"].append(project_data)
                 PortfolioManager.save_projects(projects)
                 
-                # 6. Update HTML
+                # 7. Update HTML
                 success, msg = PortfolioManager.update_html(project_data, image_filename)
                 
                 self.log("اكتملت العملية!", 100)
@@ -326,7 +339,8 @@ class AddProjectApp:
                 self.root.after(0, lambda: self.on_success(project_name))
 
         except Exception as e:
-            self.root.after(0, lambda: self.on_error(str(e)))
+            error_message = str(e)  # حفظ الرسالة في متغير لتجنب NameError
+            self.root.after(0, lambda err=error_message: self.on_error(err))
 
     def on_success(self, name):
         messagebox.showinfo("تم بنجاح", f"تم إضافة المشروع:\n{name}")
