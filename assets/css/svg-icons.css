@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════════
+ * أنماط أيقونات SVG
+ * ═══════════════════════════════════════════════════════════════ */
+
+.svg-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: currentColor;
+  overflow: visible;
+}
+
+/* أحجام مختلفة */
+.svg-icon.fa-xs {
+  font-size: 0.75em;
+}
+
+.svg-icon.fa-sm {
+  font-size: 0.875em;
+}
+
+.svg-icon.fa-lg {
+  font-size: 1.33333em;
+  line-height: 0.75em;
+  vertical-align: -0.0667em;
+}
+
+.svg-icon.fa-xl {
+  font-size: 1.5em;
+}
+
+.svg-icon.fa-2x {
+  font-size: 2em;
+}
+
+.svg-icon.fa-3x {
+  font-size: 3em;
+}
+
+.svg-icon.fa-4x {
+  font-size: 4em;
+}
+
+.svg-icon.fa-5x {
+  font-size: 5em;
+}
+
+/* أنيميشن الدوران */
+.svg-icon.fa-spin {
+  animation: svg-icon-spin 2s infinite linear;
+}
+
+@keyframes svg-icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* تثبيت العرض */
+.svg-icon.fa-fw {
+  width: 1.25em;
+  text-align: center;
+}
+
+/* أيقونات القائمة */
+.svg-icon.fa-li {
+  position: absolute;
+  left: -2em;
+  width: 2em;
+  top: 0.14286em;
+  text-align: center;
+}
+
+/* تحريك أثناء التحميل */
+.svg-icon.fa-pulse {
+  animation: svg-icon-spin 1s infinite steps(8);
+}
+
+/* عكس الاتجاه */
+.svg-icon.fa-flip-horizontal {
+  transform: scaleX(-1);
+}
+
+.svg-icon.fa-flip-vertical {
+  transform: scaleY(-1);
+}
+
+.svg-icon.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.svg-icon.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.svg-icon.fa-rotate-270 {
+  transform: rotate(270deg);
+}

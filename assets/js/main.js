@@ -19,7 +19,8 @@ function copyToClipboard(textOrId, button) {
       // إظهار تأكيد النسخ
       if (button) {
         const originalHTML = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.innerHTML =
+          '<svg class="svg-icon" viewBox="0 0 512 512"><use href="assets/images/icons.svg#icon-check"></use></svg>';
         button.classList.add("copied");
         setTimeout(function () {
           button.innerHTML = originalHTML;
@@ -30,7 +31,8 @@ function copyToClipboard(textOrId, button) {
         const copyBtn = element?.parentElement?.querySelector(".copy-btn");
         if (copyBtn) {
           const originalHTML = copyBtn.innerHTML;
-          copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+          copyBtn.innerHTML =
+            '<svg class="svg-icon" viewBox="0 0 512 512"><use href="assets/images/icons.svg#icon-check"></use></svg>';
           copyBtn.classList.add("copied");
           setTimeout(function () {
             copyBtn.innerHTML = originalHTML;
@@ -58,14 +60,12 @@ function setTheme(themeName) {
   document.documentElement.setAttribute("data-theme", themeName);
 
   // تحديث أيقونة زر التبديل
-  const themeToggleIcon = document.querySelector(".theme-toggle i");
-  if (themeToggleIcon) {
+  const themeToggleSvg = document.querySelector(".theme-toggle svg use");
+  if (themeToggleSvg) {
     if (themeName === "dark") {
-      themeToggleIcon.classList.remove("fa-moon");
-      themeToggleIcon.classList.add("fa-sun");
+      themeToggleSvg.setAttribute("href", "assets/images/icons.svg#icon-sun");
     } else {
-      themeToggleIcon.classList.remove("fa-sun");
-      themeToggleIcon.classList.add("fa-moon");
+      themeToggleSvg.setAttribute("href", "assets/images/icons.svg#icon-moon");
     }
   }
 }
@@ -121,14 +121,12 @@ function closeMobileMenu() {
 
 // تحديث أيقونة القائمة
 function updateMenuIcon() {
-  const icon = mobileToggle?.querySelector("i");
-  if (icon) {
+  const iconUse = mobileToggle?.querySelector("svg use");
+  if (iconUse) {
     if (nav.classList.contains("active")) {
-      icon.classList.remove("fa-bars");
-      icon.classList.add("fa-times");
+      iconUse.setAttribute("href", "assets/images/icons.svg#icon-times");
     } else {
-      icon.classList.remove("fa-times");
-      icon.classList.add("fa-bars");
+      iconUse.setAttribute("href", "assets/images/icons.svg#icon-bars");
     }
   }
 }
