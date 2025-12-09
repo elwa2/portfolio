@@ -1,0 +1,839 @@
+/* ============================================
+   🎮 Gaming System - Portfolio Redesign
+   ألوان الهوية الأصلية مع تصميم ألعاب
+============================================ */
+
+/* ============================================
+   Gaming Color Variables
+============================================ */
+:root {
+  /* ألوان الهوية الأساسية */
+  --gaming-primary: #5e3bee;
+  /* بنفسجي أساسي */
+  --gaming-primary-light: #8a7ddb;
+  /* بنفسجي فاتح */
+  --gaming-secondary: #4dd4ac;
+  /* تركوازي/سماوي */
+  --gaming-accent: #60d7e3;
+  /* أزرق سماوي */
+  --gaming-gold: #fbbf24;
+  /* ذهبي للنقاط */
+  --gaming-success: #22c55e;
+  /* أخضر للنجاح */
+
+  /* خلفيات Gaming */
+  --gaming-bg-dark: #1a1a3e;
+  /* بنفسجي داكن */
+  --gaming-bg-darker: #0f0f24;
+  /* أغمق */
+  --gaming-card-bg: rgba(94, 59, 238, 0.1);
+  --gaming-card-border: rgba(77, 212, 172, 0.3);
+
+  /* تدرجات */
+  --gaming-gradient: linear-gradient(135deg, #5e3bee 0%, #4dd4ac 100%);
+  --gaming-gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --gaming-glow-primary: 0 0 20px rgba(94, 59, 238, 0.5);
+  --gaming-glow-accent: 0 0 20px rgba(77, 212, 172, 0.5);
+  --gaming-glow-gold: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* ============================================
+   XP Progress Bar - شريط نقاط الخبرة
+============================================ */
+.xp-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gaming-bg-darker);
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: var(--gaming-gradient);
+  width: 0%;
+  transition: width 0.5s ease-out;
+  box-shadow: var(--gaming-glow-primary);
+}
+
+.xp-bar-container:hover .xp-bar-fill {
+  height: 8px;
+  margin-top: -2px;
+}
+
+/* ============================================
+   XP Display Widget - عرض النقاط
+============================================ */
+.xp-widget {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  background: var(--gaming-bg-dark);
+  border: 2px solid var(--gaming-card-border);
+  border-radius: 15px;
+  padding: 15px 20px;
+  z-index: 998;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--gaming-glow-primary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.xp-widget:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--gaming-glow-accent);
+  border-color: var(--gaming-secondary);
+}
+
+.xp-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.xp-level-badge {
+  width: 35px;
+  height: 35px;
+  background: var(--gaming-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: var(--gaming-glow-primary);
+}
+
+.xp-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.xp-level-text {
+  font-size: 0.75rem;
+  color: var(--gaming-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.xp-points {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.xp-points .xp-icon {
+  color: var(--gaming-gold);
+  font-size: 0.9rem;
+}
+
+.xp-widget-progress {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.xp-widget-progress-fill {
+  height: 100%;
+  background: var(--gaming-gradient-gold);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* ============================================
+   XP Gain Animation - حركة كسب النقاط
+============================================ */
+.xp-gain-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--gaming-bg-dark);
+  border: 2px solid var(--gaming-gold);
+  border-radius: 15px;
+  padding: 20px 40px;
+  z-index: 10000;
+  text-align: center;
+  animation: xpGainPop 0.5s ease-out;
+  box-shadow: var(--gaming-glow-gold);
+}
+
+.xp-gain-popup .xp-amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--gaming-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.xp-gain-popup .xp-message {
+  color: white;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+@keyframes xpGainPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================
+   Achievement Badges - شارات الإنجاز
+============================================ */
+.achievement-notification {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--gaming-bg-dark) 0%, #2d2d5a 100%);
+  border: 2px solid var(--gaming-gold);
+  border-radius: 20px;
+  padding: 25px 40px;
+  z-index: 10001;
+  text-align: center;
+  animation: achievementSlide 0.6s ease-out;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.4);
+}
+
+.achievement-notification .achievement-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  animation: achievementBounce 0.5s ease infinite;
+}
+
+.achievement-notification .achievement-title {
+  color: var(--gaming-gold);
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.achievement-notification .achievement-desc {
+  color: white;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.achievement-notification .achievement-xp {
+  margin-top: 10px;
+  padding: 5px 15px;
+  background: var(--gaming-gradient-gold);
+  border-radius: 20px;
+  display: inline-block;
+  color: #1a1a3e;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+@keyframes achievementSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes achievementBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ============================================
+   Reward Cards - بطاقات المكافآت
+============================================ */
+.reward-card {
+  background: var(--gaming-bg-dark);
+  border: 2px solid var(--gaming-card-border);
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.reward-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gaming-gradient);
+}
+
+.reward-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--gaming-secondary);
+  box-shadow: var(--gaming-glow-accent);
+}
+
+.reward-card.locked {
+  opacity: 0.6;
+  filter: grayscale(50%);
+}
+
+.reward-card.locked::after {
+  content: '\f023';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.reward-xp-cost {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--gaming-gradient-gold);
+  color: #1a1a3e;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reward-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--gaming-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: var(--gaming-glow-primary);
+}
+
+.reward-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.reward-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.reward-claim-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--gaming-gradient);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.reward-claim-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--gaming-glow-primary);
+}
+
+.reward-claim-btn:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Coupon Reveal Animation - كشف الكوبون
+============================================ */
+.coupon-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.coupon-reveal.revealing .coupon-code {
+  animation: revealCode 0.5s ease forwards;
+}
+
+@keyframes revealCode {
+  0% {
+    filter: blur(10px);
+    opacity: 0;
+  }
+
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+.coupon-claim-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================
+   Confetti Animation - تأثير القصاصات
+============================================ */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.confetti.confetti-1 {
+  background: var(--gaming-primary);
+}
+
+.confetti.confetti-2 {
+  background: var(--gaming-secondary);
+}
+
+.confetti.confetti-3 {
+  background: var(--gaming-gold);
+}
+
+.confetti.confetti-4 {
+  background: var(--gaming-accent);
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Gaming Cards - بطاقات معرض الأعمال
+============================================ */
+.gaming-portfolio-card {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  background: var(--gaming-bg-dark);
+  border: 2px solid transparent;
+  transition: all 0.4s ease;
+  transform-style: preserve-3d;
+}
+
+.gaming-portfolio-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gaming-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.gaming-portfolio-card:hover {
+  border-color: var(--gaming-secondary);
+  transform: translateY(-10px) rotateX(5deg);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    var(--gaming-glow-accent);
+}
+
+.gaming-portfolio-card:hover::before {
+  opacity: 0.1;
+}
+
+.gaming-card-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+.gaming-card-badge.featured {
+  background: var(--gaming-gradient-gold);
+  color: #1a1a3e;
+}
+
+.gaming-card-badge.new {
+  background: var(--gaming-gradient);
+  color: white;
+}
+
+.gaming-card-views {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 10;
+}
+
+.gaming-card-like {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  color: white;
+}
+
+.gaming-card-like:hover {
+  background: var(--gaming-primary);
+  transform: scale(1.1);
+}
+
+.gaming-card-like.liked {
+  background: #ef4444;
+  animation: likeHeart 0.4s ease;
+}
+
+@keyframes likeHeart {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+/* ============================================
+   Daily Bonus - المكافأة اليومية
+============================================ */
+.daily-bonus-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.daily-bonus-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.daily-bonus-content {
+  background: linear-gradient(135deg, var(--gaming-bg-dark) 0%, #2d2d5a 100%);
+  border: 3px solid var(--gaming-gold);
+  border-radius: 25px;
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+  animation: bonusPopIn 0.5s ease;
+  box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+}
+
+@keyframes bonusPopIn {
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.daily-bonus-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: bonusFloat 2s ease-in-out infinite;
+}
+
+@keyframes bonusFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.daily-bonus-title {
+  color: var(--gaming-gold);
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.daily-bonus-desc {
+  color: white;
+  margin-bottom: 25px;
+}
+
+.daily-bonus-reward {
+  background: var(--gaming-gradient-gold);
+  color: #1a1a3e;
+  padding: 15px 30px;
+  border-radius: 30px;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.daily-bonus-claim {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: var(--gaming-gradient);
+  border: none;
+  border-radius: 15px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.daily-bonus-claim:hover {
+  transform: scale(1.05);
+  box-shadow: var(--gaming-glow-primary);
+}
+
+/* ============================================
+   Rewards Page Grid - شبكة المكافآت
+============================================ */
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 20px 0;
+}
+
+.rewards-section-title {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rewards-section-title i {
+  color: var(--gaming-gold);
+}
+
+/* ============================================
+   Level Progress Section
+============================================ */
+.level-progress-section {
+  background: var(--gaming-bg-dark);
+  border: 2px solid var(--gaming-card-border);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.current-level {
+  width: 80px;
+  height: 80px;
+  background: var(--gaming-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: var(--gaming-glow-primary);
+}
+
+.level-details h3 {
+  color: white;
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+}
+
+.level-details p {
+  color: var(--gaming-secondary);
+  font-size: 0.9rem;
+}
+
+.level-progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: var(--gaming-gradient);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.level-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.level-xp-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   Responsive Design
+============================================ */
+@media (max-width: 768px) {
+  .xp-widget {
+    top: auto;
+    bottom: 80px;
+    left: 10px;
+    right: 10px;
+    padding: 12px 15px;
+    min-width: auto;
+  }
+
+  .rewards-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .daily-bonus-content {
+    margin: 20px;
+    padding: 30px 20px;
+  }
+
+  .achievement-notification {
+    left: 10px;
+    right: 10px;
+    transform: none;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .xp-widget {
+    bottom: 70px;
+  }
+
+  .level-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .current-level {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}
