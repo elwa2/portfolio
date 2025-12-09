@@ -794,13 +794,49 @@
    Responsive Design
 ============================================ */
 @media (max-width: 768px) {
+
+  /* XP Widget صغير على الموبايل - زر دائري فقط */
   .xp-widget {
     top: auto;
     bottom: 80px;
-    left: 10px;
-    right: 10px;
-    padding: 12px 15px;
+    left: 15px;
+    right: auto;
+    padding: 0;
     min-width: auto;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .xp-widget-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 0;
+  }
+
+  .xp-level-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .xp-info {
+    display: none;
+  }
+
+  .xp-widget-progress {
+    display: none;
+  }
+
+  /* شريط XP العلوي أرفع */
+  .xp-bar-container {
+    height: 3px;
   }
 
   .rewards-grid {
@@ -809,21 +845,49 @@
   }
 
   .daily-bonus-content {
-    margin: 20px;
-    padding: 30px 20px;
+    margin: 15px;
+    padding: 25px 15px;
+  }
+
+  .daily-bonus-icon {
+    font-size: 3rem;
+  }
+
+  .daily-bonus-title {
+    font-size: 1.4rem;
   }
 
   .achievement-notification {
     left: 10px;
     right: 10px;
     transform: none;
-    padding: 20px;
+    padding: 15px;
+  }
+
+  .achievement-notification .achievement-icon {
+    font-size: 2rem;
+  }
+
+  .xp-gain-popup {
+    padding: 15px 25px;
+  }
+
+  .xp-gain-popup .xp-amount {
+    font-size: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .xp-widget {
     bottom: 70px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .xp-level-badge {
+    width: 25px;
+    height: 25px;
+    font-size: 0.7rem;
   }
 
   .level-info {
