@@ -48,11 +48,8 @@
     <link rel="stylesheet" href="assets/css/style.css" />
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
-    <!-- Lightbox CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css"
-    />
+    <!-- عارض Portfolio المخصص -->
+    <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
     <style>
       /* أنماط مخصصة لـ Lightbox */
       .lightbox .lb-image {
@@ -732,25 +729,52 @@
           </div>
 
           <div class="portfolio-grid">
-            <a href="assets/images/prt/30.jpeg" data-lightbox="portfolio" data-title="قيمر لايت" 
-               class="portfolio-item" data-category="website">
-                <div class="portfolio-image">
-                    <img src="assets/images/prt/30.jpeg" alt="قيمر لايت" loading="lazy" />
-                </div>
+            <a
+              href="assets/images/prt/30.jpeg"
+              data-lightbox="portfolio"
+              data-title="قيمر لايت"
+              class="portfolio-item"
+              data-category="website"
+            >
+              <div class="portfolio-image">
+                <img
+                  src="assets/images/prt/30.jpeg"
+                  alt="قيمر لايت"
+                  loading="lazy"
+                />
+              </div>
             </a>
 
-            <a href="assets/images/prt/29.jpeg" data-lightbox="portfolio" data-title="قيمر لايت" 
-               class="portfolio-item" data-category="website">
-                <div class="portfolio-image">
-                    <img src="assets/images/prt/29.jpeg" alt="قيمر لايت" loading="lazy" />
-                </div>
+            <a
+              href="assets/images/prt/29.jpeg"
+              data-lightbox="portfolio"
+              data-title="قيمر لايت"
+              class="portfolio-item"
+              data-category="website"
+            >
+              <div class="portfolio-image">
+                <img
+                  src="assets/images/prt/29.jpeg"
+                  alt="قيمر لايت"
+                  loading="lazy"
+                />
+              </div>
             </a>
 
-            <a href="assets/images/prt/28.jpeg" data-lightbox="portfolio" data-title="محمصة سييد لتحميص افضل انواع البن و القهوة المختصة Seed Roastery" 
-               class="portfolio-item" data-category="website">
-                <div class="portfolio-image">
-                    <img src="assets/images/prt/28.jpeg" alt="محمصة سييد لتحميص افضل انواع البن و القهوة المختصة Seed Roastery" loading="lazy" />
-                </div>
+            <a
+              href="assets/images/prt/28.jpeg"
+              data-lightbox="portfolio"
+              data-title="محمصة سييد لتحميص افضل انواع البن و القهوة المختصة Seed Roastery"
+              class="portfolio-item"
+              data-category="website"
+            >
+              <div class="portfolio-image">
+                <img
+                  src="assets/images/prt/28.jpeg"
+                  alt="محمصة سييد لتحميص افضل انواع البن و القهوة المختصة Seed Roastery"
+                  loading="lazy"
+                />
+              </div>
             </a>
 
             <a
@@ -1719,57 +1743,10 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/load-components.js"></script>
     <script src="assets/js/interactions.js"></script>
-    <!-- jQuery (necesario para Lightbox) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Lightbox JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <!-- عارض Portfolio المخصص -->
+    <script src="assets/js/portfolio-viewer.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // تهيئة Lightbox بعد تحميل jQuery
-        $(document).ready(function () {
-          // تهيئة Lightbox
-          lightbox.option({
-            resizeDuration: 200,
-            wrapAround: true,
-            albumLabel: "%1 / %2",
-            fadeDuration: 300,
-            positionFromTop: 50,
-            disableScrolling: true,
-            alwaysShowNavOnTouchDevices: true,
-          });
-
-          // تحويل جميع روابط المتاجر الإلكترونية المتبقية لتعمل مع Lightbox
-          $(
-            '.portfolio-item[data-category="ecommerce"] a[target="_blank"]'
-          ).each(function () {
-            const imgSrc = $(this).find("img").attr("src");
-            const imgAlt = $(this).find("img").attr("alt");
-            $(this)
-              .attr({
-                href: imgSrc,
-                "data-lightbox": "ecommerce-designs",
-                "data-title": imgAlt,
-              })
-              .removeAttr("target");
-          });
-
-          // تحويل جميع روابط السوشيال ميديا لتعمل مع Lightbox
-          $(
-            '.portfolio-item[data-category="social"] a[data-lightbox="social"]'
-          ).each(function () {
-            $(this).attr("data-lightbox", "social-designs");
-          });
-
-          // تأكيد من أن جميع صور السوشيال ميديا تستخدم نفس المجموعة
-          $('.portfolio-item[data-category="social"] a').each(function () {
-            if (
-              $(this).attr("data-lightbox") &&
-              $(this).attr("data-lightbox") !== "social-designs"
-            ) {
-              $(this).attr("data-lightbox", "social-designs");
-            }
-          });
-        });
         // تصفية الأعمال
         const filterButtons = document.querySelectorAll(".filter-btn");
         const portfolioItems = document.querySelectorAll(".portfolio-item");
