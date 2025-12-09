@@ -1,0 +1,214 @@
+/* ============================================
+   🎨 SVG Icons Styles
+   أنماط الأيقونات SVG
+============================================ */
+
+/* Base SVG Icon Style */
+.svg-icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.125em;
+  fill: currentColor;
+  transition: fill 0.2s ease, transform 0.2s ease;
+}
+
+/* Size Variations */
+.svg-icon.icon-xs {
+  width: 0.75em;
+  height: 0.75em;
+}
+
+.svg-icon.icon-sm {
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.svg-icon.icon-lg {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.svg-icon.icon-xl {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.svg-icon.icon-2x {
+  width: 2em;
+  height: 2em;
+}
+
+.svg-icon.icon-3x {
+  width: 3em;
+  height: 3em;
+}
+
+/* Gaming Theme Colors */
+.svg-icon.icon-primary {
+  fill: var(--gaming-primary);
+}
+
+.svg-icon.icon-secondary {
+  fill: var(--gaming-secondary);
+}
+
+.svg-icon.icon-gold {
+  fill: var(--gaming-gold);
+}
+
+.svg-icon.icon-accent {
+  fill: var(--gaming-accent);
+}
+
+/* Gradient Fill (using filter for approximation) */
+.svg-icon.icon-gradient {
+  fill: var(--gaming-primary);
+  filter: drop-shadow(0 0 3px var(--gaming-secondary));
+}
+
+/* Icon in Button */
+.btn .svg-icon {
+  margin-inline-end: 0.5em;
+}
+
+/* Icon in Header Nav */
+.nav-links .svg-icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* Icon in Social Links */
+.footer-social .svg-icon,
+.social-links .svg-icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* Icon in Contact Info */
+.contact-info-list .svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* Icon in Service Cards */
+.service-icon .svg-icon {
+  width: 2em;
+  height: 2em;
+  fill: white;
+}
+
+/* Icon in Copy Button */
+.copy-btn .svg-icon,
+.copy-code .svg-icon {
+  width: 1em;
+  height: 1em;
+}
+
+/* Icon in Check List */
+.check-icon.svg-icon {
+  fill: var(--gaming-secondary);
+}
+
+/* Icon Hover Effects */
+.svg-icon-hover:hover {
+  transform: scale(1.1);
+}
+
+.svg-icon-rotate:hover {
+  transform: rotate(15deg);
+}
+
+/* Icon Animations */
+@keyframes iconPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.svg-icon.icon-pulse {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.svg-icon.icon-bounce {
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+/* Icon in Gaming Widget */
+.xp-widget .svg-icon {
+  fill: var(--gaming-gold);
+}
+
+/* Icon in XP Popup */
+.xp-gain-popup .svg-icon {
+  fill: var(--gaming-gold);
+  font-size: 1.5em;
+}
+
+/* Theme Toggle Icon */
+.theme-toggle .svg-icon {
+  width: 1.2em;
+  height: 1.2em;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .svg-icon {
+  transform: rotate(30deg);
+}
+
+/* Mobile Menu Icon */
+.mobile-toggle .svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* WhatsApp Floating Button */
+.floating-whatsapp .svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+  fill: white;
+}
+
+/* Light Mode Adjustments */
+[data-theme="light"] .svg-icon {
+  fill: currentColor;
+}
+
+[data-theme="light"] .footer-social .svg-icon {
+  fill: var(--gaming-primary);
+}
+
+[data-theme="light"] .footer-social a:hover .svg-icon {
+  fill: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .svg-icon.icon-lg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .svg-icon.icon-xl {
+    width: 1.3em;
+    height: 1.3em;
+  }
+}

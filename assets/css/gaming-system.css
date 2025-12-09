@@ -837,3 +837,84 @@
     font-size: 1.5rem;
   }
 }
+
+/* ============================================
+   🌙 LIGHT MODE - Gaming System
+   الوضع الفاتح لنظام المكافآت
+============================================ */
+[data-theme="light"] .xp-bar-container {
+  background: rgba(94, 59, 238, 0.1);
+}
+
+[data-theme="light"] .xp-widget {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(94, 59, 238, 0.3);
+  box-shadow: 0 4px 20px rgba(94, 59, 238, 0.15);
+}
+
+[data-theme="light"] .xp-widget:hover {
+  box-shadow: 0 8px 30px rgba(94, 59, 238, 0.25);
+}
+
+[data-theme="light"] .xp-points {
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .xp-level-text {
+  color: #5e3bee;
+}
+
+[data-theme="light"] .xp-gain-popup {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--gaming-gold);
+}
+
+[data-theme="light"] .xp-gain-popup .xp-message {
+  color: #4a4a6a;
+}
+
+[data-theme="light"] .achievement-notification {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+}
+
+[data-theme="light"] .achievement-notification .achievement-desc {
+  color: #4a4a6a;
+}
+
+[data-theme="light"] .daily-bonus-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+}
+
+[data-theme="light"] .daily-bonus-desc {
+  color: #4a4a6a;
+}
+
+[data-theme="light"] .reward-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(94, 59, 238, 0.2);
+}
+
+[data-theme="light"] .reward-card:hover {
+  box-shadow: 0 8px 30px rgba(94, 59, 238, 0.2);
+}
+
+[data-theme="light"] .reward-title {
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .reward-desc {
+  color: #4a4a6a;
+}
+
+[data-theme="light"] .level-progress-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(94, 59, 238, 0.2);
+}
+
+[data-theme="light"] .level-details h3 {
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .level-progress-bar {
+  background: rgba(94, 59, 238, 0.1);
+}
