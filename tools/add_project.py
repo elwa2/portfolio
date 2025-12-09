@@ -290,17 +290,44 @@ class AddProjectApp:
                 
                 self.log(f"تم العثور على: {project_name} ({category})", 60)
                 
-                # 3. Scroll down to load all products/images
+                # 3. Scroll down to load all products/images (enhanced lazy loading)
                 self.log("جاري التمرير لتحميل كل المحتوى...", 65)
                 
-                # Scroll down gradually to trigger lazy loading
-                for i in range(5):
-                    page.evaluate(f"window.scrollTo(0, document.body.scrollHeight * {(i+1)/5})")
-                    page.wait_for_timeout(800)
+                # Get total page height
+                total_height = page.evaluate("document.body.scrollHeight")
+                viewport_height = 1080
+                scroll_step = viewport_height // 2  # Scroll half viewport at a time
+                current_scroll = 0
                 
-                # Scroll back to top for screenshot
+                # Scroll down gradually - more steps with longer waits
+                while current_scroll < total_height:
+                    current_scroll += scroll_step
+                    page.evaluate(f"window.scrollTo(0, {current_scroll})")
+                    page.wait_for_timeout(1500)  # Wait for lazy images to load
+                    
+                    # Update total height (page may grow as content loads)
+                    new_height = page.evaluate("document.body.scrollHeight")
+                    if new_height > total_height:
+                        total_height = new_height
+                
+                # Scroll to bottom completely
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                page.wait_for_timeout(2000)
+                
+                # Trigger any remaining lazy images by forcing visibility
+                page.evaluate("""
+                    // Force load all images
+                    document.querySelectorAll('img[loading="lazy"], img[data-src], img[data-lazy]').forEach(img => {
+                        if (img.dataset.src) img.src = img.dataset.src;
+                        if (img.dataset.lazy) img.src = img.dataset.lazy;
+                        img.loading = 'eager';
+                    });
+                """)
+                page.wait_for_timeout(2000)
+                
+                # Scroll back to top for full page screenshot
                 page.evaluate("window.scrollTo(0, 0)")
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(1000)
                 
                 # 4. Screenshot
                 self.log("جاري التقاط الصورة...", 70)
