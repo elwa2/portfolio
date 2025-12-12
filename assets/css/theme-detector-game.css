@@ -1,0 +1,855 @@
+/* ============================================
+   🎮 Theme Detector Game Section
+   Gamification & Psychology Edition
+   ============================================ */
+
+/* === CSS Variables for Game Section === */
+.theme-detector-game {
+  --game-primary: #8b5cf6;
+  --game-secondary: #ec4899;
+  --game-accent: #06b6d4;
+  --game-gold: #fbbf24;
+  --game-success: #10b981;
+  --game-dark: #1a1033;
+  --game-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ec4899 100%);
+  --reward-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  --neon-glow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
+  --gold-glow: 0 0 20px rgba(251, 191, 36, 0.4), 0 0 40px rgba(251, 191, 36, 0.2);
+}
+
+/* === Main Section Container === */
+.theme-detector-game {
+  position: relative;
+  padding: 100px 0 80px;
+  background: linear-gradient(180deg,
+      var(--bg-color) 0%,
+      #1a1033 30%,
+      #0f0a1f 70%,
+      var(--bg-color-alt) 100%);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* === Animated Background Particles === */
+.game-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game-particles::before,
+.game-particles::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: float-particle 15s infinite ease-in-out;
+}
+
+.game-particles::before {
+  background: rgba(139, 92, 246, 0.3);
+  top: 10%;
+  right: 10%;
+  animation-delay: 0s;
+}
+
+.game-particles::after {
+  background: rgba(236, 72, 153, 0.2);
+  bottom: 20%;
+  left: 10%;
+  animation-delay: 5s;
+}
+
+@keyframes float-particle {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  75% {
+    transform: translate(20px, 10px) scale(1.05);
+  }
+}
+
+/* === Quest Banner === */
+.quest-banner {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 20px 40px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: var(--neon-glow);
+  animation: pulse-glow 3s infinite ease-in-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: var(--neon-glow);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.quest-banner .quest-icon {
+  font-size: 2.5rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.quest-banner h2 {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.live-counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px 20px;
+  border-radius: 50px;
+  color: white;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+/* === Mission Card === */
+.mission-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  padding: 50px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+
+.mission-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg,
+      transparent,
+      rgba(139, 92, 246, 0.1),
+      transparent,
+      rgba(236, 72, 153, 0.1),
+      transparent);
+  animation: rotate-gradient 10s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotate-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.mission-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.xp-badge {
+  background: var(--reward-gradient);
+  color: #1a1033;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: var(--gold-glow);
+  animation: badge-shine 3s infinite;
+}
+
+@keyframes badge-shine {
+
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+.mission-header h3 {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  text-align: center;
+  background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mission-description {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.2rem;
+  line-height: 1.8;
+  text-align: center;
+  margin-bottom: 30px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mission-description strong {
+  color: var(--game-gold);
+  display: block;
+  margin-top: 10px;
+  font-size: 1.3rem;
+}
+
+/* === Progress Section === */
+.progress-section {
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.progress-bar {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--game-primary), var(--game-secondary));
+  border-radius: 50px;
+  transition: width 1s ease;
+  position: relative;
+  animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.progress-section span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}
+
+/* === Game Buttons === */
+.game-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.game-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 35px;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  font-family: 'Tajawal', sans-serif;
+  text-decoration: none;
+}
+
+.game-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.game-btn:hover::before {
+  left: 100%;
+}
+
+.chrome-btn {
+  background: linear-gradient(135deg, #5e3bee 0%, #7d56f9 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(94, 59, 238, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chrome-btn:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(94, 59, 238, 0.4);
+  background: linear-gradient(135deg, #4a2fbe 0%, #6b46c1 100%);
+}
+
+.edge-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.edge-btn:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 40px rgba(94, 59, 238, 0.15);
+  border-color: var(--game-primary);
+}
+
+.btn-icon {
+  font-size: 1.5rem;
+}
+
+.btn-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--reward-gradient);
+  color: #1a1033;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  animation: badge-pulse 2s infinite;
+}
+
+@keyframes badge-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* === Scarcity Notice === */
+.scarcity-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 15px 25px;
+  border-radius: 50px;
+  color: var(--game-gold);
+  font-weight: 600;
+  max-width: 400px;
+  margin: 0 auto;
+  animation: attention-pulse 2s infinite;
+}
+
+@keyframes attention-pulse {
+
+  0%,
+  100% {
+    border-color: rgba(251, 191, 36, 0.3);
+  }
+
+  50% {
+    border-color: rgba(251, 191, 36, 0.6);
+  }
+}
+
+.fire-icon {
+  font-size: 1.3rem;
+  animation: fire-flicker 0.5s infinite alternate;
+}
+
+@keyframes fire-flicker {
+  0% {
+    transform: scale(1) rotate(-5deg);
+  }
+
+  100% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+/* === Achievement Badges Row === */
+.achievements-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.achievement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.achievement-badge:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: var(--game-primary);
+  transform: translateY(-3px);
+}
+
+.achievement-badge span {
+  font-size: 1.2rem;
+}
+
+/* === Reward Modal === */
+.reward-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+}
+
+.reward-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.reward-modal .modal-content {
+  background: linear-gradient(180deg, #1a1033 0%, #0f0a1f 100%);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-radius: 30px;
+  padding: 50px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  transform: scale(0.8);
+  transition: transform 0.4s ease;
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.3);
+}
+
+.reward-modal.active .modal-content {
+  transform: scale(1);
+}
+
+.reward-modal h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, var(--game-gold) 0%, #fff 50%, var(--game-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* === Spin Wheel === */
+.spin-wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#wheelCanvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  /* Custom easing for spin */
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--game-gold);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  z-index: 5;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+#spinBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: var(--game-primary);
+  color: white;
+  font-weight: 800;
+  font-family: 'Tajawal', sans-serif;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+#spinBtn:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: var(--game-secondary);
+}
+
+#spinBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Hidden Reward Info (shown after spin) */
+.reward-info-container {
+  text-align: center;
+  margin-top: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  display: none;
+  /* Initially hidden */
+}
+
+.reward-info-container.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reward-info-container h3 {
+  color: var(--game-gold);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.coupon-display {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.coupon-display code {
+  display: block;
+  color: #fff;
+  font-family: monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-top: 5px;
+}
+
+.coupon-display span {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* === Modal Actions === */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.copy-reward-btn,
+.go-to-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: 'Tajawal', sans-serif;
+  border: none;
+}
+
+.copy-reward-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.copy-reward-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.copy-reward-btn.copied {
+  background: var(--game-success);
+  border-color: var(--game-success);
+}
+
+.go-to-theme-btn {
+  background: var(--reward-gradient);
+  color: #1a1033;
+}
+
+.go-to-theme-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--gold-glow);
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* === Confetti Container === */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .theme-detector-game {
+    padding: 60px 0 50px;
+  }
+
+  .quest-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .quest-banner h2 {
+    font-size: 1.4rem;
+  }
+
+  .mission-card {
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
+
+  .mission-header h3 {
+    font-size: 1.6rem;
+  }
+
+  .mission-description {
+    font-size: 1rem;
+  }
+
+  .game-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .game-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .achievements-row {
+    gap: 10px;
+  }
+
+  .achievement-badge {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .reward-modal .modal-content {
+    padding: 30px 20px;
+  }
+
+  .scratch-card {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quest-banner h2 {
+    font-size: 1.2rem;
+  }
+
+  .live-counter {
+    font-size: 0.85rem;
+    padding: 8px 15px;
+  }
+
+  .mission-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .btn-badge {
+    display: none;
+  }
+}
+
+/* === Dark Mode Adjustments === */
+[data-theme="light"] .theme-detector-game {
+  background: linear-gradient(180deg,
+      #f8fafc 0%,
+      #e9e3f5 30%,
+      #d8d0eb 70%,
+      #f0f4f8 100%);
+}
+
+[data-theme="light"] .mission-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+[data-theme="light"] .mission-header h3 {
+  background: linear-gradient(135deg, #5e3bee 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .mission-description {
+  color: #4a5568;
+}
+
+[data-theme="light"] .progress-section span {
+  color: #718096;
+}
+
+[data-theme="light"] .achievement-badge {
+  background: rgba(139, 92, 246, 0.1);
+  color: #5e3bee;
+  border-color: rgba(139, 92, 246, 0.3);
+}

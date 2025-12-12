@@ -74,6 +74,7 @@
     <link rel="stylesheet" href="assets/css/contact-form.css" />
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="assets/css/theme-detector-game.css" />
     <style>
       /* أنماط قسم الإحصائيات المتحركة */
       .stats-section {
@@ -595,44 +596,102 @@
       </section>
 
       <!-- قسم كاشف الثيمات -->
-      <section class="section theme-detector-section">
+      <!-- قسم كاشف الثيمات - أسلوب الألعاب -->
+      <section class="theme-detector-game" id="theme-detector">
+        <!-- Animated Background -->
+        <div class="game-particles"></div>
+
         <div class="container">
-          <div class="section-title">
-            <h2>كاشف ثيمات متاجر سلة</h2>
-            <p>حمل الإضافة الآن واعرف أسماء الثيمات في متاجر سلة بسهولة</p>
-          </div>
-          <div class="theme-detector-content">
-            <p>
-              يمكنك الآن منافسة المتاجر الأخرى من خلال معرفة الثيم الذي
-              يستخدمونه وشراءه لنفسك. حمل الإضافة الآن على متصفحك المفضل.
-            </p>
-            <div class="theme-detector-buttons">
-              <a
-                href="https://chromewebstore.google.com/detail/gegmcpkdknaegpinpjioccdhidpkjpnh/"
-                target="_blank"
-                class="btn btn-primary-glow"
-              >
-                <svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true">
-                  <use xlink:href="assets/images/icons.svg#icon-chrome"></use>
-                </svg>
-                تحميل لمتصفح جوجل كروم
-              </a>
-              <a
-                href="https://microsoftedge.microsoft.com/addons/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-sa/ogeapoamjpobcldlkjabjgmifgokplld"
-                target="_blank"
-                class="btn btn-outline-glow"
-              >
-                <svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true">
-                  <use xlink:href="assets/images/icons.svg#icon-edge"></use>
-                </svg>
-                تحميل لمتصفح مايكروسوفت إيدج
-              </a>
+          <!-- Quest Banner -->
+          <div class="quest-banner">
+            <div style="display: flex; align-items: center; gap: 15px">
+              <span class="quest-icon">🎯</span>
+              <h2>مهمتك: اكتشف أسرار المنافسين!</h2>
             </div>
-            <div class="discounts-link">
-              <p>
-                ولا تنسى استخدام أكواد الخصم الخاصة بنا للحصول على أفضل الأسعار!
-              </p>
-              <a href="salla-discounts.html" class="btn">عرض أكواد الخصم</a>
+            <div class="live-counter">
+              <span class="pulse-dot"></span>
+              <span>800 تاجر يستخدمها الآن</span>
+            </div>
+          </div>
+
+          <!-- Main Mission Card -->
+          <div class="mission-card">
+            <div class="mission-header">
+              <div class="xp-badge">+50 XP</div>
+              <h3>كاشف ثيمات متاجر سلة</h3>
+            </div>
+
+            <p class="mission-description">
+              اكتشف الثيم الذي يستخدمه أي متجر على سلة بنقرة واحدة!
+              <strong>واحصل على كود خصم حصري كمكافأة! 🎁</strong>
+            </p>
+
+            <!-- Progress Bar (Psychological) -->
+            <div class="progress-section">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%"></div>
+              </div>
+              <span>75% - تقريباً وصلت للجائزة!</span>
+            </div>
+
+            <!-- Download Buttons -->
+            <div class="game-buttons">
+              <button class="game-btn chrome-btn" data-browser="chrome">
+                <span class="btn-icon">🏆</span>
+                <span class="btn-text">تحميل للكروم</span>
+                <span class="btn-badge">الأكثر شيوعاً</span>
+              </button>
+
+              <button class="game-btn edge-btn" data-browser="edge">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">تحميل للإيدج</span>
+              </button>
+            </div>
+
+            <!-- Scarcity Element -->
+            <div class="scarcity-notice">
+              <span class="fire-icon">🔥</span>
+              <span
+                >فقط <strong id="codes-remaining">47</strong> كود خصم متبقي
+                اليوم!</span
+              >
+            </div>
+          </div>
+
+          <!-- Achievement Badges -->
+          <div class="achievements-row">
+            <div class="achievement-badge"><span>🎁</span> خصم فوري</div>
+            <div class="achievement-badge"><span>⚡</span> تفعيل مجاني</div>
+            <div class="achievement-badge"><span>🌟</span> +5000 مستخدم</div>
+          </div>
+        </div>
+
+        <!-- Reward Modal (Spin Wheel) -->
+        <div class="reward-modal" id="rewardModal">
+          <div class="modal-content">
+            <button class="close-modal-btn">&times;</button>
+            <div class="confetti-container"></div>
+            <h2>🎉 مبروك! جرب حظك!</h2>
+
+            <!-- Spin Wheel -->
+            <div class="spin-wheel-container">
+              <div class="wheel-pointer"></div>
+              <canvas id="wheelCanvas"></canvas>
+              <button id="spinBtn">دِر العجلة! 🎡</button>
+            </div>
+
+            <!-- Revealed Reward Info -->
+            <div class="reward-info-container">
+              <h3>مبروك! ربحت: <span id="rewardThemeName">ثيم ...</span></h3>
+              <div class="coupon-display">
+                <span>كود الخصم الخاص بك:</span>
+                <code id="rewardCode">...</code>
+              </div>
+
+              <div class="modal-actions">
+                <button class="copy-reward-btn">📋 نسخ الكود</button>
+                <a class="go-to-theme-btn" target="_blank">🛒 اذهب للثيم</a>
+              </div>
             </div>
           </div>
         </div>
@@ -1792,5 +1851,7 @@
         handleStatsAnimation();
       });
     </script>
+    <!-- Theme Detector Game Script -->
+    <script src="assets/js/theme-detector-game.js"></script>
   </body>
 </html>
