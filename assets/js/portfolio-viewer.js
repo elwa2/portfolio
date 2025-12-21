@@ -327,25 +327,28 @@
   // ═══════════════════════════════════════════════════════════════
 
   function init() {
-    // البحث عن كل عناصر Portfolio التي تستخدم data-lightbox
-    const portfolioItems = document.querySelectorAll(
-      '[data-lightbox="portfolio"]'
-    );
+    // Find all elements with data-lightbox attribute
+    const lightboxGroups = {};
+    const items = document.querySelectorAll("[data-lightbox]");
 
-    if (portfolioItems.length === 0) return;
+    items.forEach((item) => {
+      const groupName = item.getAttribute("data-lightbox");
+      if (!lightboxGroups[groupName]) {
+        lightboxGroups[groupName] = [];
+      }
 
-    // جمع كل الصور
-    const images = [];
-    portfolioItems.forEach((item, index) => {
-      images.push({
+      const imageInfo = {
         src: item.href || item.getAttribute("data-src"),
         title: item.getAttribute("data-title") || "",
-      });
+      };
 
-      // منع السلوك الافتراضي
+      lightboxGroups[groupName].push(imageInfo);
+      const indexInGroup = lightboxGroups[groupName].length - 1;
+
+      // Handle click
       item.addEventListener("click", function (e) {
         e.preventDefault();
-        openViewer(images, index);
+        openViewer(lightboxGroups[groupName], indexInGroup);
       });
     });
   }
