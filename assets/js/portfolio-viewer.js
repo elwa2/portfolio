@@ -85,6 +85,9 @@
     `;
 
     document.body.insertAdjacentHTML("beforeend", html);
+    if (window.SvgIcons && typeof window.SvgIcons.convert === "function") {
+      window.SvgIcons.convert();
+    }
     attachEvents();
   }
 

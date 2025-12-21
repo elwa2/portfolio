@@ -41,6 +41,7 @@
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="assets/css/payment.css" />
+    <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
   </head>
   <body>
     <header class="header">
@@ -311,7 +312,8 @@
                 <div class="payment-info-item">
                   <a
                     href="assets/images/pay/stc.jpeg"
-                    target="_blank"
+                    data-lightbox="portfolio"
+                    data-title="شرح تحويل STC Pay"
                     class="btn-outline"
                     >صورة توضيحية</a
                   >
@@ -520,13 +522,15 @@
                 <div class="payment-info-item">
                   <a
                     href="assets/images/pay/rajhi.jpeg"
-                    target="_blank"
+                    data-lightbox="portfolio"
+                    data-title="شرح تحويل الراجحي - 1"
                     class="btn-outline"
                     >صورة توضيحية 1</a
                   >
                   <a
                     href="assets/images/pay/rajhi2.jpeg"
-                    target="_blank"
+                    data-lightbox="portfolio"
+                    data-title="شرح تحويل الراجحي - 2"
                     class="btn-outline"
                     >صورة توضيحية 2</a
                   >
@@ -770,7 +774,8 @@
                 <div class="payment-info-item">
                   <a
                     href="assets/images/pay/barq.jpg"
-                    target="_blank"
+                    data-lightbox="portfolio"
+                    data-title="شرح تحويل برق (فودافون كاش)"
                     class="btn-outline"
                     >صورة توضيحية</a
                   >
@@ -900,7 +905,8 @@
                 <div class="payment-info-item">
                   <a
                     href="assets/images/pay/binance.jpg"
-                    target="_blank"
+                    data-lightbox="portfolio"
+                    data-title="شرح تحويل Binance"
                     class="btn-outline"
                     >عرض الباركود</a
                   >
@@ -1060,5 +1066,14 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/load-components.js"></script>
     <script src="assets/js/interactions.js"></script>
+    <script src="assets/js/portfolio-viewer.js"></script>
+    <script>
+      // التأكد من تشغيل عارض الصور عند تحميل الصفحة
+      document.addEventListener("DOMContentLoaded", function () {
+        if (window.PortfolioViewer) {
+          // السكريبت سيتعرف تلقائياً على عناصر [data-lightbox="portfolio"]
+        }
+      });
+    </script>
   </body>
 </html>
