@@ -308,6 +308,15 @@
 
     if (rewardInfo) rewardInfo.classList.add("show");
 
+    // 🎮 Gamification Integration
+    if (window.gameState) {
+      window.gameState.addXp(150, `ربحت ${reward.theme}`);
+      window.gameState.unlockAchievement(
+        "lucky_spinner",
+        "المحظوظ: استخدمت عجلة الحظ"
+      );
+    }
+
     playConfetti(); // Celebration confetti!
   }
 

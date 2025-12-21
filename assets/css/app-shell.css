@@ -1,0 +1,154 @@
+/**
+ * 🧱 app-shell.css - Structure for the 2026 App View
+ * Transforms the page into a sidebar-driven application.
+ */
+
+:root {
+  --sidebar-width: 280px;
+  --header-height: 70px;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background: var(--p-dark);
+  margin: 0;
+  overflow-x: hidden;
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* --- App Sidebar --- */
+.app-sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  background: var(--p-glass-bg);
+  backdrop-filter: blur(var(--p-glass-blur));
+  -webkit-backdrop-filter: blur(var(--p-glass-blur));
+  border-left: 1px solid var(--p-glass-border);
+  z-index: 1000;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  transition: var(--p-transition);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--p-glass-border);
+}
+
+.sidebar-logo img {
+  height: 40px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  color: var(--p-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--p-transition);
+}
+
+.sidebar-link .icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--p-primary-rgb), 0.1);
+  border-radius: 8px;
+  color: var(--p-primary);
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: rgba(var(--p-primary-rgb), 0.1);
+  color: var(--p-primary);
+}
+
+.sidebar-link.active .icon {
+  background: var(--p-gradient-gold);
+  color: var(--p-dark);
+}
+
+/* --- Main Content Area --- */
+#spa-container {
+  margin-right: var(--sidebar-width);
+  flex: 1;
+  width: calc(100% - var(--sidebar-width));
+  position: relative;
+  min-height: 100vh;
+}
+
+.top-app-bar {
+  height: var(--header-height);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--p-glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+
+/* --- Mobile Adjustments --- */
+@media (max-width: 992px) {
+  .app-sidebar {
+    transform: translateX(100%);
+  }
+
+  body.sidebar-open .app-sidebar {
+    transform: translateX(0);
+  }
+
+  #spa-container {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .logo-mobile {
+    display: block !important;
+  }
+}
+
+/* --- Modern Section Overhaul --- */
+.app-section {
+  padding: 4rem 2rem;
+}
+
+.section-header {
+  text-align: right;
+  margin-bottom: 3rem;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin: 0;
+  background: var(--p-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

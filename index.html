@@ -78,6 +78,9 @@
     <link rel="stylesheet" href="assets/css/theme-detector-game.css" />
     <!-- عارض Portfolio المخصص -->
     <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
+    <!-- 💎 2026 Premium Design System -->
+    <link rel="stylesheet" href="assets/css/design-system.css" />
+    <link rel="stylesheet" href="assets/css/app-shell.css" />
     <style>
       /* أنماط قسم الإحصائيات المتحركة */
       .stats-section {
@@ -476,86 +479,102 @@
       }
     </style>
   </head>
-  <body class="theme-aware">
-    <!-- خلفية أيقونات متحركة -->
-    <div class="floating-background">
-      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s;">🚀</div>
-      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s;">⭐</div>
-      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s;">🔥</div>
-      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s;">💎</div>
-      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s;">🎯</div>
-      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s;">⚡</div>
-      <div class="floating-icon" style="left: 15%; animation-duration: 14s; animation-delay: 7s;">✨</div>
-      <div class="floating-icon" style="left: 80%; animation-duration: 15s; animation-delay: 8s;">🔮</div>
+  <body class="theme-aware app-view">
+    <!-- 🪐 App Sidebar (Navigation Console) -->
+    <aside class="app-sidebar">
+      <div class="sidebar-logo">
+        <img src="assets/images/logo.svg" alt="Ali Ahmed Logo" />
+        <span style="color: var(--p-primary); font-weight: 900; font-size: 1.2rem;">ابتكار 2026</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#home" class="sidebar-link active">
+          <span class="icon">🏠</span>
+          <span>الرئيسية</span>
+        </a>
+        <a href="#about" class="sidebar-link">
+          <span class="icon">👤</span>
+          <span>من نحن</span>
+        </a>
+        <a href="#services" class="sidebar-link">
+          <span class="icon">💼</span>
+          <span>خدماتنا</span>
+        </a>
+        <a href="#portfolio" class="sidebar-link">
+          <span class="icon">🎨</span>
+          <span>أعمالنا</span>
+        </a>
+        <a href="#salla-discounts" class="sidebar-link">
+          <span class="icon">🎁</span>
+          <span>خصومات سلة</span>
+        </a>
+        <a href="#contact" class="sidebar-link">
+          <span class="icon">📞</span>
+          <span>تواصل معنا</span>
+        </a>
+      </nav>
+
+      <div style="margin-top: auto; padding-top: 2rem;">
+        <div class="glass-panel" style="padding: 1rem; border-radius: 15px; background: rgba(var(--p-primary-rgb), 0.05);">
+            <div style="font-size: 0.8rem; color: var(--p-primary); margin-bottom: 0.5rem;">حالة الحساب</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700;">مستوى ١</span>
+                <span style="font-size: 0.7rem; opacity: 0.6;">0/100 XP</span>
+            </div>
+            <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                <div style="width: 0%; height: 100%; background: var(--p-gradient-gold);"></div>
+            </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 🧬 2026 Dynamic Mesh Background Refined -->
+    <div class="mesh-background">
+      <div class="mesh-blob" style="top: -10%; left: -10%; animation-duration: 35s; opacity: 0.6;"></div>
+      <div class="mesh-blob" style="bottom: -15%; right: -10%; animation-duration: 40s; animation-delay: -8s; background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 60%);"></div>
+      <div class="mesh-blob" style="top: 30%; right: 10%; animation-duration: 30s; animation-delay: -15s; background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%);"></div>
     </div>
 
-    <!-- القائمة العلوية -->
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo">
-            <a href="index.html">
-              <img src="assets/images/logo.svg" alt="Ali Ahmed" />
-            </a>
-          </div>
-
-          <nav class="nav">
-            <ul class="nav-links">
-              <li><a href="#home" class="active">الرئيسية</a></li>
-              <li><a href="#about">من نحن</a></li>
-              <li><a href="#services">خدماتنا</a></li>
-              <li><a href="#portfolio">أعمالنا</a></li>
-              <li><a href="#salla-discounts">أكواد خصم سلة</a></li>
-              <li><a href="#contact">تواصل معنا</a></li>
-              <li><a href="#payment">الدفع</a></li>
-            </ul>
-          </nav>
-
-          <div class="header-actions">
-            <a
-              href="https://wa.me/201002241591"
-              class="header-whatsapp-btn"
-              target="_blank"
-              rel="noopener"
-            >
-              <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
-                <use xlink:href="assets/images/icons.svg#icon-whatsapp"></use>
-              </svg>
-              <span>تواصل معنا</span>
-            </a>
-            <div class="theme-toggle" onclick="toggleTheme()">
-              <svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true">
+    <!-- Main App Container -->
+    <main id="spa-container">
+      <!-- 📱 Mobile Top Bar -->
+      <div class="top-app-bar">
+        <div class="logo-mobile" style="display: none;">
+            <img src="assets/images/logo.svg" alt="Logo" style="height: 30px;">
+        </div>
+        <div class="app-actions" style="margin-right: auto; display: flex; gap: 1rem; align-items: center;">
+            <div class="theme-toggle" onclick="toggleTheme()" data-xp="10" data-reason="تغيير الثيم">
+              <svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true" style="width: 20px; height: 20px;">
                 <use xlink:href="assets/images/icons.svg#icon-moon"></use>
               </svg>
             </div>
-            <div class="mobile-toggle">
-              <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
+            <div class="mobile-toggle" style="background: var(--p-glass-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--p-glass-border);">
+              <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true" style="width: 20px; height: 20px;">
                 <use xlink:href="assets/images/icons.svg#icon-bars"></use>
               </svg>
             </div>
-          </div>
         </div>
       </div>
-    </header>
 
-    <!-- القسم الرئيسي -->
-    <main id="spa-container">
       <!-- صفحة الرئيسية -->
       <section class="spa-page active" id="home">
-        <!-- قسم الترحيب -->
-        <section class="hero-section full-width">
-          <div class="hero-background"></div>
+        <!-- قسم الترحب الفائق -->
+        <section class="hero-section full-width" style="padding: 6rem 0;">
           <div class="container">
-            <div class="hero-content">
-              <div class="hero-badge">جاهزين للعمل على مشروعك</div>
-              <h1>نبدع في تصميم متجر رهيب لك!</h1>
-              <p>
-                لديك مشروع، وتريد بناء متجر أو موقع متكامل خاص به؟ نحن هنا لنبدع
-                في تصميم موقع احترافي خاص بك أو بمشروعك
+            <div class="hero-content glass-panel" style="max-width: 800px; margin: 0 auto; text-align: center; border-radius: 40px; border: 1px solid rgba(212, 175, 55, 0.2);">
+              <div class="hero-badge" style="background: var(--p-gradient-gold); color: var(--p-dark); font-weight: 900; padding: 5px 20px; border-radius: 50px; display: inline-block; margin-bottom: 2rem;">إصدار 2026 الاحترافي</div>
+              <h1 style="font-size: 4rem; line-height: 1.2; margin-bottom: 2rem;">نحول <span style="background: var(--p-gradient-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">رؤيتك</span> إلى تجربة رقمية مذهلة</h1>
+              <p style="font-size: 1.3rem; margin-bottom: 3rem; opacity: 0.8;">
+                نحن لا نصمم مجرد مواقع، نحن نبني أنظمة بيئية متكاملة لنمو تجارتك. خبرة في سلة، زد، والبرمجة الخاصة بأعلى معايير الجودة العالمية.
               </p>
-              <a href="https://wa.me/201002241591" class="hero-btn">
-                تواصل معنا الآن
-              </a>
+              <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                <a href="https://wa.me/201002241591" class="btn-luxury" data-xp="50" data-reason="بدء محادثة تجارية">
+                  🚀 استشرنا الآن مجاناً
+                </a>
+                <a href="#portfolio" class="btn-luxury" style="background: transparent; border: 1px solid var(--p-primary); color: var(--p-primary);">
+                  👀 تصفح أعمالنا
+                </a>
+              </div>
             </div>
           </div>
 
@@ -632,7 +651,7 @@
             </div>
 
             <!-- Main Mission Card -->
-            <div class="mission-card">
+            <div class="mission-card glass-panel">
               <div class="mission-header">
                 <div class="xp-badge">+50 XP</div>
                 <h3>كاشف ثيمات متاجر سلة</h3>
@@ -653,7 +672,7 @@
 
               <!-- Download Buttons -->
               <div class="game-buttons">
-                <button class="game-btn chrome-btn" data-browser="chrome">
+                <button class="game-btn chrome-btn" data-browser="chrome" data-xp="100" data-reason="دعم كاشف الثيمات">
                   <span class="btn-icon">🏆</span>
                   <span class="btn-text">تحميل للكروم</span>
                   <span class="btn-badge">الأكثر شيوعاً</span>
@@ -716,8 +735,8 @@
 
         <!-- قسم كيف يمكننا مساعدتك - مع دعم الوضع الداكن والفاتح -->
         <section class="help-section" id="help">
-          <div class="container">
-            <h2 class="help-title" data-aos="fade-up">كيف يمكننا مساعدتك!</h2>
+          <div class="container glass-panel" style="margin-top: 50px; border-radius: 30px;">
+            <h2 class="help-title" data-aos="fade-up" style="color: var(--p-primary);">كيف يمكننا مساعدتك!</h2>
             <div class="help-cards">
               <div class="help-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="help-card-icon">
@@ -6502,6 +6521,8 @@
     <script src="assets/js/theme-detector-game.js"></script>
     <!-- عارض Portfolio المخصص -->
     <script src="assets/js/portfolio-viewer.js"></script>
+    <!-- Core System Module -->
+    <script type="module" src="assets/js/modules/Core.js"></script>
     <script src="assets/js/portfolio-spa.js"></script>
   </body>
 </html>
