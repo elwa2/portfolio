@@ -3944,3 +3944,236 @@ img {
     font-size: 20px;
   }
 }
+
+/* --- ANIMATIONS & EFFECTS (Imported) --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* --- SCROLLING LOGOS (Imported) --- */
+.scrolling-logos-container {
+  --speed: 40s;
+  overflow: hidden;
+  width: 100%;
+  padding: 20px 0;
+  direction: ltr;
+}
+
+.scrolling-logos {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  animation: scroll var(--speed) linear infinite;
+  width: max-content;
+}
+
+.logo-item {
+  flex: 0 0 auto;
+  width: 183px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.logo-item img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .logo-item img {
+  filter: brightness(0.5);
+}
+
+.logo-item:hover img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* --- HELP SECTION (Imported) --- */
+.help-section {
+  padding: 80px 0;
+  background-color: var(--bg-color-alt);
+  border-radius: 20px;
+  margin: 50px 0;
+  border: 1px solid var(--border-color);
+}
+
+.help-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.help-card {
+  background-color: var(--bg-color-card);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.help-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.help-card-icon {
+  width: 70px;
+  height: 70px;
+  background: var(--primary-gradient);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--white-color);
+  font-size: 30px;
+}
+
+/* --- SVG ICONS (Imported) --- */
+.svg-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: currentColor;
+}
+
+.svg-icon.fa-lg {
+  font-size: 1.33333em;
+}
+
+.svg-icon.fa-2x {
+  font-size: 2em;
+}
+
+.svg-icon.fa-spin {
+  animation: svg-icon-spin 2s infinite linear;
+}
+
+@keyframes svg-icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
