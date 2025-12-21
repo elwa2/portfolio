@@ -43,7 +43,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 IMAGES_DIR = PROJECT_ROOT / "assets" / "images" / "prt"
 PROJECTS_FILE = SCRIPT_DIR / "projects.json"
 INDEX_HTML = PROJECT_ROOT / "index.html"
-PORTFOLIO_HTML = PROJECT_ROOT / "portfolio.html"
+# PORTFOLIO_HTML is now legacy as it's integrated into index.html (SPA)
 
 
 class PortfolioManager:
@@ -93,51 +93,47 @@ class PortfolioManager:
 
     @staticmethod
     def update_html(project_data, image_filename):
-        if not BS4_AVAILABLE:
-            return False, "مكتبة Beautiful Soup غير مثبتة"
-            
         image_path = f"assets/images/prt/{image_filename}"
         
-        # 1. Update index.html
+        # 1. Update index.html (General Update)
         try:
             with open(INDEX_HTML, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            new_item = f'''            <a href="{project_data['url']}" target="_blank" class="portfolio-slider-item">
-              <img src="{image_path}" alt="{project_data['name']}" />
-            </a>
+            # --- Type A: Slider Item ---
+            slider_item = f'''              <a href="{project_data['url']}" target="_blank" class="portfolio-slider-item">
+                <img src="{image_path}" alt="{project_data['name']}" />
+              </a>
 '''
-            pattern = r'(<!-- الصف الأول.*?)(</div>\s*\n\s*<!-- الصف الثاني)'
-            content = re.sub(pattern, lambda m: m.group(1) + new_item + m.group(2), content, flags=re.DOTALL)
+            # Insert into row1
+            slider_pattern = r'(class="portfolio-slider-row row1">)'
+            content = re.sub(slider_pattern, lambda m: m.group(1) + "\n" + slider_item, content, count=1)
             
+            # --- Type B: Portfolio Grid Item ---
+            # Map category to new design values (ecommerce, social, video)
+            grid_category = "ecommerce" # Default for this tool
+            
+            grid_item = f'''              <a
+                href="{image_path}"
+                data-lightbox="portfolio"
+                data-title="{project_data['name']}"
+                class="portfolio-item"
+                data-category="{grid_category}"
+              >
+                <div class="portfolio-image">
+                  <img src="{image_path}" alt="{project_data['name']}" loading="lazy" />
+                </div>
+              </a>
+'''
+            grid_pattern = r'(<div class="portfolio-grid">)'
+            content = re.sub(grid_pattern, lambda m: m.group(1) + "\n" + grid_item, content, count=1)
+
             with open(INDEX_HTML, 'w', encoding='utf-8') as f:
                 f.write(content)
         except Exception as e:
-            return False, f"خطأ في index.html: {e}"
-
-        # 2. Update portfolio.html
-        try:
-            with open(PORTFOLIO_HTML, 'r', encoding='utf-8') as f:
-                content = f.read()
+            return False, f"خطأ في تحديث index.html: {e}"
             
-            category = project_data.get('category', 'all')
-            new_item = f'''
-            <a href="{image_path}" data-lightbox="portfolio" data-title="{project_data['name']}" 
-               class="portfolio-item" data-category="{category}">
-                <div class="portfolio-image">
-                    <img src="{image_path}" alt="{project_data['name']}" loading="lazy" />
-                </div>
-            </a>
-'''
-            pattern = r'(class="portfolio-grid"[^>]*>)'
-            content = re.sub(pattern, lambda m: m.group(1) + new_item, content, count=1)
-            
-            with open(PORTFOLIO_HTML, 'w', encoding='utf-8') as f:
-                f.write(content)
-        except Exception as e:
-            return False, f"خطأ في portfolio.html: {e}"
-            
-        return True, "تم التحديث بنجاح"
+        return True, "تم التحديث بنجاح في الصفحة الرئيسية"
 
 
 class AddProjectApp:
