@@ -3,52 +3,76 @@
 // ═══════════════════════════════════════════════════════════════
 function copyToClipboard(textOrId, button) {
   let textToCopy;
+  let element = null;
 
   // التحقق إذا كان ID لعنصر input أو النص مباشرة
-  const element = document.getElementById(textOrId);
-  if (element && element.value) {
-    textToCopy = element.value;
+  if (typeof textOrId === "string" && document.getElementById(textOrId)) {
+    element = document.getElementById(textOrId);
+    textToCopy = element.value || element.innerText || element.textContent;
   } else {
     textToCopy = textOrId;
   }
 
+  // دالة إظهار النجاح
+  const showSuccess = (btn) => {
+    if (!btn) return;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML =
+      '<svg class="svg-icon" viewBox="0 0 512 512"><use href="assets/images/icons.svg#icon-check"></use></svg>';
+    btn.classList.add("copied");
+
+    // إخفاء التولتيب القديم إذا كان موجوداً في الـ HTML
+    const existingTooltip = btn.querySelector(".tooltip");
+    if (existingTooltip) existingTooltip.style.opacity = "1";
+    if (existingTooltip) existingTooltip.style.visibility = "visible";
+
+    setTimeout(function () {
+      btn.innerHTML = originalHTML;
+      btn.classList.remove("copied");
+      if (existingTooltip) existingTooltip.style.opacity = "";
+      if (existingTooltip) existingTooltip.style.visibility = "";
+    }, 2000);
+  };
+
   // نسخ النص للحافظة
-  navigator.clipboard
-    .writeText(textToCopy)
-    .then(function () {
-      // إظهار تأكيد النسخ
-      if (button) {
-        const originalHTML = button.innerHTML;
-        button.innerHTML =
-          '<svg class="svg-icon" viewBox="0 0 512 512"><use href="assets/images/icons.svg#icon-check"></use></svg>';
-        button.classList.add("copied");
-        setTimeout(function () {
-          button.innerHTML = originalHTML;
-          button.classList.remove("copied");
-        }, 2000);
-      } else {
-        // البحث عن الزر المجاور للـ input
-        const copyBtn = element?.parentElement?.querySelector(".copy-btn");
-        if (copyBtn) {
-          const originalHTML = copyBtn.innerHTML;
-          copyBtn.innerHTML =
-            '<svg class="svg-icon" viewBox="0 0 512 512"><use href="assets/images/icons.svg#icon-check"></use></svg>';
-          copyBtn.classList.add("copied");
-          setTimeout(function () {
-            copyBtn.innerHTML = originalHTML;
-            copyBtn.classList.remove("copied");
-          }, 2000);
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        if (button) {
+          showSuccess(button);
+        } else if (element) {
+          const copyBtn = element.parentElement?.querySelector(".copy-btn");
+          if (copyBtn) showSuccess(copyBtn);
         }
+      })
+      .catch((err) => {
+        console.error("فشل في النسخ: ", err);
+        fallbackCopy(textToCopy, element, button);
+      });
+  } else {
+    fallbackCopy(textToCopy, element, button);
+  }
+
+  function fallbackCopy(text, el, btn) {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (btn) {
+        showSuccess(btn);
+      } else if (el) {
+        const copyBtn = el.parentElement?.querySelector(".copy-btn");
+        if (copyBtn) showSuccess(copyBtn);
       }
-    })
-    .catch(function (err) {
-      console.error("فشل في النسخ: ", err);
-      // Fallback للمتصفحات القديمة
-      if (element) {
-        element.select();
-        document.execCommand("copy");
-      }
-    });
+    } catch (err) {
+      console.error("Fallback failure: ", err);
+    }
+  }
 }
 
 // تحديث السنة في الفوتر
