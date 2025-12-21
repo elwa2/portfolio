@@ -3128,3 +3128,479 @@ img {
     font-size: 1.1rem;
   }
 }
+
+/* Salla Discounts Section */
+.discounts-section {
+  padding: 80px 0;
+}
+
+.discounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.discount-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.discount-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.discount-card h3 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.discount-card p {
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.discount-card .btn {
+  width: 100%;
+}
+
+.coupon-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.coupon-container p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.coupon-code {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1.2rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn .tooltip {
+  visibility: hidden;
+  width: 100px;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -50px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-btn .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--primary-color) transparent transparent transparent;
+}
+
+.copy-btn.copied .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.discount-card.full-width-card {
+  grid-column: 1 / -1;
+  background-color: rgba(126, 86, 249, 0.1);
+  border: 2px solid var(--primary-color);
+}
+
+/* أنماط خاصة بصفحة التواصل */
+.contact-content-section {
+  background-color: var(--bg-color);
+  padding: 80px 0;
+}
+
+.contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+}
+
+.contact-info-box,
+.contact-form-box {
+  background-color: var(--card-bg);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .contact-info-box,
+[data-theme="dark"] .contact-form-box {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.contact-info-box h2,
+.contact-form-box h2 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.contact-info-box p,
+.contact-form-box p {
+  margin-bottom: 30px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.contact-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.contact-info-list li {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.contact-info-list .icon {
+  width: 50px;
+  height: 50px;
+  background-color: var(--light-purple);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--white-color);
+  transition: all 0.3s ease;
+}
+
+.contact-info-list .info h3 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin-bottom: 5px;
+}
+
+.contact-info-list .info p {
+  margin-bottom: 0;
+  text-align: right;
+}
+
+.contact-info-list .info p a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-info-list .info p a:hover {
+  color: var(--secondary-purple);
+  text-decoration: underline;
+}
+
+.contact-whatsapp-btn {
+  margin-top: 30px;
+}
+
+.btn-whatsapp {
+  background-color: #25d366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.btn-whatsapp:hover {
+  background-color: #128c7e;
+  transform: translateY(-3px);
+}
+
+/* تحسين نموذج الاتصال */
+.contact-form .form-group {
+  margin-bottom: 20px;
+}
+
+.contact-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-family: "Tajawal", sans-serif !important;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus,
+.contact-form select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+.contact-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238a7ddb' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3Csvg%3E");
+  background-repeat: no-repeat;
+  background-position: left 15px center;
+  padding-left: 40px;
+}
+
+[data-theme="dark"] .contact-form select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a99df2' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3Csvg%3E");
+}
+
+.contact-form button {
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--secondary-purple));
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 10px;
+  font-family: "Tajawal", sans-serif !important;
+}
+
+.contact-form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.map-container {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  margin-top: 50px;
+}
+
+[data-theme="dark"] .map-container {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  filter: grayscale(20%) invert(10%);
+}
+
+/* تعديلات للوضع الداكن */
+[data-theme="dark"] .contact-info-list .icon {
+  background-color: var(--primary-color);
+}
+
+[data-theme="dark"] .contact-form input,
+[data-theme="dark"] .contact-form textarea {
+  background-color: var(--dark-input-bg);
+  border-color: var(--dark-border-color);
+}
+
+/* تصميم متجاوب */
+@media (max-width: 992px) {
+  .contact-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .contact-info-box,
+  .contact-form-box {
+    padding: 30px 20px;
+  }
+}
+
+/* زر واتساب عائم */
+.floating-whatsapp {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  font-size: 30px;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+  z-index: 999;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.floating-whatsapp:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+}
+
+@media (max-width: 768px) {
+  .floating-whatsapp {
+    bottom: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 25px;
+  }
+}
+
+/* أنماط التبويبات */
+.contact-tabs {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.tab-btn {
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: none;
+  background-color: rgba(126, 86, 249, 0.2);
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Tajawal", sans-serif;
+  font-size: 1rem;
+  flex: 1;
+  max-width: 200px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #5e3bee, #7d56f9);
+  color: white;
+  box-shadow: 0 8px 20px rgba(94, 59, 238, 0.3);
+}
+
+.tab-btn:hover:not(.active) {
+  background-color: rgba(126, 86, 249, 0.3);
+  transform: translateY(-2px);
+}
+
+.tab-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: 1;
+}
+
+.tab-btn.active:hover::before {
+  transform: translateX(100%);
+}
+
+.tab-content {
+  position: relative;
+  z-index: 0;
+}
+
+.tab-pane {
+  display: none;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-theme="dark"] .tab-btn {
+  background-color: rgba(126, 86, 249, 0.3);
+  color: white;
+}
+
+[data-theme="dark"] .tab-btn.active {
+  background: linear-gradient(135deg, #5e3bee, #7d56f9);
+  color: white;
+}
+
+@media (max-width: 576px) {
+  .tab-buttons {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .tab-btn {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+}
