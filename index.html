@@ -1420,246 +1420,6 @@
           </div>
         </section>
 
-        <!-- قسم التواصل -->
-        <section class="section contact-section" id="contact">
-          <div class="container">
-            <div class="contact-content">
-              <div class="contact-form-container">
-                <h2>تواصل معنا</h2>
-                <p>
-                  فقط برجاء ملء بعض البيانات البسيطة وسنقوم بالتواصل معك في أسرع
-                  وقت لمناقشة احتياجات مشروعك
-                </p>
-
-                <!-- أزرار التبديل بين النموذجين -->
-                <div class="contact-tabs">
-                  <div class="tab-buttons">
-                    <button type="button" class="tab-btn" id="generalFormBtn">
-                      استفسار عام
-                    </button>
-                    <button
-                      type="button"
-                      class="tab-btn active"
-                      id="pricingFormBtn"
-                    >
-                      طلب تسعير خدمة
-                    </button>
-                  </div>
-
-                  <div class="tab-content">
-                    <!-- نموذج الاستفسار العام -->
-                    <div
-                      class="tab-pane"
-                      id="generalFormPane"
-                      style="display: none"
-                    >
-                      <form class="contact-form" id="generalContactForm">
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="general-name"
-                            placeholder="الاسم"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="email"
-                            id="general-email"
-                            placeholder="البريد الإلكتروني"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="tel"
-                            id="general-phone"
-                            placeholder="رقم الهاتف"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="general-subject"
-                            placeholder="موضوع الرسالة"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <textarea
-                            id="general-message"
-                            placeholder="اكتب رسالتك هنا..."
-                            rows="4"
-                            required
-                          ></textarea>
-                        </div>
-                        <button type="submit" class="submit-btn">
-                          <svg
-                            class="svg-icon"
-                            viewBox="0 0 448 512"
-                            aria-hidden="true"
-                          >
-                            <use
-                              xlink:href="assets/images/icons.svg#icon-whatsapp"
-                            ></use>
-                          </svg>
-                          إرسال عبر واتساب
-                          <span class="btn-shine"></span>
-                        </button>
-                      </form>
-                    </div>
-
-                    <!-- نموذج طلب تسعير الخدمات -->
-                    <div class="tab-pane active" id="pricingFormPane">
-                      <form class="contact-form" id="pricingContactForm">
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="contact-name"
-                            placeholder="الاسم"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="email"
-                            id="contact-email"
-                            placeholder="البريد الإلكتروني"
-                            required
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="contact-website"
-                            placeholder="الموقع الإلكتروني (اختياري)"
-                          />
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="contact-store-url"
-                            placeholder="🌐 رابط المتجر"
-                          />
-                        </div>
-                        <div class="form-group">
-                          <select id="contact-platform" required>
-                            <option value="" disabled selected>
-                              🛍️ نوع المنصة (سلة أو زد)
-                            </option>
-                            <option value="سلة">سلة</option>
-                            <option value="زد">زد</option>
-                            <option value="أخرى">أخرى</option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <select id="contact-package">
-                            <option value="" disabled selected>
-                              🛒 نوع الباقة
-                            </option>
-                            <option value="سلة برو">سلة برو</option>
-                            <option value="سلة بلس">سلة بلس</option>
-                            <option value="زد أساسية">زد أساسية</option>
-                            <option value="زد متقدمة">زد متقدمة</option>
-                            <option value="زد احترافية">زد احترافية</option>
-                            <option value="أخرى">أخرى</option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <select id="contact-domain">
-                            <option value="" disabled selected>
-                              🌐 هل الدومين مدفوع؟
-                            </option>
-                            <option value="نعم">نعم</option>
-                            <option value="لا">لا</option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <select id="contact-logo">
-                            <option value="" disabled selected>
-                              🧩 هل يوجد لديك شعار أو هوية بصرية؟
-                            </option>
-                            <option value="نعم">نعم</option>
-                            <option value="لا">لا</option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <input
-                            type="text"
-                            id="contact-competitor"
-                            placeholder="متاجر منافسة أو متاجر تعجبك تصميمها (اختياري)"
-                          />
-                        </div>
-                        <div class="form-group">
-                          <select id="contact-service" required>
-                            <option value="" disabled selected>
-                              اختر نوع الخدمة
-                            </option>
-                            <option value="تصميم موقع">تصميم موقع</option>
-                            <option value="تطوير متجر إلكتروني">
-                              تطوير متجر إلكتروني
-                            </option>
-                            <option value="تحسين SEO">تحسين SEO</option>
-                            <option value="إدارة مواقع">إدارة مواقع</option>
-                            <option value="خدمة أخرى">خدمة أخرى</option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <textarea
-                            id="contact-message"
-                            placeholder="اكتب رسالتك هنا..."
-                            rows="4"
-                            required
-                          ></textarea>
-                        </div>
-                        <button
-                          type="submit"
-                          id="submit-button"
-                          class="submit-btn"
-                        >
-                          <svg
-                            class="svg-icon"
-                            viewBox="0 0 448 512"
-                            aria-hidden="true"
-                          >
-                            <use
-                              xlink:href="assets/images/icons.svg#icon-whatsapp"
-                            ></use>
-                          </svg>
-                          طلب تسعير الخدمة
-                          <span class="btn-shine"></span>
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- رسالة النجاح -->
-                <div id="success-message">
-                  <svg
-                    class="svg-icon"
-                    viewBox="0 0 512 512"
-                    aria-hidden="true"
-                  >
-                    <use
-                      xlink:href="assets/images/icons.svg#icon-check-circle"
-                    ></use>
-                  </svg>
-                  <h3>تم إرسال رسالتك بنجاح!</h3>
-                  <p>شكراً لتواصلك معنا. سنقوم بالرد عليك في أقرب وقت ممكن.</p>
-                  <button id="reset-form" class="success-btn">
-                    إرسال رسالة أخرى
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="contact-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-          </div>
         </section>
       </section>
       <!-- end #home -->
@@ -2401,7 +2161,7 @@
                 data-lightbox="portfolio"
                 data-title="قيمر لايت"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img src="assets/images/prt/30.jpeg" alt="قيمر لايت" />
@@ -2412,7 +2172,7 @@
                 data-lightbox="portfolio"
                 data-title="متجر الكتروني"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img src="assets/images/prt/29.jpeg" alt="متجر الكتروني" />
@@ -2423,7 +2183,7 @@
                 data-lightbox="portfolio"
                 data-title="تصميم متجر الكتروني"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img
@@ -2437,7 +2197,7 @@
                 data-lightbox="portfolio"
                 data-title="محمصة سييد لتحميص افضل انواع البن و القهوة المختصة Seed Roastery"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img
@@ -2452,7 +2212,7 @@
                 data-lightbox="portfolio"
                 data-title="متجر جاذبية"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img
@@ -2467,7 +2227,7 @@
                 data-lightbox="portfolio"
                 data-title="قرناس"
                 class="portfolio-item"
-                data-category="website"
+                data-category="ecommerce"
               >
                 <div class="portfolio-image">
                   <img
@@ -2593,6 +2353,60 @@
                     تصميم واجهة مستخدم متميزة لمتجر إلكتروني على منصة سلة مع
                     تخصيص كامل للألوان والخطوط.
                   </p>
+                </div>
+              </div>
+
+              <div class="video-gallery-item">
+                <div class="video-player">
+                  <video
+                    src="assets/video/msedge_UlwVNJ1ObK.mp4"
+                    poster="assets/images/video-thumbnail-1.jpg"
+                    controls
+                    preload="metadata"
+                  ></video>
+                </div>
+                <div class="video-details">
+                  <div class="video-meta">
+                    <span
+                      ><svg
+                        class="svg-icon"
+                        viewBox="0 0 512 512"
+                        aria-hidden="true"
+                      >
+                        <use
+                          xlink:href="assets/images/icons.svg#icon-tag"
+                        ></use>
+                      </svg>
+                      منصة سلة</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="video-gallery-item">
+                <div class="video-player">
+                  <video
+                    src="assets/video/2.mp4"
+                    poster="assets/images/video-thumbnail-1.jpg"
+                    controls
+                    preload="metadata"
+                  ></video>
+                </div>
+                <div class="video-details">
+                  <div class="video-meta">
+                    <span
+                      ><svg
+                        class="svg-icon"
+                        viewBox="0 0 512 512"
+                        aria-hidden="true"
+                      >
+                        <use
+                          xlink:href="assets/images/icons.svg#icon-tag"
+                        ></use>
+                      </svg>
+                      منصة سلة</span
+                    >
+                  </div>
                 </div>
               </div>
             </div>
@@ -2813,16 +2627,432 @@
                       viewBox="0 0 576 512"
                       aria-hidden="true"
                     >
-                      <use xlink:href="assets/images/icons.svg#icon-fish"></use>
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-water"
+                      ></use>
                     </svg>
                   </div>
-                  <h3>Ocean Store</h3>
+                  <h3>Wocean Store</h3>
                   <span class="site-url">woceanstore.com</span>
+                </a>
+                <a href="https://arwmed.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-heartbeat"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>Arwmed</h3>
+                  <span class="site-url">arwmed.com</span>
+                </a>
+                <a
+                  href="https://fireplaces-su4o1.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 384 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-fire"></use>
+                    </svg>
+                  </div>
+                  <h3>Fireplaces</h3>
+                  <span class="site-url">fireplaces-su4o1.com</span>
+                </a>
+                <a
+                  href="https://volt-visions.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 320 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-bolt"></use>
+                    </svg>
+                  </div>
+                  <h3>Volt Visions</h3>
+                  <span class="site-url">volt-visions.com</span>
+                </a>
+                <a href="https://mlika-sa.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 640 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-crown"></use>
+                    </svg>
+                  </div>
+                  <h3>متجر ملكة</h3>
+                  <span class="site-url">mlika-sa.com</span>
+                </a>
+                <a
+                  href="https://ofuqaljawal.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 320 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-mobile"></use>
+                    </svg>
+                  </div>
+                  <h3>أفق الجوال</h3>
+                  <span class="site-url">ofuqaljawal.com</span>
+                </a>
+                <a href="https://grippysa.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-hand-rock"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>قريبي</h3>
+                  <span class="site-url">grippysa.com</span>
                 </a>
               </div>
             </div>
 
-            <!-- Other lists would go here, but I'll skip some to save space while keeping the core functionality -->
+            <!-- قائمة المواقع - باقة أساسية زد -->
+            <div class="sites-list" id="basic-zid-sites">
+              <div class="sites-grid">
+                <a
+                  href="https://hawraaabaya.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 256 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-female"></use>
+                    </svg>
+                  </div>
+                  <h3>حوراء عباية</h3>
+                  <span class="site-url">hawraaabaya.com</span>
+                </a>
+                <a href="https://newinsa.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 576 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-shopping-cart"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>New in SA</h3>
+                  <span class="site-url">newinsa.com</span>
+                </a>
+                <a href="https://rassmah.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-paint-brush"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>رسمة</h3>
+                  <span class="site-url">rassmah.com</span>
+                </a>
+                <a
+                  href="https://nb3alhayah.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 576 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-leaf"></use>
+                    </svg>
+                  </div>
+                  <h3>نبع الحياة</h3>
+                  <span class="site-url">nb3alhayah.com</span>
+                </a>
+                <a href="https://nadidah.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 576 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-gem"></use>
+                    </svg>
+                  </div>
+                  <h3>نديدة</h3>
+                  <span class="site-url">nadidah.com</span>
+                </a>
+                <a href="https://albsmh.sa/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 496 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-smile"></use>
+                    </svg>
+                  </div>
+                  <h3>البسمة</h3>
+                  <span class="site-url">albsmh.sa</span>
+                </a>
+                <a href="https://nokttain.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-ellipsis-h"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>نقطتين</h3>
+                  <span class="site-url">nokttain.com</span>
+                </a>
+                <a
+                  href="https://mobcogroup.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 448 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-building"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>Mobco Group</h3>
+                  <span class="site-url">mobcogroup.com</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- قائمة المواقع - باقة نمو زد -->
+            <div class="sites-list" id="growth-zid-sites">
+              <div class="sites-grid">
+                <a href="https://ghaith.info/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-cloud-rain"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>غيث</h3>
+                  <span class="site-url">ghaith.info</span>
+                </a>
+                <a
+                  href="https://almuhaideb.net/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 576 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-home"></use>
+                    </svg>
+                  </div>
+                  <h3>المهيدب</h3>
+                  <span class="site-url">almuhaideb.net</span>
+                </a>
+                <a
+                  href="https://dr-store-ksa.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-stethoscope"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>Dr Store</h3>
+                  <span class="site-url">dr-store-ksa.com</span>
+                </a>
+                <a
+                  href="https://kesho-ksa.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-magic"></use>
+                    </svg>
+                  </div>
+                  <h3>Kesho KSA</h3>
+                  <span class="site-url">kesho-ksa.com</span>
+                </a>
+                <a href="https://lapeausa.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 576 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-spa"></use>
+                    </svg>
+                  </div>
+                  <h3>Lapea USA</h3>
+                  <span class="site-url">lapeausa.com</span>
+                </a>
+                <a href="https://tha-sa.com/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 512 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-gift"></use>
+                    </svg>
+                  </div>
+                  <h3>THA SA</h3>
+                  <span class="site-url">tha-sa.com</span>
+                </a>
+                <a
+                  href="https://oilplus-sa.com/"
+                  target="_blank"
+                  class="site-card"
+                >
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 640 512"
+                      aria-hidden="true"
+                    >
+                      <use
+                        xlink:href="assets/images/icons.svg#icon-oil-can"
+                      ></use>
+                    </svg>
+                  </div>
+                  <h3>Oil Plus</h3>
+                  <span class="site-url">oilplus-sa.com</span>
+                </a>
+                <a href="https://brq.sa/" target="_blank" class="site-card">
+                  <div class="site-icon">
+                    <svg
+                      class="svg-icon"
+                      viewBox="0 0 320 512"
+                      aria-hidden="true"
+                    >
+                      <use xlink:href="assets/images/icons.svg#icon-bolt"></use>
+                    </svg>
+                  </div>
+                  <h3>BRQ</h3>
+                  <span class="site-url">brq.sa</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- قسم الفيديوهات -->
+        <section class="section video-gallery-section">
+          <div class="container">
+            <div class="section-title">
+              <h2>معرض الشروحات</h2>
+              <p>شروحات توضيحية لبعض المميزات والخدمات التي نقدمها</p>
+            </div>
+
+            <div class="video-grid">
+              <!-- فيديو 1 -->
+              <div class="video-card">
+                <div class="video-thumbnail">
+                  <video src="assets/video/chrome_zBHpFjGFMe.mp4" poster="assets/images/portfolio/video-1.jpg" preload="metadata"></video>
+                  <div class="play-button">
+                    <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
+                      <use xlink:href="assets/images/icons.svg#icon-play"></use>
+                    </svg>
+                  </div>
+                </div>
+                <div class="video-info">
+                  <h3>شرح مميزات باقة سلة برو</h3>
+                  <p>استعراض شامل لأهم المميزات في باقة سلة برو وكيف تطور متجرك.</p>
+                </div>
+              </div>
+
+              <!-- فيديو 2 -->
+              <div class="video-card">
+                <div class="video-thumbnail">
+                  <video src="assets/video/msedge_UlwVNJ1ObK.mp4" poster="assets/images/portfolio/video-2.jpg" preload="metadata"></video>
+                  <div class="play-button">
+                    <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
+                      <use xlink:href="assets/images/icons.svg#icon-play"></use>
+                    </svg>
+                  </div>
+                </div>
+                <div class="video-info">
+                  <h3>طريقة الطلب من المتجر</h3>
+                  <p>خطوات مبسطة توضح للعملاء كيفية إتمام عملية الشراء بسهولة.</p>
+                </div>
+              </div>
+
+              <!-- فيديو 3 -->
+              <div class="video-card">
+                <div class="video-thumbnail">
+                  <video src="assets/video/2.mp4" poster="assets/images/portfolio/video-3.jpg" preload="metadata"></video>
+                  <div class="play-button">
+                    <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
+                      <use xlink:href="assets/images/icons.svg#icon-play"></use>
+                    </svg>
+                  </div>
+                </div>
+                <div class="video-info">
+                  <h3>تخصيص واجهة المتجر</h3>
+                  <p>كيفية تغيير الألوان والخطوط وترتيب الأجزاء في متجر سلة.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
