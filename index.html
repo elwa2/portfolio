@@ -2,10 +2,12 @@
 <html lang="ar" dir="rtl" data-theme="light">
   <head>
     <!-- 🔐 حماية الموقع -->
-    <script src="assets/js/protection.js"></script>
     <!-- وظائف الموقع الأساسية -->
+    <script src="assets/js/protection.js"></script>
+    <script src="assets/js/StorageManager.js"></script>
+    <script src="assets/js/AppShell.js"></script>
     <script src="assets/js/main.js" defer></script>
-    <script src="assets/js/router.js" defer></script>
+    <!-- REMOVED router.js as AppShell handles navigation -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ali Ahmed | مصمم متاجر سلة وزد - تصميم وتطوير مواقع احترافية</title>
@@ -76,6 +78,7 @@
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="assets/css/theme-detector-game.css" />
+    <link rel="stylesheet" href="assets/css/app-layout.css" />
     <!-- عارض Portfolio المخصص -->
     <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
     <style>
@@ -477,57 +480,52 @@
     </style>
   </head>
   <body>
-    <!-- القائمة العلوية -->
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo">
-            <a href="index.html">
-              <img src="assets/images/logo.svg" alt="Ali Ahmed" />
-            </a>
-          </div>
-
-          <nav class="nav">
-            <ul class="nav-links">
-              <li><a href="#home" class="active">الرئيسية</a></li>
-              <li><a href="#about">من نحن</a></li>
-              <li><a href="#services">خدماتنا</a></li>
-              <li><a href="#portfolio">أعمالنا</a></li>
-              <li><a href="#salla-discounts">أكواد خصم سلة</a></li>
-              <li><a href="#contact">تواصل معنا</a></li>
-              <li><a href="#payment">الدفع</a></li>
-            </ul>
-          </nav>
-
-          <div class="header-actions">
-            <a
-              href="https://wa.me/201002241591"
-              class="header-whatsapp-btn"
-              target="_blank"
-              rel="noopener"
-            >
-              <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
-                <use xlink:href="assets/images/icons.svg#icon-whatsapp"></use>
-              </svg>
-              <span>تواصل معنا</span>
-            </a>
-            <div class="theme-toggle" onclick="toggleTheme()">
-              <svg class="svg-icon" viewBox="0 0 512 512" aria-hidden="true">
-                <use xlink:href="assets/images/icons.svg#icon-moon"></use>
-              </svg>
-            </div>
-            <div class="mobile-toggle">
-              <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
-                <use xlink:href="assets/images/icons.svg#icon-bars"></use>
-              </svg>
-            </div>
-          </div>
+    <!-- App Shell Structure -->
+    <div id="app-shell">
+      <!-- Sidebar -->
+      <aside id="app-sidebar">
+        <div class="sidebar-header">
+           <div class="sidebar-logo">
+             <a href="#home"><img src="assets/images/logo.svg" alt="Ali Ahmed"></a>
+           </div>
+           
         </div>
-      </div>
-    </header>
+        <nav class="sidebar-nav">
+           <ul>
+             <li><a href="#home" class="app-nav-link active"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-home"></use></svg> <span class="link-text">الرئيسية</span></a></li>
+             <li><a href="#about" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-user"></use></svg> <span class="link-text">من نحن</span></a></li>
+             <li><a href="#services" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-briefcase"></use></svg> <span class="link-text">خدماتنا</span></a></li>
+             <li><a href="#portfolio" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-image"></use></svg> <span class="link-text">أعمالنا</span></a></li>
+             <li><a href="#salla-discounts" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-tag"></use></svg> <span class="link-text">أكواد خصم</span></a></li>
+             <li><a href="#contact" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-envelope"></use></svg> <span class="link-text">تواصل معنا</span></a></li>
+             <li><a href="#payment" class="app-nav-link"><svg class="nav-icon"><use xlink:href="assets/images/icons.svg#icon-credit-card"></use></svg> <span class="link-text">الدفع</span></a></li>
+           </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <span style="font-size: 0.8rem; opacity: 0.7;">Dev Mode</span>
+        </div>
+      </aside>
 
-    <!-- القسم الرئيسي -->
-    <main id="spa-container">
+      <!-- Main Wrapper -->
+      <div class="main-wrapper">
+        <!-- Top Header -->
+        <header id="top-bar">
+           <div class="sidebar-toggle-btn" id="sidebar-toggle" style="cursor: pointer; padding: 5px;">
+              <svg class="svg-icon" style="width: 24px; height: 24px;"><use xlink:href="assets/images/icons.svg#icon-bars"></use></svg>
+           </div>
+           <div class="header-actions">
+              <button class="action-btn" id="theme-toggle-btn" title="تبديل المظهر">
+                 <svg class="svg-icon"><use xlink:href="assets/images/icons.svg#icon-moon"></use></svg>
+              </button>
+              <a href="https://wa.me/201002241591" class="btn-primary-glow" target="_blank" style="font-size: 0.9rem; padding: 8px 16px;">
+                <svg class="svg-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-left: 5px;"><use xlink:href="assets/images/icons.svg#icon-whatsapp"></use></svg>
+                تواصل واتساب
+              </a>
+           </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
       <!-- صفحة الرئيسية -->
       <section class="spa-page active" id="home">
         <!-- قسم الترحيب -->
@@ -6470,6 +6468,10 @@
         handleStatsAnimation();
       });
     </script>
+    </div> <!-- Close #main-content -->
+    </div> <!-- Close .main-wrapper -->
+    </div> <!-- Close #app-shell -->
+
     <!-- Theme Detector Game Script -->
     <script src="assets/js/theme-detector-game.js"></script>
     <!-- عارض Portfolio المخصص -->

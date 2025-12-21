@@ -130,7 +130,13 @@
   }
 
   // === Handle Download Click ===
-  function handleDownloadClick(browser) {
+  async function handleDownloadClick(browser) {
+    // Award XP
+    if (window.storageManager) {
+      await window.storageManager.addXP(50);
+      if (window.appShell) window.appShell.updateXPDisplay();
+    }
+
     window.open(downloadUrls[browser], "_blank");
 
     setTimeout(() => {
@@ -284,8 +290,14 @@
     }, 4000);
   }
 
-  function displayReward(index) {
+  async function displayReward(index) {
     const reward = discountCodes[index];
+
+    // Award XP
+    if (window.storageManager) {
+      await window.storageManager.addXP(100);
+      if (window.appShell) window.appShell.updateXPDisplay();
+    }
 
     // Hide wheel elements slightly to focus on reward
     const canvas = document.getElementById("wheelCanvas");

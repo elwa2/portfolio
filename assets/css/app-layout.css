@@ -1,0 +1,326 @@
+/* app-layout.css */
+:root {
+  /* Layout Variables */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --header-height: 70px;
+
+  /* Modern Palette - Light Mode */
+  --bg-primary: #F4F7FC;
+  /* Soft Blue-Grey */
+  --bg-secondary: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --accent-color: #667EEA;
+  /* Royal Blue */
+  --accent-hover: #5A67D8;
+  --border-color: #E2E8F0;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] {
+  /* Modern Palette - Dark Mode */
+  --bg-primary: #1A202C;
+  /* Navy Dark */
+  --bg-secondary: #2D3748;
+  --bg-sidebar: #171923;
+  --text-primary: #F7FAFC;
+  --text-secondary: #A0AEC0;
+  --accent-color: #7F9CF5;
+  --accent-hover: #667EEA;
+  --border-color: #2D3748;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Reset tweaks for app feel */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Tajawal', sans-serif;
+  overflow: hidden;
+  /* App-like: no body scroll */
+}
+
+/* --- App Shell Structure --- */
+#app-shell {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Sidebar */
+#app-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--bg-sidebar);
+  border-left: 1px solid var(--border-color);
+  /* RTL: Left border for sidebar on right? No, user is Arabic RTL */
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+  box-shadow: var(--sidebar-shadow);
+  flex-shrink: 0;
+}
+
+/* RTL Adjustments handled by dir="rtl" on html usually, but flex direction needs care */
+html[dir="rtl"] #app-sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border-color);
+}
+
+/* Sidebar Header (Logo) */
+.sidebar-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-logo img {
+  height: 40px;
+  transition: opacity 0.2s;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-right: 3px solid transparent;
+  /* RTL marker */
+  transition: all 0.2s;
+  font-weight: 500;
+  gap: 12px;
+}
+
+.app-nav-link:hover {
+  background-color: rgba(66, 153, 225, 0.1);
+  color: var(--accent-color);
+}
+
+.app-nav-link.active {
+  background-color: rgba(66, 153, 225, 0.15);
+  color: var(--accent-color);
+  border-right-color: var(--accent-color);
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Sidebar User Profile / Footer */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  background: var(--bg-sidebar);
+}
+
+/* Main Wrapper (Header + Content) */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top Bar */
+#top-bar {
+  height: var(--header-height);
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+.header-search {
+  position: relative;
+  width: 300px;
+}
+
+.header-search input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--bg-primary);
+  color: var(--accent-color);
+}
+
+/* Main Content Area */
+#main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+  background-color: var(--bg-primary);
+}
+
+/* Collapsed State */
+body.sidebar-collapsed {
+  --sidebar-width: var(--sidebar-collapsed-width);
+}
+
+body.sidebar-collapsed .sidebar-logo img {
+  opacity: 0;
+  /* Hide full logo */
+  width: 0;
+}
+
+body.sidebar-collapsed .link-text {
+  display: none;
+}
+
+body.sidebar-collapsed .app-nav-link {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+body.sidebar-collapsed .sidebar-footer {
+  justify-content: center;
+}
+
+body.sidebar-collapsed .sidebar-footer span {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #app-sidebar {
+    position: absolute;
+    height: 100%;
+    right: 0;
+    /* RTL default */
+    transform: translateX(0);
+  }
+
+  html[dir="rtl"] #app-sidebar {
+    right: 0;
+    left: auto;
+  }
+
+  body.sidebar-collapsed #app-sidebar {
+    transform: translateX(100%);
+    /* RTL: Hide to right */
+    width: var(--sidebar-width);
+    /* Maintain width when showing */
+  }
+
+  /* Overlay when sidebar is open on mobile */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+    /* display: none; */
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+  }
+
+  body:not(.sidebar-collapsed) .sidebar-overlay {
+    /* display: block; */
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* SPA Sections */
+.spa-page {
+  display: none;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.spa-page.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gamification Badge */
+.badge-xp {
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(118, 75, 162, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+[data-theme="dark"] .badge-xp {
+  box-shadow: 0 2px 8px rgba(118, 75, 162, 0.6);
+}
