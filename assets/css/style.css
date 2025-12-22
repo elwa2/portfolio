@@ -566,6 +566,17 @@ img {
   position: relative;
 }
 
+.partners-section {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-color-alt, #14102a);
+}
+
+.partners-section .container {
+  position: relative;
+  z-index: 1;
+}
+
 .portfolio-slider-container {
   position: relative;
   width: 100%;
