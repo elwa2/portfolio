@@ -7,7 +7,7 @@ class SPARouter {
   constructor() {
     this.pages = document.querySelectorAll(".spa-page");
     this.navLinks = document.querySelectorAll(
-      ".nav-links a, .footer-links a, .logo a"
+      ".nav-links a, .mobile-nav-links a, .footer-links a, .logo a"
     );
     this.init();
   }
