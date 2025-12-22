@@ -1,8 +1,28 @@
 /* تنسيقات مشتركة لقسم التواصل */
+/* --- Premium Contact Section --- */
 .contact-section {
   position: relative;
-  padding: 100px 0;
+  padding: 120px 0;
   overflow: hidden;
+  z-index: 1;
+}
+
+.contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .contact-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 }
 
 /* تنسيقات قسم التواصل للوضع الداكن */
@@ -75,37 +95,52 @@ html:not([data-theme="light"]) .contact-section::after {
   z-index: 2;
 }
 
-/* تنسيقات حاوية النموذج للوضع الداكن */
-[data-theme="dark"] .contact-form-container,
-html:not([data-theme="light"]) .contact-form-container {
-  width: 100%;
-  max-width: 500px;
-  background-color: rgba(28, 28, 50, 0.95);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(126, 86, 249, 0.2),
-    inset 0 0 30px rgba(126, 86, 249, 0.05);
+/* --- Premium Glass Cards --- */
+.contact-form-box,
+.contact-info-box {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 30px;
+  padding: 50px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* تنسيقات حاوية النموذج للوضع الفاتح */
-[data-theme="light"] .contact-form-container {
-  width: 100%;
-  max-width: 500px;
-  background-color: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow:
-    0 20px 40px -12px rgba(94, 59, 238, 0.15),
-    0 0 0 1px rgba(94, 59, 238, 0.05);
-  position: relative;
-  overflow: hidden;
+[data-theme="light"] .contact-form-box,
+[data-theme="light"] .contact-info-box {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+}
+
+.contact-form-box:hover,
+.contact-info-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px -15px rgba(var(--primary-rgb), 0.15);
+  border-color: rgba(var(--primary-rgb), 0.2);
+}
+
+/* Glow Effect */
+.contact-form-box::before,
+.contact-info-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  transform: scaleX(0);
+  transition: transform 0.5s ease;
+}
+
+.contact-form-box:hover::before,
+.contact-info-box:hover::before {
+  transform: scaleX(1);
 }
 
 /* تنسيقات مشتركة للعناوين والنصوص */
@@ -168,80 +203,63 @@ html:not([data-theme="light"]) .contact-form-container p {
 }
 
 /* تنسيقات مشتركة لجميع الأوضاع */
+/* --- Modern Input Fields --- */
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 16px 20px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
+  padding: 18px 25px;
+  border-radius: 16px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-color);
+  font-family: 'Tajawal', sans-serif;
 }
 
-/* تنسيقات الوضع الداكن */
-[data-theme="dark"] .form-group input,
-[data-theme="dark"] .form-group textarea,
-[data-theme="dark"] .form-group select,
-html:not([data-theme="light"]) .form-group input,
-html:not([data-theme="light"]) .form-group textarea,
-html:not([data-theme="light"]) .form-group select {
-  background-color: rgba(30, 30, 50, 0.8);
-  border: 1px solid rgba(126, 86, 249, 0.3);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .form-group input:focus,
-[data-theme="dark"] .form-group textarea:focus,
-[data-theme="dark"] .form-group select:focus,
-html:not([data-theme="light"]) .form-group input:focus,
-html:not([data-theme="light"]) .form-group textarea:focus,
-html:not([data-theme="light"]) .form-group select:focus {
-  border-color: rgba(126, 86, 249, 0.8);
-  background-color: rgba(30, 30, 50, 0.9);
-  box-shadow: 0 0 0 3px rgba(126, 86, 249, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .form-group input::placeholder,
-[data-theme="dark"] .form-group textarea::placeholder,
-[data-theme="dark"] .form-group select::placeholder,
-html:not([data-theme="light"]) .form-group input::placeholder,
-html:not([data-theme="light"]) .form-group textarea::placeholder,
-html:not([data-theme="light"]) .form-group select::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* تنسيقات الوضع الفاتح */
 [data-theme="light"] .form-group input,
 [data-theme="light"] .form-group textarea,
 [data-theme="light"] .form-group select {
-  background-color: #ffffff;
-  border: 1px solid #e0e0f0;
+  background-color: #f8f9fc;
+  border: 2px solid #eef2f6;
   color: #333;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="light"] .form-group input:focus,
-[data-theme="light"] .form-group textarea:focus,
-[data-theme="light"] .form-group select:focus {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
-  border-color: #7d56f9;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(126, 86, 249, 0.2);
+  background-color: rgba(var(--primary-rgb), 0.05);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+  transform: translateY(-2px);
 }
 
-[data-theme="light"] .form-group input::placeholder,
-[data-theme="light"] .form-group textarea::placeholder,
-[data-theme="light"] .form-group select::placeholder {
-  color: #9ca3af;
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(128, 128, 128, 0.6);
+  transition: all 0.3s ease;
 }
 
-/* تأثيرات مشتركة */
 .form-group input:focus::placeholder,
 .form-group textarea:focus::placeholder {
-  opacity: 0.3;
-  transform: translateX(5px);
-  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateX(10px);
 }
 
 /* تنسيقات مشتركة للقائمة المنسدلة */
@@ -334,7 +352,8 @@ html:not([data-theme="light"]) .submit-btn:active {
 [data-theme="light"] .submit-btn {
   background: linear-gradient(45deg, #5e3bee, #7d56f9);
   color: white;
-  box-shadow: 0 8px 20px -5px rgba(94, 59, 238, 0.4);  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 8px 20px -5px rgba(94, 59, 238, 0.4);
+  font-family: 'Cairo', sans-serif;
 }
 
 [data-theme="light"] .submit-btn:hover {
@@ -355,7 +374,7 @@ html:not([data-theme="light"]) .submit-btn:active {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0), rgba(255,255,255,0.2));
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2));
   transform: translateX(-100%);
   transition: transform 0.6s ease;
   z-index: -1;
@@ -457,9 +476,11 @@ html:not([data-theme="light"]) .submit-btn:active {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -475,6 +496,7 @@ html:not([data-theme="light"]) .submit-btn:active {
     transform: translateY(40px) scale(0.95);
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -488,11 +510,25 @@ html:not([data-theme="light"]) .submit-btn:active {
   animation-delay: calc(var(--i, 0) * 0.1s);
 }
 
-.form-group:nth-child(1) { --i: 1; }
-.form-group:nth-child(2) { --i: 2; }
-.form-group:nth-child(3) { --i: 3; }
-.form-group:nth-child(4) { --i: 4; }
-.form-group:nth-child(5) { --i: 5; }
+.form-group:nth-child(1) {
+  --i: 1;
+}
+
+.form-group:nth-child(2) {
+  --i: 2;
+}
+
+.form-group:nth-child(3) {
+  --i: 3;
+}
+
+.form-group:nth-child(4) {
+  --i: 4;
+}
+
+.form-group:nth-child(5) {
+  --i: 5;
+}
 
 @keyframes fadeIn {
   to {
@@ -508,6 +544,7 @@ html:not([data-theme="light"]) .submit-btn:active {
   0% {
     box-shadow: 0 10px 25px -5px rgba(94, 59, 238, 0.5);
   }
+
   100% {
     box-shadow: 0 15px 30px -5px rgba(94, 59, 238, 0.7);
   }
@@ -574,6 +611,7 @@ html:not([data-theme="light"]) .shape {
   0% {
     transform: translateY(0) rotate(0deg);
   }
+
   100% {
     transform: translateY(30px) rotate(10deg);
   }
@@ -593,31 +631,29 @@ html:not([data-theme="light"]) .shape {
 /* تأثير لمعان الزر للوضع الداكن */
 [data-theme="dark"] .btn-shine,
 html:not([data-theme="light"]) .btn-shine {
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
 }
 
 /* تأثير لمعان الزر للوضع الفاتح */
 [data-theme="light"] .btn-shine {
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%);
 }
 
 @keyframes btnShine {
   0% {
     transform: skewX(-20deg) translateX(-100%);
   }
+
   20% {
     transform: skewX(-20deg) translateX(100%);
   }
+
   100% {
     transform: skewX(-20deg) translateX(100%);
   }
@@ -741,12 +777,13 @@ html:not([data-theme="light"]) .btn-shine {
 
 @keyframes fadeIn {
   from {
-      opacity: 0;
-      transform: translateY(10px);
+    opacity: 0;
+    transform: translateY(10px);
   }
+
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -772,4 +809,121 @@ html:not([data-theme="light"]) .btn-shine {
     padding: 12px 15px;
     font-size: 0.9rem;
   }
+
+  /* --- Premium Contact Info List Override --- */
+  .contact-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .contact-info-list li {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .contact-info-list li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(10px);
+    border-color: rgba(var(--primary-rgb), 0.2);
+  }
+
+  [data-theme="light"] .contact-info-list li {
+    background: #f8f9fc;
+  }
+
+  [data-theme="light"] .contact-info-list li:hover {
+    background: #ffffff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .contact-info-list .icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .contact-info-list li:hover .icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .contact-info-list .info h3 {
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .contact-info-list .info p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* --- Premium Submit Button Override --- */
+  .submit-btn {
+    border: none !important;
+    padding: 18px 30px !important;
+    border-radius: 16px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    margin-top: 30px !important;
+    width: 100% !important;
+    position: relative !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
+    background-size: 200% auto !important;
+    font-family: 'Tajawal', sans-serif !important;
+    letter-spacing: 0.5px;
+  }
+
+  [data-theme="dark"] .submit-btn,
+  html:not([data-theme="light"]) .submit-btn {
+    background-image: linear-gradient(45deg, #5e3bee 0%, #7d56f9 51%, #5e3bee 100%) !important;
+    color: white !important;
+    box-shadow: 0 10px 30px rgba(94, 59, 238, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  [data-theme="light"] .submit-btn {
+    background-image: linear-gradient(45deg, #5e3bee 0%, #7d56f9 51%, #5e3bee 100%) !important;
+    color: white !important;
+    box-shadow: 0 10px 25px rgba(94, 59, 238, 0.3) !important;
+  }
+
+  .submit-btn:hover {
+    background-position: right center !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 15px 35px rgba(94, 59, 238, 0.5) !important;
+  }
+
+  .submit-btn:active {
+    transform: translateY(1px) scale(0.98) !important;
+  }
+
 }
