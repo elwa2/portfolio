@@ -4279,3 +4279,98 @@ img {
     transform: translate(15%, -15%) scale(1.2);
   }
 }
+
+/* --- Page-Wide Liquid Background (Subtle & Hidden) --- */
+.page-liquid-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.5;
+  filter: blur(120px);
+  background: var(--bg-color);
+  transition: opacity 0.5s ease;
+}
+
+[data-theme="dark"] .page-liquid-bg {
+  opacity: 0.35;
+}
+
+.page-blob {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  opacity: 0.25;
+  will-change: transform;
+}
+
+.page-blob:nth-child(1) {
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(circle, #8a7ddb 0%, transparent 70%);
+  animation: pageBlobMove1 40s infinite alternate ease-in-out;
+}
+
+.page-blob:nth-child(2) {
+  top: 10%;
+  right: -20%;
+  background: radial-gradient(circle, #6c63ff 0%, transparent 70%);
+  animation: pageBlobMove2 50s infinite alternate-reverse ease-in-out;
+}
+
+.page-blob:nth-child(3) {
+  bottom: -20%;
+  left: 5%;
+  background: radial-gradient(circle, #f093fb 0%, transparent 70%);
+  animation: pageBlobMove3 60s infinite alternate ease-in-out;
+}
+
+.page-blob:nth-child(4) {
+  bottom: 0%;
+  right: 0%;
+  background: radial-gradient(circle, #4facfe 0%, transparent 70%);
+  animation: pageBlobMove1 45s infinite alternate-reverse ease-in-out;
+}
+
+.page-blob:nth-child(5) {
+  top: 35%;
+  left: 30%;
+  background: radial-gradient(circle, #a99df2 0%, transparent 70%);
+  opacity: 0.15;
+  animation: pageBlobMove2 55s infinite alternate ease-in-out;
+}
+
+@keyframes pageBlobMove1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  100% {
+    transform: translate(15%, 10%) rotate(45deg) scale(1.1);
+  }
+}
+
+@keyframes pageBlobMove2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1.1);
+  }
+
+  100% {
+    transform: translate(-10%, 15%) rotate(-45deg) scale(0.95);
+  }
+}
+
+@keyframes pageBlobMove3 {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  100% {
+    transform: translate(10%, -15%) rotate(90deg) scale(1.15);
+  }
+}
