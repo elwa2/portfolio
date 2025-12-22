@@ -438,6 +438,12 @@ img {
   animation: fadeInUp 1s ease-out;
 }
 
+[data-theme="light"] .hero-badge {
+  background-color: rgba(94, 59, 238, 0.1);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 .hero-content h1 {
   font-size: 3.8rem;
   font-weight: 800;
@@ -451,6 +457,15 @@ img {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
+[data-theme="light"] .hero-content h1 {
+  background: linear-gradient(135deg, #412f90 0%, #6c63ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
 .hero-content p {
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.9);
@@ -462,6 +477,11 @@ img {
   margin-right: auto;
   animation: fadeInUp 1s ease-out 0.4s;
   animation-fill-mode: both;
+}
+
+[data-theme="light"] .hero-content p {
+  color: #4a5568;
+  font-weight: 600;
 }
 
 @keyframes fadeInUp {
@@ -4209,9 +4229,10 @@ img {
 }
 
 [data-theme="light"] .liquid-bg .blob {
-  mix-blend-mode: multiply;
-  opacity: 0.12;
-  filter: blur(100px);
+  mix-blend-mode: normal;
+  opacity: 0.2;
+  filter: blur(90px);
+  background: radial-gradient(circle, rgba(138, 125, 219, 0.5) 0%, transparent 70%);
 }
 
 .liquid-bg .blob:nth-child(1) {
@@ -4298,6 +4319,40 @@ img {
 
 [data-theme="dark"] .page-liquid-bg {
   opacity: 0.35;
+}
+
+[data-theme="light"] .page-liquid-bg {
+  opacity: 1;
+  background: #ffffff;
+  mix-blend-mode: normal;
+}
+
+[data-theme="light"] .page-blob {
+  mix-blend-mode: normal;
+  /* Change from multiply to normal for clarity */
+  opacity: 0.15;
+  /* Slightly increase opacity */
+  filter: blur(100px);
+}
+
+[data-theme="light"] .page-blob:nth-child(1) {
+  background: radial-gradient(circle, rgba(138, 125, 219, 0.8) 0%, transparent 70%);
+}
+
+[data-theme="light"] .page-blob:nth-child(2) {
+  background: radial-gradient(circle, rgba(108, 99, 255, 0.8) 0%, transparent 70%);
+}
+
+[data-theme="light"] .page-blob:nth-child(3) {
+  background: radial-gradient(circle, rgba(240, 147, 251, 0.8) 0%, transparent 70%);
+}
+
+[data-theme="light"] .page-blob:nth-child(4) {
+  background: radial-gradient(circle, rgba(79, 172, 254, 0.8) 0%, transparent 70%);
+}
+
+[data-theme="light"] .page-blob:nth-child(5) {
+  background: radial-gradient(circle, rgba(169, 157, 242, 0.8) 0%, transparent 70%);
 }
 
 .page-blob {
