@@ -4208,6 +4208,51 @@ img {
   height: 1em;
   vertical-align: -0.125em;
   fill: currentColor;
+  overflow: visible;
+  /* Fix clipping */
+}
+
+/* Ensure centered icons are perfectly aligned */
+.stat-icon .svg-icon,
+.service-icon .svg-icon,
+.about-icon .svg-icon,
+.about-icon-centered .svg-icon,
+.vision-icon .svg-icon,
+.mission-icon .svg-icon,
+.values-icon .svg-icon,
+.value-icon .svg-icon {
+  display: block;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+}
+
+/* Adjust size for specific icons where needed */
+.stat-icon .svg-icon {
+  width: 35px;
+  height: 35px;
+}
+
+.service-icon .svg-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.about-icon .svg-icon,
+.about-icon-centered .svg-icon {
+  width: 45px;
+  height: 45px;
+}
+
+.vision-icon .svg-icon,
+.mission-icon .svg-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.value-icon .svg-icon {
+  width: 35px;
+  height: 35px;
 }
 
 .svg-icon.fa-lg {
