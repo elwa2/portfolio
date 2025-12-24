@@ -252,7 +252,7 @@ img {
 
 .header.scrolled .nav-links li a.active,
 .header.scrolled .nav-links li a:hover {
-  color: #a99df2;
+  color: #fff;
 }
 
 .header-content {
@@ -297,7 +297,34 @@ img {
   transform: translateY(-2px);
 }
 
-.nav-links li a.active::after,
+/* Active Tab Indicator - White line with glow */
+.nav-links li a.active::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 15%;
+  width: 70%;
+  height: 3px;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 0 10px #fff, 0 0 20px rgba(138, 125, 219, 0.8);
+  animation: slideInIndicator 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInIndicator {
+  from {
+    width: 0;
+    left: 50%;
+    opacity: 0;
+  }
+
+  to {
+    width: 70%;
+    left: 15%;
+    opacity: 1;
+  }
+}
+
 .nav-links li a:hover::after {
   content: none;
 }

@@ -55,9 +55,21 @@ class SPARouter {
 
   extractIdFromLink(link) {
     const href = link.getAttribute("href");
-    if (href === "index.html" || href === "/" || href === "") return "home";
+    if (
+      !href ||
+      href === "index.html" ||
+      href === "/" ||
+      href === "" ||
+      href === "#home"
+    )
+      return "home";
 
-    // Remove .html and extract the name
+    // Handle hash links correctly
+    if (href.startsWith("#")) {
+      return href.replace("#", "");
+    }
+
+    // Remove .html and extract the name for internal pages if any
     return href.replace(".html", "").replace("./", "").replace("/", "");
   }
 
