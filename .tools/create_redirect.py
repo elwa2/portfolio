@@ -250,7 +250,7 @@ def create_redirect(target_url, filename, title="جارى تحويلك...", mess
 def run_gui():
     root = tk.Tk()
     root.title("أداة إنشاء روابط التحويل")
-    root.geometry("500x550")
+    root.geometry("500x700")
     root.configure(bg="#0f0f1a")
     root.resizable(False, False)
 
@@ -301,7 +301,33 @@ def run_gui():
 
         res = create_redirect(url, name, t, m)
         if res.endswith(".html"):
-            messagebox.showinfo("تم بنجاح", f"تم إنشاء الصفحة بنجاح في:\n{res}")
+            # Construct GitHub Pages URL
+            base_url = "https://elwa2.github.io/portfolio/form/"
+            display_filename = name if name.endswith('.html') else name + ".html"
+            final_url = f"{base_url}{display_filename}"
+            
+            # Update Result UI (if already exists, remove it)
+            for child in result_container.winfo_children():
+                child.destroy()
+            
+            tk.Label(result_container, text="رابط الصفحة المباشر:", fg="#a78bfa", bg="#0f0f1a", font=label_font, anchor="e").pack(fill="x", pady=(10, 5))
+            
+            url_display = tk.Entry(result_container, font=("Consolas", 10), bg="#252545", fg="#00ffcc", borderwidth=0, justify="center")
+            url_display.insert(0, final_url)
+            url_display.configure(state="readonly")
+            url_display.pack(fill="x", ipady=8, padx=5)
+            
+            def copy_to_clipboard():
+                root.clipboard_clear()
+                root.clipboard_append(final_url)
+                copy_btn.config(text="✅ تم النسخ!", bg="#2ecc71")
+                root.after(2000, lambda: copy_btn.config(text="نسخ الرابط", bg="#3498db"))
+
+            copy_btn = tk.Button(result_container, text="نسخ الرابط", font=("Tajawal", 10, "bold"), bg="#3498db", fg=white, 
+                               activebackground="#2980b9", activeforeground=white, bd=0, cursor="hand2", padx=20, pady=5, command=copy_to_clipboard)
+            copy_btn.pack(pady=15)
+            
+            messagebox.showinfo("تم بنجاح", f"تم إنشاء الصفحة بنجاح!\nالرابط: {final_url}")
         else:
             messagebox.showerror("خطأ", f"حدث خطأ: {res}")
 
@@ -312,6 +338,10 @@ def run_gui():
     btn = tk.Button(btn_frame, text="إنشاء الصفحة الآن", font=("Tajawal", 12, "bold"), bg=primary, fg=white, 
                     activebackground="#7d56f9", activeforeground=white, bd=0, cursor="hand2", padx=20, pady=5, command=on_submit)
     btn.pack(ipadx=40, ipady=8)
+
+    # Result Container (Empty until submission)
+    result_container = tk.Frame(root, bg="#0f0f1a")
+    result_container.pack(padx=30, fill="x")
 
     root.mainloop()
 
