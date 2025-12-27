@@ -25,7 +25,7 @@ def create_redirect(target_url, filename, title="جارى تحويلك...", mess
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+    <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -151,36 +151,36 @@ def create_redirect(target_url, filename, title="جارى تحويلك...", mess
             to {{ width: 100%; }}
         }}
 
-        .footer-text {
+        .footer-text {{
             font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.6);
             margin-top: 25px;
             line-height: 1.6;
-        }
+        }}
 
-        .manual-link-wrapper {
+        .manual-link-wrapper {{
             margin-top: 15px;
             padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             display: inline-block;
             word-break: break-all;
-        }
+        }}
 
-        .manual-link {
+        .manual-link {{
             color: var(--primary-light);
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
             border-bottom: 1px dashed var(--primary-light);
-        }
+        }}
 
-        .manual-link:hover {
+        .manual-link:hover {{
             color: #fff;
             border-bottom-style: solid;
-        }
+        }}
 
-        .portfolio-link {
+        .portfolio-link {{
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -193,12 +193,12 @@ def create_redirect(target_url, filename, title="جارى تحويلك...", mess
             text-decoration: none;
             transition: var(--transition);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        }}
 
-        .portfolio-link:hover {
+        .portfolio-link:hover {{
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-        }
+        }}
     </style>
 </head>
 <body>
@@ -247,6 +247,13 @@ def create_redirect(target_url, filename, title="جارى تحويلك...", mess
     except Exception as e:
         return str(e)
 
+# Styling colors and fonts
+PRIMARY_COLOR = "#5e3bee"
+WHITE = "#ffffff"
+BG_DARK = "#1a1a2e"
+TITLE_FONT = ("Tajawal", 16, "bold")
+LABEL_FONT = ("Tajawal", 10)
+
 def run_gui():
     root = tk.Tk()
     root.title("أداة إنشاء روابط التحويل")
@@ -254,30 +261,23 @@ def run_gui():
     root.configure(bg="#0f0f1a")
     root.resizable(False, False)
 
-    # Styling colors
-    primary = "#5e3bee"
-    white = "#ffffff"
-    bg_dark = "#1a1a2e"
-
-    title_font = ("Tajawal", 16, "bold")
-    label_font = ("Tajawal", 10)
-
     # Top Margin
     tk.Label(root, text="", bg="#0f0f1a").pack(pady=5)
 
-    tk.Label(root, text="إنشاء صفحة تحويل احترافية", font=title_font, fg=white, bg="#0f0f1a").pack(pady=10)
+    tk.Label(root, text="إنشاء صفحة تحويل احترافية", font=TITLE_FONT, fg=WHITE, bg="#0f0f1a").pack(pady=10)
+
 
     # Input Frame
     frame = tk.Frame(root, bg="#0f0f1a")
     frame.pack(padx=30, pady=5, fill="x")
 
     def create_label_entry(parent, label_text, default_text=""):
-        tk.Label(parent, text=label_text, fg="#a78bfa", bg="#0f0f1a", font=label_font, anchor="e").pack(fill="x", pady=(8, 0))
-        entry = tk.Entry(parent, font=("Tajawal", 11), bg=bg_dark, fg=white, insertbackground=white, borderwidth=0)
+        tk.Label(parent, text=label_text, fg="#a78bfa", bg="#0f0f1a", font=LABEL_FONT, anchor="e").pack(fill="x", pady=(8, 0))
+        entry = tk.Entry(parent, font=("Tajawal", 11), bg=BG_DARK, fg=WHITE, insertbackground=WHITE, borderwidth=0)
         entry.insert(0, default_text)
         entry.pack(fill="x", ipady=6)
         # Fake border/bottom line
-        line = tk.Frame(parent, height=2, bg=primary)
+        line = tk.Frame(parent, height=2, bg=PRIMARY_COLOR)
         line.pack(fill="x")
         return entry
 
@@ -310,7 +310,7 @@ def run_gui():
             for child in result_container.winfo_children():
                 child.destroy()
             
-            tk.Label(result_container, text="رابط الصفحة المباشر:", fg="#a78bfa", bg="#0f0f1a", font=label_font, anchor="e").pack(fill="x", pady=(10, 5))
+            tk.Label(result_container, text="رابط الصفحة المباشر:", fg="#a78bfa", bg="#0f0f1a", font=LABEL_FONT, anchor="e").pack(fill="x", pady=(10, 5))
             
             url_display = tk.Entry(result_container, font=("Consolas", 10), bg="#252545", fg="#00ffcc", borderwidth=0, justify="center")
             url_display.insert(0, final_url)
@@ -323,8 +323,8 @@ def run_gui():
                 copy_btn.config(text="✅ تم النسخ!", bg="#2ecc71")
                 root.after(2000, lambda: copy_btn.config(text="نسخ الرابط", bg="#3498db"))
 
-            copy_btn = tk.Button(result_container, text="نسخ الرابط", font=("Tajawal", 10, "bold"), bg="#3498db", fg=white, 
-                               activebackground="#2980b9", activeforeground=white, bd=0, cursor="hand2", padx=20, pady=5, command=copy_to_clipboard)
+            copy_btn = tk.Button(result_container, text="نسخ الرابط", font=("Tajawal", 10, "bold"), bg="#3498db", fg=WHITE, 
+                               activebackground="#2980b9", activeforeground=WHITE, bd=0, cursor="hand2", padx=20, pady=5, command=copy_to_clipboard)
             copy_btn.pack(pady=15)
             
             messagebox.showinfo("تم بنجاح", f"تم إنشاء الصفحة بنجاح!\nالرابط: {final_url}")
@@ -335,8 +335,8 @@ def run_gui():
     btn_frame = tk.Frame(root, bg="#0f0f1a")
     btn_frame.pack(pady=20)
 
-    btn = tk.Button(btn_frame, text="إنشاء الصفحة الآن", font=("Tajawal", 12, "bold"), bg=primary, fg=white, 
-                    activebackground="#7d56f9", activeforeground=white, bd=0, cursor="hand2", padx=20, pady=5, command=on_submit)
+    btn = tk.Button(btn_frame, text="إنشاء الصفحة الآن", font=("Tajawal", 12, "bold"), bg=PRIMARY_COLOR, fg=WHITE, 
+                    activebackground="#7d56f9", activeforeground=WHITE, bd=0, cursor="hand2", padx=20, pady=5, command=on_submit)
     btn.pack(ipadx=40, ipady=8)
 
     # Result Container (Empty until submission)
