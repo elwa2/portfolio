@@ -337,10 +337,34 @@
       }
 
       /* Process & FAQ */
-      .process-step { border-left: 1px solid var(--primary); padding-left: 30px; margin-bottom: 40px; position: relative; }
-      .process-step::before { content: ''; position: absolute; left: -5px; top: 0; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
-      .faq-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
-      .faq-item h4 { color: var(--primary); margin-bottom: 10px; }
+      .process-step {
+        border-left: 1px solid var(--primary);
+        padding-left: 30px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+      .process-step::before {
+        content: "";
+        position: absolute;
+        left: -5px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        background: var(--primary);
+        border-radius: 50%;
+      }
+      .faq-item {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .faq-item h4 {
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
 
       /* Values Section */
       .value-item {
@@ -365,20 +389,35 @@
       <div class="logo">ALI AHMED</div>
       <nav>
         <ul class="nav-links">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="works.html">Portfolio</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#home" data-i18n="back_main">العودة للرئيسية</a></li>
+          <li><a href="#services" data-i18n="nav_packages">باقاتنا</a></li>
+          <li><a href="works.html" data-i18n="nav_works">معرض الأعمال</a></li>
         </ul>
       </nav>
+      <button
+        id="lang-switch-btn"
+        class="btn-premium"
+        style="
+          padding: 10px 20px;
+          border-radius: 50px;
+          font-size: 0.7rem;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        "
+        data-i18n="lang_switch"
+      >
+        English
+      </button>
     </header>
 
     <main>
-      <!-- Hero -->
+      <!-- 1. Hero -->
       <section class="hero" id="home">
         <div class="hero-content">
-          <h1>THE<br />DIGITAL<br />ARCHITECT</h1>
-          <p style="font-size: 1.8rem; font-weight: 300">
+          <h1 data-i18n="hero_title">المعماري<br />الرقمي</h1>
+          <p
+            style="font-size: 1.8rem; font-weight: 300"
+            data-i18n="hero_subtitle"
+          >
             هندسة الجمال الرقمي. نبني متاجر سلة وزد كقطع فنية خالدة.
           </p>
           <div style="display: flex; gap: 20px; justify-content: center">
@@ -390,6 +429,7 @@
                 border: 1px solid #fff;
                 border-radius: 50px;
               "
+              data-i18n="nav_packages"
               >باقاتنا</a
             >
             <a
@@ -401,13 +441,14 @@
                 border: none;
                 border-radius: 50px;
               "
+              data-i18n="nav_works"
               >معرض الأعمال</a
             >
           </div>
         </div>
       </section>
 
-      <!-- Detailed About & Values -->
+      <!-- 2. About (Identity & Values) -->
       <section id="about" style="padding: 150px 10%; background: #020202">
         <div
           style="
@@ -418,10 +459,16 @@
           "
         >
           <div>
-            <h2 style="font-family: var(--font-title); font-size: 3rem">
-              OUR IDENTITY
+            <h2
+              style="font-family: var(--font-title); font-size: 3rem"
+              data-i18n="identity_title"
+            >
+              هويتنا المعمارية
             </h2>
-            <p style="margin: 30px 0; font-size: 1.2rem; line-height: 2">
+            <p
+              style="margin: 30px 0; font-size: 1.2rem; line-height: 2"
+              data-i18n="identity_text"
+            >
               أنا علي أحمد، معماري رقمي متخصص في تحويل المتاجر العادية إلى تجارب
               فخمة. نستخدم لغة الـ CSS والـ UI/UX لنصنع هوية بصرية تزيد مبيعاتك
               وتثبت علامتك في ذهن العميل.
@@ -429,36 +476,102 @@
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
             <div class="testi-card value-item">
-              <h3>الابتكار</h3>
-              <p>نصنع حلولاً برمجية وتصميمية لم يسبقنا إليها أحد.</p>
+              <h3 data-i18n="val_innovation">الابتكار</h3>
+              <p data-i18n="val_innovation_desc">
+                نصنع حلولاً برمجية وتصميمية لم يسبقنا إليها أحد.
+              </p>
             </div>
             <div class="testi-card value-item">
-              <h3>الجودة</h3>
-              <p>كل بكسل في متجرك مرسوم بعناية معمارية فائقة.</p>
+              <h3 data-i18n="val_quality">الجودة</h3>
+              <p data-i18n="val_quality_desc">
+                كل بكسل في متجرك مرسوم بعناية معمارية فائقة.
+              </p>
             </div>
             <div class="testi-card value-item">
-              <h3>الشفافية</h3>
-              <p>نعمل بوضوح مطلق من الطلب وحتى التسليم النهائي.</p>
+              <h3 data-i18n="val_transparency">الشفافية</h3>
+              <p data-i18n="val_transparency_desc">
+                نعمل بوضوح مطلق من الطلب وحتى التسليم النهائي.
+              </p>
             </div>
             <div class="testi-card value-item">
-              <h3>المسؤولية</h3>
-              <p>نتحمل مسؤولية نجاح متجرك كأننا شركاء فيه.</p>
+              <h3 data-i18n="val_responsibility">المسؤولية</h3>
+              <p data-i18n="val_responsibility_desc">
+                نتحمل مسؤولية نجاح متجرك كأننا شركاء فيه.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Services Redbirth (Detailed) -->
+      <!-- 3. How We Help (Elite Capabilities) -->
+      <section id="help" style="padding: 100px 10%; background: #000">
+        <h2
+          style="
+            font-family: var(--font-title);
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 50px;
+          "
+          data-i18n="capabilities_title"
+        >
+          قدراتنا النخبوية
+        </h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+          "
+        >
+          <div class="testi-card">
+            <h3
+              style="color: var(--primary); margin-bottom: 15px"
+              data-i18n="cap_web_design"
+            >
+              تصميم المواقع
+            </h3>
+            <p data-i18n="cap_web_design_desc">
+              تصميمات مبتكرة باستخدام ووردبريس، إلمنتور، ودروبال.
+            </p>
+          </div>
+          <div class="testi-card">
+            <h3
+              style="color: var(--primary); margin-bottom: 15px"
+              data-i18n="cap_store_mgmt"
+            >
+              إدارة المتاجر
+            </h3>
+            <p data-i18n="cap_store_mgmt_desc">
+              صيانة دورية، تحديثات مستمرة، ودعم فني متكامل.
+            </p>
+          </div>
+          <div class="testi-card">
+            <h3
+              style="color: var(--primary); margin-bottom: 15px"
+              data-i18n="cap_seo"
+            >
+              SEO & التحليلات
+            </h3>
+            <p data-i18n="cap_seo_desc">
+              تحسين محركات البحث للظهور في الصفحات الأولى.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Services (Elite Packages) -->
       <section class="services" id="services" style="padding: 150px 10%">
         <div style="margin-bottom: 80px">
-          <h2 style="font-family: var(--font-title); font-size: 4rem">
-            ELITE PACKAGES
+          <h2
+            style="font-family: var(--font-title); font-size: 4rem"
+            data-i18n="packages_title"
+          >
+            باقات النخبة
           </h2>
-          <p style="opacity: 0.4">
+          <p style="opacity: 0.4" data-i18n="packages_subtitle">
             باقات متكاملة تبدأ من الإنشاء وتنتهي بالنجاح.
           </p>
         </div>
-
         <div
           style="
             display: grid;
@@ -466,13 +579,9 @@
             gap: 30px;
           "
         >
-          <!-- Package 1 -->
           <div class="pkg-card">
-            <h3>باقة الانشاء</h3>
-            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
-              للانطلاق السريع نحو الاحتراف.
-            </p>
-            <ul class="pkg-features">
+            <h3 data-i18n="pkg_creation">باقة الانشاء</h3>
+            <ul class="pkg-features" data-i18n="pkg_creation_feat">
               <li>تصميم متجر إلكتروني احترافي</li>
               <li>واجهة مستخدم سهلة وجذابة</li>
               <li>توافق مع جميع الأجهزة</li>
@@ -483,10 +592,10 @@
               href="https://wa.me/201002241591"
               class="btn-premium"
               style="width: 100%; text-align: center; border-radius: 50px"
+              data-i18n="btn_order"
               >ORDER NOW</a
             >
           </div>
-          <!-- Package 2 -->
           <div class="pkg-card" style="border-color: var(--primary)">
             <div
               style="
@@ -497,14 +606,12 @@
                 font-size: 0.7rem;
                 letter-spacing: 2px;
               "
+              data-i18n="most_popular"
             >
               MOST POPULAR
             </div>
-            <h3>باقة رواد الأعمال</h3>
-            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
-              الحل الشامل لبناء علامة تجارية.
-            </p>
-            <ul class="pkg-features">
+            <h3 data-i18n="pkg_pro">باقة رواد الأعمال</h3>
+            <ul class="pkg-features" data-i18n="pkg_pro_feat">
               <li>تصميم هوية بصرية كاملة</li>
               <li>إنشاء متجر إلكتروني احترافي</li>
               <li>استضافة لمدة سنة</li>
@@ -520,16 +627,13 @@
                 border-radius: 50px;
                 background: var(--primary);
               "
+              data-i18n="btn_order"
               >ORDER NOW</a
             >
           </div>
-          <!-- Package 3 -->
           <div class="pkg-card">
-            <h3>الباقة الكاملة</h3>
-            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
-              من الإنشاء إلى أول مبيعة.
-            </p>
-            <ul class="pkg-features">
+            <h3 data-i18n="pkg_full">الباقة الكاملة</h3>
+            <ul class="pkg-features" data-i18n="pkg_full_feat">
               <li>جميع مميزات الباقات السابقة</li>
               <li>استراتيجية تسويقية متكاملة</li>
               <li>حملات إعلانية مدفوعة</li>
@@ -540,150 +644,56 @@
               href="https://wa.me/201002241591"
               class="btn-premium"
               style="width: 100%; text-align: center; border-radius: 50px"
+              data-i18n="btn_order"
               >ORDER NOW</a
             >
           </div>
         </div>
       </section>
 
-      <!-- How We Help -->
-      <section id="help" style="padding: 100px 10%; background: #000">
+      <!-- 5. Process (Architectural Process) -->
+      <section id="process" style="padding: 100px 10%; background: #050505">
         <h2
           style="
             font-family: var(--font-title);
             font-size: 3rem;
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 70px;
           "
+          data-i18n="process_title"
         >
-          ELITE CAPABILITIES
+          العملية المعمارية
         </h2>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-          "
-        >
-          <div class="testi-card">
-            <h3 style="color: var(--primary); margin-bottom: 15px">
-              تصميم المواقع
-            </h3>
-            <p>
-              تصميمات مبتكرة باستخدام ووردبريس، إلمنتور، ودروبال. نركز على
-              استراتيجية الـ UI/UX لتحسين معدلات التحويل.
+        <div style="max-width: 900px; margin: 0 auto">
+          <div class="process-step">
+            <h3 data-i18n="proc_discovery">01. الاكتشاف</h3>
+            <p data-i18n="proc_discovery_desc">
+              نفهم رؤيتك، أهدافك، والجمهور المستهدف لمتجرك.
             </p>
           </div>
-          <div class="testi-card">
-            <h3 style="color: var(--primary); margin-bottom: 15px">
-              إدارة المتاجر
-            </h3>
-            <p>
-              صيانة دورية، تحديثات مستمرة، ودعم فني متكامل لضمان عمل متجرك
-              بكفاءة 24/7.
+          <div class="process-step">
+            <h3 data-i18n="proc_blueprint">02. المخطط</h3>
+            <p data-i18n="proc_blueprint_desc">
+              نرسم هيكلية المتجر ونحدد تجربة المستخدم (UX) المثالية.
             </p>
           </div>
-          <div class="testi-card">
-            <h3 style="color: var(--primary); margin-bottom: 15px">
-              SEO & Analytics
-            </h3>
-            <p>
-              تحسين محركات البحث للظهور في الصفحات الأولى، مع تحليل دقيق للكلمات
-              المفتاحية وتقارير أداء دورية.
+          <div class="process-step">
+            <h3 data-i18n="proc_construction">03. البناء</h3>
+            <p data-i18n="proc_construction_desc">
+              نقوم بكتابة أكواد الـ CSS المخصصة وتطوير واجهات المتجر.
+            </p>
+          </div>
+          <div class="process-step">
+            <h3 data-i18n="proc_refinement">04. التدقيق</h3>
+            <p data-i18n="proc_refinement_desc">
+              مرحلة اختبار الأداء، التوافق مع الجوال، وسرعة التصفح.
             </p>
           </div>
         </div>
       </section>
 
-      <!-- Partners Marquee -->
-      <section class="marquee-container">
-        <div class="marquee-content">
-          <img src="assets/images/logos/1.png" alt="P1" />
-          <img src="assets/images/logos/2.webp" alt="P2" />
-          <img src="assets/images/logos/3.webp" alt="P3" />
-          <img src="assets/images/logos/salla.svg" alt="Salla" />
-          <img src="assets/images/logos/zid.svg" alt="Zid" />
-          <img src="assets/images/logos/111.png" alt="P4" />
-          <img src="assets/images/logos/22.png" alt="P5" />
-          <img src="assets/images/logos/7.png" alt="P6" />
-          <!-- Duplicate -->
-          <img src="assets/images/logos/1.png" alt="P1" />
-          <img src="assets/images/logos/2.webp" alt="P2" />
-        </div>
-      </section>
-
-      <!-- Payment & Contact Hub -->
-      <section id="contact" style="padding: 150px 10%; background: #050505">
-        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px">
-          <!-- Contact Side -->
-          <div>
-            <h2 style="font-family: var(--font-title); font-size: 3rem">
-              LETS<br />CONNECT
-            </h2>
-            <p style="opacity: 0.4; margin: 20px 0">
-              هل تريد متجراً مميزاً يزيد من مبيعاتك؟ تواصل معي الآن.
-            </p>
-            <a
-              href="https://wa.me/201002241591"
-              class="btn-premium"
-              style="
-                padding: 20px 40px;
-                border-radius: 50px;
-                background: #25d366;
-                border: none;
-              "
-              >CHAT ON WHATSAPP</a
-            >
-          </div>
-
-          <!-- Payment Side -->
-          <div class="payment-grid">
-            <div class="pay-card">
-              <h4>Bank Transfer (بنك مصر)</h4>
-              <div class="copy-area">
-                <span style="font-size: 0.7rem"
-                  >ACCOUNT: Ali Ahmed Abd elrazek</span
-                >
-                <button
-                  class="btn-copy"
-                  onclick="copyText('Ali Ahmed Abd elrazek')"
-                >
-                  Copy
-                </button>
-              </div>
-              <div class="copy-area">
-                <span style="font-size: 0.7rem"
-                  >IBAN: EG410002002300000002360875231</span
-                >
-                <button
-                  class="btn-copy"
-                  onclick="copyText('EG410002002300000002360875231')"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-            <div class="pay-card">
-              <h4>Vodafone Cash / InstaPay</h4>
-              <div class="copy-area">
-                <span style="font-size: 0.7rem">PHONE: 01002241591</span>
-                <button class="btn-copy" onclick="copyText('01002241591')">
-                  Copy
-                </button>
-              </div>
-              <div class="copy-area">
-                <span style="font-size: 0.7rem">INSTAPAY: elwa1@instapay</span>
-                <button class="btn-copy" onclick="copyText('elwa1@instapay')">
-                  Copy
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Testimonials -->
-      <section style="padding: 100px 10%; background: #000">
+      <!-- 6. Testimonials (Voice of Clients) -->
+      <section id="testimonials" style="padding: 100px 10%; background: #000">
         <h2
           style="
             font-family: var(--font-title);
@@ -691,8 +701,9 @@
             text-align: center;
             margin-bottom: 60px;
           "
+          data-i18n="testimonials_title"
         >
-          VOICE OF CLIENTS
+          صوت العملاء
         </h2>
         <div
           style="
@@ -723,34 +734,27 @@
         </div>
       </section>
 
-      <!-- Theme Detector Gear -->
-      <section
-        style="
-          padding: 100px 10%;
-          background: linear-gradient(to bottom, #000, #050505);
-        "
-      >
+      <!-- 7. Theme Detector (Quest) -->
+      <section id="detector" style="padding: 100px 10%; background: #050505">
         <div
           class="pkg-card"
           style="
             border: 2px dashed var(--primary);
             text-align: center;
-            padding: 100px 20px;
+            padding: 60px 20px;
           "
         >
-          <h2 style="font-size: 3rem; margin-bottom: 20px">
-            QUEST: THEME DETECTOR
+          <h2
+            style="font-size: 2.5rem; margin-bottom: 20px"
+            data-i18n="detector_title"
+          >
+            QUEST: كاشف الثيمات
           </h2>
           <p
-            style="
-              font-size: 1.2rem;
-              max-width: 800px;
-              margin: 0 auto 40px;
-              opacity: 0.7;
-            "
+            style="opacity: 0.7; margin-bottom: 30px"
+            data-i18n="detector_desc"
           >
             أداة كاشف ثيمات سلة: اعرف الثيم اللي بيستخدمه منافسك بضغطة واحدة!
-            أكثر من 800 تاجر يستخدمها الآن.
           </p>
           <div
             style="
@@ -767,9 +771,10 @@
                 background: #fff;
                 color: #000;
                 border: none;
-                padding: 20px 40px;
+                padding: 15px 30px;
                 border-radius: 50px;
               "
+              data-i18n="detector_chrome"
               >تحميل للكروم</a
             >
             <a
@@ -777,65 +782,65 @@
               class="btn-premium"
               style="
                 border: 1px solid #fff;
-                padding: 20px 40px;
+                padding: 15px 30px;
                 border-radius: 50px;
               "
+              data-i18n="detector_edge"
               >تحميل للإيدج</a
             >
           </div>
         </div>
       </section>
 
-      <!-- Our Process -->
-      <section id="process" style="padding: 100px 10%; background: #050505;">
-          <h2 style="font-family: var(--font-title); font-size: 3rem; text-align: center; margin-bottom: 70px;">THE ARCHITECTURAL PROCESS</h2>
-          <div style="max-width: 900px; margin: 0 auto; direction: rtl;">
-              <div class="process-step">
-                  <h3>01. DISCOVERY (الاكتشاف)</h3>
-                  <p>نفهم رؤيتك، أهدافك، والجمهور المستهدف لمتجرك.</p>
-              </div>
-              <div class="process-step">
-                  <h3>02. BLUEPRINT (المخطط)</h3>
-                  <p>نرسم هيكلية المتجر ونحدد تجربة المستخدم (UX) المثالية.</p>
-              </div>
-              <div class="process-step">
-                  <h3>03. CONSTRUCTION (البناء)</h3>
-                  <p>نقوم بكتابة أكواد الـ CSS المخصصة وتطوير واجهات المتجر.</p>
-              </div>
-              <div class="process-step">
-                  <h3>04. REFINEMENT (التدقيق)</h3>
-                  <p>مرحلة اختبار الأداء، التوافق مع الجوال، وسرعة التصفح.</p>
-              </div>
-          </div>
-      </section>
-
-      <!-- FAQ -->
-      <section id="faq" style="padding: 100px 10%; background: #000;">
-          <h2 style="font-family: var(--font-title); font-size: 3rem; text-align: center; margin-bottom: 60px;">COMMON QUERIES</h2>
-          <div style="max-width: 800px; margin: 0 auto;">
-              <div class="faq-item">
-                <h4>ما هي المنصات التي تدعمونها؟</h4>
-                <p>نتخصص بشكل احترافي في منصات سلة (Salla) وزد (Zid).</p>
-              </div>
-              <div class="faq-item">
-                <h4>كم يستغرق تصميم المتجر؟</h4>
-                <p>تتراوح المدة بين 5 إلى 14 يوم عمل حسب حجم الباقة المطلوبة.</p>
-              </div>
-              <div class="faq-item">
-                <h4>هل تقدمون دعماً فنياً بعد التسليم؟</h4>
-                <p>نعم، نقدم دعماً فنياً شاملاً لضمان استقرار أداء متجرك.</p>
-              </div>
-          </div>
-      </section>
+      <!-- 8. FAQ (Common Queries) -->
+      <section id="faq" style="padding: 100px 10%; background: #000">
         <h2
           style="
             font-family: var(--font-title);
             font-size: 3rem;
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
           "
+          data-i18n="faq_title"
         >
-          SALLA DISCOUNTS
+          الأسئلة الشائعة
+        </h2>
+        <div style="max-width: 800px; margin: 0 auto">
+          <div class="faq-item">
+            <h4 data-i18n="faq_q1">ما هي المنصات التي تدعمونها؟</h4>
+            <p data-i18n="faq_a1">
+              نتخصص بشكل احترافي في منصات سلة (Salla) وزد (Zid).
+            </p>
+          </div>
+          <div class="faq-item">
+            <h4 data-i18n="faq_q2">كم يستغرق تصميم المتجر؟</h4>
+            <p data-i18n="faq_a2">
+              تتراوح المدة بين 5 إلى 14 يوم عمل حسب حجم الباقة المطلوبة.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h4 data-i18n="faq_q3">هل تقدمون دعماً فنياً بعد التسليم؟</h4>
+            <p data-i18n="faq_a3">
+              نعم، نقدم دعماً فنياً شاملاً لضمان استقرار أداء متجرك.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Salla Discounts -->
+      <section
+        id="discounts"
+        style="padding: 100px 10%; background: #050505; text-align: center"
+      >
+        <h2
+          style="
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+          "
+          data-i18n="discounts_title"
+        >
+          خصومات سلة
         </h2>
         <div
           style="
@@ -844,44 +849,151 @@
             gap: 20px;
           "
         >
-          <div class="pkg-card" style="text-align: center">
-            <h4>ثيم سيليا</h4>
-            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+          <div class="pkg-card">
+            <h4 data-i18n="theme_celia">ثيم سيليا</h4>
+            <p style="font-size: 1.5rem; color: var(--primary); margin: 10px 0">
               F-PSDOIDV4
             </p>
             <button
               class="btn-premium"
               style="border-radius: 50px"
               onclick="copyText('F-PSDOIDV4')"
+              data-i18n="copy_code"
             >
               نسخ الكود
             </button>
           </div>
-          <div class="pkg-card" style="text-align: center">
-            <h4>ثيم ملاك</h4>
-            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+          <div class="pkg-card">
+            <h4 data-i18n="theme_malak">ثيم ملاك</h4>
+            <p style="font-size: 1.5rem; color: var(--primary); margin: 10px 0">
               F-YLKSA1DX
             </p>
             <button
               class="btn-premium"
               style="border-radius: 50px"
               onclick="copyText('F-YLKSA1DX')"
+              data-i18n="copy_code"
             >
               نسخ الكود
             </button>
           </div>
-          <div class="pkg-card" style="text-align: center">
-            <h4>كود باقات سلة</h4>
-            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+          <div class="pkg-card">
+            <h4 data-i18n="pkg_discounts">كود باقات سلة</h4>
+            <p style="font-size: 1.5rem; color: var(--primary); margin: 10px 0">
               F-AFN5N48K
             </p>
             <button
               class="btn-premium"
               style="border-radius: 50px"
               onclick="copyText('F-AFN5N48K')"
+              data-i18n="copy_code"
             >
               نسخ الكود
             </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Partners Marquee -->
+      <section class="marquee-container" style="background: #000">
+        <div class="marquee-content">
+          <img src="assets/images/logos/1.png" alt="P1" /><img
+            src="assets/images/logos/2.webp"
+            alt="P2"
+          /><img src="assets/images/logos/3.webp" alt="P3" /><img
+            src="assets/images/logos/salla.svg"
+            alt="Salla"
+          /><img src="assets/images/logos/zid.svg" alt="Zid" /><img
+            src="assets/images/logos/111.png"
+            alt="P4"
+          /><img src="assets/images/logos/22.png" alt="P5" /><img
+            src="assets/images/logos/7.png"
+            alt="P6"
+          />
+          <img src="assets/images/logos/1.png" alt="P1" /><img
+            src="assets/images/logos/2.webp"
+            alt="P2"
+          />
+        </div>
+      </section>
+
+      <!-- 11. Contact & Payment -->
+      <section id="contact" style="padding: 150px 10%; background: #050505">
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px">
+          <div>
+            <h2
+              style="font-family: var(--font-title); font-size: 3rem"
+              data-i18n="connect_title"
+            >
+              لنتواصل الآن
+            </h2>
+            <p style="opacity: 0.4; margin: 20px 0" data-i18n="connect_desc">
+              هل تريد متجراً مميزاً يزيد من مبيعاتك؟ تواصل معي الآن.
+            </p>
+            <a
+              href="https://wa.me/201002241591"
+              class="btn-premium"
+              style="
+                padding: 20px 40px;
+                border-radius: 50px;
+                background: #25d366;
+                border: none;
+              "
+              data-i18n="whatsapp_btn"
+              >تحدث عبر واتساب</a
+            >
+          </div>
+          <div class="payment-grid">
+            <div class="pay-card">
+              <h4 data-i18n="bank_transfer">تحويل بنكي (بنك مصر)</h4>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem"
+                  >ACCOUNT: Ali Ahmed Abd elrazek</span
+                >
+                <button
+                  class="btn-copy"
+                  onclick="copyText('Ali Ahmed Abd elrazek')"
+                  data-i18n="copy"
+                >
+                  نسخ
+                </button>
+              </div>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem"
+                  >IBAN: EG410002002300000002360875231</span
+                >
+                <button
+                  class="btn-copy"
+                  onclick="copyText('EG410002002300000002360875231')"
+                  data-i18n="copy"
+                >
+                  نسخ
+                </button>
+              </div>
+            </div>
+            <div class="pay-card">
+              <h4 data-i18n="vodafone_cash">فودافون كاش / InstaPay</h4>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem">PHONE: 01002241591</span>
+                <button
+                  class="btn-copy"
+                  onclick="copyText('01002241591')"
+                  data-i18n="copy"
+                >
+                  نسخ
+                </button>
+              </div>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem">INSTAPAY: elwa1@instapay</span>
+                <button
+                  class="btn-copy"
+                  onclick="copyText('elwa1@instapay')"
+                  data-i18n="copy"
+                >
+                  نسخ
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

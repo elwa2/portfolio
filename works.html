@@ -279,6 +279,22 @@
         background: var(--primary);
         box-shadow: 0 0 30px rgba(94, 59, 238, 0.4);
       }
+
+      /* Language Switcher in Works */
+      #lang-switch-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      #lang-switch-btn:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
     </style>
   </head>
   <body>
@@ -290,18 +306,16 @@
 
     <div class="container">
       <div class="header-nav">
-        <a href="index.html" class="back-link"> <span>←</span> BACK TO MAIN </a>
-        <div
-          class="logo"
-          style="font-family: 'Cinzel'; font-weight: 900; letter-spacing: 5px"
-        >
-          ALI AHMED
-        </div>
+        <a href="index.html" class="back-link" data-i18n="back_main">
+          <span>←</span> العودة للرئيسية
+        </a>
+        <div class="logo">ALI AHMED</div>
+        <button id="lang-switch-btn" data-i18n="lang_switch">English</button>
       </div>
 
       <section class="title-section">
-        <h1>SELECTED<br />WORKS</h1>
-        <p>
+        <h1 data-i18n="works_title">أعمال<br />مختارة</h1>
+        <p data-i18n="works_subtitle">
           نظرة عميقة على المتاجر الإلكترونية والتجارب الرقمية التي صممناها بشغف
           وحرفية عالية.
         </p>
@@ -312,17 +326,21 @@
       </div>
 
       <section class="share-panel">
-        <h2>SMART SHARE</h2>
-        <p>
+        <h2 data-i18n="share_title">المشاركة الذكية</h2>
+        <p data-i18n="share_desc">
           مشاهدة الأعمال أصبحت أسهل، يمكنك نسخ كافة الروابط أو إرسالها للعملاء
           بتنسيق فاخر.
         </p>
         <div class="share-actions">
-          <button class="btn-action" onclick="copyLinks()">
-            📋 Copy All Links
+          <button class="btn-action" onclick="copyLinks()" data-i18n="copy_all">
+            📋 نسخ جميع الروابط
           </button>
-          <button class="btn-action" onclick="whatsappShare()">
-            💬 WhatsApp Share
+          <button
+            class="btn-action"
+            onclick="whatsappShare()"
+            data-i18n="whatsapp_share"
+          >
+            💬 مشاركة عبر واتساب
           </button>
         </div>
       </section>
@@ -332,44 +350,66 @@
     <script>
       const projects = [
         {
-          name: "SHURFA SHOP",
-          desc: "متجر شرفة للمنتجات المتميزة، تصميم عصري وتجربة مستخدم سلسة.",
+          name_en: "SHURFA SHOP",
+          name_ar: "متجر شرفة",
+          desc_en:
+            "Shurfa store for premium products, modern design and smooth user experience.",
+          desc_ar:
+            "متجر شرفة للمنتجات المتميزة، تصميم عصري وتجربة مستخدم سلسة.",
           url: "https://shurfa.shop/",
           img: "assets/images/prt/33.jpeg",
         },
         {
-          name: "JEWELER-Y",
-          desc: "متجر الجواهري للمجوهرات، فخامة في العرض ودقة في التفاصيل.",
+          name_en: "JEWELER-Y",
+          name_ar: "الجواهري",
+          desc_en:
+            "Jeweler-Y store, luxury in display and precision in details.",
+          desc_ar: "متجر الجواهري للمجوهرات، فخامة في العرض ودقة في التفاصيل.",
           url: "https://jeweler-y-inc.com/",
           img: "assets/images/prt/32.jpeg",
         },
         {
-          name: "VIOLET BOUQUETS",
-          desc: "باقة بنفسج للزهور، لمسات فنية وتنسيق احترافي.",
+          name_en: "VIOLET BOUQUETS",
+          name_ar: "باقة بنفسج",
+          desc_en:
+            "Violet Bouquets, artistic touches and professional coordination.",
+          desc_ar: "باقة بنفسج للزهور، لمسات فنية وتنسيق احترافي.",
           url: "https://violetbouquets.com/ar",
           img: "assets/images/prt/31.jpeg",
         },
         {
-          name: "TAMAYOZ STORE",
-          desc: "تخصيص متجر تميز على منصة سلة بأداء فائق وتصميم نيون.",
+          name_en: "TAMAYOZ STORE",
+          name_ar: "متجر تميز",
+          desc_en:
+            "Tamayoz store customization on Salla platform with high performance and neon design.",
+          desc_ar: "تخصيص متجر تميز على منصة سلة بأداء فائق وتصميم نيون.",
           url: "https://tamayoz-store.com",
           img: "assets/images/portfolio/1.jpg",
         },
         {
-          name: "ATIQ STORE",
-          desc: "متجر عتيق للإكسسوارات، ثيم مخصص وتجربة مستخدم فريدة.",
+          name_en: "ATIQ STORE",
+          name_ar: "متجر عتيق",
+          desc_en:
+            "Atiq store for accessories, custom theme and unique user experience.",
+          desc_ar: "متجر عتيق للإكسسوارات، ثيم مخصص وتجربة مستخدم فريدة.",
           url: "https://atiq.sa",
           img: "assets/images/portfolio/2.jpg",
         },
         {
-          name: "SAHR STORE",
-          desc: "متجر سحر للعطور، تخصيص ثيم زد وبرمجة خاصة.",
+          name_en: "SAHR STORE",
+          name_ar: "متجر سحر",
+          desc_en:
+            "Sahr perfumes store, Zid theme customization and special programming.",
+          desc_ar: "متجر سحر للعطور، تخصيص ثيم زد وبرمجة خاصة.",
           url: "https://sahr.com",
           img: "assets/images/portfolio/3.jpg",
         },
         {
-          name: "MIX FIBER",
-          desc: "مشروع ميكس فايبر، تحويل التصميم إلى واقع رقمي متكامل.",
+          name_en: "MIX FIBER",
+          name_ar: "ميكس فايبر",
+          desc_en:
+            "Mix Fiber project, transforming design into a complete digital reality.",
+          desc_ar: "مشروع ميكس فايبر، تحويل التصميم إلى واقع رقمي متكامل.",
           url: "https://mixfiber.com",
           img: "assets/images/portfolio/4.jpg",
         },
@@ -377,15 +417,26 @@
 
       function renderWorks() {
         const grid = document.getElementById("worksGrid");
+        const lang = window.Engine
+          ? window.Engine.currentLang
+          : localStorage.getItem("lang") || "ar";
+        const visitBtnText = lang === "ar" ? "زيارة المتجر" : "Visit Store";
+
         grid.innerHTML = projects
           .map(
             (p) => `
                 <div class="work-card">
-                    <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=${p.name}'">
+                    <img src="${p.img}" alt="${
+              lang === "ar" ? p.name_ar : p.name_en
+            }" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=${
+              p.name_en
+            }'">
                     <div class="work-info">
-                        <h3>${p.name}</h3>
-                        <p>${p.desc}</p>
-                        <a href="${p.url}" target="_blank" class="btn-visit">زيارة المتجر</a>
+                        <h3>${lang === "ar" ? p.name_ar : p.name_en}</h3>
+                        <p>${lang === "ar" ? p.desc_ar : p.desc_en}</p>
+                        <a href="${
+                          p.url
+                        }" target="_blank" class="btn-visit">${visitBtnText}</a>
                     </div>
                 </div>
             `
@@ -401,9 +452,20 @@
       }
 
       function whatsappShare() {
+        const lang = window.Engine
+          ? window.Engine.currentLang
+          : localStorage.getItem("lang") || "ar";
+        const shareMsg =
+          lang === "ar"
+            ? "تحقق من أحدث أعمالي المميزة:"
+            : "Check out my latest premium works:";
         const msg = encodeURIComponent(
-          `Check out my latest premium works:\n\n` +
-            projects.map((p) => `🔥 ${p.name}: ${p.url}`).join("\n")
+          `${shareMsg}\n\n` +
+            projects
+              .map(
+                (p) => `🔥 ${lang === "ar" ? p.name_ar : p.name_en}: ${p.url}`
+              )
+              .join("\n")
         );
         window.open(`https://wa.me/?text=${msg}`, "_blank");
       }
