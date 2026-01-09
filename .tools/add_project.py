@@ -95,45 +95,39 @@ class PortfolioManager:
     def update_html(project_data, image_filename):
         image_path = f"assets/images/prt/{image_filename}"
         
-        # 1. Update index.html (General Update)
+        # المسارات
+        WORKS_HTML = PROJECT_ROOT / "works.html"
+        
+        # 1. Update works.html - Add to first page
         try:
-            with open(INDEX_HTML, 'r', encoding='utf-8') as f:
+            with open(WORKS_HTML, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # --- Type A: Slider Item ---
-            slider_item = f'''              <a href="{project_data['url']}" target="_blank" class="portfolio-slider-item">
-                <img src="{image_path}" alt="{project_data['name']}" />
+            # Create new work card
+            work_card = f'''          <div class="work-card">
+            <img src="{image_path}" alt="{project_data['name']}" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>{project_data['name']}</h3>
+              <a href="{project_data['url']}" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512" style="width: 14px; height: 14px; fill: currentColor">
+                  <use xlink:href="assets/images/icons.svg#icon-external-link"></use>
+                </svg>
+                زيارة المتجر
               </a>
+            </div>
+          </div>
 '''
-            # Insert into row1
-            slider_pattern = r'(class="portfolio-slider-row row1">)'
-            content = re.sub(slider_pattern, lambda m: m.group(1) + "\n" + slider_item, content, count=1)
-            
-            # --- Type B: Portfolio Grid Item ---
-            # Map category to new design values (ecommerce, social, video)
-            grid_category = "ecommerce" # Default for this tool
-            
-            grid_item = f'''              <a
-                href="{image_path}"
-                data-lightbox="portfolio"
-                data-title="{project_data['name']}"
-                class="portfolio-item"
-                data-category="{grid_category}"
-              >
-                <div class="portfolio-image">
-                  <img src="{image_path}" alt="{project_data['name']}" loading="lazy" />
-                </div>
-              </a>
-'''
-            grid_pattern = r'(<div class="portfolio-grid">)'
-            content = re.sub(grid_pattern, lambda m: m.group(1) + "\n" + grid_item, content, count=1)
+            # Insert at the beginning of page-1 gallery
+            pattern = r'(<div class="works-gallery works-page-content active" id="page-1">)'
+            content = re.sub(pattern, lambda m: m.group(1) + "\n" + work_card, content, count=1)
 
-            with open(INDEX_HTML, 'w', encoding='utf-8') as f:
+            with open(WORKS_HTML, 'w', encoding='utf-8') as f:
                 f.write(content)
+                
         except Exception as e:
-            return False, f"خطأ في تحديث index.html: {e}"
+            return False, f"خطأ في تحديث works.html: {e}"
             
-        return True, "تم التحديث بنجاح في الصفحة الرئيسية"
+        return True, "تم التحديث بنجاح في صفحة الأعمال"
 
 
 class AddProjectApp:
