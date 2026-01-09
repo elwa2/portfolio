@@ -62,6 +62,10 @@
     <script src="assets/js/svg-icons.js" defer></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Three.js (Core) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="assets/js/three-bg.js" defer></script>
+    <!-- Swiper CSS -->
     <!-- Swiper CSS -->
     <link
       rel="stylesheet"
@@ -477,6 +481,9 @@
     </style>
   </head>
   <body class="theme-aware">
+    <!-- حاوية الخلفية التفاعلية Three.js -->
+    <div id="three-bg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none;"></div>
+    
     <!-- خلفية أيقونات متحركة -->
     <div class="floating-background">
       <!-- Page Liquid Background -->
@@ -2090,8 +2097,50 @@
               <div class="partner-logo">
                 <img src="assets/images/logos/10.png" />
               </div>
-              <div class="partner-logo">
-                <img src="assets/images/logos/11.png" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- قسم أعمالنا (الإصدار الخفيف) -->
+        <section class="section" id="portfolio">
+          <div class="container">
+            <div class="section-title">
+              <h2 style="color: var(--primary-color);">إبداعاتنا في المتاجر 🚀</h2>
+              <p>نعمل مع أشهر المنصات والبراندات لنصنع تجارب تسوق لا تُنسى</p>
+            </div>
+            
+            <div class="store-links-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center;">
+              <!-- ستور 1 -->
+              <a href="https://wa.me/201002241591" class="store-icon-link" style="padding: 20px; border: 1px solid rgba(94, 59, 238, 0.2); border-radius: 15px; display: block; transition: 0.3s; text-decoration: none;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🛍️</div>
+                <span style="font-weight: 600; color: var(--primary-color);">متجر سلة</span>
+              </a>
+              <!-- ستور 2 -->
+              <a href="https://wa.me/201002241591" class="store-icon-link" style="padding: 20px; border: 1px solid rgba(94, 59, 238, 0.2); border-radius: 15px; display: block; transition: 0.3s; text-decoration: none;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">📦</div>
+                <span style="font-weight: 600; color: var(--primary-color);">متجر زد</span>
+              </a>
+              <!-- ستور 3 -->
+              <a href="https://wa.me/201002241591" class="store-icon-link" style="padding: 20px; border: 1px solid rgba(94, 59, 238, 0.2); border-radius: 15px; display: block; transition: 0.3s; text-decoration: none;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🎨</div>
+                <span style="font-weight: 600; color: var(--primary-color);">تصميم ثيمات</span>
+              </a>
+              <!-- ستور 4 -->
+              <a href="https://wa.me/201002241591" class="store-icon-link" style="padding: 20px; border: 1px solid rgba(94, 59, 238, 0.2); border-radius: 15px; display: block; transition: 0.3s; text-decoration: none;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">💻</div>
+                <span style="font-weight: 600; color: var(--primary-color);">برمجة خاصة</span>
+              </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+              <a href="works.html" class="hero-btn" style="background: linear-gradient(135deg, var(--primary-color), var(--neon-glow));">
+                مشاهدة معرض الأعمال الكامل (أكثر من 50 متجر) 🔥
+              </a>
+            </div>
+          </div>
+        </section>
+        <img src="assets/images/logos/11.png" />
               </div>
               <div class="partner-logo">
                 <img src="assets/images/logos/12.png" />

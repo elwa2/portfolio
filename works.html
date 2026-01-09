@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>معرض الأعمال | Ali Ahmed</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #5e3bee;
+        --bg-dark: #0f0f1a;
+        --neon-glow: #a78bfa;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: #fff;
+        overflow-x: hidden;
+        font-family: "Tajawal", sans-serif;
+      }
+
+      #three-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      .works-container {
+        max-width: 1200px;
+        margin: 100px auto;
+        padding: 20px;
+        position: relative;
+      }
+
+      .header-content {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .header-content h1 {
+        font-size: 3rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary-color) 100%);
+        -webkit-background-clip: text;
+        background-clip: text; /* Fixed compatibility */
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+
+      .neon-button {
+        position: relative;
+        padding: 12px 30px;
+        background: rgba(94, 59, 238, 0.1);
+        border: 1px solid var(--primary-color);
+        color: #fff;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: 0.3s;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        margin: 10px;
+      }
+
+      .neon-button:hover {
+        background: var(--primary-color);
+        box-shadow: 0 0 20px var(--primary-color);
+      }
+
+      .works-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .work-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.5s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .work-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 30px rgba(94, 59, 238, 0.3);
+      }
+
+      /* Neon Snake Border Effect */
+      .work-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        box-sizing: border-box;
+        border: 2px solid transparent;
+        pointer-events: none;
+      }
+
+      .work-card:hover::before {
+        animation: borderRotate 2s linear infinite;
+        border-image: conic-gradient(
+            from var(--angle),
+            var(--primary-color),
+            transparent 20%
+          )
+          1;
+      }
+
+      @property --angle {
+        syntax: "<angle>";
+        initial-value: 0deg;
+        inherits: false;
+      }
+
+      @keyframes borderRotate {
+        to {
+          --angle: 360deg;
+        }
+      }
+
+      .work-card img {
+        width: 100%;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        transition: 0.5s;
+      }
+
+      .actions-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 60px;
+        text-align: center;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 50px;
+      }
+
+      .page-link {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        text-decoration: none;
+        transition: 0.3s;
+      }
+
+      .page-link.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="three-bg"></div>
+
+    <div class="works-container">
+      <div class="header-content">
+        <a href="index.html" class="neon-button">← العودة للرئيسية</a>
+        <h1>معرض الإبداع</h1>
+        <p>مجموعة مختارة من أفضل المتاجر والمشاريع التي قمنا بتطويرها</p>
+      </div>
+
+      <div class="works-grid" id="worksGrid">
+        <!-- سيتم ملؤه بواسطة JavaScript -->
+      </div>
+
+      <div class="pagination">
+        <a href="#" class="page-link active">1</a>
+        <a href="#" class="page-link">2</a>
+        <a href="#" class="page-link">3</a>
+      </div>
+
+      <div class="actions-panel">
+        <h3>مشاركة سريعة للعملاء 🚀</h3>
+        <p>
+          يمكنك نسخ جميع روابط المتاجر بضغطة واحدة أو إرسالها للعملاء عبر واتساب
+          بتنسيق رائع
+        </p>
+        <div style="margin-top: 20px">
+          <button class="neon-button" onclick="copyAllLinks()">
+            📋 نسخ كافة الروابط
+          </button>
+          <button class="neon-button" onclick="shareToWhatsApp()">
+            💬 إرسال عبر واتساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/js/three-bg.js"></script>
+    <script>
+      const stores = [
+        {
+          name: "متجر تمكين",
+          url: "https://tamkeen.com",
+          img: "assets/images/portfolio/1.jpg",
+        },
+        {
+          name: "متجر نون",
+          url: "https://noon.com",
+          img: "assets/images/portfolio/2.jpg",
+        },
+        {
+          name: "متجر زد",
+          url: "https://zid.sa",
+          img: "assets/images/portfolio/3.jpg",
+        },
+        // أضف المزيد هنا
+      ];
+
+      function renderWorks() {
+        const grid = document.getElementById("worksGrid");
+        grid.innerHTML = stores
+          .map(
+            (store) => `
+                <div class="work-card">
+                    <img src="${store.img}" alt="${store.name}" onerror="this.src='https://via.placeholder.com/300x200/0f0f1a/5e3bee?text=${store.name}'">
+                    <h4>${store.name}</h4>
+                    <a href="${store.url}" target="_blank" class="neon-button" style="padding: 5px 15px; font-size: 0.8rem;">زيارة المتجر</a>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function copyAllLinks() {
+        const links = stores.map((s) => `${s.name}: ${s.url}`).join("\n");
+        navigator.clipboard.writeText(links).then(() => {
+          alert("تم نسخ جميع الروابط بنجاح!");
+        });
+      }
+
+      function shareToWhatsApp() {
+        const message = encodeURIComponent(
+          `أهلاً بك، إليك قائمة ببعض أعمالنا المميزة:\n\n` +
+            stores.map((s) => `🔹 ${s.name}: ${s.url}`).join("\n")
+        );
+        window.open(`https://wa.me/?text=${message}`, "_blank");
+      }
+
+      renderWorks();
+    </script>
+  </body>
+</html>
