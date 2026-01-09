@@ -5,9 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ali Ahmed | Premium Visual Artist & Developer</title>
 
+    <!-- SEO & Security -->
+    <meta
+      name="description"
+      content="علي أحمد - مصمم ومعماري رقمي متخصص في تصميم متاجر سلة وزد وتخصيص CSS باحترافية عالية."
+    />
+    <meta
+      name="keywords"
+      content="سلة, زد, تصميم متاجر, CSS, تطوير مواقع, علي أحمد, Digital Architect"
+    />
+    <meta name="author" content="Ali Ahmed" />
+    <meta property="og:title" content="Ali Ahmed | Digital Architect" />
+    <meta
+      property="og:description"
+      content="هندسة التجارب الرقمية الفاخرة لمتاجر سلة وزد."
+    />
+
     <!-- Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&family=Tajawal:wght@300;400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap"
       rel="stylesheet"
     />
 
@@ -22,7 +38,7 @@
         --text: #ffffff;
         --font-main: "Montserrat", sans-serif;
         --font-title: "Cinzel", serif;
-        --font-ar: "Tajawal", sans-serif;
+        --font-ar: "IBM Plex Sans Arabic", sans-serif;
       }
 
       * {
@@ -35,9 +51,42 @@
       body {
         background-color: var(--bg);
         color: var(--text);
-        font-family: var(--font-main);
+        font-family: var(--font-ar); /* Default Arabic for better fallback */
         overflow-x: hidden;
-        line-height: 1.6;
+        line-height: 1.8; /* Improved for Arabic */
+        direction: rtl;
+        text-align: right;
+      }
+
+      h1,
+      h2,
+      h3,
+      .logo {
+        font-family: var(--font-title);
+        direction: ltr;
+      }
+
+      /* Fix Arabic Headings fallback */
+      h1:has(span),
+      h2:has(span),
+      h3:has(span),
+      h1:lang(ar),
+      h2:lang(ar),
+      h3:lang(ar),
+      .ar-font {
+        font-family: var(--font-ar) !important;
+        direction: rtl !important;
+        letter-spacing: 0 !important;
+      }
+
+      p,
+      li,
+      .btn-premium,
+      .pkg-card h3,
+      .pay-card h4,
+      .testi-card h5 {
+        font-family: var(--font-ar);
+        letter-spacing: 0;
       }
 
       /* Custom Cursor */
@@ -178,6 +227,20 @@
         }
       }
 
+      /* Protection UI (Hidden alert) */
+      #protection-alert {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--primary);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 10px;
+        z-index: 10000;
+        display: none;
+        font-family: var(--font-ar);
+      }
+
       /* Data Rich Styles */
       .pkg-card {
         background: rgba(255, 255, 255, 0.02);
@@ -272,6 +335,22 @@
           transform: translateX(-50%);
         }
       }
+
+      /* Process & FAQ */
+      .process-step { border-left: 1px solid var(--primary); padding-left: 30px; margin-bottom: 40px; position: relative; }
+      .process-step::before { content: ''; position: absolute; left: -5px; top: 0; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
+      .faq-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+      .faq-item h4 { color: var(--primary); margin-bottom: 10px; }
+
+      /* Values Section */
+      .value-item {
+        text-align: center;
+        padding: 20px;
+      }
+      .value-item h3 {
+        color: var(--primary);
+        margin-bottom: 15px;
+      }
     </style>
   </head>
   <body>
@@ -299,17 +378,73 @@
       <section class="hero" id="home">
         <div class="hero-content">
           <h1>THE<br />DIGITAL<br />ARCHITECT</h1>
-          <p>أين تلتقي الفخامة بالوظيفة. متخصص في بناء تجارب سلة وزد عالمية.</p>
-          <a
-            href="#services"
-            class="btn-premium"
-            style="
-              padding: 15px 60px;
-              border: 1px solid #fff;
-              border-radius: 50px;
-            "
-            >OUR SERVICES</a
-          >
+          <p style="font-size: 1.8rem; font-weight: 300">
+            هندسة الجمال الرقمي. نبني متاجر سلة وزد كقطع فنية خالدة.
+          </p>
+          <div style="display: flex; gap: 20px; justify-content: center">
+            <a
+              href="#services"
+              class="btn-premium"
+              style="
+                padding: 15px 40px;
+                border: 1px solid #fff;
+                border-radius: 50px;
+              "
+              >باقاتنا</a
+            >
+            <a
+              href="works.html"
+              class="btn-premium"
+              style="
+                padding: 15px 40px;
+                background: var(--primary);
+                border: none;
+                border-radius: 50px;
+              "
+              >معرض الأعمال</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Detailed About & Values -->
+      <section id="about" style="padding: 150px 10%; background: #020202">
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+          "
+        >
+          <div>
+            <h2 style="font-family: var(--font-title); font-size: 3rem">
+              OUR IDENTITY
+            </h2>
+            <p style="margin: 30px 0; font-size: 1.2rem; line-height: 2">
+              أنا علي أحمد، معماري رقمي متخصص في تحويل المتاجر العادية إلى تجارب
+              فخمة. نستخدم لغة الـ CSS والـ UI/UX لنصنع هوية بصرية تزيد مبيعاتك
+              وتثبت علامتك في ذهن العميل.
+            </p>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div class="testi-card value-item">
+              <h3>الابتكار</h3>
+              <p>نصنع حلولاً برمجية وتصميمية لم يسبقنا إليها أحد.</p>
+            </div>
+            <div class="testi-card value-item">
+              <h3>الجودة</h3>
+              <p>كل بكسل في متجرك مرسوم بعناية معمارية فائقة.</p>
+            </div>
+            <div class="testi-card value-item">
+              <h3>الشفافية</h3>
+              <p>نعمل بوضوح مطلق من الطلب وحتى التسليم النهائي.</p>
+            </div>
+            <div class="testi-card value-item">
+              <h3>المسؤولية</h3>
+              <p>نتحمل مسؤولية نجاح متجرك كأننا شركاء فيه.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -411,23 +546,69 @@
         </div>
       </section>
 
+      <!-- How We Help -->
+      <section id="help" style="padding: 100px 10%; background: #000">
+        <h2
+          style="
+            font-family: var(--font-title);
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 50px;
+          "
+        >
+          ELITE CAPABILITIES
+        </h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+          "
+        >
+          <div class="testi-card">
+            <h3 style="color: var(--primary); margin-bottom: 15px">
+              تصميم المواقع
+            </h3>
+            <p>
+              تصميمات مبتكرة باستخدام ووردبريس، إلمنتور، ودروبال. نركز على
+              استراتيجية الـ UI/UX لتحسين معدلات التحويل.
+            </p>
+          </div>
+          <div class="testi-card">
+            <h3 style="color: var(--primary); margin-bottom: 15px">
+              إدارة المتاجر
+            </h3>
+            <p>
+              صيانة دورية، تحديثات مستمرة، ودعم فني متكامل لضمان عمل متجرك
+              بكفاءة 24/7.
+            </p>
+          </div>
+          <div class="testi-card">
+            <h3 style="color: var(--primary); margin-bottom: 15px">
+              SEO & Analytics
+            </h3>
+            <p>
+              تحسين محركات البحث للظهور في الصفحات الأولى، مع تحليل دقيق للكلمات
+              المفتاحية وتقارير أداء دورية.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <!-- Partners Marquee -->
       <section class="marquee-container">
         <div class="marquee-content">
           <img src="assets/images/logos/1.png" alt="P1" />
           <img src="assets/images/logos/2.webp" alt="P2" />
           <img src="assets/images/logos/3.webp" alt="P3" />
-          <img src="assets/images/logos/4.png" alt="P4" />
-          <img src="assets/images/logos/5.webp" alt="P5" />
-          <img src="assets/images/logos/6.png" alt="P6" />
-          <img src="assets/images/logos/7.png" alt="P7" />
-          <img src="assets/images/salla.svg" alt="Salla" />
-          <img src="assets/images/zid.svg" alt="Zid" />
-          <!-- Duplicate for seamless loop -->
+          <img src="assets/images/logos/salla.svg" alt="Salla" />
+          <img src="assets/images/logos/zid.svg" alt="Zid" />
+          <img src="assets/images/logos/111.png" alt="P4" />
+          <img src="assets/images/logos/22.png" alt="P5" />
+          <img src="assets/images/logos/7.png" alt="P6" />
+          <!-- Duplicate -->
           <img src="assets/images/logos/1.png" alt="P1" />
           <img src="assets/images/logos/2.webp" alt="P2" />
-          <img src="assets/images/logos/3.webp" alt="P3" />
-          <img src="assets/images/logos/4.png" alt="P4" />
         </div>
       </section>
 
@@ -501,8 +682,151 @@
         </div>
       </section>
 
-      <!-- Salla Discounts -->
-      <section style="padding: 100px 10%">
+      <!-- Testimonials -->
+      <section style="padding: 100px 10%; background: #000">
+        <h2
+          style="
+            font-family: var(--font-title);
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 60px;
+          "
+        >
+          VOICE OF CLIENTS
+        </h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+          "
+        >
+          <div class="testi-card">
+            <p>
+              "مشكور على جهودكم، ما كنت متوقع كل هذه المبيعات! المتجر شكله فخم
+              جداً."
+            </p>
+            <h5 style="margin-top: 20px; color: var(--primary)">
+              محمد عبد الله الملحم
+            </h5>
+          </div>
+          <div class="testi-card">
+            <p>"والله مبهورة جداً بشكل المتجر، أكثر من رائع! التصميم عالمي."</p>
+            <h5 style="margin-top: 20px; color: var(--primary)">منى الفراج</h5>
+          </div>
+          <div class="testi-card">
+            <p>"يعطيكم العافية المتجر روعة! فعلاً شغل معماري مرتب."</p>
+            <h5 style="margin-top: 20px; color: var(--primary)">
+              محمد علي البراك
+            </h5>
+          </div>
+        </div>
+      </section>
+
+      <!-- Theme Detector Gear -->
+      <section
+        style="
+          padding: 100px 10%;
+          background: linear-gradient(to bottom, #000, #050505);
+        "
+      >
+        <div
+          class="pkg-card"
+          style="
+            border: 2px dashed var(--primary);
+            text-align: center;
+            padding: 100px 20px;
+          "
+        >
+          <h2 style="font-size: 3rem; margin-bottom: 20px">
+            QUEST: THEME DETECTOR
+          </h2>
+          <p
+            style="
+              font-size: 1.2rem;
+              max-width: 800px;
+              margin: 0 auto 40px;
+              opacity: 0.7;
+            "
+          >
+            أداة كاشف ثيمات سلة: اعرف الثيم اللي بيستخدمه منافسك بضغطة واحدة!
+            أكثر من 800 تاجر يستخدمها الآن.
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 20px;
+              justify-content: center;
+              flex-wrap: wrap;
+            "
+          >
+            <a
+              href="#"
+              class="btn-premium"
+              style="
+                background: #fff;
+                color: #000;
+                border: none;
+                padding: 20px 40px;
+                border-radius: 50px;
+              "
+              >تحميل للكروم</a
+            >
+            <a
+              href="#"
+              class="btn-premium"
+              style="
+                border: 1px solid #fff;
+                padding: 20px 40px;
+                border-radius: 50px;
+              "
+              >تحميل للإيدج</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Our Process -->
+      <section id="process" style="padding: 100px 10%; background: #050505;">
+          <h2 style="font-family: var(--font-title); font-size: 3rem; text-align: center; margin-bottom: 70px;">THE ARCHITECTURAL PROCESS</h2>
+          <div style="max-width: 900px; margin: 0 auto; direction: rtl;">
+              <div class="process-step">
+                  <h3>01. DISCOVERY (الاكتشاف)</h3>
+                  <p>نفهم رؤيتك، أهدافك، والجمهور المستهدف لمتجرك.</p>
+              </div>
+              <div class="process-step">
+                  <h3>02. BLUEPRINT (المخطط)</h3>
+                  <p>نرسم هيكلية المتجر ونحدد تجربة المستخدم (UX) المثالية.</p>
+              </div>
+              <div class="process-step">
+                  <h3>03. CONSTRUCTION (البناء)</h3>
+                  <p>نقوم بكتابة أكواد الـ CSS المخصصة وتطوير واجهات المتجر.</p>
+              </div>
+              <div class="process-step">
+                  <h3>04. REFINEMENT (التدقيق)</h3>
+                  <p>مرحلة اختبار الأداء، التوافق مع الجوال، وسرعة التصفح.</p>
+              </div>
+          </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq" style="padding: 100px 10%; background: #000;">
+          <h2 style="font-family: var(--font-title); font-size: 3rem; text-align: center; margin-bottom: 60px;">COMMON QUERIES</h2>
+          <div style="max-width: 800px; margin: 0 auto;">
+              <div class="faq-item">
+                <h4>ما هي المنصات التي تدعمونها؟</h4>
+                <p>نتخصص بشكل احترافي في منصات سلة (Salla) وزد (Zid).</p>
+              </div>
+              <div class="faq-item">
+                <h4>كم يستغرق تصميم المتجر؟</h4>
+                <p>تتراوح المدة بين 5 إلى 14 يوم عمل حسب حجم الباقة المطلوبة.</p>
+              </div>
+              <div class="faq-item">
+                <h4>هل تقدمون دعماً فنياً بعد التسليم؟</h4>
+                <p>نعم، نقدم دعماً فنياً شاملاً لضمان استقرار أداء متجرك.</p>
+              </div>
+          </div>
+      </section>
         <h2
           style="
             font-family: var(--font-title);
@@ -530,7 +854,7 @@
               style="border-radius: 50px"
               onclick="copyText('F-PSDOIDV4')"
             >
-              COPY COUPON
+              نسخ الكود
             </button>
           </div>
           <div class="pkg-card" style="text-align: center">
@@ -543,7 +867,7 @@
               style="border-radius: 50px"
               onclick="copyText('F-YLKSA1DX')"
             >
-              COPY COUPON
+              نسخ الكود
             </button>
           </div>
           <div class="pkg-card" style="text-align: center">
@@ -556,7 +880,7 @@
               style="border-radius: 50px"
               onclick="copyText('F-AFN5N48K')"
             >
-              COPY COUPON
+              نسخ الكود
             </button>
           </div>
         </div>
@@ -568,10 +892,30 @@
     <script>
       function copyText(text) {
         navigator.clipboard.writeText(text);
-        alert("تم النسخ بنجاح: " + text);
+        showProtectionAlert("تم النسخ بنجاح: " + text);
       }
+
+      function showProtectionAlert(msg) {
+        const alert = document.getElementById("protection-alert");
+        alert.innerText = msg;
+        alert.style.display = "block";
+        setTimeout(() => (alert.style.display = "none"), 3000);
+      }
+
+      // Content Protection logic
+      document.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        showProtectionAlert("حقوق التصميم محفوظة لعلي أحمد ©");
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey && (e.key === "u" || e.key === "s" || e.key === "c")) {
+          e.preventDefault();
+          showProtectionAlert("حقوق الملكية الفكرية محفوظة.");
+        }
+      });
     </script>
 
-    <script src="assets/js/app.js"></script>
+    <div id="protection-alert"></div>
   </body>
 </html>

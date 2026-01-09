@@ -67,59 +67,57 @@ class RaedEngine {
     const cursor = document.querySelector(".custom-cursor");
     const cursorDot = document.querySelector(".cursor-dot");
 
-    // Ensure visibility
-    gsap.set([cursor, cursorDot], { opacity: 1, display: "block" });
+    gsap.set([cursor, cursorDot], { opacity: 0 });
 
     const moveCursor = (e) => {
       const { clientX: x, clientY: y } = e;
 
-      // Outer ring with slight delay
       gsap.to(cursor, {
         x: x,
         y: y,
-        duration: 0.3,
+        duration: 0.6,
+        ease: "power3.out",
+        xPercent: -50,
+        yPercent: -50,
+      });
+
+      gsap.to(cursorDot, {
+        x: x,
+        y: y,
+        duration: 0.1,
         ease: "power2.out",
         xPercent: -50,
         yPercent: -50,
       });
 
-      // Central dot - instant
-      gsap.to(cursorDot, {
-        x: x,
-        y: y,
-        duration: 0,
-        xPercent: -50,
-        yPercent: -50,
-      });
+      if (cursor.style.opacity === "0") {
+        gsap.to([cursor, cursorDot], { opacity: 1, duration: 0.5 });
+      }
     };
 
     window.addEventListener("mousemove", moveCursor);
-    document.addEventListener("mouseenter", () => {
-      gsap.to([cursor, cursorDot], { opacity: 1 });
-    });
-    document.addEventListener("mouseleave", () => {
-      gsap.to([cursor, cursorDot], { opacity: 0 });
-    });
 
-    // Hover Effects
+    // Hover Effects with smooth transitions
     document
-      .querySelectorAll("a, button, .pkg-card, .pay-card")
+      .querySelectorAll("a, button, .pkg-card, .pay-card, .testi-card")
       .forEach((el) => {
         el.addEventListener("mouseenter", () => {
           gsap.to(cursor, {
             scale: 1.5,
-            backgroundColor: "rgba(94, 59, 238, 0.1)",
-            borderColor: "#fff",
-            duration: 0.3,
+            backgroundColor: "rgba(94, 59, 238, 0.05)",
+            borderColor: "rgba(255,255,255,0.5)",
+            duration: 0.4,
           });
+          gsap.to(cursorDot, { scale: 0.5, duration: 0.4 });
         });
         el.addEventListener("mouseleave", () => {
           gsap.to(cursor, {
             scale: 1,
             backgroundColor: "transparent",
             borderColor: "#5e3bee",
-            duration: 0.3,
+            duration: 0.4,
           });
+          gsap.to(cursorDot, { scale: 1, duration: 0.4 });
         });
       });
   }
