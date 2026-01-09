@@ -1,6 +1,6 @@
 /**
- * Raed Ibrahim Identity Engine - 2026
- * Core Logic for 3D Background, Custom Cursor & Animations
+ * Ultimate Rebirth Engine - 2026
+ * Professional Architecture for Ultra-Premium Experience
  */
 
 class RaedEngine {
@@ -9,7 +9,6 @@ class RaedEngine {
     this.camera = null;
     this.renderer = null;
     this.particles = null;
-    this.sphere = null;
     this.mouseX = 0;
     this.mouseY = 0;
     this.targetX = 0;
@@ -43,40 +42,23 @@ class RaedEngine {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(this.renderer.domElement);
 
-    // Particle Field
-    const particlesGeometry = new THREE.BufferGeometry();
-    const count = 3000;
-    const positions = new Float32Array(count * 3);
+    // Ultra-Fine Particle System
+    const geo = new THREE.BufferGeometry();
+    const count = 4000;
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 20;
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
 
-    for (let i = 0; i < count * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 15;
-    }
-
-    particlesGeometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(positions, 3)
-    );
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.012,
-      color: 0x5e3bee,
+    const mat = new THREE.PointsMaterial({
+      size: 0.008,
+      color: 0xffffff,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.3,
       blending: THREE.AdditiveBlending,
     });
 
-    this.particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    this.particles = new THREE.Points(geo, mat);
     this.scene.add(this.particles);
-
-    // Wireframe Sphere
-    const sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({
-      color: 0x5e3bee,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.15,
-    });
-    this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    this.scene.add(this.sphere);
 
     this.animate();
   }
@@ -85,49 +67,77 @@ class RaedEngine {
     const cursor = document.querySelector(".custom-cursor");
     const cursorDot = document.querySelector(".cursor-dot");
 
-    document.addEventListener("mousemove", (e) => {
+    // Ensure visibility
+    gsap.set([cursor, cursorDot], { opacity: 1, display: "block" });
+
+    const moveCursor = (e) => {
+      const { clientX: x, clientY: y } = e;
+
+      // Outer ring with slight delay
       gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.5,
-        ease: "power3.out",
+        x: x,
+        y: y,
+        duration: 0.3,
+        ease: "power2.out",
+        xPercent: -50,
+        yPercent: -50,
       });
+
+      // Central dot - instant
       gsap.to(cursorDot, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.1,
+        x: x,
+        y: y,
+        duration: 0,
+        xPercent: -50,
+        yPercent: -50,
       });
+    };
+
+    window.addEventListener("mousemove", moveCursor);
+    document.addEventListener("mouseenter", () => {
+      gsap.to([cursor, cursorDot], { opacity: 1 });
+    });
+    document.addEventListener("mouseleave", () => {
+      gsap.to([cursor, cursorDot], { opacity: 0 });
     });
 
-    document.querySelectorAll("a, button").forEach((el) => {
-      el.addEventListener("mouseenter", () => cursor.classList.add("active"));
-      el.addEventListener("mouseleave", () =>
-        cursor.classList.remove("active")
-      );
-    });
+    // Hover Effects
+    document
+      .querySelectorAll("a, button, .pkg-card, .pay-card")
+      .forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          gsap.to(cursor, {
+            scale: 1.5,
+            backgroundColor: "rgba(94, 59, 238, 0.1)",
+            borderColor: "#fff",
+            duration: 0.3,
+          });
+        });
+        el.addEventListener("mouseleave", () => {
+          gsap.to(cursor, {
+            scale: 1,
+            backgroundColor: "transparent",
+            borderColor: "#5e3bee",
+            duration: 0.3,
+          });
+        });
+      });
   }
 
   initAnimations() {
     gsap.from(".hero-content h1", {
-      y: 100,
+      letterSpacing: "50px",
+      opacity: 0,
+      duration: 2,
+      ease: "power4.out",
+    });
+
+    gsap.from(".hero-content p", {
+      y: 30,
       opacity: 0,
       duration: 1.5,
-      ease: "expo.out",
-      delay: 0.5,
-    });
-    gsap.from(".hero-content p", {
-      y: 50,
-      opacity: 0,
-      duration: 1.2,
-      ease: "power3.out",
       delay: 1,
-    });
-    gsap.from(".nav-links li", {
-      opacity: 0,
-      y: -20,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power2.out",
+      ease: "power3.out",
     });
   }
 
@@ -138,9 +148,9 @@ class RaedEngine {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    document.addEventListener("mousemove", (e) => {
-      this.targetX = (e.clientX - window.innerWidth / 2) * 0.001;
-      this.targetY = (e.clientY - window.innerHeight / 2) * 0.001;
+    window.addEventListener("mousemove", (e) => {
+      this.targetX = (e.clientX - window.innerWidth / 2) * 0.0005;
+      this.targetY = (e.clientY - window.innerHeight / 2) * 0.0005;
     });
   }
 
@@ -150,12 +160,9 @@ class RaedEngine {
     this.mouseX += (this.targetX - this.mouseX) * 0.05;
     this.mouseY += (this.targetY - this.mouseY) * 0.05;
 
-    this.particles.rotation.y += 0.001;
+    this.particles.rotation.y += 0.0005;
     this.particles.rotation.x = this.mouseY;
     this.particles.rotation.y = this.mouseX;
-
-    this.sphere.rotation.y += 0.005;
-    this.sphere.rotation.x += 0.002;
 
     this.renderer.render(this.scene, this.camera);
   }

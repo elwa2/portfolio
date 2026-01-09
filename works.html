@@ -51,25 +51,26 @@
       /* Custom Cursor */
       .custom-cursor {
         position: fixed;
+        top: 0;
+        left: 0;
         width: 40px;
         height: 40px;
         border: 1px solid var(--primary);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
-        transition: transform 0.3s ease;
-        transform: translate(-50%, -50%);
       }
 
       .cursor-dot {
         position: fixed;
+        top: 0;
+        left: 0;
         width: 6px;
         height: 6px;
         background-color: var(--primary);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
-        transform: translate(-50%, -50%);
       }
 
       /* Content */
@@ -108,10 +109,19 @@
 
       .title-section h1 {
         font-family: var(--font-title);
-        font-size: 4rem;
-        font-weight: 400;
+        font-size: 8vw;
+        font-weight: 900;
         margin-bottom: 20px;
-        letter-spacing: 5px;
+        letter-spacing: -2px;
+        line-height: 0.9;
+        background: linear-gradient(
+          to bottom,
+          #fff 40%,
+          rgba(255, 255, 255, 0.1) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       .title-section p {
@@ -322,6 +332,24 @@
     <script>
       const projects = [
         {
+          name: "SHURFA SHOP",
+          desc: "متجر شرفة للمنتجات المتميزة، تصميم عصري وتجربة مستخدم سلسة.",
+          url: "https://shurfa.shop/",
+          img: "assets/images/prt/33.jpeg",
+        },
+        {
+          name: "JEWELER-Y",
+          desc: "متجر الجواهري للمجوهرات، فخامة في العرض ودقة في التفاصيل.",
+          url: "https://jeweler-y-inc.com/",
+          img: "assets/images/prt/32.jpeg",
+        },
+        {
+          name: "VIOLET BOUQUETS",
+          desc: "باقة بنفسج للزهور، لمسات فنية وتنسيق احترافي.",
+          url: "https://violetbouquets.com/ar",
+          img: "assets/images/prt/31.jpeg",
+        },
+        {
           name: "TAMAYOZ STORE",
           desc: "تخصيص متجر تميز على منصة سلة بأداء فائق وتصميم نيون.",
           url: "https://tamayoz-store.com",
@@ -344,12 +372,6 @@
           desc: "مشروع ميكس فايبر، تحويل التصميم إلى واقع رقمي متكامل.",
           url: "https://mixfiber.com",
           img: "assets/images/portfolio/4.jpg",
-        },
-        {
-          name: "SALLA DESIGN",
-          desc: "هوية بصرية كاملة وتعديل CSS متقدم لمتجر سلة.",
-          url: "https://salla.sa",
-          img: "assets/images/portfolio/5.jpg",
         },
       ];
 

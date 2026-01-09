@@ -43,25 +43,26 @@
       /* Custom Cursor */
       .custom-cursor {
         position: fixed;
+        top: 0;
+        left: 0;
         width: 40px;
         height: 40px;
         border: 1px solid var(--primary);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
-        transition: transform 0.3s ease;
-        transform: translate(-50%, -50%);
       }
 
       .cursor-dot {
         position: fixed;
+        top: 0;
+        left: 0;
         width: 6px;
         height: 6px;
         background-color: var(--primary);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
-        transform: translate(-50%, -50%);
       }
 
       .custom-cursor.active {
@@ -120,111 +121,155 @@
         color: var(--primary);
       }
 
-      /* Hero Section */
+      /* Hero Section Rebirth */
       .hero {
         height: 100vh;
         display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        padding: 0 10%;
+        text-align: center;
+        padding: 0 5%;
         position: relative;
       }
 
       .hero-content {
-        max-width: 800px;
         z-index: 10;
-      }
-
-      .hero-content span {
-        font-family: var(--font-main);
-        font-weight: 800;
-        font-size: 0.9rem;
-        letter-spacing: 5px;
-        color: var(--primary);
-        text-transform: uppercase;
-        display: block;
-        margin-bottom: 20px;
+        width: 100%;
       }
 
       .hero-content h1 {
         font-family: var(--font-title);
-        font-size: 5rem;
-        font-weight: 400;
-        line-height: 1.1;
+        font-size: 10vw;
+        font-weight: 900;
+        line-height: 0.9;
         margin-bottom: 30px;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+        background: linear-gradient(
+          to bottom,
+          #fff 40%,
+          rgba(255, 255, 255, 0.1) 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       .hero-content p {
         font-family: var(--font-ar);
-        font-size: 1.2rem;
-        max-width: 500px;
-        opacity: 0.7;
-        margin-bottom: 40px;
-      }
-
-      /* Buttons */
-      .btn-premium {
-        padding: 15px 40px;
-        border: 1px solid var(--primary);
-        background: transparent;
-        color: var(--text);
-        font-family: var(--font-main);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 0.8rem;
-        font-weight: 800;
-        transition: 0.4s;
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-        text-decoration: none;
-      }
-
-      .btn-premium:hover {
-        background-color: var(--primary);
-        box-shadow: 0 0 30px rgba(94, 59, 238, 0.4);
-        transform: translateY(-5px);
-      }
-
-      /* Neon Snake Border Element */
-      .hero-image-container {
-        position: absolute;
-        right: 15%;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 400px;
-        height: 500px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        overflow: hidden;
-      }
-
-      .hero-image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.8;
-        filter: grayscale(100%);
-        transition: 0.5s;
-      }
-
-      .hero-image-container:hover img {
-        filter: grayscale(0%);
-        opacity: 1;
+        font-size: 1.4rem;
+        max-width: 700px;
+        opacity: 0.5;
+        margin: 0 auto 50px;
+        letter-spacing: 1px;
       }
 
       /* Mobile adjustment */
       @media (max-width: 768px) {
         .hero-content h1 {
-          font-size: 3rem;
-        }
-        .hero-image-container {
-          display: none;
+          font-size: 4rem;
         }
         header {
           padding: 20px 5%;
         }
         nav .nav-links {
           display: none;
+        }
+      }
+
+      /* Data Rich Styles */
+      .pkg-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 40px;
+        border-radius: 30px;
+        transition: 0.5s;
+        position: relative;
+        overflow: hidden;
+      }
+      .pkg-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 10px 40px rgba(94, 59, 238, 0.1);
+      }
+      .pkg-features {
+        list-style: none;
+        margin: 30px 0;
+        text-align: right;
+      }
+      .pkg-features li {
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .pkg-features li::before {
+        content: "✓";
+        color: var(--primary);
+        font-weight: 900;
+      }
+
+      .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+      .pay-card {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+      }
+      .copy-area {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px 15px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .btn-copy {
+        background: var(--primary);
+        border: none;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.7rem;
+        cursor: pointer;
+      }
+
+      /* Marquee */
+      .marquee-container {
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 50px 0;
+        background: #000;
+      }
+      .marquee-content {
+        display: inline-block;
+        animation: marquee 30s linear infinite;
+      }
+      .marquee-content img {
+        height: 50px;
+        margin: 0 40px;
+        opacity: 0.4;
+        filter: grayscale(1);
+        transition: 0.3s;
+      }
+      .marquee-content img:hover {
+        opacity: 1;
+        filter: grayscale(0);
+      }
+      @keyframes marquee {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
         }
       }
     </style>
@@ -250,133 +295,282 @@
     </header>
 
     <main>
+      <!-- Hero -->
       <section class="hero" id="home">
         <div class="hero-content">
-          <span>Visual Architect & Developer</span>
-          <h1>MODERN<br />DIGITAL<br />ARTISTRY</h1>
-          <p>
-            أنا علي أحمد، مصمم ومطور واجهات أمامية متخصص في تحويل الأفكار إلى
-            واقع رقمي فائق الجمال. خبرة أكثر من 5 سنوات في تخصيص متاجر سلة وزد
-            وتطوير المواقع بأحدث التقنيات.
-          </p>
-          <a href="works.html" class="btn-premium">مشاهدة معرض الأعمال</a>
-        </div>
-
-        <div class="hero-image-container">
-          <img
-            src="assets/images/avatar_male.webp"
-            alt="Ali Ahmed"
-            onerror="this.src='https://via.placeholder.com/800x1000/000/fff?text=ALI+AHMED'"
-          />
-          <div
+          <h1>THE<br />DIGITAL<br />ARCHITECT</h1>
+          <p>أين تلتقي الفخامة بالوظيفة. متخصص في بناء تجارب سلة وزد عالمية.</p>
+          <a
+            href="#services"
+            class="btn-premium"
             style="
-              position: absolute;
-              bottom: 20px;
-              left: 20px;
-              background: rgba(0, 0, 0, 0.5);
-              padding: 10px 20px;
-              border-radius: 10px;
-              backdrop-filter: blur(5px);
-              border: 1px solid rgba(94, 59, 238, 0.3);
+              padding: 15px 60px;
+              border: 1px solid #fff;
+              border-radius: 50px;
             "
+            >OUR SERVICES</a
           >
-            <p style="font-size: 0.8rem; margin: 0; letter-spacing: 2px">
-              ALI AHMED EXCLUSIVE
-            </p>
-          </div>
         </div>
       </section>
 
-      <!-- Services Section -->
-      <section class="services" id="about" style="padding: 100px 10%">
-        <div style="text-align: center; margin-bottom: 60px">
-          <h2
-            style="
-              font-family: var(--font-title);
-              font-size: 3rem;
-              letter-spacing: 5px;
-            "
-          >
-            SERVICES
+      <!-- Services Redbirth (Detailed) -->
+      <section class="services" id="services" style="padding: 150px 10%">
+        <div style="margin-bottom: 80px">
+          <h2 style="font-family: var(--font-title); font-size: 4rem">
+            ELITE PACKAGES
           </h2>
-          <p style="font-family: var(--font-ar); opacity: 0.6">
-            خدمات احترافية مصممة خصيصاً لنمو تجارتك الإلكترونية
+          <p style="opacity: 0.4">
+            باقات متكاملة تبدأ من الإنشاء وتنتهي بالنجاح.
           </p>
         </div>
 
         <div
           style="
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
           "
         >
-          <!-- Service 1 -->
-          <div
-            class="work-card"
-            style="
-              padding: 40px;
-              text-align: center;
-              background: rgba(255, 255, 255, 0.02);
-              border: 1px solid rgba(255, 255, 255, 0.05);
-              border-radius: 20px;
-              transition: 0.5s;
-            "
-          >
-            <div style="font-size: 3rem; margin-bottom: 20px">🛍️</div>
-            <h3 style="font-family: var(--font-title); margin-bottom: 15px">
-              SALLA EXPERT
-            </h3>
-            <p style="font-family: var(--font-ar); opacity: 0.7">
-              تجهيز وتنسيق متاجر سلة، تعديل الثيمات ببرمجيات CSS/JS خاصة لجعل
-              متجرك فريداً.
+          <!-- Package 1 -->
+          <div class="pkg-card">
+            <h3>باقة الانشاء</h3>
+            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
+              للانطلاق السريع نحو الاحتراف.
             </p>
+            <ul class="pkg-features">
+              <li>تصميم متجر إلكتروني احترافي</li>
+              <li>واجهة مستخدم سهلة وجذابة</li>
+              <li>توافق مع جميع الأجهزة</li>
+              <li>ربط بوابات الدفع</li>
+              <li>تدريب على إدارة المتجر</li>
+            </ul>
+            <a
+              href="https://wa.me/201002241591"
+              class="btn-premium"
+              style="width: 100%; text-align: center; border-radius: 50px"
+              >ORDER NOW</a
+            >
           </div>
-          <!-- Service 2 -->
-          <div
-            class="work-card"
-            style="
-              padding: 40px;
-              text-align: center;
-              background: rgba(255, 255, 255, 0.02);
-              border: 1px solid rgba(255, 255, 255, 0.05);
-              border-radius: 20px;
-              transition: 0.5s;
-            "
-          >
-            <div style="font-size: 3rem; margin-bottom: 20px">📦</div>
-            <h3 style="font-family: var(--font-title); margin-bottom: 15px">
-              ZID SPECIALIST
-            </h3>
-            <p style="font-family: var(--font-ar); opacity: 0.7">
-              تخصيص كامل لمنصة زد، تركيب الأكواد الإحصائية، وتحسين تجربة
-              المستخدم بشكل كامل.
+          <!-- Package 2 -->
+          <div class="pkg-card" style="border-color: var(--primary)">
+            <div
+              style="
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                color: var(--primary);
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+              "
+            >
+              MOST POPULAR
+            </div>
+            <h3>باقة رواد الأعمال</h3>
+            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
+              الحل الشامل لبناء علامة تجارية.
             </p>
+            <ul class="pkg-features">
+              <li>تصميم هوية بصرية كاملة</li>
+              <li>إنشاء متجر إلكتروني احترافي</li>
+              <li>استضافة لمدة سنة</li>
+              <li>إعداد وسائل التواصل الاجتماعي</li>
+              <li>دعم فني لمدة 3 أشهر</li>
+            </ul>
+            <a
+              href="https://wa.me/201002241591"
+              class="btn-premium"
+              style="
+                width: 100%;
+                text-align: center;
+                border-radius: 50px;
+                background: var(--primary);
+              "
+              >ORDER NOW</a
+            >
           </div>
-          <!-- Service 3 -->
-          <div
-            class="work-card"
-            style="
-              padding: 40px;
-              text-align: center;
-              background: rgba(255, 255, 255, 0.02);
-              border: 1px solid rgba(255, 255, 255, 0.05);
-              border-radius: 20px;
-              transition: 0.5s;
-            "
-          >
-            <div style="font-size: 3rem; margin-bottom: 20px">💻</div>
-            <h3 style="font-family: var(--font-title); margin-bottom: 15px">
-              UI/UX DEV
-            </h3>
-            <p style="font-family: var(--font-ar); opacity: 0.7">
-              تطوير واجهات أمامية احترافية، تحويل ملفات Figma إلى أكواد نظيفة
-              وسريعة التحميل.
+          <!-- Package 3 -->
+          <div class="pkg-card">
+            <h3>الباقة الكاملة</h3>
+            <p style="opacity: 0.5; font-size: 0.8rem; margin: 10px 0">
+              من الإنشاء إلى أول مبيعة.
             </p>
+            <ul class="pkg-features">
+              <li>جميع مميزات الباقات السابقة</li>
+              <li>استراتيجية تسويقية متكاملة</li>
+              <li>حملات إعلانية مدفوعة</li>
+              <li>تحسين محركات البحث SEO</li>
+              <li>تقارير أداء شهرية</li>
+            </ul>
+            <a
+              href="https://wa.me/201002241591"
+              class="btn-premium"
+              style="width: 100%; text-align: center; border-radius: 50px"
+              >ORDER NOW</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Partners Marquee -->
+      <section class="marquee-container">
+        <div class="marquee-content">
+          <img src="assets/images/logos/1.png" alt="P1" />
+          <img src="assets/images/logos/2.webp" alt="P2" />
+          <img src="assets/images/logos/3.webp" alt="P3" />
+          <img src="assets/images/logos/4.png" alt="P4" />
+          <img src="assets/images/logos/5.webp" alt="P5" />
+          <img src="assets/images/logos/6.png" alt="P6" />
+          <img src="assets/images/logos/7.png" alt="P7" />
+          <img src="assets/images/salla.svg" alt="Salla" />
+          <img src="assets/images/zid.svg" alt="Zid" />
+          <!-- Duplicate for seamless loop -->
+          <img src="assets/images/logos/1.png" alt="P1" />
+          <img src="assets/images/logos/2.webp" alt="P2" />
+          <img src="assets/images/logos/3.webp" alt="P3" />
+          <img src="assets/images/logos/4.png" alt="P4" />
+        </div>
+      </section>
+
+      <!-- Payment & Contact Hub -->
+      <section id="contact" style="padding: 150px 10%; background: #050505">
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px">
+          <!-- Contact Side -->
+          <div>
+            <h2 style="font-family: var(--font-title); font-size: 3rem">
+              LETS<br />CONNECT
+            </h2>
+            <p style="opacity: 0.4; margin: 20px 0">
+              هل تريد متجراً مميزاً يزيد من مبيعاتك؟ تواصل معي الآن.
+            </p>
+            <a
+              href="https://wa.me/201002241591"
+              class="btn-premium"
+              style="
+                padding: 20px 40px;
+                border-radius: 50px;
+                background: #25d366;
+                border: none;
+              "
+              >CHAT ON WHATSAPP</a
+            >
+          </div>
+
+          <!-- Payment Side -->
+          <div class="payment-grid">
+            <div class="pay-card">
+              <h4>Bank Transfer (بنك مصر)</h4>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem"
+                  >ACCOUNT: Ali Ahmed Abd elrazek</span
+                >
+                <button
+                  class="btn-copy"
+                  onclick="copyText('Ali Ahmed Abd elrazek')"
+                >
+                  Copy
+                </button>
+              </div>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem"
+                  >IBAN: EG410002002300000002360875231</span
+                >
+                <button
+                  class="btn-copy"
+                  onclick="copyText('EG410002002300000002360875231')"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="pay-card">
+              <h4>Vodafone Cash / InstaPay</h4>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem">PHONE: 01002241591</span>
+                <button class="btn-copy" onclick="copyText('01002241591')">
+                  Copy
+                </button>
+              </div>
+              <div class="copy-area">
+                <span style="font-size: 0.7rem">INSTAPAY: elwa1@instapay</span>
+                <button class="btn-copy" onclick="copyText('elwa1@instapay')">
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Salla Discounts -->
+      <section style="padding: 100px 10%">
+        <h2
+          style="
+            font-family: var(--font-title);
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 50px;
+          "
+        >
+          SALLA DISCOUNTS
+        </h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div class="pkg-card" style="text-align: center">
+            <h4>ثيم سيليا</h4>
+            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+              F-PSDOIDV4
+            </p>
+            <button
+              class="btn-premium"
+              style="border-radius: 50px"
+              onclick="copyText('F-PSDOIDV4')"
+            >
+              COPY COUPON
+            </button>
+          </div>
+          <div class="pkg-card" style="text-align: center">
+            <h4>ثيم ملاك</h4>
+            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+              F-YLKSA1DX
+            </p>
+            <button
+              class="btn-premium"
+              style="border-radius: 50px"
+              onclick="copyText('F-YLKSA1DX')"
+            >
+              COPY COUPON
+            </button>
+          </div>
+          <div class="pkg-card" style="text-align: center">
+            <h4>كود باقات سلة</h4>
+            <p style="font-size: 2rem; color: var(--primary); margin: 15px 0">
+              F-AFN5N48K
+            </p>
+            <button
+              class="btn-premium"
+              style="border-radius: 50px"
+              onclick="copyText('F-AFN5N48K')"
+            >
+              COPY COUPON
+            </button>
           </div>
         </div>
       </section>
     </main>
+
+    <!-- Essential Scripts & Final Cursor Solution -->
+    <script src="assets/js/app.js"></script>
+    <script>
+      function copyText(text) {
+        navigator.clipboard.writeText(text);
+        alert("تم النسخ بنجاح: " + text);
+      }
+    </script>
 
     <script src="assets/js/app.js"></script>
   </body>
