@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- 🔐 حماية الموقع -->
+    <script src="assets/js/protection.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>معرض الأعمال | Ali Ahmed - Premium Portfolio</title>
+    <meta
+      name="description"
+      content="معرض أعمالنا - تصميمات متاجر سلة وزد الاحترافية. شاهد أكثر من 150 متجر تم تصميمه بطريقة إبداعية."
+    />
+    <meta name="author" content="Ali Ahmed" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- أيقونة الموقع (Favicon) -->
+    <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml" />
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- SVG Icons -->
+    <link rel="stylesheet" href="assets/css/svg-icons.css" />
+    <script src="assets/js/svg-icons.js" defer></script>
+    <!-- ملفات CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/floating-whatsapp.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+    <link rel="stylesheet" href="assets/css/design-enhancements.css" />
+
+    <style>
+      /* أنماط صفحة الأعمال */
+      .works-page {
+        min-height: 100vh;
+        padding-top: 120px;
+        background-color: var(--bg-color);
+      }
+
+      .works-header {
+        text-align: center;
+        margin-bottom: 50px;
+        padding: 40px 20px;
+        background: linear-gradient(
+          135deg,
+          rgba(var(--primary-rgb), 0.1) 0%,
+          rgba(var(--primary-rgb), 0.05) 100%
+        );
+        border-radius: var(--border-radius-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .works-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="2" cy="2" r="1" fill="rgba(138, 125, 219, 0.1)"/></svg>');
+        opacity: 0.5;
+        z-index: 0;
+      }
+
+      .works-header h1 {
+        font-size: 2.8rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .works-header p {
+        color: var(--text-color-light);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary-gradient);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .back-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.3);
+        color: white;
+      }
+
+      .back-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+
+      /* شبكة الصور */
+      .works-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        padding: 20px 0;
+      }
+
+      .work-card {
+        position: relative;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: var(--card-bg);
+        aspect-ratio: 16/14;
+      }
+
+      .work-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(var(--primary-rgb), 0.2);
+      }
+
+      .work-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+        transition: all 1.5s ease-in-out;
+      }
+
+      .work-card:hover img {
+        object-position: bottom;
+      }
+
+      .work-card-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.8) 0%,
+          transparent 100%
+        );
+        padding: 30px 20px 20px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+      }
+
+      .work-card:hover .work-card-overlay {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .work-card-overlay h3 {
+        color: white;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+      }
+
+      .work-card-overlay a {
+        color: var(--light-purple);
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .work-card-overlay a:hover {
+        color: white;
+      }
+
+      /* Pagination */
+      .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 50px 0;
+        flex-wrap: wrap;
+      }
+
+      .pagination-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 1rem;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .pagination-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-2px);
+      }
+
+      .pagination-btn.active {
+        background: var(--primary-gradient);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .pagination-btn.nav-btn {
+        width: auto;
+        padding: 0 20px;
+        gap: 5px;
+      }
+
+      .pagination-btn.nav-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+
+      .pagination-info {
+        color: var(--text-color-light);
+        font-size: 0.95rem;
+        padding: 0 15px;
+      }
+
+      /* Footer بسيط */
+      .works-footer {
+        text-align: center;
+        padding: 40px 20px;
+        background: var(--bg-color-alt);
+        margin-top: 50px;
+      }
+
+      .works-footer p {
+        color: var(--text-color-light);
+      }
+
+      .works-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .works-page {
+          padding-top: 100px;
+        }
+
+        .works-header h1 {
+          font-size: 2rem;
+        }
+
+        .works-gallery {
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 15px;
+        }
+
+        .pagination-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 0.9rem;
+        }
+
+        .pagination-btn.nav-btn {
+          padding: 0 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .works-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .work-card {
+          aspect-ratio: 16/12;
+        }
+      }
+
+      /* Hidden pages */
+      .works-page-content {
+        display: none;
+      }
+
+      .works-page-content.active {
+        display: grid;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <!-- خلفية أيقونات متحركة -->
+    <div class="floating-background">
+      <div class="page-liquid-bg">
+        <div class="page-blob"></div>
+        <div class="page-blob"></div>
+        <div class="page-blob"></div>
+      </div>
+    </div>
+
+    <!-- القائمة العلوية -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="index.html">
+              <img src="assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="index.html#home">الرئيسية</a></li>
+              <li><a href="index.html#about">من نحن</a></li>
+              <li><a href="index.html#services">خدماتنا</a></li>
+              <li><a href="index.html#portfolio" class="active">أعمالنا</a></li>
+              <li><a href="index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <a
+              href="https://wa.me/201002241591"
+              class="header-whatsapp-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-whatsapp"></use>
+              </svg>
+              <span>تواصل معنا</span>
+            </a>
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- محتوى الصفحة -->
+    <main class="works-page">
+      <div class="container">
+        <!-- رأس الصفحة -->
+        <div class="works-header">
+          <h1>🖼️ معرض الأعمال</h1>
+          <p>
+            أكثر من 150 متجر تم تصميمه بطريقة إبداعية واحترافية. استعرض أعمالنا
+            واحصل على الإلهام لمتجرك!
+          </p>
+          <a href="index.html#portfolio" class="back-btn">
+            <svg viewBox="0 0 448 512">
+              <use xlink:href="assets/images/icons.svg#icon-arrow-right"></use>
+            </svg>
+            العودة للرئيسية
+          </a>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 1 -->
+        <div class="works-gallery works-page-content active" id="page-1">
+          <div class="work-card">
+            <img src="assets/images/prt/33.jpeg" alt="شرفة" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>شرفة</h3>
+              <a href="https://shurfa.shop/" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img
+              src="assets/images/prt/32.jpeg"
+              alt="الجواهري"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>الجواهري</h3>
+              <a href="https://jeweler-y-inc.com/" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img
+              src="assets/images/prt/31.jpeg"
+              alt="باقة بنفسج"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>باقة بنفسج</h3>
+              <a href="https://violetbouquets.com/ar" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img
+              src="assets/images/prt/30.jpeg"
+              alt="قيمر لايت"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>قيمر لايت</h3>
+              <a href="https://gamer2light.com/ar" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img
+              src="assets/images/prt/29.jpeg"
+              alt="قيمر لايت 2"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>قيمر لايت</h3>
+              <a href="https://gamer2light.com/ar" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img
+              src="assets/images/prt/28.jpeg"
+              alt="محمصة سييد"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>محمصة سييد</h3>
+              <a href="https://seedroastery.com/" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 2 -->
+        <div class="works-gallery works-page-content" id="page-2">
+          <div class="work-card">
+            <img
+              src="assets/images/prt/27.jpeg"
+              alt="متجر جاذبية"
+              loading="lazy"
+            />
+            <div class="work-card-overlay">
+              <h3>متجر جاذبية</h3>
+              <a href="https://jazebia.com/" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/26.jpeg" alt="قرناس" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>قرناس - QRNAS</h3>
+              <a href="https://qrnas-ksa.com/" target="_blank">
+                <svg
+                  class="svg-icon"
+                  viewBox="0 0 512 512"
+                  style="width: 14px; height: 14px; fill: currentColor"
+                >
+                  <use
+                    xlink:href="assets/images/icons.svg#icon-external-link"
+                  ></use>
+                </svg>
+                زيارة المتجر
+              </a>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/25.jpeg" alt="عمل 25" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/24.jpeg" alt="عمل 24" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/23.jpeg" alt="عمل 23" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/22.jpeg" alt="عمل 22" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 3 -->
+        <div class="works-gallery works-page-content" id="page-3">
+          <div class="work-card">
+            <img src="assets/images/prt/21.jpeg" alt="عمل 21" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/20.jpeg" alt="عمل 20" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/19.jpeg" alt="عمل 19" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/18.jpeg" alt="عمل 18" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/17.jpeg" alt="عمل 17" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/16.jpeg" alt="عمل 16" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 4 -->
+        <div class="works-gallery works-page-content" id="page-4">
+          <div class="work-card">
+            <img src="assets/images/prt/15.jpeg" alt="عمل 15" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/14.jpeg" alt="عمل 14" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/13.jpeg" alt="عمل 13" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/12.jpeg" alt="عمل 12" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/11.jpeg" alt="عمل 11" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/10.jpeg" alt="عمل 10" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 5 -->
+        <div class="works-gallery works-page-content" id="page-5">
+          <div class="work-card">
+            <img src="assets/images/prt/9.jpeg" alt="عمل 9" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/8.jpeg" alt="عمل 8" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/7.jpeg" alt="عمل 7" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/6.jpeg" alt="عمل 6" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/5.jpeg" alt="عمل 5" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/4.jpeg" alt="عمل 4" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- شبكة الأعمال - الصفحة 6 -->
+        <div class="works-gallery works-page-content" id="page-6">
+          <div class="work-card">
+            <img src="assets/images/prt/3.jpeg" alt="عمل 3" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/2.jpeg" alt="عمل 2" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+          <div class="work-card">
+            <img src="assets/images/prt/1.jpeg" alt="عمل 1" loading="lazy" />
+            <div class="work-card-overlay">
+              <h3>تصميم متجر</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- أزرار الصفحات -->
+        <div class="pagination-wrapper">
+          <button
+            class="pagination-btn nav-btn"
+            id="prev-btn"
+            onclick="changePage('prev')"
+          >
+            <svg viewBox="0 0 448 512">
+              <use
+                xlink:href="assets/images/icons.svg#icon-chevron-right"
+              ></use>
+            </svg>
+            السابق
+          </button>
+
+          <button
+            class="pagination-btn active"
+            data-page="1"
+            onclick="goToPage(1)"
+          >
+            1
+          </button>
+          <button class="pagination-btn" data-page="2" onclick="goToPage(2)">
+            2
+          </button>
+          <button class="pagination-btn" data-page="3" onclick="goToPage(3)">
+            3
+          </button>
+          <button class="pagination-btn" data-page="4" onclick="goToPage(4)">
+            4
+          </button>
+          <button class="pagination-btn" data-page="5" onclick="goToPage(5)">
+            5
+          </button>
+          <button class="pagination-btn" data-page="6" onclick="goToPage(6)">
+            6
+          </button>
+
+          <span class="pagination-info"
+            >الصفحة <span id="current-page">1</span> من 6</span
+          >
+
+          <button
+            class="pagination-btn nav-btn"
+            id="next-btn"
+            onclick="changePage('next')"
+          >
+            التالي
+            <svg viewBox="0 0 448 512">
+              <use xlink:href="assets/images/icons.svg#icon-chevron-left"></use>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="works-footer">
+        <p>
+          جميع الحقوق محفوظة &copy; 2024 - <a href="index.html">Ali Ahmed</a>
+        </p>
+      </footer>
+    </main>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+      rel="noopener"
+      aria-label="تواصل معنا عبر واتساب"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512" aria-hidden="true">
+        <use xlink:href="assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <!-- وظائف الموقع الأساسية -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+      // Pagination Logic
+      let currentPage = 1;
+      const totalPages = 6;
+
+      function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+
+        // Hide all pages
+        document.querySelectorAll(".works-page-content").forEach((el) => {
+          el.classList.remove("active");
+        });
+
+        // Show target page
+        document.getElementById(`page-${page}`).classList.add("active");
+
+        // Update buttons
+        document
+          .querySelectorAll(".pagination-btn[data-page]")
+          .forEach((btn) => {
+            btn.classList.remove("active");
+            if (parseInt(btn.dataset.page) === page) {
+              btn.classList.add("active");
+            }
+          });
+
+        // Update current page display
+        document.getElementById("current-page").textContent = page;
+        currentPage = page;
+
+        // Update nav buttons state
+        document.getElementById("prev-btn").disabled = page === 1;
+        document.getElementById("next-btn").disabled = page === totalPages;
+
+        // Scroll to top of gallery
+        document
+          .querySelector(".works-header")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function changePage(direction) {
+        if (direction === "next" && currentPage < totalPages) {
+          goToPage(currentPage + 1);
+        } else if (direction === "prev" && currentPage > 1) {
+          goToPage(currentPage - 1);
+        }
+      }
+
+      // Theme toggle function
+      function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+      }
+
+      // Load saved theme
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      });
+    </script>
+  </body>
+</html>
