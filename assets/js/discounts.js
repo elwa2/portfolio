@@ -313,15 +313,168 @@ function renderDiscounts() {
 
   container.innerHTML = "";
 
-  // Grid styling
+  // 1. Inject CSS Styles for Premium Animation & Layout
+  const styleId = "discount-premium-styles";
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.innerHTML = `
+        /* Premium Row Layout */
+        .premium-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .premium-row {
+                flex-direction: column;
+            }
+        }
+
+        /* Animated Border Card */
+        .animated-border-card {
+            position: relative;
+            background: #0b0b12; /* Inner bg */
+            border-radius: 20px;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2px; /* Border thickness */
+        }
+        
+        /* The Moving Gradient */
+        .animated-border-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--card-color));
+            animation: rotateBorder 4s linear infinite;
+            z-index: -2;
+        }
+
+        /* Inner Content Mask */
+        .animated-border-card .card-content {
+            background: #0b0b12;
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            padding: 30px 20px;
+            position: relative;
+            z-index: -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes rotateBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Shine Effect overlay */
+        .card-shine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Grid styling for main container
   container.style.display = "grid";
   container.style.gridTemplateColumns = "repeat(auto-fill, minmax(300px, 1fr))";
   container.style.gap = "25px";
 
-  discountCodes.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "discount-card";
-    card.style.cssText = `
+  // 2. Create Premium Row Container
+  const premiumRow = document.createElement("div");
+  premiumRow.className = "premium-row";
+  container.appendChild(premiumRow);
+
+  discountCodes.forEach((item, index) => {
+    const isSpecial = index < 2;
+
+    if (isSpecial) {
+      // --- Premium Card (First 2) ---
+      const card = document.createElement("div");
+      card.className = "discount-card animated-border-card";
+      card.style.flex = "1"; // Share width equally in flex container
+      card.style.setProperty("--card-color", item.color);
+
+      // Hover effects
+      card.onmouseover = function () {
+        this.querySelector(
+          ".animated-border-card::before"
+        ).style.animationDuration = "2s";
+      };
+      card.onmouseout = function () {
+        this.querySelector(
+          ".animated-border-card::before"
+        ).style.animationDuration = "4s";
+      };
+
+      card.innerHTML = `
+            <div class="card-content">
+                <div class="card-shine"></div>
+                <h2 style="color: ${item.color}; margin-bottom: 25px; font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; text-shadow: 0 0 40px ${item.color}60;">${item.theme}</h2>
+                
+                <div style="margin-bottom: 35px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 2px; font-family: monospace; text-shadow: 0 2px 5px rgba(0,0,0,0.5);">${item.code}</div>
+                    <div style="color: #888; font-size: 0.95rem; margin-top: 12px; font-weight: 500;">خصم خاص وحصري</div>
+                </div>
+                
+                <div style="display: flex; gap: 20px; width: 100%; max-width: 400px; z-index: 1;">
+                     <button class="btn-copy" onclick="copyDiscountCode('${item.code}', this, '${item.color}')" style="
+                        flex: 1;
+                        padding: 16px;
+                        border-radius: 12px;
+                        background: ${item.color};
+                        color: #fff;
+                        border: none;
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 10px 25px ${item.color}40;
+                    ">نسخ الكود</button>
+
+                     <a href="${item.link}" target="_blank" style="
+                        flex: 1;
+                        padding: 16px;
+                        border-radius: 12px;
+                        background: rgba(255,255,255,0.03);
+                        color: #fff;
+                        text-decoration: none;
+                        font-weight: 600;
+                        font-size: 1.1rem;
+                        border: 1px solid rgba(255,255,255,0.1);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.borderColor='${item.color}'; this.style.color='${item.color}'; this.style.background='${item.color}10'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#fff'; this.style.background='rgba(255,255,255,0.03)'">تفعيله الآن</a>
+                </div>
+            </div>
+      `;
+      premiumRow.appendChild(card);
+    } else {
+      // --- Standard Theme Card (Rest) ---
+      const card = document.createElement("div");
+      card.className = "discount-card";
+      card.style.cssText = `
             background: #151521; 
             padding: 35px 25px; 
             border-radius: 20px; 
@@ -331,23 +484,23 @@ function renderDiscounts() {
             position: relative;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        `;
+      `;
 
-    // Add hover effect
-    card.onmouseover = function () {
-      this.style.transform = "translateY(-10px)";
-      this.style.boxShadow = `0 15px 40px -10px ${item.color}40`; // 40 is hex opacity
-      this.style.borderColor = `${item.color}40`;
-    };
-    card.onmouseout = function () {
-      this.style.transform = "translateY(0)";
-      this.style.boxShadow = "0 10px 30px rgba(0,0,0,0.2)";
-      this.style.borderColor = "rgba(255,255,255,0.05)";
-    };
+      // Standard Hover Effect
+      card.onmouseover = function () {
+        this.style.transform = "translateY(-10px)";
+        this.style.boxShadow = `0 15px 40px -10px ${item.color}40`;
+        this.style.borderColor = `${item.color}40`;
+      };
+      card.onmouseout = function () {
+        this.style.transform = "translateY(0)";
+        this.style.boxShadow = "0 10px 30px rgba(0,0,0,0.2)";
+        this.style.borderColor = "rgba(255,255,255,0.05)";
+      };
 
-    // Glow element at top
-    const glowPoints = document.createElement("div");
-    glowPoints.style.cssText = `
+      // Glow element
+      const glowPoints = document.createElement("div");
+      glowPoints.style.cssText = `
             position: absolute;
             top: -50px;
             left: 50%;
@@ -358,10 +511,10 @@ function renderDiscounts() {
             filter: blur(60px);
             opacity: 0.2;
             pointer-events: none;
-        `;
-    card.appendChild(glowPoints);
+      `;
+      card.appendChild(glowPoints);
 
-    card.innerHTML += `
+      card.innerHTML += `
             <h2 style="color: ${item.color}; margin-bottom: 20px; font-size: 1.6rem; text-shadow: 0 0 20px ${item.color}40;">${item.theme}</h2>
             
             <div style="margin: 20px 0;">
@@ -375,7 +528,7 @@ function renderDiscounts() {
                     flex: 1;
                     padding: 12px;
                     border-radius: 50px;
-                    background: ${item.color}20; /* Low opacity bg */
+                    background: ${item.color}20;
                     color: ${item.color};
                     text-decoration: none;
                     font-weight: bold;
@@ -392,7 +545,7 @@ function renderDiscounts() {
                     padding: 12px;
                     border-radius: 50px;
                     background: ${item.color};
-                    color: #fff; /* White text on colored bg */
+                    color: #fff;
                     border: none;
                     font-weight: bold;
                     cursor: pointer;
@@ -401,9 +554,9 @@ function renderDiscounts() {
                     box-shadow: 0 5px 15px ${item.color}60;
                 ">نسخ الكود</button>
             </div>
-        `;
-
-    container.appendChild(card);
+      `;
+      container.appendChild(card);
+    }
   });
 }
 
