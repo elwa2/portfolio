@@ -2358,14 +2358,13 @@
         </div>
         <section class="section">
            <div class="container">
-              <div class="discount-card" style="background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--border-color);">
-                 <h2 style="color: var(--primary-color);">S4U</h2>
-                 <p>كود خصم خاص لباقات سلة الشهرية والسنوية</p>
-                 <button class="btn" onclick="navigator.clipboard.writeText('S4U'); alert('تم نسخ الكود!')">نسخ الكود</button>
+              <div id="discounts-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
+                 <!-- سيتم إضافة الأكواد هنا بواسطة JavaScript -->
               </div>
            </div>
         </section>
       </section>
+      <script src="assets/js/discounts.js"></script>
 
       <!-- صفحة تواصل معنا -->
       <section class="spa-page" id="contact">
