@@ -253,8 +253,31 @@ document.addEventListener("DOMContentLoaded", function () {
   // إضافة مستمع للتمرير
   window.addEventListener("scroll", handleScroll);
 
-  // تشغيل الدالة مرة واحدة عند تحميل الصفحة
   handleScroll();
+});
+
+// Force Handle Salla Discounts Link Click
+document.addEventListener("DOMContentLoaded", function () {
+  const sallaLinks = document.querySelectorAll('a[href="#salla-discounts"]');
+  sallaLinks.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      // Allow default hash change
+      setTimeout(() => {
+        const section = document.getElementById("salla-discounts");
+        if (section) {
+          // Force display if router failed
+          if (getComputedStyle(section).display === "none") {
+            document
+              .querySelectorAll(".spa-page")
+              .forEach((p) => (p.style.display = "none"));
+            section.style.display = "block";
+            section.classList.add("active");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }
+      }, 100);
+    });
+  });
 });
 
 // Copy to Clipboard Utility
