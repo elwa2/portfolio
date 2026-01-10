@@ -1,5 +1,11 @@
 const discountCodes = [
   {
+    theme: "كوبون خصم زد",
+    code: "AliAHMED26",
+    link: "https://web.zid.sa/pricing",
+    color: "#a855f7",
+  },
+  {
     theme: "باقة سلة",
     code: "F-AFN5N48K",
     link: "https://mtjr.at/LfOztodFwz",
