@@ -108,12 +108,19 @@ class PortfolioManager:
             <img src="{image_path}" alt="{project_data['name']}" loading="lazy" />
             <div class="work-card-overlay">
               <h3>{project_data['name']}</h3>
-              <a href="{project_data['url']}" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 512 512" style="width: 14px; height: 14px; fill: currentColor">
-                  <use xlink:href="assets/images/icons.svg#icon-external-link"></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="{project_data['url']}" target="_blank">
+                  <svg class="svg-icon" viewBox="0 0 512 512" style="width: 14px; height: 14px; fill: currentColor">
+                    <use xlink:href="assets/images/icons.svg#icon-external-link-alt"></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg class="svg-icon" viewBox="0 0 512 512" style="width: 16px; height: 16px;">
+                    <use xlink:href="assets/images/icons.svg#icon-search-plus"></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 '''
