@@ -43,6 +43,9 @@
             <button class="viewer-btn" id="viewer-fit" title="ملء الشاشة">
                <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-expand"></use></svg>
             </button>
+            <a href="#" target="_blank" class="viewer-btn store-link-btn" id="viewer-store-link" title="زيارة المتجر">
+               <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-external-link-alt"></use></svg>
+            </a>
           </div>
         </div>
         
@@ -249,8 +252,19 @@
     const loading = document.getElementById("viewer-loading");
     const title = document.getElementById("viewer-title");
     const counter = document.getElementById("viewer-counter");
+    const storeLink = document.getElementById("viewer-store-link");
 
     if (!image) return;
+
+    // إظهر/إخفاء رابط المتجر
+    if (storeLink) {
+      if (currentImages[index].link) {
+        storeLink.href = currentImages[index].link;
+        storeLink.style.display = "flex";
+      } else {
+        storeLink.style.display = "none";
+      }
+    }
 
     // إظهار التحميل
     if (loading) loading.style.display = "block";
@@ -371,23 +385,47 @@
         const heading = card.querySelector("h3");
         if (heading) title = heading.textContent;
 
-        // Add click listener to the CARD, not just the image
-        // This ensures clicking the overlay also opens the viewer
-        card.style.cursor = "zoom-in";
-        card.addEventListener("click", function (e) {
-          // If clicking a link or button inside the card, do not open viewer
-          if (e.target.closest("a") || e.target.closest("button")) {
-            return;
-          }
+        // Inject zoom button if missing
+        let zoomBtn = card.querySelector(".work-card-zoom");
+        if (!zoomBtn) {
+          const overlay = card.querySelector(".work-card-overlay");
+          if (overlay) {
+            let actions = overlay.querySelector(".work-card-actions");
+            if (!actions) {
+              // Create actions wrapper if missing (wrapping existing links)
+              actions = document.createElement("div");
+              actions.className = "work-card-actions";
+              const existingLinks = overlay.querySelectorAll("a");
+              existingLinks.forEach((link) => actions.appendChild(link));
+              overlay.appendChild(actions);
+            }
 
-          e.preventDefault();
-          openViewer(galleryGroup, index);
-        });
+            zoomBtn = document.createElement("button");
+            zoomBtn.className = "work-card-zoom";
+            zoomBtn.title = "تكبير الصورة";
+            zoomBtn.innerHTML = `
+              <svg class="svg-icon" viewBox="0 0 512 512" style="width: 16px; height: 16px;">
+                <use xlink:href="assets/images/icons.svg#icon-search-plus"></use>
+              </svg>
+            `;
+            actions.appendChild(zoomBtn);
+          }
+        }
+
+        // Add click listener to the ZOOM BUTTON
+        if (zoomBtn) {
+          zoomBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent card click
+            openViewer(galleryGroup, index);
+          });
+        }
       }
 
       galleryGroup.push({
         src: img.src,
         title: title || img.alt || `Work ${index + 1}`,
+        link: card.querySelector("a") ? card.querySelector("a").href : null,
       });
     });
 

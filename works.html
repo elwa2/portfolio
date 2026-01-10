@@ -31,8 +31,36 @@
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
-
     <style>
+      /* زر التكبير في بطاقة العمل */
+      .work-card-zoom {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        backdrop-filter: blur(5px);
+      }
+
+      .work-card-zoom:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        transform: scale(1.1);
+      }
+
+      .work-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
       /* أنماط صفحة الأعمال */
       .works-page {
         min-height: 100vh;
@@ -390,18 +418,31 @@
             <img src="assets/images/prt/33.jpeg" alt="شرفة" loading="lazy" />
             <div class="work-card-overlay">
               <h3>شرفة</h3>
-              <a href="https://shurfa.shop/" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://shurfa.shop/" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="work-card">
@@ -412,18 +453,31 @@
             />
             <div class="work-card-overlay">
               <h3>الجواهري</h3>
-              <a href="https://jeweler-y-inc.com/" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://jeweler-y-inc.com/" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="work-card">
@@ -434,18 +488,31 @@
             />
             <div class="work-card-overlay">
               <h3>باقة بنفسج</h3>
-              <a href="https://violetbouquets.com/ar" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://violetbouquets.com/ar" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="work-card">
@@ -456,18 +523,31 @@
             />
             <div class="work-card-overlay">
               <h3>قيمر لايت</h3>
-              <a href="https://gamer2light.com/ar" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://gamer2light.com/ar" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="work-card">
@@ -478,18 +558,31 @@
             />
             <div class="work-card-overlay">
               <h3>قيمر لايت</h3>
-              <a href="https://gamer2light.com/ar" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://gamer2light.com/ar" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="work-card">
@@ -500,18 +593,31 @@
             />
             <div class="work-card-overlay">
               <h3>محمصة سييد</h3>
-              <a href="https://seedroastery.com/" target="_blank">
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 512 512"
-                  style="width: 14px; height: 14px; fill: currentColor"
-                >
-                  <use
-                    xlink:href="assets/images/icons.svg#icon-external-link"
-                  ></use>
-                </svg>
-                زيارة المتجر
-              </a>
+              <div class="work-card-actions">
+                <a href="https://seedroastery.com/" target="_blank">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 14px; height: 14px; fill: currentColor"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-external-link"
+                    ></use>
+                  </svg>
+                  زيارة المتجر
+                </a>
+                <button class="work-card-zoom" title="تكبير الصورة">
+                  <svg
+                    class="svg-icon"
+                    viewBox="0 0 512 512"
+                    style="width: 16px; height: 16px"
+                  >
+                    <use
+                      xlink:href="assets/images/icons.svg#icon-search-plus"
+                    ></use>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1275,6 +1381,7 @@
     <!-- وظائف الموقع الأساسية -->
     <script src="assets/js/main.js"></script>
 
+    <script src="assets/js/portfolio-viewer.js"></script>
     <script>
       // Pagination Logic
       let currentPage = 1;
