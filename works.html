@@ -31,6 +31,9 @@
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="assets/css/portfolio-viewer.css" />
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
       /* زر التكبير في بطاقة العمل */
       .work-card-zoom {
@@ -65,7 +68,7 @@
       .works-page {
         min-height: 100vh;
         padding-top: 120px;
-        background-color: var(--bg-color);
+        background-color: transparent;
       }
 
       .works-header {
@@ -276,7 +279,7 @@
       .works-footer {
         text-align: center;
         padding: 40px 20px;
-        background: var(--bg-color-alt);
+        background: rgba(var(--primary-rgb), 0.03);
         margin-top: 50px;
       }
 
@@ -336,14 +339,9 @@
     </style>
   </head>
   <body class="theme-aware">
-    <!-- خلفية أيقونات متحركة -->
-    <div class="floating-background">
-      <div class="page-liquid-bg">
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-      </div>
-    </div>
+    <div class="grain-overlay"></div>
+    <!-- Avant-Garde 3D Background -->
+    <div id="three-canvas-container"></div>
 
     <!-- القائمة العلوية -->
     <header class="header">
@@ -1484,5 +1482,6 @@
         });
       });
     </script>
+    <script src="assets/js/three-bg.js"></script>
   </body>
 </html>

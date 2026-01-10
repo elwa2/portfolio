@@ -63,6 +63,9 @@
       rel="stylesheet"
       href="assets/css/lib/swiper-bundle.min.css"
     />
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <!-- ملفات CSS -->
     <link rel="stylesheet" href="assets/css/style.css" />
     <link rel="stylesheet" href="assets/css/scrolling-logos.css" />
@@ -473,16 +476,10 @@
     </style>
   </head>
   <body class="theme-aware">
-    <!-- خلفية أيقونات متحركة -->
+    <div class="grain-overlay"></div>
+    <!-- Avant-Garde 3D Background -->
+    <div id="three-canvas-container"></div>
     <div class="floating-background">
-      <!-- Page Liquid Background -->
-      <div class="page-liquid-bg">
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-        <div class="page-blob"></div>
-      </div>
       <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s;">🚀</div>
       <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s;">⭐</div>
       <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s;">🔥</div>
@@ -6732,5 +6729,6 @@
         }
       }
     </script>
+    <script src="assets/js/three-bg.js"></script>
   </body>
 </html>
