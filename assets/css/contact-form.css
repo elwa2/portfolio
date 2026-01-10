@@ -926,4 +926,6 @@ html:not([data-theme="light"]) .btn-shine {
     transform: translateY(1px) scale(0.98) !important;
   }
 
+}[data-theme="dark"] .contact-section, html:not([data-theme="light"]) .contact-section {
+    background: linear-gradient(125deg, #5e3bee00 0%, #7d56f924 100%);
 }
