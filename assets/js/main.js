@@ -256,3 +256,40 @@ document.addEventListener("DOMContentLoaded", function () {
   // تشغيل الدالة مرة واحدة عند تحميل الصفحة
   handleScroll();
 });
+
+// Copy to Clipboard Utility
+window.copyToClipboard = function (text, btnElement) {
+  if (!navigator.clipboard) {
+    console.warn("Clipboard API not supported");
+    // Fallback using textarea
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand("copy");
+      const originalText = btnElement.querySelector(".tooltip").textContent;
+      const tooltip = btnElement.querySelector(".tooltip");
+      btnElement.classList.add("copied");
+      setTimeout(() => {
+        btnElement.classList.remove("copied");
+      }, 2000);
+    } catch (err) {
+      console.error("Fallback: Oops, unable to copy", err);
+    }
+    document.body.removeChild(textArea);
+    return;
+  }
+
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      btnElement.classList.add("copied");
+      setTimeout(() => {
+        btnElement.classList.remove("copied");
+      }, 2000);
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+    });
+};

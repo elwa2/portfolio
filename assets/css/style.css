@@ -4808,3 +4808,191 @@ img {
     font-size: 1.5rem;
   }
 }
+
+/* Salla Discounts Section Styles */
+.discounts-section {
+  padding: 60px 0;
+}
+
+.discounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding: 20px 0;
+}
+
+.discount-card {
+  background: rgba(30, 30, 45, 0.8);
+  /* Darker, more opaque background */
+  border: 1px solid rgba(138, 125, 219, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: visible;
+  /* changed from hidden to visible for tooltips */
+  z-index: 10;
+  /* Ensure above background */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .discount-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.discount-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(94, 59, 238, 0.15);
+  border-color: rgba(94, 59, 238, 0.3);
+}
+
+.full-width-card {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, rgba(94, 59, 238, 0.1), rgba(42, 42, 74, 0.4));
+  border: 1px solid rgba(94, 59, 238, 0.2);
+}
+
+[data-theme="light"] .full-width-card {
+  background: linear-gradient(135deg, rgba(94, 59, 238, 0.05), rgba(74, 144, 226, 0.05));
+}
+
+.discount-card h3 {
+  font-size: 1.4rem;
+  color: var(--primary-light);
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+[data-theme="light"] .discount-card h3 {
+  color: var(--primary-color);
+}
+
+.discount-card p {
+  color: var(--text-color-muted);
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.discount-card a {
+  color: var(--accent-color);
+  word-break: break-all;
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.3s;
+}
+
+.discount-card a:hover {
+  border-bottom-color: var(--accent-color);
+}
+
+.coupon-container {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  transition: background 0.3s;
+}
+
+[data-theme="light"] .coupon-container {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.coupon-container:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .coupon-container:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.coupon-code {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #4ade80;
+  /* Green for success */
+  letter-spacing: 1px;
+}
+
+[data-theme="light"] .coupon-code {
+  color: #16a34a;
+}
+
+.copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-color-muted);
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+[data-theme="light"] .copy-btn:hover {
+  color: var(--primary-color);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.copy-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Tooltip behavior */
+.copy-btn .tooltip {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #4ade80;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.copy-btn.copied .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+  .discounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width-card {
+    grid-column: 1;
+  }
+}
