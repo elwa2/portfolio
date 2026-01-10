@@ -4500,6 +4500,311 @@ img {
   100% {
     transform: translate(10%, -15%) rotate(90deg) scale(1.15);
   }
-}[data-theme="dark"] .stores-actions  span { color: white;}
+}
 
- 
+[data-theme="dark"] .stores-actions span {
+  color: white;
+}
+
+/* Contact Section Enhancements */
+.contact-card-modern {
+  background: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: var(--box-shadow);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+/* Glassmorphism Effect */
+[data-theme="dark"] .contact-card-modern {
+  background: rgba(26, 26, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.contact-header h2 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.contact-header p {
+  color: var(--text-color-light);
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.contact-item:last-child {
+  border-bottom: none;
+}
+
+.contact-item:hover {
+  background: rgba(var(--primary-rgb), 0.05);
+  border-radius: var(--border-radius);
+  padding-left: 25px;
+  /* Effect on hover */
+}
+
+.contact-text {
+  text-align: right;
+}
+
+.contact-text h3 {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.contact-text span {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.contact-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--light-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover .contact-icon-box {
+  background: var(--primary-color);
+  color: white;
+  transform: rotate(10deg);
+}
+
+.contact-icon-box svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* WhatsApp Full Button */
+.whatsapp-full-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px;
+  margin-top: 30px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-full-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4);
+  color: white;
+}
+
+.whatsapp-full-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Response */
+@media (max-width: 480px) {
+  .contact-card-modern {
+    padding: 25px;
+  }
+
+  .contact-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Contact Grid Layout */
+.contact-grid-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.contact-card-modern,
+.contact-form-card {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  /* Glassmorphism Base */
+  background: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow);
+  padding: 40px;
+}
+
+/* Dark Mode - Better Glassmorphism to match site background */
+[data-theme="dark"] .contact-card-modern,
+[data-theme="dark"] .contact-form-card {
+  background: rgba(15, 15, 26, 0.4);
+  /* Much more transparent */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Icons Fix */
+.contact-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(94, 59, 238, 0.1);
+  /* Subtle default bg */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .contact-icon-box {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  /* White icon in dark mode for better visibility */
+}
+
+.contact-icon-box svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Form Tabs Fix */
+.form-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 5px;
+  border-radius: 12px;
+  position: relative;
+  z-index: 20;
+  /* Ensure clickable */
+}
+
+[data-theme="dark"] .form-tabs {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.form-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 21;
+}
+
+.form-tab.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 15px rgba(94, 59, 238, 0.3);
+}
+
+/* Modern Form Inputs */
+.modern-form .form-group {
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 5;
+}
+
+.modern-form input,
+.modern-form select,
+.modern-form textarea {
+  width: 100%;
+  padding: 15px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-color);
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .modern-form input,
+[data-theme="dark"] .modern-form select,
+[data-theme="dark"] .modern-form textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.modern-form input:focus,
+.modern-form select:focus,
+.modern-form textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  background: rgba(94, 59, 238, 0.05);
+}
+
+.modern-form button[type="submit"] {
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-grid-wrapper {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .contact-card-modern,
+  .contact-form-card {
+    padding: 25px;
+  }
+
+  .contact-header h2 {
+    font-size: 1.5rem;
+  }
+}
