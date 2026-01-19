@@ -126,6 +126,89 @@
         box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
       }
 
+      /* Advanced Color Lab Styles */
+      .advanced-color-lab {
+        width: 100%;
+        margin-top: 30px;
+        text-align: left;
+        direction: ltr;
+      }
+      .lab-section h3 {
+        font-size: 1.1rem;
+        color: var(--text-color);
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--primary-color);
+        display: inline-block;
+        padding-bottom: 5px;
+      }
+      .lab-row {
+        margin-bottom: 20px;
+      }
+      .lab-row label {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-color-light);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
+      .swatch {
+        height: 40px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .swatch:hover {
+        transform: scale(1.15);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        position: relative;
+      }
+
+      .harmony-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px;
+      }
+      .harmony-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-color-light);
+        margin-bottom: 8px;
+      }
+      .mini-swatches {
+        display: flex;
+        gap: 5px;
+        height: 40px;
+      }
+      .mini-swatch {
+        flex: 1;
+        height: 100%;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      .mini-swatch:first-child {
+        border-radius: 6px 0 0 6px;
+      }
+      .mini-swatch:last-child {
+        border-radius: 0 6px 6px 0;
+      }
+
+      @media (max-width: 600px) {
+        .swatch-grid {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+
       /* Fix for 3D Background Overlap */
       #three-canvas-container {
         position: fixed;
