@@ -51,6 +51,13 @@ class SPARouter {
       "salla-discounts.html",
       "contact.html",
     ];
+      href === "index.html" ||
+      href === "/"
+    );
+    
+    // Explicitly ignore external tools directory
+    if (href.includes("open-source-tools/")) return false;
+    
     return (
       pages.some((p) => href.includes(p)) ||
       href === "index.html" ||

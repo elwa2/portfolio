@@ -70,6 +70,13 @@
     "fa-clock": "clock",
     "fa-check-circle": "check-circle",
     "fa-map-marker-alt": "map-marker-alt",
+    // Tools Icons
+    "fa-tools": "cogs", // Fallback to cogs if tools missing
+    "fa-expand-arrows-alt": "expand",
+    "fa-key": "shield-alt", // Fallback to shield-alt
+    "fa-file-image": "images", // Fallback to images
+    "fa-th-large": "th", // Fallback to th or grid
+    "fa-paint-brush": "paint-brush",
   };
 
   function getBasePath() {
