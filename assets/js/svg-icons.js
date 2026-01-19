@@ -72,6 +72,10 @@
     "fa-map-marker-alt": "map-marker-alt",
   };
 
+  function getBasePath() {
+    return window.location.href.indexOf("open-source-tools") > -1 ? "../" : "";
+  }
+
   // تحويل عنصر Font Awesome إلى SVG
   function convertToSvg(element) {
     const classes = Array.from(element.classList);
@@ -101,10 +105,11 @@
 
     // إنشاء عنصر use للإشارة إلى الرمز
     const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    const basePath = getBasePath();
     use.setAttributeNS(
       "http://www.w3.org/1999/xlink",
       "xlink:href",
-      "assets/images/icons.svg#icon-" + iconName
+      basePath + "assets/images/icons.svg#icon-" + iconName,
     );
 
     svg.appendChild(use);
@@ -119,32 +124,32 @@
 
   // تحميل ملف الأيقونات وإضافته للصفحة
   function loadIconSprite() {
-    // تحميل ملف SVG
-    fetch("assets/images/icons.svg")
-      .then((response) => response.text())
-      .then((data) => {
-        // إضافة الأيقونات للصفحة
-        const div = document.createElement("div");
-        div.style.display = "none";
-        div.innerHTML = data;
-        document.body.insertBefore(div, document.body.firstChild);
+    const basePath = getBasePath();
+    const iconsPath = basePath + "assets/images/icons.svg";
 
-        // تحديث مسارات use
-        document.querySelectorAll("svg.svg-icon use").forEach((use) => {
-          const href = use.getAttributeNS(
-            "http://www.w3.org/1999/xlink",
-            "xlink:href"
-          );
-          if (href && href.includes("assets/images/icons.svg#")) {
-            use.setAttributeNS(
-              "http://www.w3.org/1999/xlink",
-              "xlink:href",
-              href.replace("assets/images/icons.svg", "")
-            );
-          }
-        });
+    // تحميل ملف SVG
+    fetch(iconsPath)
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.text();
       })
-      .catch((err) => console.warn("Could not load icons.svg:", err));
+      .then((data) => {
+        // التحقق من أن البيانات هي SVG
+        if (!data.includes("<svg")) return;
+
+        // إضافة الأيقونات للصفحة (مخفية)
+        // ملاحظة: تكرار ID قد يسبب مشاكل، لذا نتأكد أولاً
+        if (!document.getElementById("svg-icon-sprite")) {
+          const div = document.createElement("div");
+          div.id = "svg-icon-sprite";
+          div.style.display = "none";
+          div.innerHTML = data;
+          document.body.insertBefore(div, document.body.firstChild);
+        }
+      })
+      .catch((err) =>
+        console.warn("Could not load icons.svg from " + iconsPath, err),
+      );
   }
 
   // التنفيذ عند تحميل الصفحة

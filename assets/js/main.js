@@ -78,6 +78,11 @@ function copyToClipboard(textOrId, button) {
 // تحديث السنة في الفوتر
 document.getElementById("currentYear").textContent = new Date().getFullYear();
 
+// Helper to get correct assets path
+function getAssetsPath() {
+  return window.location.href.indexOf("open-source-tools") > -1 ? "../" : "";
+}
+
 // إدارة وضع الظلام (Dark Mode)
 function setTheme(themeName) {
   localStorage.setItem("theme", themeName);
@@ -86,10 +91,17 @@ function setTheme(themeName) {
   // تحديث أيقونة زر التبديل
   const themeToggleSvg = document.querySelector(".theme-toggle svg use");
   if (themeToggleSvg) {
+    const basePath = getAssetsPath();
     if (themeName === "dark") {
-      themeToggleSvg.setAttribute("href", "assets/images/icons.svg#icon-sun");
+      themeToggleSvg.setAttribute(
+        "href",
+        basePath + "assets/images/icons.svg#icon-sun",
+      );
     } else {
-      themeToggleSvg.setAttribute("href", "assets/images/icons.svg#icon-moon");
+      themeToggleSvg.setAttribute(
+        "href",
+        basePath + "assets/images/icons.svg#icon-moon",
+      );
     }
   }
 }
@@ -147,10 +159,17 @@ function closeMobileMenu() {
 function updateMenuIcon() {
   const iconUse = mobileToggle?.querySelector("svg use");
   if (iconUse) {
+    const basePath = getAssetsPath();
     if (nav.classList.contains("active")) {
-      iconUse.setAttribute("href", "assets/images/icons.svg#icon-times");
+      iconUse.setAttribute(
+        "href",
+        basePath + "assets/images/icons.svg#icon-times",
+      );
     } else {
-      iconUse.setAttribute("href", "assets/images/icons.svg#icon-bars");
+      iconUse.setAttribute(
+        "href",
+        basePath + "assets/images/icons.svg#icon-bars",
+      );
     }
   }
 }
