@@ -7,7 +7,7 @@ class SPARouter {
   constructor() {
     this.pages = document.querySelectorAll(".spa-page");
     this.navLinks = document.querySelectorAll(
-      ".nav-links a, .mobile-nav-links a, .footer-links a, .logo a"
+      ".nav-links a, .mobile-nav-links a, .footer-links a, .logo a",
     );
     this.init();
   }
@@ -22,6 +22,11 @@ class SPARouter {
     // Intercept clicks on internal links
     document.addEventListener("click", (e) => {
       const link = e.target.closest("a");
+      // Ignore if link has target="_blank" (external navigation)
+      if (link && link.getAttribute("target") === "_blank") {
+        return;
+      }
+
       if (link && link.getAttribute("href")?.startsWith("#")) {
         // Internal hash link - standard behavior (let hashchange handle it)
       } else if (link && this.isInternalPageLink(link)) {
