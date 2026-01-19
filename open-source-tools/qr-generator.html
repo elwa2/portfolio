@@ -178,12 +178,8 @@
         </div>
 
         <div class="tool-container">
-          <div class="qr-preview">
-            <img
-              id="qrImage"
-              src="https://chart.googleapis.com/chart?cht=qr&chl=AliAhmed&chs=250x250&chld=L|0"
-              alt="QR Code Preview"
-            />
+          <div class="qr-preview" id="qrImageContainer">
+            <!-- QR code will be generated here -->
           </div>
 
           <textarea
@@ -305,25 +301,77 @@
       </svg>
     </a>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
+      let qrcode = null;
+
       function generateQR() {
         const content = document.getElementById("qrContent").value.trim();
         if (!content) return alert("الرجاء إدخال محتوى أولاً");
 
-        const qrImage = document.getElementById("qrImage");
-        const encoded = encodeURIComponent(content);
-        qrImage.src = `https://chart.googleapis.com/chart?cht=qr&chl=${encoded}&chs=250x250&chld=L|0`;
-        document.getElementById("downloadBtn").style.display = "block";
+        const qrContainer = document.getElementById("qrImageContainer");
+        qrContainer.innerHTML = ""; // Clear previous
+
+        // Create new container for the library and image
+        const div = document.createElement("div");
+        qrContainer.appendChild(div);
+
+        // Generate QR
+        qrcode = new QRCode(div, {
+          text: content,
+          width: 250,
+          height: 250,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+
+        // Show download button after a brief delay to allow rendering
+        setTimeout(() => {
+          document.getElementById("downloadBtn").style.display = "block";
+        }, 100);
       }
 
       function downloadQR() {
-        const qrImage = document.getElementById("qrImage");
-        const link = document.createElement("a");
-        link.href = qrImage.src;
-        link.download = "qr-code-aliahmed.png";
-        link.target = "_blank";
-        link.click();
+        const qrContainer = document.getElementById("qrImageContainer");
+        const img = qrContainer.querySelector("img");
+
+        if (img && img.src) {
+          const link = document.createElement("a");
+          link.href = img.src;
+          link.download = "qr-code-aliahmed.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          // Fallback if the library renders canvas instead of img immediately
+          const canvas = qrContainer.querySelector("canvas");
+          if (canvas) {
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "qr-code-aliahmed.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }
       }
+
+      // Initialize with default
+      window.onload = function () {
+        const qrContainer = document.getElementById("qrImageContainer");
+        qrContainer.innerHTML = "";
+        const div = document.createElement("div");
+        qrContainer.appendChild(div);
+        qrcode = new QRCode(div, {
+          text: "Ali Ahmed Portfolio",
+          width: 250,
+          height: 250,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+      };
     </script>
   </body>
 </html>
