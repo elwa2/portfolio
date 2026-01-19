@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>محول روابط GitHub إلى CDN | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+      .tool-container {
+        max-width: 700px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .input-group {
+        margin-bottom: 25px;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: var(--text-color);
+      }
+
+      input {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: "Cairo", sans-serif;
+        outline: none;
+      }
+      input:focus {
+        border-color: var(--primary-color);
+      }
+
+      .result-box {
+        margin-top: 30px;
+        background: rgba(var(--primary-rgb), 0.05);
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        display: none;
+      }
+      .result-box pre {
+        background: #23272e;
+        color: #abb2bf;
+        padding: 15px;
+        border-radius: 10px;
+        overflow-x: auto;
+        font-family: "Roboto Mono", monospace;
+        font-size: 0.9rem;
+        direction: ltr;
+        text-align: left;
+      }
+
+      .btn-tool {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Cairo", sans-serif;
+      }
+      .btn-tool:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .btn-copy {
+        background: var(--secondary-purple);
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >
+        ⭐
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >
+        🎯
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >
+        ⚡
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 40px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">
+            محول روابط GitHub إلى CDN
+          </h1>
+          <p style="color: var(--text-color-light)">
+            حول روابط ملفاتك في GitHub إلى روابط CDN سريعة وسهلة الاستخدام
+          </p>
+        </div>
+
+        <div class="tool-container">
+          <div class="input-group">
+            <label>اسم المستخدم في GitHub:</label>
+            <input type="text" id="username" placeholder="مثال: AliAhmed" />
+          </div>
+          <div class="input-group">
+            <label>اسم المستودع (Repository):</label>
+            <input type="text" id="repo" placeholder="مثال: my-assets" />
+          </div>
+          <div class="input-group">
+            <label>مسار الملف (Path):</label>
+            <input type="text" id="path" placeholder="مثال: css/style.css" />
+          </div>
+
+          <button class="btn-tool" onclick="generateCDN()">
+            إنشاء رابط CDN <i class="fas fa-link"></i>
+          </button>
+
+          <div class="result-box" id="resultBox">
+            <label style="display: block; margin-bottom: 10px; font-weight: 700"
+              >رابط CDN المباشر:</label
+            >
+            <pre id="cdnLink"></pre>
+            <button class="btn-tool btn-copy" onclick="copyCDN()">
+              نسخ الرابط <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      function generateCDN() {
+        const u = document.getElementById("username").value.trim();
+        const r = document.getElementById("repo").value.trim();
+        const p = document.getElementById("path").value.trim();
+
+        if (!u || !r || !p) return alert("الرجاء إكمال كافة الحقول");
+
+        const link = `https://cdn.jsdelivr.net/gh/${u}/${r}/${p}`;
+        document.getElementById("cdnLink").innerText = link;
+        document.getElementById("resultBox").style.display = "block";
+      }
+
+      function copyCDN() {
+        const link = document.getElementById("cdnLink").innerText;
+        navigator.clipboard.writeText(link);
+        alert("تم نسخ الرابط بنجاح!");
+      }
+    </script>
+  </body>
+</html>

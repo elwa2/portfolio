@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أداة تغيير حجم الصور | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+      .tool-container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .input-group {
+        margin-bottom: 25px;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: var(--text-color);
+      }
+
+      input[type="file"] {
+        width: 100%;
+        padding: 20px;
+        border: 2px dashed rgba(var(--primary-rgb), 0.2);
+        border-radius: 15px;
+        background: rgba(var(--primary-rgb), 0.02);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      input[type="file"]:hover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.05);
+      }
+
+      .dimensions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      input[type="number"],
+      input[type="range"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        outline: none;
+      }
+
+      .preview-box {
+        margin-top: 30px;
+        text-align: center;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 20px;
+        background: #fdfdfd;
+      }
+      #preview {
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-tool {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        font-family: "Cairo", sans-serif;
+      }
+      .btn-tool:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+      }
+
+      #downloadButton {
+        background: var(--secondary-purple);
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >
+        ⭐
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >
+        🎯
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >
+        ⚡
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">
+            تغيير حجم الصور
+          </h1>
+          <p style="color: var(--text-color-light)">
+            قم بتعديل أبعاد صورك بدقة وسهولة واحترافية
+          </p>
+        </div>
+
+        <div class="tool-container">
+          <div class="input-group">
+            <label>اختر الصورة:</label>
+            <input id="fileInput" type="file" accept="image/*" />
+          </div>
+
+          <div class="dimensions-grid">
+            <div class="input-group">
+              <label>العرض (بكسل):</label>
+              <input id="pixelWidthInput" type="number" value="800" />
+            </div>
+            <div class="input-group">
+              <label>الارتفاع (بكسل):</label>
+              <input id="pixelHeightInput" type="number" value="600" />
+            </div>
+          </div>
+          <button class="btn-tool" onclick="resizeByPixel()">
+            تغيير الحجم بالبكسل
+          </button>
+
+          <hr
+            style="margin: 30px 0; border: none; border-top: 1px solid #eee"
+          />
+
+          <div class="input-group">
+            <label>تغيير الحجم بالنسبة المئوية:</label>
+            <input
+              id="ratioInput"
+              max="2"
+              min="0.1"
+              step="0.1"
+              type="range"
+              value="1"
+            />
+            <div style="text-align: center; margin-top: 10px">
+              <span id="ratioValue">100%</span>
+            </div>
+          </div>
+          <button
+            class="btn-tool"
+            onclick="resizeByRatio()"
+            style="background: var(--secondary-purple)"
+          >
+            تغيير الحجم بالنسبة
+          </button>
+
+          <div class="preview-box">
+            <label style="margin-bottom: 15px">المعاينة:</label>
+            <img
+              id="preview"
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23aaa'%3ENo Image%3C/text%3E%3C/svg%3E"
+            />
+            <button
+              id="downloadButton"
+              class="btn-tool"
+              onclick="downloadImage()"
+            >
+              تحميل الصورة المعدلة
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات الصور
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      let originalImage;
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("preview");
+      const downloadButton = document.getElementById("downloadButton");
+      const ratioInput = document.getElementById("ratioInput");
+      const ratioValue = document.getElementById("ratioValue");
+
+      ratioInput.addEventListener("input", () => {
+        ratioValue.innerText = Math.round(ratioInput.value * 100) + "%";
+      });
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            originalImage = img;
+            preview.src = reader.result;
+            document.getElementById("pixelWidthInput").value = img.width;
+            document.getElementById("pixelHeightInput").value = img.height;
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      function resizeByPixel() {
+        if (!originalImage) return alert("الرجاء اختيار صورة أولاً");
+        const width = Number(document.getElementById("pixelWidthInput").value);
+        const height = Number(
+          document.getElementById("pixelHeightInput").value,
+        );
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(originalImage, 0, 0, width, height);
+        preview.src = canvas.toDataURL("image/png");
+        downloadButton.style.display = "block";
+      }
+
+      function resizeByRatio() {
+        if (!originalImage) return alert("الرجاء اختيار صورة أولاً");
+        const ratio = Number(ratioInput.value);
+        const width = originalImage.width * ratio;
+        const height = originalImage.height * ratio;
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(originalImage, 0, 0, width, height);
+        preview.src = canvas.toDataURL("image/png");
+        downloadButton.style.display = "block";
+      }
+
+      function downloadImage() {
+        const link = document.createElement("a");
+        link.href = preview.src;
+        link.download = "resized-image-aliahmed.png";
+        link.click();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>محول الصور إلى WebP | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+      .tool-container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        text-align: center;
+      }
+
+      .drop-zone {
+        border: 4px dashed rgba(var(--primary-rgb), 0.2);
+        border-radius: 20px;
+        padding: 60px 20px;
+        background: rgba(var(--primary-rgb), 0.02);
+        cursor: pointer;
+        transition: 0.3s;
+        margin-bottom: 30px;
+      }
+      .drop-zone:hover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.05);
+      }
+      .drop-zone i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+      }
+
+      #previews {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+      .preview-item {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+      .preview-item img {
+        max-width: 100%;
+        border-radius: 8px;
+      }
+      .preview-item a {
+        background: var(--secondary-purple);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.3s;
+      }
+      .preview-item a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(var(--secondary-purple-rgb), 0.3);
+      }
+
+      progress {
+        width: 100%;
+        height: 8px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >
+        ⭐
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >
+        🎯
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >
+        ⚡
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 40px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">
+            ضغط وتحويل الصور إلى WebP
+          </h1>
+          <p style="color: var(--text-color-light)">
+            قلل حجم صورك وحسن سرعة موقعك باستخدام تنسيق WebP المتطور
+          </p>
+        </div>
+
+        <div class="tool-container">
+          <div
+            class="drop-zone"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>اسحب الصور هنا أو اضغط للاختيار</h3>
+            <p style="color: var(--text-color-light)">
+              يدعم PNG, JPG, GIF و AVIF
+            </p>
+            <input
+              type="file"
+              id="fileInput"
+              multiple
+              accept="image/*"
+              style="display: none"
+            />
+          </div>
+
+          <div id="previews"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات الصور
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const previews = document.getElementById("previews");
+
+      fileInput.addEventListener("change", () => {
+        const files = Array.from(fileInput.files);
+        files.forEach(processFile);
+        fileInput.value = "";
+      });
+
+      function processFile(file) {
+        const item = document.createElement("div");
+        item.className = "preview-item";
+        item.innerHTML = `<progress value="0" max="100"></progress><span>معالجة: ${file.name}</span>`;
+        previews.appendChild(item);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext("2d").drawImage(img, 0, 0);
+
+            canvas.toBlob(
+              (blob) => {
+                const url = URL.createObjectURL(blob);
+                item.innerHTML = `
+                <img src="${url}">
+                <a href="${url}" download="${file.name.split(".")[0]}.webp">تحميل WebP <i class="fas fa-download"></i></a>
+              `;
+              },
+              "image/webp",
+              0.8,
+            );
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    </script>
+  </body>
+</html>

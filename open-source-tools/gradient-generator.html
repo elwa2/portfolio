@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منشئ التدرجات اللونية | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+      .main-tool-container {
+        max-width: 900px;
+        margin: 40px auto;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      .tool-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .gradient-preview {
+        height: 250px;
+        width: 100%;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .color-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      .control-item {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .control-item label {
+        font-weight: 700;
+        color: var(--text-color);
+      }
+
+      select,
+      input[type="color"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: "Cairo", sans-serif;
+      }
+
+      textarea {
+        font-family: "Roboto Mono", monospace;
+        font-size: 14px;
+        height: 100px;
+        resize: none;
+        margin: 20px 0;
+      }
+
+      .btn-tool {
+        padding: 15px 25px;
+        border-radius: 12px;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Cairo", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .btn-tool:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .btn-secondary {
+        background: var(--secondary-purple);
+      }
+
+      .tool-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 50px;
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >
+        ⭐
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >
+        🎯
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >
+        ⚡
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 40px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">
+            منشئ التدرجات اللونية (CSS)
+          </h1>
+          <p style="color: var(--text-color-light)">
+            صمم تدرجات لونية عصرية واحترافية لموقعك بلمسة واحدة
+          </p>
+        </div>
+
+        <div class="main-tool-container">
+          <!-- Mode 1: Comprehensive Picker -->
+          <div class="tool-card">
+            <span class="tool-badge">المشغل المتقدم</span>
+            <div
+              class="gradient-preview"
+              id="preview1"
+              style="background: linear-gradient(to right, #5665e9, #a271f8)"
+            ></div>
+
+            <div class="color-controls">
+              <div class="control-item">
+                <label>الاتجاه:</label>
+                <select id="direction1">
+                  <option value="to top">أعلى</option>
+                  <option value="to right top">أعلى يمين</option>
+                  <option value="to right" selected>يمين</option>
+                  <option value="to right bottom">أسفل يمين</option>
+                  <option value="to bottom">أسفل</option>
+                  <option value="to left bottom">أسفل يسار</option>
+                  <option value="to left">يسار</option>
+                  <option value="to left top">أعلى يسار</option>
+                </select>
+              </div>
+              <div class="control-item">
+                <label>اللون الأول:</label>
+                <input type="color" id="color1" value="#5665E9" />
+              </div>
+              <div class="control-item">
+                <label>اللون الثاني:</label>
+                <input type="color" id="color2" value="#A271F8" />
+              </div>
+            </div>
+
+            <textarea id="output1" readonly>
+background: linear-gradient(to right, #5665E9, #A271F8);</textarea
+            >
+
+            <div style="display: flex; gap: 15px">
+              <button class="btn-tool" onclick="refreshRandom()">
+                <i class="fas fa-magic"></i> توليد عشوائي
+              </button>
+              <button
+                class="btn-tool btn-secondary"
+                onclick="copyCode('output1', this)"
+              >
+                <i class="fas fa-copy"></i> نسخ الكود
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات الألوان
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      const color1 = document.getElementById("color1");
+      const color2 = document.getElementById("color2");
+      const direction1 = document.getElementById("direction1");
+      const preview1 = document.getElementById("preview1");
+      const output1 = document.getElementById("output1");
+
+      function updateGradient() {
+        const grad = `linear-gradient(${direction1.value}, ${color1.value}, ${color2.value})`;
+        preview1.style.background = grad;
+        output1.value = `background: ${grad};`;
+      }
+
+      function refreshRandom() {
+        const r1 =
+          "#" +
+          Math.floor(Math.random() * 16777215)
+            .toString(16)
+            .padStart(6, "0");
+        const r2 =
+          "#" +
+          Math.floor(Math.random() * 16777215)
+            .toString(16)
+            .padStart(6, "0");
+        color1.value = r1;
+        color2.value = r2;
+        updateGradient();
+      }
+
+      function copyCode(id, btn) {
+        const t = document.getElementById(id);
+        navigator.clipboard.writeText(t.value);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+        setTimeout(() => (btn.innerHTML = original), 2000);
+      }
+
+      color1.addEventListener("input", updateGradient);
+      color2.addEventListener("input", updateGradient);
+      direction1.addEventListener("change", updateGradient);
+    </script>
+  </body>
+</html>

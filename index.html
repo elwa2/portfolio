@@ -473,6 +473,106 @@
       [data-theme="light"] .stat-label {
         color: #000;
       }
+      /* أنماط قسم الأدوات مفتوحة المصدر */
+      .open-source-tools-section {
+        padding: 100px 0;
+        background-color: var(--bg-color-alt);
+        position: relative;
+      }
+
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+      }
+
+      .tool-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: right;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tool-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
+        border-color: var(--primary-color);
+      }
+
+      .tool-card-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.2);
+      }
+
+      .tool-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--text-color);
+      }
+
+      .tool-card p {
+        color: var(--text-color-light);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+      }
+
+      .tool-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: gap 0.3s ease;
+      }
+
+      .tool-card:hover .tool-link {
+        gap: 15px;
+      }
+
+      .all-tools-link {
+        text-align: center;
+        margin-top: 60px;
+      }
+
+      .section-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--text-color);
+      }
+
+      .section-description {
+        max-width: 700px;
+        color: var(--text-color-light);
+        margin-bottom: 40px;
+        font-size: 1.1rem;
+      }
     </style>
   </head>
   <body class="theme-aware">
@@ -507,6 +607,7 @@
               <li><a href="#services">خدماتنا</a></li>
               <li><a href="works.html">أعمالنا</a></li>
               <li><a href="#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="open-source-tools/index.html">أدواتنا</a></li>
               <li><a href="#contact">تواصل معنا</a></li>
               <li><a href="#payment">الدفع</a></li>
             </ul>
@@ -566,6 +667,38 @@
               </a>
             </div>
           </div>
+        </section>
+
+        <!-- قسم الأدوات مفتوحة المصدر (Open Source Tools) -->
+        <section class="open-source-tools-section" id="open-source-tools">
+          <div class="container">
+            <div class="section-badge">مفتوحة المصدر</div>
+            <h2 class="section-title">أدوات المطورين & المصممين</h2>
+            <p class="section-description">
+              مجموعة من الأدوات المجانية والمفتوحة المصدر التي نطورها لمساعدة المجتمع التقني في تسهيل مهامهم اليومية.
+            </p>
+            
+            <div class="tools-grid">
+              <!-- Tool Card 1 -->
+              <div class="tool-card" data-aos="fade-up">
+                <div class="tool-card-icon">
+                  <svg class="svg-icon" aria-hidden="true">
+                    <use xlink:href="assets/images/icons.svg#icon-cogs"></use>
+                  </svg>
+                </div>
+                <h3>مجموعة أدوات المطورين</h3>
+                <p>ضغط ملفات CSS، تعمية JavaScript، وتشفير ملفات SVG بسهولة وسرعة.</p>
+                <div class="tool-card-footer">
+                  <a href="open-source-tools/dev-tools.html" class="tool-link">استخدم الأداة <i class="fas fa-arrow-left"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="all-tools-link">
+              <a href="open-source-tools/index.html" class="btn-outline-glow">عرض جميع الإضافات و الأدوات</a>
+            </div>
+          </div>
+        </section>
 
           <!-- شريط الشعارات المتحرك -->
           <div class="partners-bar">
