@@ -27,12 +27,21 @@ class SPARouter {
         return;
       }
 
-      if (link && link.getAttribute("href")?.startsWith("#")) {
-        // Internal hash link - standard behavior (let hashchange handle it)
-      } else if (link && this.isInternalPageLink(link)) {
+      if (
+        link &&
+        (link.getAttribute("href")?.startsWith("#") ||
+          this.isInternalPageLink(link))
+      ) {
         e.preventDefault();
         const targetId = this.extractIdFromLink(link);
-        window.location.hash = targetId;
+
+        // Only trigger navigation if hash actually changes or to force re-render
+        if (window.location.hash !== `#${targetId}`) {
+          window.location.hash = targetId;
+        } else {
+          // If hash is same, manually trigger route handling
+          this.handleRoute();
+        }
       }
     });
   }
@@ -41,16 +50,14 @@ class SPARouter {
     const href = link.getAttribute("href");
     if (!href) return false;
 
-    // Check if it matches existing page names or just the root
-    const pages = [
+    const internalPages = [
       "index.html",
-      "about.html",
-      "services.html",
-      "works.html",
-      "portfolio.html",
-      "payment.html",
-      "salla-discounts.html",
-      "contact.html",
+      "about",
+      "services",
+      "contact",
+      "payment",
+      "home",
+      "salla-discounts",
     ];
 
     // Explicitly ignore external tools directory
