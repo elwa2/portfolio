@@ -22,14 +22,265 @@
     />
 
     <style>
-      /* --- Tool Specific Styles (Avant-Garde Adaptation) --- */
-      :root {
-        --tool-primary: var(--primary-color);
-        --tool-accent: var(--secondary-purple);
-        --card-bg-tool: var(--card-bg);
+      /* --- Tool Specific Styles --- */
+      /* Scoped Tool Styles to avoid breaking main site */
+      .tool-page-wrapper {
+        --tool-primary: #5d3dcd;
+        --tool-accent: #00b8d4;
+        --tool-bg: #f4f6fc;
+        --tool-card-bg: #ffffff;
+        --tool-text: #212529;
+        --tool-border: #e0e5ec;
       }
-/* ... (existing styles) ... */
+
+      /* Base Tool Styles */
+      .main-tools-wrapper {
+        max-width: 980px;
+        width: 100%;
+        margin: 0 auto;
+        box-shadow: 0 8px 30px rgba(93, 61, 205, 0.12);
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: var(--card-bg); /* Use site variable */
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      /* Tab Navigation */
+      .tab-navigation {
+        display: flex;
+        background: rgba(var(--primary-rgb), 0.03);
+        border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .tab-button {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 14px 20px;
+        font-size: 1rem;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        color: var(--text-color-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border-radius: 8px;
+      }
+      .tab-button:hover {
+        color: var(--primary-color);
+        background-color: rgba(var(--primary-rgb), 0.05);
+      }
+      .tab-button.active {
+        color: #fff;
+        background-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+      }
+      .tab-button i {
+        font-size: 1.2rem;
+      }
+
+      /* Tab Content */
+      .tab-content {
+        padding: 30px;
+        background-color: var(--card-bg);
+      }
+      .tool-section {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .tool-section.hidden { display: none; }
+
+      .tool-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+        text-align: center;
+      }
+      .tool-section h4 {
+        font-size: 1.1rem;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        color: var(--text-color);
+        font-weight: 700;
+      }
+      .tool-section > p {
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 30px auto;
+        color: var(--text-color-light);
+      }
+
+      /* Inputs */
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 18px;
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        border-radius: 12px;
+        font-size: 14px;
+        font-family: "Roboto Mono", monospace;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        outline: none;
+        transition: 0.3s;
+        resize: vertical;
+      }
+      textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+      }
+
+      /* Options */
+      .options-area {
+        background-color: rgba(var(--primary-rgb), 0.03);
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+      .options-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+      }
+      .option-item {
+        display: flex;
+        align-items: center;
+        background-color: var(--card-bg);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        cursor: pointer;
+      }
+      .option-item label {
+        cursor: pointer;
+        padding-right: 12px;
+        font-size: 14px;
+        color: var(--text-color);
+      }
+      .option-input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--primary-color);
+      }
+
+      /* Buttons */
+      .tool-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .btn-tool {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Cairo", sans-serif;
+        transition: 0.3s;
+      }
+      .btn-primary { background: var(--primary-color); color: white; }
+      .btn-secondary { background: #6c757d; color: white; }
+      .btn-danger { background: #dc3545; color: white; }
+      .btn-accent { background: var(--secondary-purple); color: white; }
+      .btn-tool:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+      /* JS Toggle */
+      .js-tool-mode-switcher {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 25px;
+        background-color: rgba(var(--primary-rgb), 0.05);
+        border-radius: 8px;
+        padding: 5px;
+        max-width: 400px;
+        margin: 0 auto 25px auto;
+      }
+      .js-mode-button {
+        flex: 1;
+        background: transparent;
+        color: var(--text-color-light);
+        padding: 10px;
+        font-weight: 700;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: "Cairo", sans-serif;
+      }
+      .js-mode-button.active {
+        background-color: var(--card-bg);
+        color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+
+      /* SVG Encoder Specifics */
+      #svg-encoder-wrapper .panel {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        background-color: rgba(var(--primary-rgb), 0.03);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+      #svg-encoder-wrapper .containers {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .demo-wrapper {
+        border: 2px dashed rgba(var(--primary-rgb), 0.2);
+        border-radius: 12px;
+        padding: 20px;
+        background: #fdfdfd;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .demo {
+        width: 100%;
+        height: 100%;
+        min-height: 150px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+      }
+      .contrast-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        align-items: center;
+      }
+      .contrast-button {
+        width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;
+      }
+      .contrast-button--white { background: white; }
+      .contrast-button--silver { background: silver; }
+      .contrast-button--black { background: black; }
+
+      @media (max-width: 768px) {
+        .tab-button span { display: none; }
+        .tab-button i { font-size: 1.4rem; margin: 0; }
+        #svg-encoder-wrapper .containers { grid-template-columns: 1fr; }
+      }
     </style>
+
   </head>
   <body class="theme-aware">
     <div class="grain-overlay"></div>
@@ -80,113 +331,162 @@
             مجموعة أدوات المطورين
           </h1>
           <p style="color: var(--text-color-light)">
-            أدوات احترافية لتحسين الكود وتسهيل العمل
+            مجموعة كاملة من الأدوات: ضغط CSS، تعمية JS، وتشفير SVG
           </p>
         </div>
 
         <div class="main-tools-wrapper">
           <div class="tab-navigation">
-            <button class="tab-button active" data-tab="css-minifier">
+            <button class="tab-button active" data-tab="css-minifier-tool">
               <i class="fab fa-css3-alt"></i> <span>ضاغط CSS</span>
             </button>
-            <button class="tab-button" data-tab="js-encoder">
+            <button class="tab-button" data-tab="js-encoder-tool">
               <i class="fab fa-js-square"></i> <span>تعمية JS</span>
             </button>
-            <button class="tab-button" data-tab="svg-encoder">
+            <button class="tab-button" data-tab="svg-encoder-wrapper">
               <i class="fas fa-vector-square"></i> <span>تشفير SVG</span>
             </button>
           </div>
 
           <div class="tab-content">
-            <!-- CSS Minifier -->
-            <div class="tool-section" id="css-minifier">
-              <h3>ضاغط ومحسن أكواد CSS</h3>
-              <p>قم بلصق الكود وضغطه لتقليص الحجم وتحسين الأداء.</p>
-              <textarea
-                id="cssInput"
-                placeholder="/* الصق كود CSS هنا */"
-              ></textarea>
-              <div class="tool-buttons">
-                <button
-                  class="btn-tool btn-tool-primary"
-                  onclick="compressCSS()"
-                >
-                  <i class="fas fa-compress-alt"></i> ضغط الكود
-                </button>
-                <button
-                  class="btn-tool btn-tool-secondary"
-                  onclick="copyToClipboard('cssOutput')"
-                >
-                  <i class="fas fa-copy"></i> نسخ النتيجة
-                </button>
-              </div>
-              <textarea
-                id="cssOutput"
-                placeholder="النتيجة ستظهر هنا..."
-                readonly
-              ></textarea>
-            </div>
-
-            <!-- JS Encoder -->
-            <div class="tool-section hidden" id="js-encoder">
-              <h3>تعمية JavaScript</h3>
+            <!-- CSS Minifier Tool Content -->
+            <div class="tool-section" id="css-minifier-tool">
+              <h2>ضاغط ومحسن أكواد CSS</h2>
               <p>
-                قم بحماية كود JavaScript الخاص بك عن طريق التعمية (Obfuscation).
+                قم بلصق كود CSS الخاص بك لتقليل حجمه، مما يساهم في تسريع تحميل موقعك.
               </p>
-              <textarea
-                id="jsInput"
-                placeholder="// اكتب كود JS هنا..."
-              ></textarea>
-              <div class="tool-buttons">
-                <button
-                  class="btn-tool btn-tool-primary"
-                  onclick="performJsEncode()"
-                >
-                  <i class="fas fa-lock"></i> تعمية الكود
-                </button>
-                <button
-                  class="btn-tool btn-tool-secondary"
-                  onclick="copyToClipboard('jsOutput')"
-                >
-                  <i class="fas fa-copy"></i> نسخ النتيجة
-                </button>
+              <div id="cssminifier">
+                <h4>الصق كود CSS هنا:</h4>
+                <textarea id="cssInput" placeholder="/* مثال */
+    body {
+      color: #333;
+      font-size: 16px; 
+    }" spellcheck="false"></textarea>
+
+                <div class="options-area">
+                    <div class="options-container">
+                        <div class="option-item">
+                            <input class="option-input" id="stripAllComment" type="checkbox" checked>
+                            <label for="stripAllComment">إزالة كل التعليقات</label>
+                        </div>
+                        <div class="option-item">
+                            <input class="option-input" id="stripCustomComments" type="checkbox" checked>
+                            <label for="stripCustomComments">إزالة تعليقات الكود المخصصة</label>
+                        </div>
+                        <div class="option-item">
+                            <input class="option-input" id="superCompact" type="checkbox" checked>
+                            <label for="superCompact">ضغط مدمج للغاية</label>
+                        </div>
+                        <div class="option-item">
+                            <input class="option-input" id="betterIndentation" type="checkbox">
+                            <label for="betterIndentation">الحفاظ على المسافة البادئة</label>
+                        </div>
+                        <div class="option-item">
+                            <input class="option-input" id="removeLastSemicolon" type="checkbox" checked>
+                            <label for="removeLastSemicolon">إزالة الفاصلة المنقوطة الأخيرة</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-buttons">
+                    <button class="btn-tool btn-primary" onclick="compressCSS();"><i class="fas fa-compress-alt"></i> ضغط CSS</button>
+                    <button class="btn-tool btn-secondary" onclick="clearField('cssInput');"><i class="fas fa-eraser"></i> مسح</button>
+                    <button class="btn-tool btn-secondary" onclick="copyToClipboard('cssOutput');"><i class="fas fa-copy"></i> نسخ النتيجة</button>
+                </div>
+
+                <h4>كود CSS المضغوط:</h4>
+                <textarea id="cssOutput" placeholder="النتيجة المضغوطة ستظهر هنا..." spellcheck="false" readonly onclick="copyToClipboard('cssOutput')"></textarea>
               </div>
-              <textarea
-                id="jsOutput"
-                placeholder="النتيجة ستظهر هنا..."
-                readonly
-              ></textarea>
             </div>
 
-            <!-- SVG Encoder -->
-            <div class="tool-section hidden" id="svg-encoder">
-              <div id="svg-encoder-wrapper">
-                <h3>محول SVG إلى URL</h3>
-                <div class="containers-svg">
-                  <div class="container-input">
-                    <p>أدخل كود SVG:</p>
-                    <textarea id="svgInput" spellcheck="false"></textarea>
+            <!-- JavaScript Encoder/Decoder Tool Content -->
+            <div class="tool-section hidden" id="js-encoder-tool">
+              <h2>🔐 أداة تعمية JavaScript</h2>
+              <p>
+                اختر الوضع المناسب: "تعمية" لتحويل كودك إلى نص غير مقروء، أو "فك التعمية" لاستعادة الكود الأصلي.
+              </p>
+
+              <div class="js-tool-mode-switcher">
+                <button class="js-mode-button active" onclick="switchJsMode('encode')"><i class="fas fa-lock"></i> تعمية</button>
+                <button class="js-mode-button" onclick="switchJsMode('decode')"><i class="fas fa-unlock-alt"></i> فك التعمية</button>
+              </div>
+
+              <div id="js-encode-mode" class="js-tool-mode">
+                  <h4>أدخل كود JavaScript للتعمية:</h4>
+                  <textarea id="jsEncodeInput" placeholder="// اكتب كودك هنا...
+    function hello() {
+      console.log('Hello, World!');
+    }"></textarea>
+                  <div class="tool-buttons">
+                      <button class="btn-tool btn-primary" onclick="performJsEncode()"><i class="fas fa-cogs"></i> تعمية الكود</button>
+                      <button class="btn-tool btn-secondary" onclick="clearField('jsEncodeInput')"><i class="fas fa-eraser"></i> مسح</button>
                   </div>
-                  <div class="container-preview">
-                    <p>معاينة:</p>
-                    <div class="demo-wrapper">
-                      <div class="demo-svg" id="svgDemo"></div>
-                    </div>
+                  <h4>النتيجة المعماة:</h4>
+                  <textarea id="jsEncodeOutput" placeholder="النتيجة ستظهر هنا..." readonly onclick="copyToClipboard('jsEncodeOutput')"></textarea>
+              </div>
+
+              <div id="js-decode-mode" class="js-tool-mode hidden">
+                  <h4>أدخل الكود المعمّى لفك تعميته:</h4>
+                  <textarea id="jsDecodeInput" placeholder='eval(decodeURIComponent(escape(atob("..."))));'></textarea>
+                   <div class="tool-buttons">
+                      <button class="btn-tool btn-danger" onclick="performJsDecode()"><i class="fas fa-key"></i> فك تعمية الكود</button>
+                      <button class="btn-tool btn-secondary" onclick="clearField('jsDecodeInput')"><i class="fas fa-eraser"></i> مسح</button>
+                  </div>
+                  <h4>الكود الأصلي المسترجع:</h4>
+                  <textarea id="jsDecodeOutput" placeholder="النتيجة ستظهر هنا..." readonly onclick="copyToClipboard('jsDecodeOutput')"></textarea>
+              </div>
+            </div>
+
+            <!-- URL-encoder for SVG Tool Content -->
+            <div class="tool-section hidden" id="svg-encoder-wrapper">
+              <h2 style="color: var(--secondary-purple)">محول SVG إلى URL</h2>
+              <p>
+                  حوّل كود SVG إلى صيغة URL-encoded لاستخدامه مباشرة في CSS (background-image).
+              </p>
+              
+              <div class="panel">
+                <div class="options">
+                  <b>علامات التنصيص:</b>
+                  <label style="margin: 0 10px;">
+                    <input type="radio" value="single" name="quotes" class="options__input"> 'Single'
+                  </label>
+                  <label>
+                    <input type="radio" value="double" name="quotes" class="options__input" checked> "Double"
+                  </label>
+                </div>
+              </div>
+
+              <div class="containers">
+                <div class="container">
+                  <h4>
+                    <i class="fas fa-paste"></i> أدخل كود SVG:
+                    <button class="btn-tool btn-accent" style="padding: 2px 8px; font-size: 12px; display:inline-flex;" id="svgExampleBtn">مثال</button>
+                  </h4>
+                  <textarea name="init" id="init" spellcheck="false" placeholder="<svg>...</svg>"></textarea>
+                </div>
+                <div class="container">
+                  <h4><i class="fas fa-eye"></i> معاينة:</h4>
+                  <div class="demo-wrapper">
+                      <div id="demo" class="demo"></div>
+                  </div>
+                  <div class="contrast-buttons">
+                    <b>الخلفية:</b>
+                    <button type="button" class="contrast-button contrast-button--white contrast-button--current" data-color="white" style="background:white"></button>
+                    <button type="button" class="contrast-button contrast-button--silver" data-color="silver" style="background:silver"></button>
+                    <button type="button" class="contrast-button contrast-button--black" data-color="black" style="background:black"></button>
                   </div>
                 </div>
-                <div class="tool-buttons">
-                  <button
-                    class="btn-tool btn-tool-primary"
-                    onclick="copyToClipboard('svgOutput')"
-                  >
-                    <i class="fas fa-copy"></i> نسخ CSS URL
-                  </button>
-                </div>
-                <textarea
-                  id="svgOutput"
-                  placeholder="background-image: url(...)"
-                  readonly
-                ></textarea>
+              </div>
+
+               <div class="containers">
+                  <div class="container">
+                      <h4><i class="fas fa-link"></i> النتيجة (Encoded URL):</h4>
+                      <textarea name="result" id="result" spellcheck="false" readonly onclick="copyToClipboard('result')"></textarea>
+                  </div>
+                  <div class="container">
+                      <h4><i class="fab fa-css3"></i> كود CSS جاهز:</h4>
+                      <textarea name="result-css" id="result-css" spellcheck="false" readonly onclick="copyToClipboard('result-css')"></textarea>
+                  </div>
               </div>
             </div>
           </div>
@@ -287,83 +587,203 @@
     <script>
       const get = (id) => document.getElementById(id);
 
-      function showToast(msg) {
-        const t = get("toast");
-        t.innerText = msg;
-        t.classList.add("show");
-        setTimeout(() => t.classList.remove("show"), 2500);
-      }
-
-      async function copyToClipboard(id) {
-        const el = get(id);
-        if (!el.value) return;
+      // --- Global Copy Function ---
+      async function copyToClipboard(elementId) {
+        const el = get(elementId);
+        if (!el || !el.value || el.value.trim() === "") {
+          alert("لا يوجد شيء لنسخه!");
+          return;
+        }
         try {
           await navigator.clipboard.writeText(el.value);
-          showToast("تم النسخ بنجاح!");
-        } catch (e) {
-          showToast("فشل النسخ");
+          // Simple visual feedback could be added here
+          alert("تم النسخ بنجاح!");
+        } catch (err) {
+          console.error("Copy failed:", err);
         }
       }
 
-      // Tab logic
-      document.querySelectorAll(".tab-button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".tab-button")
-            .forEach((b) => b.classList.remove("active"));
-          document
-            .querySelectorAll(".tool-section")
-            .forEach((s) => s.classList.add("hidden"));
-          btn.classList.add("active");
-          get(btn.dataset.tab).classList.remove("hidden");
+      function clearField(elementId) {
+        const field = get(elementId);
+        if (field) {
+            field.value = "";
+            // Also clear output if mapped
+            if(elementId === 'cssInput') get('cssOutput').value = "";
+            if(elementId === 'jsEncodeInput') get('jsEncodeOutput').value = "";
+            if(elementId === 'jsDecodeInput') get('jsDecodeOutput').value = "";
+        }
+      }
+
+      // --- Tab Switching Logic ---
+      document.addEventListener("DOMContentLoaded", () => {
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const toolSections = document.querySelectorAll(".tool-section");
+
+        function showTab(tabId) {
+          toolSections.forEach(section => section.classList.add("hidden"));
+          tabButtons.forEach(button => button.classList.remove("active"));
+          
+          const targetSection = get(tabId);
+          const targetButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+          
+          if (targetSection && targetButton) {
+            targetSection.classList.remove("hidden");
+            targetButton.classList.add("active");
+          }
+        }
+
+        tabButtons.forEach(button => {
+          button.addEventListener("click", () => showTab(button.dataset.tab));
         });
       });
 
-      // CSS Minifier logic (simplified logic from user provided html)
+      // --- CSS Minifier JavaScript ---
       function compressCSS() {
-        let n = get("cssInput").value;
+        const cssInput = get("cssInput");
+        const cssOutput = get("cssOutput");
+        let n = cssInput.value;
         if (!n.trim()) return;
-        n = n.replace(/\/\*[\w\W]*?\*\//gm, "");
+
+        if (get("stripCustomComments").checked) n = n.replace(/\/\*\/\/\*[\s\S]*?\/\*\/\//g, "");
+        if (get("stripAllComment").checked || get("superCompact").checked) n = n.replace(/\/\*[\w\W]*?\*\//gm, "");
+        else n = n.replace(/(\n+)?(\/\*[\w\W]*?\*\/)(\n+)?/gm, "\n$2\n");
         n = n.replace(/([\n\r\t\s ]+)?([,\:;\{\}]+?)([\n\r\t\s ]+)?/g, "$2");
+        if (!get("superCompact").checked) n = n.replace(/\}(?!\})/g, "}\n");
+        const mediaKeyframesRegex = /@(media|-w|-m|-o|keyframes|page)(.*?)\{([\s\S]+?)?\}\}/gi;
+        if (get("betterIndentation").checked) {
+          n = n.replace(mediaKeyframesRegex, e => e.replace(/\n+/g, "\n  "));
+          if (!get("superCompact").checked) {
+            n = n.replace(/\}\}/g, "}\n}");
+            n = n.replace(/@(media|-w|-m|-o|keyframes)(.*?)\{/g, "@$1$2{\n  ");
+          }
+        } else {
+          n = n.replace(mediaKeyframesRegex, e => e.replace(/\n+/g, ""));
+        }
+        if (get("removeLastSemicolon").checked) n = n.replace(/;\}/g, "}");
+        else n = n.replace(/\}/g, ";}").replace(/;+\}/g, ";}").replace(/\};\}/g, "}}");
         n = n.replace(/\:0(px|em|pt)/gi, ":0").replace(/ 0(px|em|pt)/gi, " 0");
-        get("cssOutput").value = n.trim();
-        showToast("تم الضغط!");
+        n = n.replace(/\s+\!important/gi, "!important").replace(/(^\n+|\n+$)/, "");
+        cssOutput.value = n;
       }
 
-      // JS Encoder logic
+      // --- JavaScript Encoder/Decoder Logic ---
+      function switchJsMode(mode) {
+        const encodeMode = get('js-encode-mode'), decodeMode = get('js-decode-mode');
+        const encodeBtn = document.querySelector('.js-mode-button[onclick*="encode"]');
+        const decodeBtn = document.querySelector('.js-mode-button[onclick*="decode"]');
+        
+        if (mode === 'encode') {
+            encodeMode.classList.remove('hidden');
+            decodeMode.classList.add('hidden');
+            encodeBtn.classList.add('active');
+            decodeBtn.classList.remove('active');
+        } else {
+            decodeMode.classList.remove('hidden');
+            encodeMode.classList.add('hidden');
+            decodeBtn.classList.add('active');
+            encodeBtn.classList.remove('active');
+        }
+      }
+
       function performJsEncode() {
-        const val = get("jsInput").value;
-        if (!val.trim()) return;
+        const input = get('jsEncodeInput'), output = get('jsEncodeOutput');
+        if (!input.value.trim()) return;
         try {
-          let b = btoa(unescape(encodeURIComponent(val)));
-          get("jsOutput").value =
-            `eval(decodeURIComponent(escape(atob("${b}"))));`;
-          showToast("تمت التعمية!");
+          let encoded = btoa(unescape(encodeURIComponent(input.value)));
+          output.value = `eval(decodeURIComponent(escape(atob("${encoded}"))));`;
         } catch (e) {
-          showToast("خطأ في الكود");
+          console.error(e);
+          alert("خطأ في عملية التعمية");
         }
       }
 
-      // SVG logic
-      get("svgInput").addEventListener("input", () => {
-        let val = get("svgInput").value;
-        if (!val.trim()) return;
-        if (val.indexOf("http://www.w3.org/2000/svg") < 0) {
-          val = val.replace(/<svg/g, `<svg xmlns="http://www.w3.org/2000/svg"`);
+      function performJsDecode() {
+        const input = get('jsDecodeInput'), output = get('jsDecodeOutput');
+        if (!input.value.trim()) return;
+        try {
+            // Simplified regex to catch simple atob patterns
+            const match = input.value.match(/atob\("(.+?)"\)/);
+            if (match && match[1]) {
+                 output.value = decodeURIComponent(escape(atob(match[1])));
+            } else {
+                 alert("لم يتم العثور على نمط تعمية متوافق (atob).");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("خطأ في فك التعمية");
         }
-        let escaped = val
-          .replace(/"/g, "'")
-          .replace(/>\s{1,}</g, "><")
-          .replace(/\s{2,}/g, " ");
-        escaped = escaped.replace(
-          /[\r\n#()<>?\[\\\]^`{|}]/g,
-          encodeURIComponent,
-        );
-        const res = `background-image: url("data:image/svg+xml,${escaped}");`;
-        get("svgOutput").value = res;
-        get("svgDemo").style.backgroundImage =
-          `url("data:image/svg+xml,${escaped}")`;
-      });
+      }
+
+      // --- URL-encoder for SVG JavaScript ---
+      (function() {
+        const initTextarea = get("init"), resultTextarea = get("result"), resultCssTextarea = get("result-css");
+        const resultDemo = get("demo");
+        const contrastButtons = document.querySelectorAll(".contrast-button");
+        const quotesInputs = document.querySelectorAll('.options__input[name="quotes"]');
+        
+        // Example Button
+        const exBtn = document.getElementById('svgExampleBtn');
+        if(exBtn) {
+            exBtn.addEventListener('click', () => {
+                initTextarea.value = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">\n  <circle cx="50" cy="50" r="40" fill="#5d3dcd" />\n</svg>`;
+                initTextarea.dispatchEvent(new Event('input'));
+            });
+        }
+
+        let externalQuotesValue = "double";
+        let quotes = getQuotes();
+        
+        function getResults() {
+          if (!initTextarea) return;
+          if (!initTextarea.value.trim()) {
+            resultTextarea.value = resultCssTextarea.value = "";
+            resultDemo.style.backgroundImage = "";
+            return;
+          }
+          let namespaced = addNameSpace(initTextarea.value);
+          let escaped = encodeSVG(namespaced);
+          resultTextarea.value = escaped;
+          let resultCss = `background-image: url(${quotes.level1}data:image/svg+xml,${escaped}${quotes.level1});`;
+          resultCssTextarea.value = resultCss;
+          resultDemo.style.backgroundImage = `url("data:image/svg+xml,${escaped}")`;
+        }
+
+        function getQuotes() {
+            return {
+                level1: externalQuotesValue === "double" ? `"` : `'`,
+                level2: externalQuotesValue === "double" ? `'` : `"`
+            };
+        }
+        function addNameSpace(data) {
+          if (data.indexOf("http://www.w3.org/2000/svg") < 0) {
+            data = data.replace(/<svg/g, `<svg xmlns=${quotes.level2}http://www.w3.org/2000/svg${quotes.level2}`);
+          }
+          return data;
+        }
+        function encodeSVG(data) {
+          const symbols = /[\r\n#()<>?\[\\\]^`{|}]/g;
+          if (externalQuotesValue === "double") data = data.replace(/"/g, "'");
+          else data = data.replace(/'/g, '"');
+          data = data.replace(/>\s{1,}</g, "><").replace(/\s{2,}/g, " ");
+          return data.replace(symbols, encodeURIComponent);
+        }
+
+        if(initTextarea){
+            initTextarea.addEventListener("input", getResults);
+            quotesInputs.forEach(input => input.addEventListener("change", function() {
+              externalQuotesValue = this.value;
+              quotes = getQuotes();
+              getResults();
+            }));
+            contrastButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    document.querySelector('.contrast-button--current')?.classList.remove('contrast-button--current');
+                    this.classList.add('contrast-button--current');
+                    resultDemo.style.backgroundColor = this.dataset.color;
+                });
+            });
+        }
+      })();
     </script>
   </body>
 </html>
