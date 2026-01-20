@@ -314,11 +314,59 @@
           padding: 20px;
         }
       }
+      /* Fix Select Option Contrast */
+      option {
+        background: var(--tool-card-bg);
+        color: var(--tool-text);
+      }
+
+      [data-theme="dark"] option {
+        background: #1e1e2e;
+        color: #ffffff;
+      }
     </style>
   </head>
   <body class="theme-aware">
     <div class="grain-overlay"></div>
     <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 5%; top: 10%; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 15%; top: 60%; animation-delay: 1s"
+      >
+        ✨
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; top: 20%; animation-delay: 2s"
+      >
+        ⚡
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 45%; top: 70%; animation-delay: 0.5s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 65%; top: 15%; animation-delay: 3s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; top: 50%; animation-delay: 1.5s"
+      >
+        ⭐
+      </div>
+    </div>
     <div class="floating-background">
       <div
         class="floating-icon"

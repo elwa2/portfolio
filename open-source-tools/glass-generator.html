@@ -274,11 +274,60 @@
         border: 2px solid #fff;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
       }
+
+      /* Fix Select Option Contrast */
+      option {
+        background: var(--tool-card-bg);
+        color: var(--tool-text);
+      }
+
+      [data-theme="dark"] option {
+        background: #1e1e2e;
+        color: #ffffff;
+      }
     </style>
   </head>
   <body class="theme-aware">
     <div class="grain-overlay"></div>
     <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 5%; top: 10%; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 15%; top: 60%; animation-delay: 1s"
+      >
+        ✨
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; top: 20%; animation-delay: 2s"
+      >
+        ⚡
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 45%; top: 70%; animation-delay: 0.5s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 65%; top: 15%; animation-delay: 3s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; top: 50%; animation-delay: 1.5s"
+      >
+        ⭐
+      </div>
+    </div>
 
     <header class="header">
       <div class="container">
@@ -431,11 +480,89 @@
       </div>
     </div>
 
-    <footer class="footer">
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
       <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use
+                    href="../assets/images/icons.svg#icon-map-marker-alt"
+                  ></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
         <div class="footer-bottom">
           <p>
-            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
           </p>
         </div>
       </div>
