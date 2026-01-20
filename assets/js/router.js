@@ -64,7 +64,7 @@ class SPARouter {
     if (href.includes("open-source-tools/")) return false;
 
     return (
-      pages.some((p) => href.includes(p)) ||
+      internalPages.some((p) => href.includes(p)) ||
       href === "index.html" ||
       href === "/" ||
       href.startsWith("#")
