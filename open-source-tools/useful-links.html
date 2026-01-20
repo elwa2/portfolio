@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>روابط مفيدة للمطورين والمصممين | Ali Ahmed</title>
+
+    <!-- External Links -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      :root {
+        --tool-primary: #5d3dcd;
+        --tool-accent: #00b8d4;
+        --tool-bg: #f4f6fc;
+        --tool-card-bg: #ffffff;
+        --tool-text: #212529;
+        --tool-border: #e0e5ec;
+        --primary-rgb: 93, 61, 205;
+      }
+
+      [data-theme="dark"] {
+        --tool-bg: transparent;
+        --tool-card-bg: rgba(30, 30, 30, 0.65);
+        --tool-text: #ffffff;
+        --tool-border: rgba(255, 255, 255, 0.2);
+        --bg-color: #0f0f15;
+      }
+
+      /* Global Reset & Scroll fix */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: transparent !important;
+        overflow-x: hidden;
+        overflow-y: auto !important;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--tool-bg);
+        z-index: -3;
+      }
+
+      [data-theme="dark"] body {
+        background-color: #0f0f15 !important;
+      }
+
+      #three-canvas-container,
+      .floating-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      .grain-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      .links-page-wrapper {
+        position: relative;
+        z-index: 10;
+        padding: 60px 0;
+        min-height: 100vh;
+      }
+
+      .links-container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .category-section {
+        margin-bottom: 50px;
+      }
+
+      .category-title {
+        font-size: 1.8rem;
+        color: var(--tool-primary);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-right: 15px;
+        border-right: 4px solid var(--tool-primary);
+      }
+
+      .links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+      }
+
+      .link-card {
+        background: var(--tool-card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid var(--tool-border);
+        text-decoration: none;
+        color: var(--tool-text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .link-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--tool-primary);
+      }
+
+      .link-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--tool-primary);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .link-card:hover::after {
+        transform: scaleX(1);
+      }
+
+      .link-icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 1px solid var(--tool-border);
+      }
+
+      [data-theme="dark"] .link-icon {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .link-icon img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
+
+      .link-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+        font-family: "Cairo", sans-serif;
+      }
+
+      .link-domain {
+        font-size: 0.8rem;
+        opacity: 0.6;
+        font-family: monospace;
+      }
+
+      @media (max-width: 600px) {
+        .links-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="links-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 60px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">
+            روابط مفيدة للمصممين والمطورين
+          </h1>
+          <p style="color: var(--text-color-light)">
+            مجموعة من أهم المواقع والأدوات التي تساعدك في الإبداع والبرمجة
+          </p>
+        </div>
+
+        <div class="links-container">
+          <!-- Design & AI Category -->
+          <div class="category-section">
+            <h2 class="category-title">
+              <i class="fas fa-palette"></i> أدوات التصميم والذكاء الاصطناعي
+            </h2>
+            <div class="links-grid">
+              <a
+                href="https://www.remove.bg/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=remove.bg&sz=64"
+                    alt="Remove.bg"
+                  />
+                </div>
+                <div class="link-name">إزالة خلفية الصور</div>
+                <div class="link-domain">remove.bg</div>
+              </a>
+              <a
+                href="https://business.gemini.google/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64"
+                    alt="Gemini"
+                  />
+                </div>
+                <div class="link-name">جوجل Gemini</div>
+                <div class="link-domain">gemini.google.com</div>
+              </a>
+              <a
+                href="https://excalidraw.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=excalidraw.com&sz=64"
+                    alt="Excalidraw"
+                  />
+                </div>
+                <div class="link-name">إكسكاليدرو</div>
+                <div class="link-domain">excalidraw.com</div>
+              </a>
+              <a
+                href="https://labs.google/fx/ar/tools/whisk"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=labs.google&sz=64"
+                    alt="Whisk"
+                  />
+                </div>
+                <div class="link-name">أداة Whisk</div>
+                <div class="link-domain">labs.google</div>
+              </a>
+              <a
+                href="https://stitch.withgoogle.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=stitch.withgoogle.com&sz=64"
+                    alt="Stitch"
+                  />
+                </div>
+                <div class="link-name">جوجل Stitch</div>
+                <div class="link-domain">withgoogle.com</div>
+              </a>
+              <a
+                href="https://yandex.com/images/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=yandex.com&sz=64"
+                    alt="Yandex Images"
+                  />
+                </div>
+                <div class="link-name">محرك صور ياندكس</div>
+                <div class="link-domain">yandex.com</div>
+              </a>
+              <a
+                href="https://aistudio.google.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=aistudio.google.com&sz=64"
+                    alt="AI Studio"
+                  />
+                </div>
+                <div class="link-name">جوجل AI Studio</div>
+                <div class="link-domain">google.com</div>
+              </a>
+              <a href="#" class="link-card" target="_blank">
+                <div class="link-icon">
+                  <i
+                    class="fas fa-banana"
+                    style="color: #ffe135; font-size: 24px"
+                  ></i>
+                </div>
+                <div class="link-name">نانو بنانا</div>
+                <div class="link-domain">نظام التشغيل المصغر</div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Development & CSS Category -->
+          <div class="category-section">
+            <h2 class="category-title">
+              <i class="fas fa-code"></i> البرمجة وتطوير الويب
+            </h2>
+            <div class="links-grid">
+              <a href="https://supabase.com/" class="link-card" target="_blank">
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=supabase.com&sz=64"
+                    alt="Supabase"
+                  />
+                </div>
+                <div class="link-name">سوبابيس (قواعد بيانات)</div>
+                <div class="link-domain">supabase.com</div>
+              </a>
+              <a
+                href="https://www.netlify.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=netlify.com&sz=64"
+                    alt="Netlify"
+                  />
+                </div>
+                <div class="link-name">نتليفاي (استضافة)</div>
+                <div class="link-domain">netlify.com</div>
+              </a>
+              <a
+                href="https://www.phpkobo.com/css-obfuscator"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=phpkobo.com&sz=64"
+                    alt="CSS Obfuscator"
+                  />
+                </div>
+                <div class="link-name">تشفير CSS</div>
+                <div class="link-domain">phpkobo.com</div>
+              </a>
+              <a
+                href="https://www.htmlwasher.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=htmlwasher.com&sz=64"
+                    alt="HTML Washer"
+                  />
+                </div>
+                <div class="link-name">تنظيف كود HTML</div>
+                <div class="link-domain">htmlwasher.com</div>
+              </a>
+              <a
+                href="https://www.base64encode.org/enc/font/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=base64encode.org&sz=64"
+                    alt="Base64 Font"
+                  />
+                </div>
+                <div class="link-name">تشفير الخطوط Base64</div>
+                <div class="link-domain">base64encode.org</div>
+              </a>
+              <a
+                href="https://www.base64-image.de/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=base64-image.de&sz=64"
+                    alt="Base64 Image"
+                  />
+                </div>
+                <div class="link-name">تشفير الصور Base64</div>
+                <div class="link-domain">base64-image.de</div>
+              </a>
+              <a
+                href="https://www.image-map.net/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=image-map.net&sz=64"
+                    alt="Image Map"
+                  />
+                </div>
+                <div class="link-name">خرائط الصور</div>
+                <div class="link-domain">image-map.net</div>
+              </a>
+              <a
+                href="https://web3forms.com/"
+                class="link-card"
+                target="_blank"
+              >
+                <div class="link-icon">
+                  <img
+                    src="https://www.google.com/s2/favicons?domain=web3forms.com&sz=64"
+                    alt="Web3Forms"
+                  />
+                </div>
+                <div class="link-name">ويب 3 فورمس</div>
+                <div class="link-domain">web3forms.com</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة.
+            </p>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>جميع الحقوق محفوظة &copy; Ali Ahmed</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+  </body>
+</html>
