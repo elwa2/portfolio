@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أدوات KDP الاحترافية | Ali Ahmed</title>
+
+    <!-- External Links -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      :root {
+        --tool-primary: #5d3dcd;
+        --tool-accent: #00b8d4;
+        --tool-bg: #f4f6fc;
+        --tool-card-bg: #ffffff;
+        --tool-text: #212529;
+        --tool-border: #e0e5ec;
+        --primary-rgb: 93, 61, 205;
+      }
+
+      [data-theme="dark"] {
+        --tool-bg: transparent;
+        --tool-card-bg: rgba(30, 30, 30, 0.65);
+        --tool-text: #ffffff;
+        --tool-border: rgba(255, 255, 255, 0.2);
+        --bg-color: #0f0f15;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: transparent !important;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--tool-bg);
+        z-index: -3;
+      }
+
+      [data-theme="dark"] body {
+        background-color: #0f0f15 !important;
+      }
+
+      #three-canvas-container,
+      .floating-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      .grain-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      .kdp-wrapper {
+        position: relative;
+        z-index: 10;
+        padding: 120px 0 60px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Tabs System */
+      .tool-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 40px;
+        background: var(--tool-card-bg);
+        padding: 10px;
+        border-radius: 50px;
+        border: 1px solid var(--tool-border);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .tab-btn {
+        padding: 12px 25px;
+        border: none;
+        background: transparent;
+        color: var(--tool-text);
+        font-family: "Cairo", sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 30px;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .tab-btn.active {
+        background: var(--tool-primary);
+        color: #fff;
+        box-shadow: 0 5px 15px rgba(93, 61, 205, 0.3);
+      }
+
+      .tool-content {
+        display: none;
+        background: var(--tool-card-bg);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid var(--tool-border);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        animation: fadeIn 0.5s ease;
+      }
+
+      .tool-content.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Shared UI Components */
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        color: var(--tool-primary);
+        font-family: "Cairo", sans-serif;
+        border-bottom: 2px solid var(--tool-border);
+        padding-bottom: 10px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--tool-text);
+        font-family: "Cairo", sans-serif;
+      }
+
+      select,
+      input {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--tool-border);
+        background: var(--tool-bg);
+        color: var(--tool-text);
+        font-family: inherit;
+        outline: none;
+        transition: 0.3s;
+      }
+
+      select:focus,
+      input:focus {
+        border-color: var(--tool-primary);
+        box-shadow: 0 0 0 3px rgba(93, 61, 205, 0.1);
+      }
+
+      .btn-generate {
+        width: 100%;
+        padding: 16px;
+        background: var(--tool-primary);
+        color: #fff;
+        border: none;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+        font-family: "Cairo", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .btn-generate:hover {
+        background: var(--tool-accent);
+        transform: translateY(-2px);
+      }
+
+      /* Specific Tool Styles */
+      .upload-area {
+        border: 2px dashed var(--tool-border);
+        padding: 40px;
+        text-align: center;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-bottom: 20px;
+      }
+
+      .upload-area:hover {
+        border-color: var(--tool-primary);
+        background: rgba(93, 61, 205, 0.05);
+      }
+
+      #image-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .image-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--tool-border);
+      }
+
+      .image-item img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+      }
+
+      .delete-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      /* Status Indicator */
+      #status {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        font-weight: 600;
+        display: none;
+      }
+
+      #status.success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        display: block;
+      }
+      #status.error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .tool-nav {
+          flex-wrap: wrap;
+          border-radius: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="kdp-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 50px">
+          <h1
+            style="
+              font-size: 2.5rem;
+              color: var(--primary-color);
+              font-family: &quot;Cairo&quot;, sans-serif;
+            "
+          >
+            أدوات KDP للناشرين المحترفين
+          </h1>
+          <p style="color: var(--text-color-light)">
+            حول صورك إلى كتب جاهزة للنشر أو ولد ألغازاً وتصاميم داخلية بدقة
+            عالية
+          </p>
+        </div>
+
+        <nav class="tool-nav">
+          <button class="tab-btn active" onclick="switchTab('coloring')">
+            <i class="fas fa-paint-brush"></i> كتب التلوين
+          </button>
+          <button class="tab-btn" onclick="switchTab('sudoku')">
+            <i class="fas fa-th"></i> كتب السودوكو
+          </button>
+          <button class="tab-btn" onclick="switchTab('interior')">
+            <i class="fas fa-book-open"></i> التصاميم الداخلية
+          </button>
+        </nav>
+
+        <!-- Coloring Page Tool -->
+        <div id="coloring" class="tool-content active">
+          <h2 class="section-title">
+            مُولد كتب التلوين (Coloring Book Builder)
+          </h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>حجم الصفحة</label>
+              <select id="pageSize-coloring">
+                <option value="6x9">6 x 9 in</option>
+                <option value="8.5x11" selected>8.5 x 11 in (Letter)</option>
+                <option value="8.27x11.69">A4 (8.27 x 11.69 in)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>نمط الإطار</label>
+              <select id="frameStyle">
+                <option value="square">إطار مربع</option>
+                <option value="rounded">زوايا مستديرة</option>
+                <option value="without-border">بدون إطار</option>
+              </select>
+            </div>
+          </div>
+          <div
+            class="upload-area"
+            id="uploadArea"
+            onclick="document.getElementById('imageUpload').click()"
+          >
+            <i
+              class="fas fa-cloud-upload-alt"
+              style="
+                font-size: 3rem;
+                color: var(--tool-primary);
+                margin-bottom: 15px;
+              "
+            ></i>
+            <p>اسحب الصور هنا أو اضغط للاختيار</p>
+            <input
+              type="file"
+              id="imageUpload"
+              multiple
+              accept="image/*"
+              style="display: none"
+            />
+          </div>
+          <div id="image-preview"></div>
+          <button class="btn-generate" onclick="generateColoringPdf()">
+            <i class="fas fa-file-pdf"></i> إنشاء ملف PDF للتحميل
+          </button>
+        </div>
+
+        <!-- Sudoku Tool -->
+        <div id="sudoku" class="tool-content">
+          <h2 class="section-title">مُولد كتب السودوكو (Sudoku Generator)</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>حجم الكتاب</label>
+              <select id="pageSize-sudoku">
+                <option value="6x9" selected>6 x 9 in</option>
+                <option value="8.5x11">8.5 x 11 in</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>مستوى الصعوبة</label>
+              <select id="difficulty">
+                <option>Easy</option>
+                <option selected>Medium</option>
+                <option>Hard</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>عدد الألغاز</label>
+              <input
+                type="number"
+                id="numPuzzles"
+                value="10"
+                min="1"
+                max="100"
+              />
+            </div>
+            <div class="form-group">
+              <label>ألغاز في كل صفحة</label>
+              <select id="puzzlesPerPage">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-generate" onclick="generateSudokuPdf()">
+            <i class="fas fa-puzzle-piece"></i> توليد ألغاز السودوكو
+          </button>
+        </div>
+
+        <!-- Interior Tool -->
+        <div id="interior" class="tool-content">
+          <h2 class="section-title">
+            مُولد التصاميم الداخلية (Interior Designer)
+          </h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>نوع القالب</label>
+              <select id="templateType">
+                <option value="lined_notebook">
+                  دفتر مسطر (Lined Notebook)
+                </option>
+                <option value="daily_planner">مخطط يومي (Daily Planner)</option>
+                <option value="weekly_planner">
+                  مخطط أسبوعي (Weekly Planner)
+                </option>
+                <option value="to_do_list">قائمة مهام (To-Do List)</option>
+                <option value="inventory_log">
+                  سجل المخزون (Inventory Log)
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>حجم الصفحة</label>
+              <select id="pageSize-interior">
+                <option value="6x9" selected>6 x 9 in</option>
+                <option value="8.5x11">8.5 x 11 in</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>عدد الصفحات</label>
+              <input
+                type="number"
+                id="pageCount"
+                value="100"
+                min="10"
+                max="500"
+              />
+            </div>
+            <div class="form-group">
+              <label>ترقيم الصفحات</label>
+              <select id="pageNumbering">
+                <option value="yes">نعم</option>
+                <option value="no">لا</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-generate" onclick="generateInteriorPdf()">
+            <i class="fas fa-book"></i> إنشاء التصميم الداخلي
+          </button>
+        </div>
+
+        <div id="status"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/three-bg.js"></script>
+
+    <script>
+      const { jsPDF } = window.jspdf;
+      const { PDFDocument, rgb, StandardFonts } = PDFLib;
+
+      // Tab Switching
+      function switchTab(tabId) {
+        document
+          .querySelectorAll(".tool-content")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+
+        document.getElementById(tabId).classList.add("active");
+        event.currentTarget.classList.add("active");
+      }
+
+      function showStatus(msg, type = "success") {
+        const s = document.getElementById("status");
+        s.innerText = msg;
+        s.className = type;
+        setTimeout(() => (s.style.display = "none"), 5000);
+      }
+
+      // --- Coloring Logic ---
+      let uploadedImages = [];
+      const imageUpload = document.getElementById("imageUpload");
+      const imagePreview = document.getElementById("image-preview");
+
+      imageUpload.addEventListener("change", (e) => {
+        const files = e.target.files;
+        for (const file of files) {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            uploadedImages.push(ev.target.result);
+            renderPreviews();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      function renderPreviews() {
+        imagePreview.innerHTML = "";
+        uploadedImages.forEach((src, idx) => {
+          const div = document.createElement("div");
+          div.className = "image-item";
+          div.innerHTML = `<img src="${src}"><button class="delete-image-btn" onclick="deleteImg(${idx})">×</button>`;
+          imagePreview.appendChild(div);
+        });
+      }
+
+      function deleteImg(i) {
+        uploadedImages.splice(i, 1);
+        renderPreviews();
+      }
+
+      async function generateColoringPdf() {
+        if (!uploadedImages.length)
+          return showStatus("يرجى رفع صور أولاً", "error");
+
+        const size = document
+          .getElementById("pageSize-coloring")
+          .value.split("x");
+        const w = parseFloat(size[0]);
+        const h = parseFloat(size[1]);
+        const frame = document.getElementById("frameStyle").value;
+
+        const doc = new jsPDF({ unit: "in", format: [w, h] });
+        doc.deletePage(1);
+
+        for (const imgData of uploadedImages) {
+          doc.addPage();
+          const img = new Image();
+          img.src = imgData;
+          await new Promise((r) => (img.onload = r));
+
+          let margin = 0.5;
+          let rw = w - margin * 2;
+          let rh = h - margin * 2;
+          const ratio = img.width / img.height;
+          if (ratio > rw / rh) rh = rw / ratio;
+          else rw = rh * ratio;
+
+          const x = (w - rw) / 2;
+          const y = (h - rh) / 2;
+
+          doc.addImage(imgData, "JPEG", x, y, rw, rh);
+          if (frame !== "without-border") {
+            doc.setDrawColor(0);
+            if (frame === "square") doc.rect(x, y, rw, rh);
+            else if (frame === "rounded")
+              doc.roundedRect(x, y, rw, rh, 0.2, 0.2);
+          }
+        }
+        doc.save("coloring-book.pdf");
+        showStatus("تم توليد كتاب التلوين بنجاح!");
+      }
+
+      // --- Sudoku Logic ---
+      class Sudoku {
+        constructor() {
+          this.grid = Array(9)
+            .fill(0)
+            .map(() => Array(9).fill(0));
+          this.solution = null;
+        }
+        generate() {
+          this.solve(this.grid);
+          this.solution = JSON.parse(JSON.stringify(this.grid));
+        }
+        solve(grid) {
+          const find = this.findEmpty(grid);
+          if (!find) return true;
+          const [r, c] = find;
+          const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(
+            () => Math.random() - 0.5,
+          );
+          for (let n of nums) {
+            if (this.isValid(grid, r, c, n)) {
+              grid[r][c] = n;
+              if (this.solve(grid)) return true;
+              grid[r][c] = 0;
+            }
+          }
+          return false;
+        }
+        findEmpty(grid) {
+          for (let r = 0; r < 9; r++)
+            for (let c = 0; c < 9; c++) if (grid[r][c] === 0) return [r, c];
+          return null;
+        }
+        isValid(grid, r, c, n) {
+          for (let i = 0; i < 9; i++)
+            if (grid[r][i] === n || grid[i][c] === n) return false;
+          const sr = Math.floor(r / 3) * 3,
+            sc = Math.floor(c / 3) * 3;
+          for (let i = 0; i < 3; i++)
+            for (let j = 0; j < 3; j++)
+              if (grid[sr + i][sc + j] === n) return false;
+          return true;
+        }
+        getPuzzle(diff) {
+          let clues = diff === "Easy" ? 38 : diff === "Hard" ? 28 : 32;
+          let p = JSON.parse(JSON.stringify(this.solution));
+          let rem = 81 - clues;
+          while (rem > 0) {
+            let r = Math.floor(Math.random() * 9),
+              c = Math.floor(Math.random() * 9);
+            if (p[r][c] !== 0) {
+              p[r][c] = 0;
+              rem--;
+            }
+          }
+          return p;
+        }
+      }
+
+      async function generateSudokuPdf() {
+        showStatus("جاري توليد الألغاز... انتظر قليلاً", "success");
+        const num = parseInt(document.getElementById("numPuzzles").value);
+        const diff = document.getElementById("difficulty").value;
+        const ppp = parseInt(document.getElementById("puzzlesPerPage").value);
+        const pageSize = document
+          .getElementById("pageSize-sudoku")
+          .value.split("x")
+          .map((v) => v * 72);
+
+        const pdfDoc = await PDFDocument.create();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        for (let i = 0; i < Math.ceil(num / ppp); i++) {
+          const page = pdfDoc.addPage(pageSize);
+          const { width, height } = page.getSize();
+
+          for (let j = 0; j < ppp; j++) {
+            if (i * ppp + j >= num) break;
+            const sdk = new Sudoku();
+            sdk.generate();
+            const puzzle = sdk.getPuzzle(diff);
+
+            let size = (Math.min(width, height) - 100) / (ppp > 1 ? 2 : 1);
+            let x = width / 2 - size / 2 + (ppp === 4 && j % 2 ? width / 4 : 0); // Simplified positioning
+            let y = height - size - 100 - (ppp > 1 && j >= 2 ? height / 2 : 0);
+
+            drawSudokuGrid(page, puzzle, x, y, size, font, i * ppp + j + 1);
+          }
+        }
+        const bytes = await pdfDoc.save();
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "sudoku-book.pdf";
+        link.click();
+        showStatus("تم تحميل كتاب السودوكو!");
+      }
+
+      function drawSudokuGrid(page, grid, x, y, size, font, id) {
+        const cs = size / 9;
+        page.drawText(`Puzzle #${id}`, {
+          x: x,
+          y: y + size + 10,
+          size: 12,
+          font,
+        });
+        for (let i = 0; i <= 9; i++) {
+          const t = i % 3 === 0 ? 2 : 0.5;
+          page.drawLine({
+            start: { x: x, y: y + i * cs },
+            end: { x: x + size, y: y + i * cs },
+            thickness: t,
+          });
+          page.drawLine({
+            start: { x: x + i * cs, y: y },
+            end: { x: x + i * cs, y: y + size },
+            thickness: t,
+          });
+        }
+        for (let r = 0; r < 9; r++)
+          for (let c = 0; c < 9; c++) {
+            if (grid[r][c] !== 0)
+              page.drawText(String(grid[r][c]), {
+                x: x + c * cs + cs / 3,
+                y: y + size - (r + 1) * cs + cs / 4,
+                size: cs / 2,
+                font,
+              });
+          }
+      }
+
+      // --- Interior Logic ---
+      function generateInteriorPdf() {
+        const type = document.getElementById("templateType").value;
+        const pageCount = parseInt(document.getElementById("pageCount").value);
+        const pageSize = document
+          .getElementById("pageSize-interior")
+          .value.split("x");
+        const numbering =
+          document.getElementById("pageNumbering").value === "yes";
+
+        const doc = new jsPDF({
+          unit: "in",
+          format: [parseFloat(pageSize[0]), parseFloat(pageSize[1])],
+        });
+        const w = parseFloat(pageSize[0]);
+        const h = parseFloat(pageSize[1]);
+
+        for (let i = 1; i <= pageCount; i++) {
+          if (i > 1) doc.addPage();
+
+          if (type === "lined_notebook") {
+            doc.setDrawColor(200);
+            for (let y = 1; y < h - 0.5; y += 0.3) doc.line(0.5, y, w - 0.5, y);
+          } else if (type === "to_do_list") {
+            doc
+              .setFontSize(20)
+              .text("To-Do List", w / 2, 0.8, { align: "center" });
+            for (let y = 1.2; y < h - 0.8; y += 0.4) {
+              doc.rect(0.6, y - 0.15, 0.2, 0.2);
+              doc.line(1, y, w - 0.6, y);
+            }
+          }
+          // Add other templates here as needed...
+
+          if (numbering)
+            doc
+              .setFontSize(10)
+              .text(String(i), w / 2, h - 0.4, { align: "center" });
+        }
+        doc.save(`${type}.pdf`);
+        showStatus("تم إنشاء التصميم الداخلي بنجاح!");
+      }
+    </script>
+  </body>
+</html>
