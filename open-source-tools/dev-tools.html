@@ -141,6 +141,9 @@
       .tab-content {
         padding: 40px;
       }
+      .tool-section.tool-hidden-state {
+        display: none !important;
+      }
       .tool-section h2 {
         color: var(--tool-primary);
         margin-bottom: 20px;
@@ -511,7 +514,7 @@
             </div>
 
             <!-- JavaScript Encoder/Decoder Tool Content -->
-            <div class="tool-section hidden" id="js-encoder-tool">
+            <div class="tool-section tool-hidden-state" id="js-encoder-tool">
               <h2>🔐 أداة تعمية JavaScript</h2>
               <p>
                 اختر الوضع المناسب: "تعمية" لتحويل كودك إلى نص غير مقروء، أو "فك
@@ -562,7 +565,7 @@
                 ></textarea>
               </div>
 
-              <div id="js-decode-mode" class="js-tool-mode hidden">
+              <div id="js-decode-mode" class="js-tool-mode tool-hidden-state">
                 <h4>أدخل الكود المعمّى لفك تعميته:</h4>
                 <textarea
                   id="jsDecodeInput"
@@ -593,7 +596,10 @@
             </div>
 
             <!-- URL-encoder for SVG Tool Content -->
-            <div class="tool-section hidden" id="svg-encoder-wrapper">
+            <div
+              class="tool-section tool-hidden-state"
+              id="svg-encoder-wrapper"
+            >
               <h2 style="color: var(--secondary-purple)">محول SVG إلى URL</h2>
               <p>
                 حوّل كود SVG إلى صيغة URL-encoded لاستخدامه مباشرة في CSS
@@ -831,7 +837,9 @@
         const toolSections = document.querySelectorAll(".tool-section");
 
         function showTab(tabId) {
-          toolSections.forEach((section) => section.classList.add("hidden"));
+          toolSections.forEach((section) =>
+            section.classList.add("tool-hidden-state"),
+          );
           tabButtons.forEach((button) => button.classList.remove("active"));
 
           const targetSection = get(tabId);
@@ -840,7 +848,7 @@
           );
 
           if (targetSection && targetButton) {
-            targetSection.classList.remove("hidden");
+            targetSection.classList.remove("tool-hidden-state");
             targetButton.classList.add("active");
           }
         }
@@ -848,6 +856,14 @@
         tabButtons.forEach((button) => {
           button.addEventListener("click", () => showTab(button.dataset.tab));
         });
+
+        // Initialize: show the first tab only
+        const activeTab = document.querySelector(".tab-button.active");
+        if (activeTab) {
+          showTab(activeTab.dataset.tab);
+        } else if (tabButtons.length > 0) {
+          showTab(tabButtons[0].dataset.tab);
+        }
       });
 
       // --- CSS Minifier JavaScript ---
@@ -900,13 +916,13 @@
         );
 
         if (mode === "encode") {
-          encodeMode.classList.remove("hidden");
-          decodeMode.classList.add("hidden");
+          encodeMode.classList.remove("tool-hidden-state");
+          decodeMode.classList.add("tool-hidden-state");
           encodeBtn.classList.add("active");
           decodeBtn.classList.remove("active");
         } else {
-          decodeMode.classList.remove("hidden");
-          encodeMode.classList.add("hidden");
+          decodeMode.classList.remove("tool-hidden-state");
+          encodeMode.classList.add("tool-hidden-state");
           decodeBtn.classList.add("active");
           encodeBtn.classList.remove("active");
         }
