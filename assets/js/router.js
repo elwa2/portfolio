@@ -46,22 +46,21 @@ class SPARouter {
       "index.html",
       "about.html",
       "services.html",
+      "works.html",
       "portfolio.html",
       "payment.html",
       "salla-discounts.html",
       "contact.html",
     ];
-      href === "index.html" ||
-      href === "/"
-    );
-    
+
     // Explicitly ignore external tools directory
     if (href.includes("open-source-tools/")) return false;
-    
+
     return (
       pages.some((p) => href.includes(p)) ||
       href === "index.html" ||
-      href === "/"
+      href === "/" ||
+      href.startsWith("#")
     );
   }
 
