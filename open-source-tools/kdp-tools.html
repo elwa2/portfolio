@@ -433,6 +433,7 @@
             <div class="form-group">
               <label>حجم الصفحة</label>
               <select id="pageSize-coloring">
+                <option value="5x8">5 x 8 in</option>
                 <option value="6x9">6 x 9 in</option>
                 <option value="8.5x11" selected>8.5 x 11 in (Letter)</option>
                 <option value="8.27x11.69">A4 (8.27 x 11.69 in)</option>
@@ -441,12 +442,117 @@
             <div class="form-group">
               <label>نمط الإطار</label>
               <select id="frameStyle">
+                <option value="without-border">بدون إطار</option>
                 <option value="square">إطار مربع</option>
                 <option value="rounded">زوايا مستديرة</option>
-                <option value="without-border">بدون إطار</option>
+                <option value="double">إطار مزدوج</option>
+                <option value="thick">إطار سميك</option>
               </select>
             </div>
           </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>خيارات إضافية</label>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="belongsToPage-coloring" checked />
+                  إضافة صفحة ملكية (Belongs to)
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="copyrightPage-coloring" checked />
+                  إضافة صفحة حقوق (Copyright)
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="blankPage-coloring" checked /> ترك
+                  صفحة بيضاء بين الصور
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="colorTestPage-coloring" /> إضافة
+                  صفحات تجربة الألوان
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="pageNumbering-coloring" /> إضافة
+                  ترقيم الصفحات
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="bleed-coloring" /> تفعيل النزيف
+                  (Bleed)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div id="coloring-texts" style="margin-bottom: 20px">
+            <div
+              id="belongsToGroup-coloring"
+              class="form-group"
+              style="margin-bottom: 15px"
+            >
+              <label>نص الملكية</label>
+              <input
+                type="text"
+                id="belongsToText-coloring"
+                value="This Coloring Book Belongs To:"
+              />
+            </div>
+            <div id="copyrightGroup-coloring" class="form-group">
+              <label>نص الحقوق</label>
+              <input
+                type="text"
+                id="copyrightText-coloring"
+                value="Copyright © 2025 Ali Ahmed. All rights reserved."
+              />
+            </div>
+          </div>
+
           <div
             class="upload-area"
             id="uploadArea"
@@ -482,7 +588,9 @@
             <div class="form-group">
               <label>حجم الكتاب</label>
               <select id="pageSize-sudoku">
+                <option value="5x8">5 x 8 in</option>
                 <option value="6x9" selected>6 x 9 in</option>
+                <option value="8x10">8 x 10 in</option>
                 <option value="8.5x11">8.5 x 11 in</option>
               </select>
             </div>
@@ -513,6 +621,92 @@
               </select>
             </div>
           </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>خيارات متقدمة</label>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="includeSolutions-sudoku" checked />
+                  إضافة الحلول (Solutions)
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="pageNumbers-sudoku" checked />
+                  إضافة ترقيم الصفحات
+                </label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                  "
+                >
+                  <input type="checkbox" id="bleed-sudoku" /> تفعيل النزيف
+                  (Bleed)
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>حلول في كل صفحة</label>
+              <select id="solutionsPerPage-sudoku">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" id="includeBelongsTo-sudoku" checked />
+                صفحة "هذا الكتاب يخص"
+              </label>
+            </div>
+            <div class="form-group">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" id="includeCopyright-sudoku" checked />
+                صفحة الحقوق
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px">
+            <label>صاحب الحقوق</label>
+            <input type="text" id="copyrightOwner-sudoku" value="Ali Ahmed" />
+          </div>
+
           <button class="btn-generate" onclick="generateSudokuPdf()">
             <i class="fas fa-puzzle-piece"></i> توليد ألغاز السودوكو
           </button>
@@ -527,17 +721,36 @@
             <div class="form-group">
               <label>نوع القالب</label>
               <select id="templateType">
-                <option value="lined_notebook">
-                  دفتر مسطر (Lined Notebook)
-                </option>
-                <option value="daily_planner">مخطط يومي (Daily Planner)</option>
-                <option value="weekly_planner">
-                  مخطط أسبوعي (Weekly Planner)
-                </option>
-                <option value="to_do_list">قائمة مهام (To-Do List)</option>
-                <option value="inventory_log">
-                  سجل المخزون (Inventory Log)
-                </option>
+                <optgroup label="نوت بوك ومجلات">
+                  <option value="lined_notebook">
+                    دفتر مسطر (Lined Notebook)
+                  </option>
+                  <option value="college_ruled">
+                    تسطير جامعي (College Ruled)
+                  </option>
+                  <option value="dot_grid_journal">منقط (Dot Grid)</option>
+                  <option value="graph_paper">مربعات (Graph Paper)</option>
+                  <option value="music_manuscript">نوتة موسيقية</option>
+                </optgroup>
+                <optgroup label="مخططات">
+                  <option value="daily_planner">
+                    مخطط يومي (Daily Planner)
+                  </option>
+                  <option value="weekly_planner">
+                    مخطط أسبوعي (Weekly Planner)
+                  </option>
+                  <option value="to_do_list">قائمة مهام (To-Do List)</option>
+                  <option value="habit_tracker">متتبع عادات</option>
+                  <option value="meal_planner">مخطط وجبات</option>
+                </optgroup>
+                <optgroup label="سجلات وأعمال">
+                  <option value="inventory_log">
+                    سجل المخزون (Inventory Log)
+                  </option>
+                  <option value="expense_tracker">متتبع مصاريف</option>
+                  <option value="password_log">سجل كلمات المرور</option>
+                  <option value="recipe_page">صفحة وصفات طعام</option>
+                </optgroup>
               </select>
             </div>
             <div class="form-group">
@@ -545,6 +758,8 @@
               <select id="pageSize-interior">
                 <option value="6x9" selected>6 x 9 in</option>
                 <option value="8.5x11">8.5 x 11 in</option>
+                <option value="5x8">5 x 8 in</option>
+                <option value="8.27x11.69">A4</option>
               </select>
             </div>
             <div class="form-group">
@@ -565,6 +780,36 @@
               </select>
             </div>
           </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" id="bleed-interior" /> تفعيل النزيف
+                (Bleed)
+              </label>
+            </div>
+            <div class="form-group">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  cursor: pointer;
+                "
+              >
+                <input type="checkbox" id="includeBelongsTo-interior" /> إضافة
+                صفحة "هذا الكتاب يخص"
+              </label>
+            </div>
+          </div>
+
           <button class="btn-generate" onclick="generateInteriorPdf()">
             <i class="fas fa-book"></i> إنشاء التصميم الداخلي
           </button>
@@ -690,9 +935,18 @@
       function showStatus(msg, type = "success") {
         const s = document.getElementById("status");
         s.innerText = msg;
+        s.style.display = "block";
         s.className = type;
         setTimeout(() => (s.style.display = "none"), 5000);
       }
+
+      // --- Common Constants ---
+      const FONT_STYLES = {
+        lightGray: "#ced4da",
+        darkGray: "#212529",
+        headerColor: [93, 61, 205], // Primary color
+        lineSpacing: 0.28,
+      };
 
       // --- Coloring Logic ---
       let uploadedImages = [];
@@ -730,25 +984,108 @@
         if (!uploadedImages.length)
           return showStatus("يرجى رفع صور أولاً", "error");
 
+        showStatus("جاري إنشاء الملف... قد يستغرق ذلك لحظات", "success");
+
         const size = document
           .getElementById("pageSize-coloring")
           .value.split("x");
         const w = parseFloat(size[0]);
         const h = parseFloat(size[1]);
         const frame = document.getElementById("frameStyle").value;
+        const addBelongsTo = document.getElementById(
+          "belongsToPage-coloring",
+        ).checked;
+        const addCopyright = document.getElementById(
+          "copyrightPage-coloring",
+        ).checked;
+        const addBlankPages =
+          document.getElementById("blankPage-coloring").checked;
+        const addColorTest = document.getElementById(
+          "colorTestPage-coloring",
+        ).checked;
+        const addNumbers = document.getElementById(
+          "pageNumbering-coloring",
+        ).checked;
+        const bleed = document.getElementById("bleed-coloring").checked;
 
-        const doc = new jsPDF({ unit: "in", format: [w, h] });
+        const belongsToText = document.getElementById(
+          "belongsToText-coloring",
+        ).value;
+        const copyrightText = document.getElementById(
+          "copyrightText-coloring",
+        ).value;
+
+        const doc = new jsPDF({
+          unit: "in",
+          format: [w, h],
+          orientation: w > h ? "landscape" : "portrait",
+        });
         doc.deletePage(1);
 
-        for (const imgData of uploadedImages) {
+        let pageNum = 0;
+
+        // 1. Belongs To Page
+        if (addBelongsTo && belongsToText.trim()) {
           doc.addPage();
+          doc.setFontSize(22);
+          doc.text(belongsToText, w / 2, h / 2 - 0.5, { align: "center" });
+          doc.setDrawColor(200);
+          doc.line(w / 2 - 1.5, h / 2, w / 2 + 1.5, h / 2);
+        }
+
+        // 2. Copyright Page
+        if (addCopyright && copyrightText.trim()) {
+          doc.addPage();
+          doc.setFontSize(10);
+          doc.text(copyrightText, w / 2, h - 1, { align: "center" });
+        }
+
+        // 3. Color Test Pages
+        if (addColorTest) {
+          for (let k = 0; k < 2; k++) {
+            doc.addPage();
+            doc.setFontSize(14).text("Color Test Page", w / 2, 0.8, {
+              align: "center",
+            });
+            const swatchSize = 0.6;
+            const gap = 0.2;
+            const startX = (w - (swatchSize * 6 + gap * 5)) / 2;
+            for (let r = 0; r < 8; r++) {
+              for (let c = 0; c < 6; c++) {
+                doc.setDrawColor(200);
+                doc.rect(
+                  startX + c * (swatchSize + gap),
+                  1.2 + r * (swatchSize + gap),
+                  swatchSize,
+                  swatchSize,
+                );
+              }
+            }
+          }
+        }
+
+        // 4. Images
+        for (let i = 0; i < uploadedImages.length; i++) {
+          if (addBlankPages && i > 0) {
+            doc.addPage();
+            if (addNumbers) {
+              pageNum++;
+              doc.setFontSize(10).text(String(pageNum), w / 2, h - 0.4, {
+                align: "center",
+              });
+            }
+          }
+
+          doc.addPage();
+          if (addNumbers) pageNum++;
+
           const img = new Image();
-          img.src = imgData;
+          img.src = uploadedImages[i];
           await new Promise((r) => (img.onload = r));
 
-          let margin = 0.5;
-          let rw = w - margin * 2;
-          let rh = h - margin * 2;
+          let m = bleed ? 0 : 0.5;
+          let rw = w - m * 2;
+          let rh = h - m * 2;
           const ratio = img.width / img.height;
           if (ratio > rw / rh) rh = rw / ratio;
           else rw = rh * ratio;
@@ -756,16 +1093,30 @@
           const x = (w - rw) / 2;
           const y = (h - rh) / 2;
 
-          doc.addImage(imgData, "JPEG", x, y, rw, rh);
+          doc.addImage(uploadedImages[i], "JPEG", x, y, rw, rh);
+
           if (frame !== "without-border") {
-            doc.setDrawColor(0);
+            doc.setDrawColor(0).setLineWidth(0.01);
             if (frame === "square") doc.rect(x, y, rw, rh);
             else if (frame === "rounded")
               doc.roundedRect(x, y, rw, rh, 0.2, 0.2);
+            else if (frame === "double") {
+              doc.rect(x, y, rw, rh);
+              doc.rect(x + 0.05, y + 0.05, rw - 0.1, rh - 0.1);
+            } else if (frame === "thick") {
+              doc.setLineWidth(0.05).rect(x, y, rw, rh);
+            }
+          }
+
+          if (addNumbers) {
+            doc.setFontSize(10).text(String(pageNum), w / 2, h - 0.4, {
+              align: "center",
+            });
           }
         }
+
         doc.save("coloring-book.pdf");
-        showStatus("تم توليد كتاب التلوين بنجاح!");
+        showStatus("تم إنشاء كتاب التلوين بنجاح!");
       }
 
       // --- Sudoku Logic ---
@@ -832,31 +1183,150 @@
         const num = parseInt(document.getElementById("numPuzzles").value);
         const diff = document.getElementById("difficulty").value;
         const ppp = parseInt(document.getElementById("puzzlesPerPage").value);
-        const pageSize = document
+        const spp = parseInt(
+          document.getElementById("solutionsPerPage-sudoku").value,
+        );
+        const includeSolutions = document.getElementById(
+          "includeSolutions-sudoku",
+        ).checked;
+        const addNumbers =
+          document.getElementById("pageNumbers-sudoku").checked;
+        const includeBelongsTo = document.getElementById(
+          "includeBelongsTo-sudoku",
+        ).checked;
+        const includeCopyright = document.getElementById(
+          "includeCopyright-sudoku",
+        ).checked;
+        const owner = document.getElementById("copyrightOwner-sudoku").value;
+
+        const size = document
           .getElementById("pageSize-sudoku")
-          .value.split("x")
-          .map((v) => v * 72);
+          .value.split("x");
+        const pageWidth = parseFloat(size[0]) * 72;
+        const pageHeight = parseFloat(size[1]) * 72;
 
         const pdfDoc = await PDFDocument.create();
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-        for (let i = 0; i < Math.ceil(num / ppp); i++) {
-          const page = pdfDoc.addPage(pageSize);
-          const { width, height } = page.getSize();
+        const puzzles = [];
+        const solutions = [];
+        for (let i = 0; i < num; i++) {
+          const sdk = new Sudoku();
+          sdk.generate();
+          puzzles.push(sdk.getPuzzle(diff));
+          solutions.push(sdk.solution);
+        }
 
-          for (let j = 0; j < ppp; j++) {
-            if (i * ppp + j >= num) break;
-            const sdk = new Sudoku();
-            sdk.generate();
-            const puzzle = sdk.getPuzzle(diff);
+        let currentPage = 0;
 
-            let size = (Math.min(width, height) - 100) / (ppp > 1 ? 2 : 1);
-            let x = width / 2 - size / 2 + (ppp === 4 && j % 2 ? width / 4 : 0); // Simplified positioning
-            let y = height - size - 100 - (ppp > 1 && j >= 2 ? height / 2 : 0);
+        // Belongs To
+        if (includeBelongsTo) {
+          const page = pdfDoc.addPage([pageWidth, pageHeight]);
+          page.drawText("This Sudoku Book Belongs To:", {
+            x: pageWidth / 2 - 100,
+            y: pageHeight / 2 + 50,
+            size: 18,
+            font,
+          });
+          page.drawLine({
+            start: { x: pageWidth / 2 - 100, y: pageHeight / 2 },
+            end: { x: pageWidth / 2 + 100, y: pageHeight / 2 },
+            thickness: 1,
+          });
+        }
 
-            drawSudokuGrid(page, puzzle, x, y, size, font, i * ppp + j + 1);
+        // Copyright
+        if (includeCopyright) {
+          const page = pdfDoc.addPage([pageWidth, pageHeight]);
+          page.drawText(`© 2025 ${owner}. All rights reserved.`, {
+            x: pageWidth / 2 - 80,
+            y: 50,
+            size: 10,
+            font,
+          });
+        }
+
+        // Draw Puzzles
+        const puzzlePages = Math.ceil(num / ppp);
+        for (let i = 0; i < puzzlePages; i++) {
+          const page = pdfDoc.addPage([pageWidth, pageHeight]);
+          currentPage++;
+          const puzzlesOnPage = puzzles.slice(i * ppp, (i + 1) * ppp);
+
+          puzzlesOnPage.forEach((puzzle, idx) => {
+            let s =
+              (Math.min(pageWidth, pageHeight) - 100) / (ppp > 1 ? 2.2 : 1.2);
+            let x =
+              ppp === 1
+                ? (pageWidth - s) / 2
+                : idx % 2 === 0
+                  ? 50
+                  : pageWidth - s - 50;
+            let y =
+              ppp <= 2
+                ? (pageHeight - s) / 2
+                : idx < 2
+                  ? pageHeight - s - 50
+                  : 50;
+            drawSudokuGrid(
+              page,
+              puzzle,
+              x,
+              y,
+              s,
+              font,
+              i * ppp + idx + 1,
+              diff,
+            );
+          });
+
+          if (addNumbers) {
+            page.drawText(String(currentPage), {
+              x: pageWidth / 2,
+              y: 20,
+              size: 10,
+              font,
+            });
           }
         }
+
+        // Solutions Title Page
+        if (includeSolutions) {
+          const titlePage = pdfDoc.addPage([pageWidth, pageHeight]);
+          titlePage.drawText("Solutions", {
+            x: pageWidth / 2 - 50,
+            y: pageHeight / 2,
+            size: 30,
+            font,
+          });
+
+          const solutionPages = Math.ceil(num / spp);
+          for (let i = 0; i < solutionPages; i++) {
+            const page = pdfDoc.addPage([pageWidth, pageHeight]);
+            currentPage++;
+            const solOnPage = solutions.slice(i * spp, (i + 1) * spp);
+
+            solOnPage.forEach((sol, idx) => {
+              let rows = Math.ceil(spp / 2);
+              let s =
+                (Math.min(pageWidth, pageHeight) - 100) / (spp > 1 ? 2.5 : 1.5);
+              let x = idx % 2 === 0 ? 40 : pageWidth - s - 40;
+              let y = pageHeight - (Math.floor(idx / 2) + 1) * (s + 60);
+
+              drawSudokuGrid(page, sol, x, y, s, font, i * spp + idx + 1);
+            });
+
+            if (addNumbers) {
+              page.drawText(String(currentPage), {
+                x: pageWidth / 2,
+                y: 20,
+                size: 10,
+                font,
+              });
+            }
+          }
+        }
+
         const bytes = await pdfDoc.save();
         const blob = new Blob([bytes], { type: "application/pdf" });
         const link = document.createElement("a");
@@ -866,16 +1336,13 @@
         showStatus("تم تحميل كتاب السودوكو!");
       }
 
-      function drawSudokuGrid(page, grid, x, y, size, font, id) {
+      function drawSudokuGrid(page, grid, x, y, size, font, id, diff = "") {
         const cs = size / 9;
-        page.drawText(`Puzzle #${id}`, {
-          x: x,
-          y: y + size + 10,
-          size: 12,
-          font,
-        });
+        const title = diff ? `Puzzle #${id} (${diff})` : `Solution #${id}`;
+        page.drawText(title, { x: x, y: y + size + 5, size: 8, font });
+
         for (let i = 0; i <= 9; i++) {
-          const t = i % 3 === 0 ? 2 : 0.5;
+          const t = i % 3 === 0 ? 1.5 : 0.5;
           page.drawLine({
             start: { x: x, y: y + i * cs },
             end: { x: x + size, y: y + i * cs },
@@ -889,13 +1356,15 @@
         }
         for (let r = 0; r < 9; r++)
           for (let c = 0; c < 9; c++) {
-            if (grid[r][c] !== 0)
-              page.drawText(String(grid[r][c]), {
+            if (grid[r][c] !== 0) {
+              const val = String(grid[r][c]);
+              page.drawText(val, {
                 x: x + c * cs + cs / 3,
                 y: y + size - (r + 1) * cs + cs / 4,
-                size: cs / 2,
+                size: cs / 1.8,
                 font,
               });
+            }
           }
       }
 
@@ -906,38 +1375,202 @@
         const pageSize = document
           .getElementById("pageSize-interior")
           .value.split("x");
+        const bleed = document.getElementById("bleed-interior").checked;
+        const addBelongsTo = document.getElementById(
+          "includeBelongsTo-interior",
+        ).checked;
         const numbering =
           document.getElementById("pageNumbering").value === "yes";
 
-        const doc = new jsPDF({
-          unit: "in",
-          format: [parseFloat(pageSize[0]), parseFloat(pageSize[1])],
-        });
         const w = parseFloat(pageSize[0]);
         const h = parseFloat(pageSize[1]);
 
+        const doc = new jsPDF({ unit: "in", format: [w, h] });
+        doc.deletePage(1);
+
+        // Belongs To Page
+        if (addBelongsTo) {
+          doc.addPage();
+          doc
+            .setFontSize(20)
+            .text("This book belongs to:", w / 2, h / 2 - 0.5, {
+              align: "center",
+            });
+          doc.line(w / 2 - 1.5, h / 2, w / 2 + 1.5, h / 2);
+        }
+
         for (let i = 1; i <= pageCount; i++) {
-          if (i > 1) doc.addPage();
+          doc.addPage();
+          const margin = bleed ? 0 : 0.5;
 
-          if (type === "lined_notebook") {
-            doc.setDrawColor(200);
-            for (let y = 1; y < h - 0.5; y += 0.3) doc.line(0.5, y, w - 0.5, y);
-          } else if (type === "to_do_list") {
-            doc
-              .setFontSize(20)
-              .text("To-Do List", w / 2, 0.8, { align: "center" });
-            for (let y = 1.2; y < h - 0.8; y += 0.4) {
-              doc.rect(0.6, y - 0.15, 0.2, 0.2);
-              doc.line(1, y, w - 0.6, y);
+          if (type === "lined_notebook" || type === "college_ruled") {
+            const spacing = type === "college_ruled" ? 0.28 : 0.32;
+            doc.setDrawColor(200).setLineWidth(0.01);
+            for (let y = margin + 0.5; y < h - margin; y += spacing) {
+              doc.line(margin, y, w - margin, y);
             }
-          }
-          // Add other templates here as needed...
-
-          if (numbering)
+          } else if (type === "dot_grid_journal") {
+            doc.setDrawColor(150);
+            for (let x = margin; x < w - margin; x += 0.2) {
+              for (let y = margin; y < h - margin; y += 0.2) {
+                doc.rect(x, y, 0.005, 0.005, "F");
+              }
+            }
+          } else if (type === "to_do_list") {
+            doc.setFontSize(18).text("To-Do List", w / 2, margin + 0.4, {
+              align: "center",
+            });
+            doc.setDrawColor(150);
+            for (let y = margin + 0.8; y < h - margin; y += 0.4) {
+              doc.rect(margin, y - 0.15, 0.2, 0.2);
+              doc.line(margin + 0.3, y, w - margin, y);
+            }
+          } else if (type === "daily_planner") {
+            doc.setFontSize(18).text("Daily Planner", w / 2, 0.8, {
+              align: "center",
+            });
+            doc.setFontSize(10).text("Date: ___________", w - 1.5, 0.8);
+            doc.rect(0.5, 1.2, w - 1, 0.5); // Focus
+            doc.text("Top Priorities Today", 0.6, 1.5);
+            doc.autoTable({
+              startY: 2,
+              head: [["Time", "Activity", "Done"]],
+              body: Array(12).fill(["", "", ""]),
+              theme: "grid",
+              headStyles: { fillColor: FONT_STYLES.headerColor },
+            });
+          } else if (type === "inventory_log") {
+            doc.setFontSize(18).text("Inventory Log", w / 2, 0.8, {
+              align: "center",
+            });
+            doc.autoTable({
+              startY: 1.2,
+              head: [["Item Description", "SKU", "Qty", "Price", "Value"]],
+              body: Array(25).fill(["", "", "", "", ""]),
+              theme: "grid",
+              headStyles: { fillColor: [44, 62, 80] },
+            });
+          } else if (type === "habit_tracker") {
+            doc
+              .setFontSize(18)
+              .text("Monthly Habit Tracker", w / 2, 0.8, { align: "center" });
+            const habits = [
+              "Habit 1",
+              "Habit 2",
+              "Habit 3",
+              "Habit 4",
+              "Habit 5",
+            ];
+            doc.autoTable({
+              startY: 1.5,
+              head: [
+                ["Habit name"].concat(
+                  Array.from({ length: 31 }, (_, i) => i + 1),
+                ),
+              ],
+              body: habits.map((h) => [h].concat(Array(31).fill(""))),
+              theme: "grid",
+              styles: { fontSize: 6 },
+              headStyles: { fillColor: FONT_STYLES.headerColor },
+            });
+          } else if (type === "weekly_planner") {
+            doc
+              .setFontSize(18)
+              .text("Weekly Planner", w / 2, 0.8, { align: "center" });
+            doc.autoTable({
+              startY: 1.2,
+              head: [["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]],
+              body: Array(10).fill(["", "", "", "", "", "", ""]),
+              theme: "grid",
+              headStyles: { fillColor: FONT_STYLES.headerColor },
+            });
+          } else if (type === "meal_planner") {
+            doc
+              .setFontSize(18)
+              .text("Weekly Meal Planner", w / 2, 0.8, { align: "center" });
+            doc.autoTable({
+              startY: 1.2,
+              head: [["Day", "Breakfast", "Lunch", "Dinner", "Snacks"]],
+              body: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                (d) => [d, "", "", "", ""],
+              ),
+              theme: "grid",
+              headStyles: { fillColor: FONT_STYLES.headerColor },
+            });
+          } else if (type === "expense_tracker") {
+            doc
+              .setFontSize(18)
+              .text("Expense Tracker", w / 2, 0.8, { align: "center" });
+            doc.autoTable({
+              startY: 1.2,
+              head: [["Date", "Description", "Category", "Amount"]],
+              body: Array(25).fill(["", "", "", ""]),
+              theme: "grid",
+              headStyles: { fillColor: [231, 76, 60] },
+            });
+          } else if (type === "password_log") {
+            doc
+              .setFontSize(18)
+              .text("Password Log", w / 2, 0.8, { align: "center" });
+            doc.autoTable({
+              startY: 1.2,
+              head: [
+                ["Website / Service", "Username / Email", "Password", "Notes"],
+              ],
+              body: Array(20).fill(["", "", "", ""]),
+              theme: "grid",
+              headStyles: { fillColor: [52, 152, 219] },
+            });
+          } else if (type === "recipe_page") {
+            doc.setFontSize(18).text("Recipe: ____________________", 0.6, 0.8);
             doc
               .setFontSize(10)
-              .text(String(i), w / 2, h - 0.4, { align: "center" });
+              .text("Prep Time: ____", 0.6, 1.1)
+              .text("Cook Time: ____", 2.5, 1.1)
+              .text("Servings: ____", 4.5, 1.1);
+            doc.rect(0.5, 1.3, w - 1, 0.1, "F");
+            doc.text("Ingredients", 0.6, 1.6);
+            doc.line(0.6, 1.7, 3, 1.7);
+            for (let j = 0; j < 12; j++)
+              doc.line(0.6, 2.0 + j * 0.3, 3, 2.0 + j * 0.3);
+            doc.text("Directions", 3.5, 1.6);
+            doc.line(3.5, 1.7, w - 0.6, 1.7);
+            for (let j = 0; j < 15; j++)
+              doc.line(3.5, 2.0 + j * 0.3, w - 0.6, 2.0 + j * 0.3);
+          } else if (type === "graph_paper") {
+            doc.setDrawColor(200).setLineWidth(0.005);
+            const step = 0.2;
+            for (let x = margin; x < w - margin; x += step)
+              doc.line(x, margin, x, h - margin);
+            for (let y = margin; y < h - margin; y += step)
+              doc.line(margin, y, w - margin, y);
+          } else if (type === "music_manuscript") {
+            doc.setDrawColor(100).setLineWidth(0.005);
+            for (let s = 0; s < 10; s++) {
+              let startY = 1 + s * 0.8;
+              for (let line = 0; line < 5; line++) {
+                doc.line(
+                  margin,
+                  startY + line * 0.1,
+                  w - margin,
+                  startY + line * 0.1,
+                );
+              }
+            }
+          } else {
+            // Default generic page for others
+            doc.setFontSize(14).text("Template Placeholder", w / 2, h / 2, {
+              align: "center",
+            });
+          }
+
+          if (numbering) {
+            doc
+              .setFontSize(8)
+              .text(String(i), w / 2, h - 0.3, { align: "center" });
+          }
         }
+
         doc.save(`${type}.pdf`);
         showStatus("تم إنشاء التصميم الداخلي بنجاح!");
       }

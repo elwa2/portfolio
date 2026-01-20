@@ -150,7 +150,7 @@
       .tab-content {
         padding: 40px;
       }
-      .tool-section.tool-hidden-state {
+      .tool-hidden-state {
         display: none !important;
       }
       .tool-section h2 {
@@ -580,12 +580,17 @@
 
               <div class="js-tool-mode-switcher">
                 <button
+                  id="js-btn-encode"
                   class="js-mode-button active"
                   onclick="switchJsMode('encode')"
                 >
                   <i class="fas fa-lock"></i> تعمية
                 </button>
-                <button class="js-mode-button" onclick="switchJsMode('decode')">
+                <button
+                  id="js-btn-decode"
+                  class="js-mode-button"
+                  onclick="switchJsMode('decode')"
+                >
                   <i class="fas fa-unlock-alt"></i> فك التعمية
                 </button>
               </div>
@@ -965,23 +970,19 @@
       function switchJsMode(mode) {
         const encodeMode = get("js-encode-mode"),
           decodeMode = get("js-decode-mode");
-        const encodeBtn = document.querySelector(
-          '.js-mode-button[onclick*="encode"]',
-        );
-        const decodeBtn = document.querySelector(
-          '.js-mode-button[onclick*="decode"]',
-        );
+        const encodeBtn = get("js-btn-encode");
+        const decodeBtn = get("js-btn-decode");
 
         if (mode === "encode") {
           encodeMode.classList.remove("tool-hidden-state");
           decodeMode.classList.add("tool-hidden-state");
-          encodeBtn.classList.add("active");
-          decodeBtn.classList.remove("active");
+          if (encodeBtn) encodeBtn.classList.add("active");
+          if (decodeBtn) decodeBtn.classList.remove("active");
         } else {
           decodeMode.classList.remove("tool-hidden-state");
           encodeMode.classList.add("tool-hidden-state");
-          decodeBtn.classList.add("active");
-          encodeBtn.classList.remove("active");
+          if (decodeBtn) decodeBtn.classList.add("active");
+          if (encodeBtn) encodeBtn.classList.remove("active");
         }
       }
 
