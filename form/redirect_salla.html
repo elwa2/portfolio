@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>كاشف ثيمات سلة - جارى التحويل...</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #5e3bee;
+        --primary-light: #7d56f9;
+        --bg-color: #0f0f1a;
+        --card-bg: rgba(26, 26, 46, 0.8);
+        --text-color: #ffffff;
+        --transition: all 0.3s ease;
+        --firefox-color: #ff9100;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Tajawal", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .blobs {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .blob {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: var(--primary-color);
+        filter: blur(80px);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 10s infinite alternate;
+      }
+
+      .blob:nth-child(1) {
+        top: -100px;
+        left: -100px;
+        background: #7d56f9;
+      }
+      .blob:nth-child(2) {
+        bottom: -100px;
+        right: -100px;
+        background: #5e3bee;
+        animation-delay: -5s;
+      }
+
+      @keyframes float {
+        from {
+          transform: translate(0, 0) scale(1);
+        }
+        to {
+          transform: translate(50px, 50px) scale(1.2);
+        }
+      }
+
+      .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        z-index: 1;
+        width: 90%;
+        max-width: 600px;
+        animation: fadeIn 0.8s ease-out;
+        transition: all 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo {
+        width: 80px;
+        margin-bottom: 25px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+      }
+
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        display: block; /* Can be hidden for Firefox */
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          var(--primary-color),
+          var(--primary-light)
+        );
+        border-radius: 10px;
+        animation: load 3s linear forwards;
+      }
+
+      @keyframes load {
+        to {
+          width: 100%;
+        }
+      }
+
+      .footer-text {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 25px;
+        line-height: 1.6;
+      }
+
+      .manual-link-wrapper {
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        display: inline-block;
+        word-break: break-all;
+        max-width: 100%;
+      }
+
+      .manual-link {
+        color: var(--primary-light);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        border-bottom: 1px dashed var(--primary-light);
+        font-size: 0.9rem;
+      }
+
+      .manual-link:hover {
+        color: #fff;
+        border-bottom-style: solid;
+      }
+
+      /* Firefox Specific Styles */
+      #firefox-content {
+        display: none; /* Hidden by default */
+        text-align: right;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .firefox-alert {
+        background: rgba(255, 145, 0, 0.1);
+        border: 1px solid rgba(255, 145, 0, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .firefox-icon {
+        color: var(--firefox-color);
+        font-size: 2rem;
+        margin-bottom: 15px;
+        display: block;
+        text-align: center;
+      }
+
+      .steps-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 15px;
+      }
+
+      .step-item {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem;
+      }
+
+      .step-number {
+        background: var(--firefox-color);
+        color: #000;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .code-snippet {
+        display: inline-block;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        color: #4ade80; /* bright green */
+        margin: 0 5px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+      }
+
+      .download-btn {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #e66465 0%, #9198e5 100%);
+        /* Or Firefox Orange */
+        background: linear-gradient(
+          135deg,
+          #ff9a9e 0%,
+          #fecfef 99%,
+          #fecfef 100%
+        );
+        background: linear-gradient(135deg, #ff9100, #ff5e00);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 20px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 4px 15px rgba(255, 94, 0, 0.3);
+      }
+
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 94, 0, 0.4);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blobs">
+      <div class="blob"></div>
+      <div class="blob"></div>
+    </div>
+
+    <div class="card">
+      <svg
+        class="logo"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        id="main-icon"
+      >
+        <path
+          d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+          stroke="white"
+          stroke-width="2"
+        />
+        <path
+          d="M12 6V12L16 14"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+
+      <h1 id="status-title">جارى اكتشاف المتصفح...</h1>
+      <p id="status-desc">لحظات وسيتم توجيهك للمتجر المناسب لجهازك</p>
+
+      <!-- Standard Loading -->
+      <div id="loading-section">
+        <div class="progress-container">
+          <div class="progress-bar"></div>
+        </div>
+
+        <div class="footer-text">
+          إذا لم يتم تحويلك تلقائياً خلال ثوانٍ،
+          <a href="#" id="manual-redirect-link" class="manual-link">اضغط هنا</a>
+        </div>
+      </div>
+
+      <!-- Firefox Section (Hidden) -->
+      <div id="firefox-content">
+        <div class="firefox-alert">
+          <div class="steps-list">
+            <div class="step-item">
+              <span class="step-number">1</span>
+              <span>قم بتحميل ملف الإضافة (XPI) من الرابط أدناه.</span>
+            </div>
+            <div class="step-item">
+              <span class="step-number">2</span>
+              <span
+                >افتح صفحة الإعدادات المتقدمة بكتابة
+                <span
+                  class="code-snippet"
+                  onclick="copyToClipboard('about:config')"
+                  >about:config</span
+                >
+                في شريط العنوان واضغط Enter.</span
+              >
+            </div>
+            <div class="step-item">
+              <span class="step-number">3</span>
+              <span
+                >ابحث عن
+                <span
+                  class="code-snippet"
+                  onclick="copyToClipboard('xpinstall.signatures.required')"
+                  >xpinstall.signatures.required</span
+                >
+                وقم بتغيير القيمة إلى <b>false</b>.</span
+              >
+            </div>
+            <div class="step-item">
+              <span class="step-number">4</span>
+              <span>قم بسحب ملف الإضافة واسقاطه داخل المتصفح لتثبيته.</span>
+            </div>
+          </div>
+
+          <a
+            href="../open-source-tools/salla-theme-detector-firefox.xpi"
+            class="download-btn"
+          >
+            📥 تحميل الإضافة (Firefox XPI)
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Copy helper
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          // Could show a tooltip toast here
+          /* console.log('Copied'); */
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const userAgent = navigator.userAgent;
+        const isEdge = /Edg/.test(userAgent);
+        const isFirefox = /Firefox/.test(userAgent);
+        const isChrome = /Chrome/.test(userAgent) && !isEdge;
+
+        // Links
+        const edgeLink =
+          "https://microsoftedge.microsoft.com/addons/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-sa/ogeapoamjpobcldlkjabjgmifgokplld";
+        const chromeLink =
+          "https://chromewebstore.google.com/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-sall/gegmcpkdknaegpinpjioccdhidpkjpnh";
+
+        // Elements
+        const title = document.getElementById("status-title");
+        const desc = document.getElementById("status-desc");
+        const loadingSection = document.getElementById("loading-section");
+        const firefoxContent = document.getElementById("firefox-content");
+        const manualLink = document.getElementById("manual-redirect-link");
+        const mainIcon = document.getElementById("main-icon");
+
+        if (isFirefox) {
+          // Handle Firefox
+          title.innerText = "تثبيت الإضافة يدوياً";
+          desc.innerText = "متصفح فايرفوكس يتطلب خطوات إضافية للتثبيت";
+
+          // Hide loading, show firefox content
+          loadingSection.style.display = "none";
+          firefoxContent.style.display = "block";
+
+          // Change icon logic if needed, or keep logo
+          // mainIcon.innerHTML = ... (Optional)
+        } else {
+          // Handle Chrome/Edge/Other
+          let targetLink = chromeLink; // Default
+          let browserName = "Chrome";
+
+          if (isEdge) {
+            targetLink = edgeLink;
+            browserName = "Edge";
+          }
+
+          // Update text
+          // title.innerText = "جارى تحويلك لمتجر " + browserName;
+
+          manualLink.href = targetLink;
+          manualLink.innerText = targetLink;
+
+          // Redirect after timeout matches animation (3s)
+          setTimeout(function () {
+            window.location.href = targetLink;
+          }, 2500);
+        }
+      });
+    </script>
+  </body>
+</html>
