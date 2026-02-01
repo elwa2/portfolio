@@ -1,14 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Base64 Tools - Encode, Decode & Image Converter</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أداة Base64 | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <style>
     :root {
       --primary: #10b981;
       --primary-dark: #059669;
@@ -27,16 +63,45 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: inherit;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      padding: 0;
     }
-    .container { max-width: 960px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { font-size: 2.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 8px; }
-    .header p { color: var(--text-muted); font-size: 1rem; }
+    .tool-page-wrapper {
+      padding: 130px 0 80px;
+      min-height: 80vh;
+      position: relative;
+      z-index: 1;
+    }
+    .base64-tool .card {
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .base64-tool .tabs-nav {
+      background: #f1f5f9;
+      border-radius: 14px 14px 0 0;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-bottom: none;
+    }
+    .base64-tool .tab-btn {
+      background: #f8fafc;
+      color: #475569;
+    }
+    .base64-tool .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary-dark);
+    }
+    .base64-tool .info-box {
+      background: #fef9c3;
+    }
+    .tool-container { max-width: 960px; margin: 0 auto; }
+    .tool-hero { text-align: center; margin-bottom: 30px; }
+    .tool-hero h1 { font-size: 2.2rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 8px; }
+    .tool-hero p { color: var(--text-muted); font-size: 1rem; }
     .tabs-nav { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid var(--border); }
     .tab-btn {
       flex: 1; padding: 16px 24px; font-size: 1rem; font-weight: 600;
@@ -266,14 +331,94 @@
       .preview-thumb { width: 100%; max-width: 200px; height: auto; }
     }
   </style>
+  </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1><i class="fas fa-code"></i> Base64 Tools</h1>
-      <p>Professional tools to encode, decode & convert images to Base64 format</p>
+<body class="theme-aware">
+  <div class="grain-overlay"></div>
+  <div id="three-canvas-container"></div>
+  <div class="floating-background">
+    <div
+      class="floating-icon"
+      style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+    >
+      🚀
     </div>
-    <div class="tabs-nav">
+    <div
+      class="floating-icon"
+      style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+    >
+      ⭐
+    </div>
+    <div
+      class="floating-icon"
+      style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+    >
+      🔥
+    </div>
+    <div
+      class="floating-icon"
+      style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+    >
+      💎
+    </div>
+    <div
+      class="floating-icon"
+      style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+    >
+      🎯
+    </div>
+    <div
+      class="floating-icon"
+      style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+    >
+      ⚡
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="../index.html">
+            <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-links">
+            <li><a href="../index.html#home">الرئيسية</a></li>
+            <li><a href="../index.html#about">من نحن</a></li>
+            <li><a href="../index.html#services">خدماتنا</a></li>
+            <li><a href="../works.html">أعمالنا</a></li>
+            <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+            <li><a href="index.html" class="active">أدواتنا</a></li>
+            <li><a href="../index.html#contact">تواصل معنا</a></li>
+            <li><a href="../index.html#payment">الدفع</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <div class="theme-toggle" onclick="toggleTheme()">
+            <svg class="svg-icon" viewBox="0 0 512 512">
+              <use href="../assets/images/icons.svg#icon-moon"></use>
+            </svg>
+          </div>
+          <div class="mobile-toggle">
+            <svg class="svg-icon" viewBox="0 0 448 512">
+              <use href="../assets/images/icons.svg#icon-bars"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tool-page-wrapper base64-tool">
+    <div class="container">
+      <div class="tool-container">
+        <div class="tool-hero">
+          <h1><i class="fas fa-code"></i> أداة Base64</h1>
+          <p>Professional tools to encode, decode & convert images to Base64 format</p>
+        </div>
+        <div class="tabs-nav">
       <button class="tab-btn active" data-tab="encode"><i class="fas fa-lock"></i> Encode</button>
       <button class="tab-btn" data-tab="decode"><i class="fas fa-unlock"></i> Decode</button>
       <button class="tab-btn" data-tab="image"><i class="fas fa-image"></i> Image to Base64</button>
@@ -420,8 +565,108 @@
         </div>
       </div>
     </div>
-    <div class="footer"><p>Made with <i class="fas fa-heart" style="color: #ef4444;"></i> | <a href="index.html">Back to Tools</a></p></div>
   </div>
+  </div>
+
+  <!-- الفوتر -->
+  <footer class="footer" id="footer_aboutus">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+          </div>
+          <p class="about-text">
+            مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+            CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+            وتجربة التسوق لزيادة المبيعات.
+          </p>
+          <div class="footer-certificate">
+            <a href="https://www.behance.net/3lwaaa1" target="_blank">
+              <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+              <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+            </a>
+          </div>
+          <p class="footer-cr">Custom Css Salla zid</p>
+        </div>
+
+        <div class="footer-links">
+          <h3>روابط سريعة</h3>
+          <ul>
+            <li><a href="../index.html">الرئيسية</a></li>
+            <li><a href="index.html">أدواتنا</a></li>
+            <li><a href="../index.html#contact">تواصل معنا</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact">
+          <h3>تواصل معنا</h3>
+          <ul>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 384 512">
+                <use
+                  href="../assets/images/icons.svg#icon-map-marker-alt"
+                ></use>
+              </svg>
+              <span>مصر</span>
+            </li>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-phone"></use>
+              </svg>
+              <span>+20 100 224 1591</span>
+            </li>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-envelope"></use>
+              </svg>
+              <span>salla1zid@gmail.com</span>
+            </li>
+          </ul>
+          <div class="footer-social">
+            <a href="https://wa.me/201002241591" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/salla1zid/" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-instagram"></use>
+              </svg>
+            </a>
+            <a href="https://twitter.com/salla1zid" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-twitter"></use>
+              </svg>
+            </a>
+            <a href="https://t.me/cssfree1" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 496 512">
+                <use href="../assets/images/icons.svg#icon-telegram"></use>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>
+          جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+          بوابة الأدوات مفتوحة المصدر
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- زر واتساب عائم -->
+  <a
+    href="https://wa.me/201002241591"
+    class="floating-whatsapp"
+    target="_blank"
+  >
+    <svg class="svg-icon" viewBox="0 0 448 512">
+      <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+    </svg>
+  </a>
+
   <script>
     // Tab Switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -641,7 +886,7 @@
       const fileId = ++imageCounter;
       
       // Add file to list
-      imageFiles.push({ id: fileId, file, status: 'processing' });
+      imageFiles.push({ id: fileId, file, status: 'processing', detailsRendered: false });
       
       // Show results container
       imageResultsContainer.classList.add('show');
@@ -713,7 +958,7 @@
                 ''}
             </div>
           </div>
-          <div class="image-result-details" id="image-details-${id}"></div>
+          <div class="image-result-details" id="image-details-${id}" data-rendered="false"></div>
         </div>
       `;
     }
@@ -745,33 +990,7 @@
             </button>
           </div>
         </div>
-        <div class="image-result-details" id="image-details-${id}">
-          <div class="image-result-preview">
-            <img src="${base64Data}" alt="${escapeHtml(name)}" class="preview-thumb">
-            <div class="code-panels">
-              <div class="code-panel">
-                <div class="code-panel-header">
-                  <span class="code-panel-title"><i class="fas fa-code"></i> For &lt;img&gt; elements:</span>
-                  <div class="code-panel-actions">
-                    <button class="code-action-btn" onclick="selectCodeText(this)"><i class="fas fa-mouse-pointer"></i> Select</button>
-                    <button class="code-action-btn" onclick="copyImageCode(${id}, 'data')"><i class="fas fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-                <div class="code-area" id="code-data-${id}">${escapeHtml(base64Data)}</div>
-              </div>
-              <div class="code-panel">
-                <div class="code-panel-header">
-                  <span class="code-panel-title"><i class="fas fa-palette"></i> For CSS background:</span>
-                  <div class="code-panel-actions">
-                    <button class="code-action-btn" onclick="selectCodeText(this)"><i class="fas fa-mouse-pointer"></i> Select</button>
-                    <button class="code-action-btn" onclick="copyImageCode(${id}, 'css')"><i class="fas fa-copy"></i> Copy</button>
-                  </div>
-                </div>
-                <div class="code-area" id="code-css-${id}">background-image: url(${escapeHtml(base64Data)});</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="image-result-details" id="image-details-${id}" data-rendered="false"></div>
       `;
     }
 
@@ -788,9 +1007,48 @@
 
     function toggleImageDetails(id) {
       const details = document.getElementById(`image-details-${id}`);
-      if (details) {
-        details.classList.toggle('show');
+      if (!details) return;
+      if (details.dataset.rendered !== 'true') {
+        renderImageDetails(id);
       }
+      details.classList.toggle('show');
+    }
+
+    function renderImageDetails(id) {
+      const file = imageFiles.find(f => f.id === id);
+      const details = document.getElementById(`image-details-${id}`);
+      if (!file || !details || file.status !== 'success') return;
+      if (file.detailsRendered) return;
+
+      details.innerHTML = `
+        <div class="image-result-preview">
+          <img src="${file.base64}" alt="${escapeHtml(file.file.name)}" class="preview-thumb">
+          <div class="code-panels">
+            <div class="code-panel">
+              <div class="code-panel-header">
+                <span class="code-panel-title"><i class="fas fa-code"></i> For &lt;img&gt; elements:</span>
+                <div class="code-panel-actions">
+                  <button class="code-action-btn" onclick="selectCodeText(this)"><i class="fas fa-mouse-pointer"></i> Select</button>
+                  <button class="code-action-btn" onclick="copyImageCode(${id}, 'data')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+              </div>
+              <div class="code-area" id="code-data-${id}">${escapeHtml(file.base64)}</div>
+            </div>
+            <div class="code-panel">
+              <div class="code-panel-header">
+                <span class="code-panel-title"><i class="fas fa-palette"></i> For CSS background:</span>
+                <div class="code-panel-actions">
+                  <button class="code-action-btn" onclick="selectCodeText(this)"><i class="fas fa-mouse-pointer"></i> Select</button>
+                  <button class="code-action-btn" onclick="copyImageCode(${id}, 'css')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+              </div>
+              <div class="code-area" id="code-css-${id}">background-image: url(${escapeHtml(file.base64)});</div>
+            </div>
+          </div>
+        </div>
+      `;
+      details.dataset.rendered = 'true';
+      file.detailsRendered = true;
     }
 
     function copyImageCode(id, type) {
