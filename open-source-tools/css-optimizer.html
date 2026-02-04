@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OptiCSS Pro - أداة تحسين وضغط CSS الاحترافية | Ali Ahmed</title>
+    <title>OptiCode Pro - أداة تحسين وضغط الأكواد المتقدمة | Ali Ahmed</title>
     <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../assets/css/fonts.css" />
     <!-- Diff Library for comparison -->
@@ -910,14 +910,12 @@
                 max-height: 350px;
                 font-size: 0.8rem;
             }
-        }.toolbar-btn {
-     background: #ffffff;
+        }.toolbar-btn,.theme-toggle {
     
-}.theme-toggle {
-    
-    
-    background: #ffffff;
-  
+    background: hsl(0, 0%, 100%);
+   font-family: 'Almarai', 'Cairo', sans-serif;
+}.btn-secondary {
+    background: #0a0a14 !important;
 }
     </style>
 </head>
@@ -955,22 +953,33 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>🎨 OptiCSS Pro</h1>
-            <p>أداة احترافية متقدمة لتحسين وضغط أكواد CSS</p>
-            <p style="font-size: 0.9rem; color: var(--text-color-light);">بدون استخدام AI - خوارزميات نقية وسريعة ⚡</p>
+            <h1>🎨 OptiCode Pro</h1>
+            <p>أداة احترافية متقدمة لتحسين وضغط الأكواد والمفاتيح البرمجية</p>
+            <p style="font-size: 0.9rem; color: var(--text-color-light);">يدعم CSS و JavaScript - خوارزميات نقية وسريعة ⚡</p>
             <div class="header-badges">
                 <span class="badge">🚀 سرعة فائقة</span>
                 <span class="badge">🔒 آمن 100%</span>
-                <span class="badge">📱 متجاوب</span>
-                <span class="badge">🌙 وضع ليلي</span>
-                <span class="badge">💾 حفظ تلقائي</span>
+                <span class="badge">💻 لغات متعددة</span>
+                <span class="badge">⚡ تحسين تلقائي</span>
             </div>
         </header>
 
         <!-- Options Card -->
         <div class="card fade-in-up" style="margin-bottom: 2rem;">
-            <h3 class="card-title">⚙️ خيارات التحسين</h3>
-            <div class="options-grid">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <h3 class="card-title" style="margin-bottom: 0;">⚙️ خيارات التحسين</h3>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <select id="codeLanguage" onchange="changeLanguage()" class="toolbar-btn" style="padding: 8px 16px; border-radius: 8px; font-weight: 600;">
+                        <option value="css">CSS stylesheet</option>
+                        <option value="javascript">JavaScript</option>
+                    </select>
+                    <label class="checkbox-label" style="padding: 8px 16px; margin: 0;">
+                        <input type="checkbox" id="autoOptimize" checked>
+                        <span>تحسين تلقائي ⚡</span>
+                    </label>
+                </div>
+            </div>
+            <div class="options-grid" id="optionsGrid">
                 <label class="checkbox-label">
                     <input type="checkbox" id="removeComments" checked>
                     <span>إزالة التعليقات</span>
@@ -979,14 +988,22 @@
                     <input type="checkbox" id="removeWhitespace" checked>
                     <span>إزالة المسافات الفارغة</span>
                 </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="removeEmptyRules" checked>
-                    <span>إزالة القواعد الفارغة</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="mergeDuplicates" checked>
-                    <span>دمج المكررات</span>
-                </label>
+                <div id="cssOnlyOptions" style="display: contents;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="removeEmptyRules" checked>
+                        <span>إزالة القواعد الفارغة</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="mergeDuplicates" checked>
+                        <span>دمج المكررات (CSS فقط)</span>
+                    </label>
+                </div>
+                <div id="jsOnlyOptions" style="display: none;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="minifyJS" checked>
+                        <span>ضغط مكثف (Minify)</span>
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -996,7 +1013,7 @@
             <div class="editor-section">
                 <div class="card">
                     <div class="editor-header">
-                        <h3 class="editor-title">📝 كود CSS الأصلي</h3>
+                        <h3 class="editor-title">📝 الكود الأصلي</h3>
                         <button class="btn btn-secondary" onclick="loadSample()">
                             📂 تحميل مثال
                         </button>
@@ -1004,7 +1021,7 @@
                     
                     <!-- Toolbar -->
                     <div class="toolbar">
-                        <button class="toolbar-btn" onclick="uploadFile()" title="رفع ملف CSS">
+                        <button class="toolbar-btn" onclick="uploadFile()" title="رفع ملف">
                             📁 رفع
                         </button>
                         <button class="toolbar-btn" onclick="pasteFromClipboard()" title="لصق من الحافظة">
@@ -1014,7 +1031,7 @@
                             🗑️ مسح
                         </button>
                         <div class="toolbar-divider"></div>
-                        <button class="toolbar-btn" onclick="formatCSS('input')" title="تنسيق الكود">
+                        <button class="toolbar-btn" onclick="formatCode('input')" title="تنسيق الكود">
                             ✨ تنسيق
                         </button>
                         <button class="toolbar-btn" onclick="selectAllInput()" title="تحديد الكل">
@@ -1024,16 +1041,16 @@
                     
                     <div class="editor-wrapper" id="inputWrapper">
                         <textarea 
-                            id="inputCSS" 
-                            placeholder="الصق كود CSS هنا أو اسحب وأفلت ملف..."
+                            id="inputCode" 
+                            placeholder="الصق الكود هنا أو اسحب وأفلت ملف..."
                             spellcheck="false"
-                            oninput="updateCharCount('input')"
+                            oninput="handleInput()"
                         ></textarea>
                         <div class="char-counter" id="inputCounter">0 حرف</div>
                     </div>
                     
                     <div class="btn-group">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="optimizeCSS()">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="optimizeCode()">
                             🚀 تحسين الآن
                         </button>
                         <button class="btn btn-danger" onclick="clearAll()">
@@ -1065,7 +1082,7 @@
                             🔗 مشاركة
                         </button>
                         <div class="toolbar-divider"></div>
-                        <button class="toolbar-btn" onclick="formatCSS('output')" title="تنسيق النتيجة">
+                        <button class="toolbar-btn" onclick="formatCode('output')" title="تنسيق النتيجة">
                             ✨ تنسيق
                         </button>
                         <button class="toolbar-btn" onclick="selectAllOutput()" title="تحديد الكل">
@@ -1073,17 +1090,18 @@
                         </button>
                     </div>
                     
-                    <div class="editor-wrapper">
+                    <div class="editor-wrapper" onclick="copyResult()" style="cursor: pointer;" title="اضغط لنسخ الكود المحسن">
                         <textarea 
-                            id="outputCSS" 
+                            id="outputCode" 
                             placeholder="النتيجة ستظهر هنا..."
                             readonly
                             spellcheck="false"
+                            style="cursor: pointer;"
                         ></textarea>
                         <div class="char-counter" id="outputCounter">0 حرف</div>
                     </div>
                     
-                    <button class="btn btn-primary btn-full" onclick="downloadResult()">
+                    <button class="btn btn-primary btn-full" id="downloadBtn" onclick="downloadResult()">
                         💾 تحميل كملف CSS
                     </button>
                 </div>
@@ -1172,11 +1190,11 @@
         <!-- Footer -->
         <footer class="footer">
             <p>
-                🚀 أداة مفتوحة المصدر - بدون استخدام AI | 
+                🚀 أداة مفتوحة المصدر لتحسين الأكواد - بدون استخدام AI | 
                 <a href="../index.html">العودة للموقع الرئيسي</a>
             </p>
             <p style="margin-top: 0.5rem; font-size: 0.9rem;">
-                تعمل بالكامل في المتصفح - بياناتك آمنة ولا تُرسل لأي خادم
+                تدعم CSS و JavaScript وتحمل جميع العمليات في متصفحك لضمان الخصوصية والسرعة
             </p>
         </footer>
     </div>
@@ -1264,9 +1282,93 @@
             }, 3000);
         }
 
+        // Language Management
+        function changeLanguage() {
+            const lang = document.getElementById('codeLanguage').value;
+            const cssOptions = document.getElementById('cssOnlyOptions');
+            const jsOptions = document.getElementById('jsOnlyOptions');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const inputArea = document.getElementById('inputCode');
+
+            if (lang === 'css') {
+                cssOptions.style.display = 'contents';
+                jsOptions.style.display = 'none';
+                downloadBtn.textContent = '💾 تحميل كملف CSS';
+                inputArea.placeholder = 'الصق كود CSS هنا أو اسحب وأفلت ملف...';
+            } else {
+                cssOptions.style.display = 'none';
+                jsOptions.style.display = 'contents';
+                downloadBtn.textContent = '💾 تحميل كملف JS';
+                inputArea.placeholder = 'الصق كود JavaScript هنا أو اسحب وأفلت ملف...';
+            }
+
+            if (inputArea.value.trim()) {
+                optimizeCode();
+            }
+        }
+
+        // Auto-Detect Language
+        function detectLanguage(code) {
+            if (!code || code.trim().length < 10) return null;
+            
+            const jsPatterns = [
+                /\b(var|let|const|function|class|return|if|else|for|while|await|async|export|import)\b/,
+                /=>/,
+                /console\.log/,
+                /document\./,
+                /window\./,
+                /=\s*\{/, // object assignment
+                /\[\d+\]/ // array access
+            ];
+            
+            const cssPatterns = [
+                /@media\s*/,
+                /@keyframes\s*/,
+                /:\s*(block|inline|flex|grid|none|relative|absolute|fixed|sticky)\b/,
+                /:\s*\d+(px|rem|em|vh|vw|%|s|ms|deg)\b/,
+                /:\s*(#[0-9a-f]{3,6}|rgba?|hsla?)\b/,
+                /\{[\s\S]*\}[\s\S]*\{/,
+                /\.[a-zA-Z-]+\s*\{/, // class selector
+                /#[a-zA-Z-]+\s*\{/  // id selector
+            ];
+            
+            let jsScore = 0;
+            let cssScore = 0;
+            
+            jsPatterns.forEach(p => { if (p.test(code)) jsScore++; });
+            cssPatterns.forEach(p => { if (p.test(code)) cssScore++; });
+            
+            if (jsScore > cssScore && jsScore >= 2) return 'javascript';
+            if (cssScore > jsScore && cssScore >= 2) return 'css';
+            
+            return null;
+        }
+
+        // Debounce for Auto-Optimization
+        let debounceTimer;
+        function handleInput() {
+            updateCharCount('input');
+            const code = document.getElementById('inputCode').value;
+
+            // Auto-detect language
+            const detected = detectLanguage(code);
+            if (detected && detected !== document.getElementById('codeLanguage').value) {
+                document.getElementById('codeLanguage').value = detected;
+                changeLanguage();
+            }
+
+            const autoOptimize = document.getElementById('autoOptimize').checked;
+            if (autoOptimize) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    optimizeCode();
+                }, 1000);
+            }
+        }
+
         // Character Counter
         function updateCharCount(type) {
-            const textarea = document.getElementById(type === 'input' ? 'inputCSS' : 'outputCSS');
+            const textarea = document.getElementById(type === 'input' ? 'inputCode' : 'outputCode');
             const counter = document.getElementById(type === 'input' ? 'inputCounter' : 'outputCounter');
             const length = textarea.value.length;
             const lines = textarea.value.split('\n').length;
@@ -1283,13 +1385,11 @@
             const inputWrapper = document.getElementById('inputWrapper');
             
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                inputWrapper.addEventListener(eventName, preventDefaults, false);
+                inputWrapper.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
             });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
 
             ['dragenter', 'dragover'].forEach(eventName => {
                 inputWrapper.addEventListener(eventName, () => {
@@ -1314,24 +1414,29 @@
         }
 
         function handleFile(file) {
-            if (file.type === 'text/css' || file.name.endsWith('.css')) {
+            const lang = document.getElementById('codeLanguage').value;
+            const isValid = lang === 'css' ? (file.type === 'text/css' || file.name.endsWith('.css')) : (file.type.includes('javascript') || file.name.endsWith('.js'));
+            
+            if (isValid) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    document.getElementById('inputCSS').value = e.target.result;
+                    document.getElementById('inputCode').value = e.target.result;
                     updateCharCount('input');
+                    optimizeCode();
                     showSuccess('✅ تم تحميل الملف بنجاح!');
                 };
                 reader.readAsText(file);
             } else {
-                alert('⚠️ الرجاء اختيار ملف CSS فقط!');
+                alert(`⚠️ الرجاء اختيار ملف ${lang.toUpperCase()} فقط!`);
             }
         }
 
         // File Upload
         function uploadFile() {
+            const lang = document.getElementById('codeLanguage').value;
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.css';
+            input.accept = lang === 'css' ? '.css' : '.js';
             input.onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -1345,8 +1450,9 @@
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
-                document.getElementById('inputCSS').value = text;
+                document.getElementById('inputCode').value = text;
                 updateCharCount('input');
+                optimizeCode();
                 showSuccess('✅ تم اللصق من الحافظة!');
             } catch (err) {
                 alert('⚠️ لا يمكن الوصول إلى الحافظة!');
@@ -1355,16 +1461,16 @@
 
         // Selection Functions
         function selectAllInput() {
-            document.getElementById('inputCSS').select();
+            document.getElementById('inputCode').select();
         }
 
         function selectAllOutput() {
-            document.getElementById('outputCSS').select();
+            document.getElementById('outputCode').select();
         }
 
         function clearInput() {
             if (confirm('🗑️ هل أنت متأكد من مسح الكود؟')) {
-                document.getElementById('inputCSS').value = '';
+                document.getElementById('inputCode').value = '';
                 updateCharCount('input');
             }
         }
@@ -1394,8 +1500,8 @@
             if (historyIndex > 0) {
                 historyIndex--;
                 const item = history[historyIndex];
-                document.getElementById('inputCSS').value = item.input;
-                document.getElementById('outputCSS').value = item.output;
+                document.getElementById('inputCode').value = item.input;
+                document.getElementById('outputCode').value = item.output;
                 updateCharCount('input');
                 updateCharCount('output');
                 updateHistoryButtons();
@@ -1407,8 +1513,8 @@
             if (historyIndex < history.length - 1) {
                 historyIndex++;
                 const item = history[historyIndex];
-                document.getElementById('inputCSS').value = item.input;
-                document.getElementById('outputCSS').value = item.output;
+                document.getElementById('inputCode').value = item.input;
+                document.getElementById('outputCode').value = item.output;
                 updateCharCount('input');
                 updateCharCount('output');
                 updateHistoryButtons();
@@ -1429,8 +1535,8 @@
 
         function resetAll() {
             if (confirm('🔄 هل أنت متأكد من إعادة تعيين كل شيء؟')) {
-                document.getElementById('inputCSS').value = '';
-                document.getElementById('outputCSS').value = '';
+                document.getElementById('inputCode').value = '';
+                document.getElementById('outputCode').value = '';
                 document.getElementById('statsContainer').classList.add('hidden');
                 history = [];
                 historyIndex = -1;
@@ -1511,32 +1617,41 @@
             return div.innerHTML;
         }
 
-        // Format CSS (Beautify)
-        function formatCSS(type) {
-            const textarea = document.getElementById(type === 'input' ? 'inputCSS' : 'outputCSS');
-            let css = textarea.value;
+        // Format Code (Beautify)
+        function formatCode(type) {
+            const textarea = document.getElementById(type === 'input' ? 'inputCode' : 'outputCode');
+            const lang = document.getElementById('codeLanguage').value;
+            let code = textarea.value;
             
-            if (!css.trim()) {
+            if (!code.trim()) {
                 alert('⚠️ لا يوجد كود للتنسيق!');
                 return;
             }
 
-            // Simple beautification
-            css = css.replace(/\}/g, '}\n');
-            css = css.replace(/\{/g, ' {\n  ');
-            css = css.replace(/;/g, ';\n  ');
-            css = css.replace(/\/\*/g, '\n/*');
-            css = css.replace(/\*\//g, '*/\n');
-            css = css.replace(/\n\s*\n/g, '\n');
+            if (lang === 'css') {
+                code = code.replace(/\}/g, '}\n');
+                code = code.replace(/\{/g, ' {\n  ');
+                code = code.replace(/;/g, ';\n  ');
+                code = code.replace(/\/\*/g, '\n/*');
+                code = code.replace(/\*\//g, '*/\n');
+                code = code.replace(/\n\s*\n/g, '\n');
+            } else {
+                // Simple JS Beautification
+                code = code.replace(/\{/g, ' {\n    ');
+                code = code.replace(/\}/g, '\n}');
+                code = code.replace(/;/g, ';\n    ');
+                code = code.replace(/,/g, ', ');
+                code = code.replace(/\n\s*\n/g, '\n');
+            }
             
-            textarea.value = css.trim();
+            textarea.value = code.trim();
             updateCharCount(type);
             showSuccess('✨ تم تنسيق الكود!');
         }
 
         // Share Function
         async function shareResult() {
-            const output = document.getElementById('outputCSS').value;
+            const output = document.getElementById('outputCode').value;
             if (!output) {
                 alert('⚠️ لا توجد نتيجة للمشاركة!');
                 return;
@@ -1545,7 +1660,7 @@
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: 'OptiCSS - Optimized CSS',
+                        title: 'OptiCode - Optimized Code',
                         text: output
                     });
                     showSuccess('✅ تمت المشاركة!');
@@ -1553,9 +1668,49 @@
                     console.log('Share cancelled');
                 }
             } else {
-                copyResult();
+                const dummy = document.createElement('textarea');
+                document.body.appendChild(dummy);
+                dummy.value = output;
+                dummy.select();
+                document.execCommand('copy');
+                document.body.removeChild(dummy);
                 showSuccess('📋 تم النسخ! يمكنك المشاركة الآن');
             }
+        }
+
+        // JavaScript Optimization Engine
+        function optimizeJS(js, options) {
+            const startTime = performance.now();
+            let processed = js;
+
+            if (options.removeComments) {
+                // Remove multi-line comments
+                processed = processed.replace(/\/\*[\s\S]*?\*\//g, '');
+                // Remove single-line comments (careful with URLs and strings)
+                // This is a simple regex that handles most cases
+                processed = processed.replace(/\/\/.*/g, '');
+            }
+
+            if (options.removeWhitespace) {
+                // Remove leading/trailing spaces on each line
+                processed = processed.split('\n').map(line => line.trim()).join('\n');
+                // Remove empty lines
+                processed = processed.replace(/\n\s*\n/g, '\n');
+            }
+
+            if (options.minifyJS) {
+                // More aggressive whitespace removal
+                processed = processed
+                    .replace(/\s*([=+\-*/%&|^!<>?:;,{}()\[\]])\s*/g, '$1')
+                    .replace(/;?\s*\n\s*/g, ';')
+                    .replace(/;}/g, '}');
+            }
+
+            const endTime = performance.now();
+            return {
+                result: processed.trim(),
+                duration: endTime - startTime
+            };
         }
 
         // CSS Optimization Engine (Pure JavaScript - No AI/ML)
@@ -1922,54 +2077,52 @@
         };
 
         // UI Functions
-        function optimizeCSS() {
-            const inputCSS = document.getElementById('inputCSS').value;
-            if (!inputCSS.trim()) {
-                alert('⚠️ الرجاء إدخال كود CSS أولاً!');
-                return;
-            }
+        function optimizeCode() {
+            const inputCode = document.getElementById('inputCode').value;
+            if (!inputCode.trim()) return;
 
+            const lang = document.getElementById('codeLanguage').value;
             const options = {
                 removeComments: document.getElementById('removeComments').checked,
-                removeWhitespace: document. getElementById('removeWhitespace').checked,
+                removeWhitespace: document.getElementById('removeWhitespace').checked,
                 removeEmptyRules: document.getElementById('removeEmptyRules').checked,
-                mergeDuplicates: document.getElementById('mergeDuplicates').checked
+                mergeDuplicates: document.getElementById('mergeDuplicates').checked,
+                minifyJS: document.getElementById('minifyJS').checked
             };
 
             try {
-                // Show progress
                 const progressBar = document.getElementById('progressBar');
                 progressBar.style.width = '30%';
 
-                const { result, duration } = optimize(inputCSS, options);
-                
+                let resultData;
+                if (lang === 'css') {
+                    resultData = optimize(inputCode, options);
+                } else {
+                    resultData = optimizeJS(inputCode, options);
+                }
+
+                const { result, duration } = resultData;
                 progressBar.style.width = '70%';
                 
-                document.getElementById('outputCSS').value = result;
+                document.getElementById('outputCode').value = result;
                 updateCharCount('output');
 
-                // Store for diff
-                originalCode = inputCSS;
+                originalCode = inputCode;
                 optimizedCode = result;
+                addToHistory(inputCode, result);
 
-                // Add to history
-                addToHistory(inputCSS, result);
-
-                // Calculate statistics
-                const originalSize = new Blob([inputCSS]).size;
+                const originalSize = new Blob([inputCode]).size;
                 const optimizedSize = new Blob([result]).size;
                 const savings = originalSize - optimizedSize;
                 const percentage = originalSize > 0 ? ((savings / originalSize) * 100).toFixed(2) : 0;
                 
-                const originalLines = inputCSS.split('\n').length;
+                const originalLines = inputCode.split('\n').length;
                 const optimizedLines = result.split('\n').length;
                 const linesReduced = originalLines - optimizedLines;
-                
                 const speed = (originalSize / duration * 1000).toFixed(2);
 
                 progressBar.style.width = '100%';
 
-                // Update statistics
                 document.getElementById('originalSize').textContent = formatBytes(originalSize);
                 document.getElementById('optimizedSize').textContent = formatBytes(optimizedSize);
                 document.getElementById('savings').textContent = formatBytes(savings);
@@ -1981,64 +2134,62 @@
                 document.getElementById('savingsLines').textContent = `${linesReduced} سطر`;
                 document.getElementById('speed').textContent = `${speed} KB/s`;
 
-                // Show statistics
                 document.getElementById('statsContainer').classList.remove('hidden');
 
-                // Success notification
-                if (savings > 0) {
-                    setTimeout(() => {
-                        showSuccess(`✅ تم التحسين بنجاح! تم توفير ${formatBytes(savings)} (${percentage}%)`);
-                    }, 100);
-                } else {
-                    showSuccess('✅ تم التحسين بنجاح!');
+                if (savings > 0 && !document.getElementById('autoOptimize').checked) {
+                    showSuccess(`✅ تم التحسين بنجاح! تم توفير ${formatBytes(savings)} (${percentage}%)`);
                 }
 
-                // Reset progress
                 setTimeout(() => {
                     progressBar.style.width = '0%';
                 }, 1000);
 
             } catch (error) {
-                alert('❌ حدث خطأ أثناء التحسين: ' + error.message);
                 console.error(error);
                 document.getElementById('progressBar').style.width = '0%';
             }
         }
 
         function copyResult() {
-            const output = document.getElementById('outputCSS');
-            if (!output.value) {
-                alert('⚠️ لا توجد نتيجة للنسخ!');
-                return;
-            }
+            const output = document.getElementById('outputCode');
+            if (!output.value) return;
+            
             output.select();
             document.execCommand('copy');
+            
+            // إضافة تأثير بصري عند النسخ
+            const wrapper = output.closest('.editor-wrapper');
+            wrapper.style.borderColor = 'var(--primary-color)';
+            wrapper.style.transform = 'scale(1.01)';
+            
+            setTimeout(() => {
+                wrapper.style.borderColor = '';
+                wrapper.style.transform = '';
+            }, 300);
             
             showSuccess('✅ تم النسخ إلى الحافظة!');
         }
 
         function downloadResult() {
-            const output = document.getElementById('outputCSS').value;
-            if (!output) {
-                alert('⚠️ لا توجد نتيجة للتحميل!');
-                return;
-            }
-            const blob = new Blob([output], { type: 'text/css' });
+            const output = document.getElementById('outputCode').value;
+            const lang = document.getElementById('codeLanguage').value;
+            if (!output) return;
+            
+            const blob = new Blob([output], { type: lang === 'css' ? 'text/css' : 'application/javascript' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             const timestamp = new Date().toISOString().slice(0, 10);
-            a.download = `optimized-style-${timestamp}.css`;
+            a.download = `optimized-${lang === 'css' ? 'style' : 'script'}-${timestamp}.${lang}`;
             a.click();
             URL.revokeObjectURL(url);
-            
             showSuccess('💾 تم التحميل بنجاح!');
         }
 
         function clearAll() {
             if (confirm('🗑️ هل أنت متأكد من مسح جميع البيانات؟')) {
-                document.getElementById('inputCSS').value = '';
-                document.getElementById('outputCSS').value = '';
+                document.getElementById('inputCode').value = '';
+                document.getElementById('outputCode').value = '';
                 document.getElementById('statsContainer').classList.add('hidden');
                 updateCharCount('input');
                 updateCharCount('output');
@@ -2049,97 +2200,42 @@
         }
 
         function loadSample() {
-            const sample = `/* مثال على كود CSS مع مكررات وقواعد متداخلة */
-
-/* الزر الأساسي */
+            const lang = document.getElementById('codeLanguage').value;
+            let sample = '';
+            
+            if (lang === 'css') {
+                sample = `/* مثال على كود CSS مع مكررات وقواعد متداخلة */
 .button {
     background-color: #5e3bee;
     padding: 12px 24px;
     border-radius: 8px;
-    transition: all 0.3s ease;
 }
-
-/* نفس الزر مع خصائص إضافية - سيتم دمجها */
 .button {
     color: white;
     font-weight: bold;
-    cursor: pointer;
 }
-
-/* Media Query للأجهزة الصغيرة */
 @media (max-width: 768px) {
-    .button {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-}
-
-/* Media Query آخر بنفس الحجم - سيتم دمجه */
-@media (max-width: 768px) {
-    .container {
-        width: 100%;
-        padding: 15px;
-    }
-}
-
-/* الحاوية الرئيسية */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.container {
-    background: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Keyframes Animation - سيتم الحفاظ عليها */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* قاعدة فارغة - سيتم حذفها */
-.empty-class {
-    /* لا توجد خصائص */
-}
-
-/* Header مكرر */
-.header {
-    font-size: 24px;
-    padding: 20px;
-}
-
-.header {
-    font-weight: bold;
-    color: #2d3748;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Card Component */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.card {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
+    .button { padding: 10px; }
 }`;
-            document.getElementById('inputCSS').value = sample;
+            } else {
+                sample = `// مثال على كود JavaScript مع تعليقات وشرح
+/** 
+ * دالة لحساب المجموع
+ */
+function calculateSum(a, b) {
+    // هذا تعليق تجريبي
+    console.log("حساب المجموع...");
+    const result = a + b;
+    return result; 
+}
+
+calculateSum(5, 10);`;
+            }
+            
+            document.getElementById('inputCode').value = sample;
             updateCharCount('input');
-            showSuccess('📂 تم تحميل المثال! جرّب التحسين الآن');
+            optimizeCode();
+            showSuccess('📂 تم تحميل المثال!');
         }
 
         // Keyboard shortcuts
@@ -2147,7 +2243,7 @@
             // Ctrl/Cmd + Enter to optimize
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
-                optimizeCSS();
+                optimizeCode();
             }
             // Ctrl/Cmd + L to load sample
             if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
