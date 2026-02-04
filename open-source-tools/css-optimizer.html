@@ -814,6 +814,43 @@
             display: none;
         }
 
+        /* Options Accordion */
+        .options-wrapper {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .options-wrapper.active {
+            max-height: 500px;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+            user-select: none;
+        }
+
+        .accordion-header .arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+            background: var(--bg-color-alt);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+
+        .active-header .arrow {
+            transform: rotate(180deg);
+        }
+
         /* Success Message */
         .success-message {
             position: fixed;
@@ -966,9 +1003,12 @@
 
         <!-- Options Card -->
         <div class="card fade-in-up" style="margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                <h3 class="card-title" style="margin-bottom: 0;">⚙️ خيارات التحسين</h3>
-                <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="accordion-header" onclick="toggleOptions(this)">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <h3 class="card-title" style="margin-bottom: 0;">⚙️ خيارات التحسين</h3>
+                    <span class="arrow">▼</span>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;" onclick="event.stopPropagation()">
                     <select id="codeLanguage" onchange="changeLanguage()" class="toolbar-btn" style="padding: 8px 16px; border-radius: 8px; font-weight: 600;">
                         <option value="css">CSS stylesheet</option>
                         <option value="javascript">JavaScript</option>
@@ -979,30 +1019,32 @@
                     </label>
                 </div>
             </div>
-            <div class="options-grid" id="optionsGrid">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="removeComments" checked>
-                    <span>إزالة التعليقات</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="removeWhitespace" checked>
-                    <span>إزالة المسافات الفارغة</span>
-                </label>
-                <div id="cssOnlyOptions" style="display: contents;">
+            <div class="options-wrapper" id="optionsWrapper">
+                <div class="options-grid" id="optionsGrid" style="margin-top: 1.5rem;">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="removeEmptyRules" checked>
-                        <span>إزالة القواعد الفارغة</span>
+                        <input type="checkbox" id="removeComments" checked>
+                        <span>إزالة التعليقات</span>
                     </label>
                     <label class="checkbox-label">
-                        <input type="checkbox" id="mergeDuplicates" checked>
-                        <span>دمج المكررات (CSS فقط)</span>
+                        <input type="checkbox" id="removeWhitespace" checked>
+                        <span>إزالة المسافات الفارغة</span>
                     </label>
-                </div>
-                <div id="jsOnlyOptions" style="display: none;">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="minifyJS" checked>
-                        <span>ضغط مكثف (Minify)</span>
-                    </label>
+                    <div id="cssOnlyOptions" style="display: contents;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="removeEmptyRules" checked>
+                            <span>إزالة القواعد الفارغة</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="mergeDuplicates" checked>
+                            <span>دمج المكررات (CSS فقط)</span>
+                        </label>
+                    </div>
+                    <div id="jsOnlyOptions" style="display: none;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="minifyJS" checked>
+                            <span>ضغط مكثف (Minify)</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1280,6 +1322,13 @@
             setTimeout(() => {
                 successMsg.classList.remove('show');
             }, 3000);
+        }
+
+        // Toggle Options Accordion
+        function toggleOptions(header) {
+            const wrapper = document.getElementById('optionsWrapper');
+            header.classList.toggle('active-header');
+            wrapper.classList.toggle('active');
         }
 
         // Language Management
