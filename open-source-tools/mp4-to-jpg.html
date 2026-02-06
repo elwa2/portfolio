@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محول MP4 إلى JPG | Ali Ahmed</title>
+  <link rel="stylesheet" href="../assets/css/fonts.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+  <link rel="stylesheet" href="../assets/css/animations.css" />
+  <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+  <style>
+    .converter-section {
+      padding: 80px 0;
+      min-height: 70vh;
+      background: var(--bg-color-alt);
+    }
+    .converter-box {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.08);
+      text-align: center;
+      border: 1px solid rgba(var(--primary-rgb), 0.1);
+    }
+    .converter-box h1 {
+      color: var(--primary-color);
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+    }
+    .converter-box p {
+      color: var(--text-color-light);
+      margin-bottom: 30px;
+    }
+    .upload-area {
+      border: 2px dashed var(--primary-color);
+      border-radius: 16px;
+      padding: 40px 20px;
+      background: var(--bg-color);
+      margin-bottom: 30px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    .upload-area.dragover {
+      border-color: var(--accent-color);
+      background: var(--light-purple);
+    }
+    .upload-area input[type="file"] {
+      display: none;
+    }
+    .result-preview {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+    .result-preview img {
+      max-width: 120px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 4px;
+    }
+    .download-all-btn {
+      margin-top: 20px;
+      display: inline-block;
+      background: var(--primary-gradient);
+      color: #fff;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: background 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+    .download-all-btn:hover {
+      background: var(--secondary-gradient);
+    }
+  </style>
+</head>
+<body class="theme-aware">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="../index.html">
+            <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-links">
+            <li><a href="../index.html#home">الرئيسية</a></li>
+            <li><a href="../index.html#about">من نحن</a></li>
+            <li><a href="../index.html#services">خدماتنا</a></li>
+            <li><a href="../works.html">أعمالنا</a></li>
+            <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+            <li><a href="index.html">أدواتنا</a></li>
+            <li><a href="../index.html#contact">تواصل معنا</a></li>
+            <li><a href="../index.html#payment">الدفع</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <div class="theme-toggle" onclick="toggleTheme()">
+            <svg class="svg-icon" viewBox="0 0 512 512">
+              <use href="../assets/images/icons.svg#icon-moon"></use>
+            </svg>
+          </div>
+          <div class="mobile-toggle">
+            <svg class="svg-icon" viewBox="0 0 448 512">
+              <use href="../assets/images/icons.svg#icon-bars"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <section class="converter-section">
+    <div class="container">
+      <div class="converter-box">
+        <h1>محول MP4 إلى JPG</h1>
+        <p>حوّل فيديو MP4 إلى صور JPG عالية الجودة بسهولة وسرعة. يدعم استخراج جميع الإطارات أو إطار واحد فقط.</p>
+        <form id="mp4ToJpgForm">
+          <label class="upload-area" id="uploadArea">
+            <span id="uploadText">اسحب ملف MP4 هنا أو اضغط لاختيار ملف</span>
+            <input type="file" id="mp4Input" accept="video/mp4" />
+          </label>
+          <div style="margin-bottom:20px;">
+            <label style="font-weight:500; color:var(--text-color);">عدد الإطارات:
+              <select id="frameOption" style="margin-right:10px; border-radius:8px; padding:6px 12px;">
+                <option value="all">كل الإطارات</option>
+                <option value="first">الإطار الأول فقط</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit" class="download-all-btn" id="convertBtn">بدء التحويل</button>
+        </form>
+        <div class="result-preview" id="resultPreview"></div>
+      </div>
+    </div>
+  </section>
+  <footer class="footer" id="footer_aboutus">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+          </div>
+          <p class="about-text">
+            مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميزاً. خبرة واسعة في تحسين واجهة المستخدم وتجربة التسوق لزيادة المبيعات.
+          </p>
+          <div class="footer-certificate">
+            <a href="https://www.behance.net/3lwaaa1" target="_blank">
+              <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+              <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+            </a>
+          </div>
+          <p class="footer-cr">Custom Css Salla zid</p>
+        </div>
+        <div class="footer-links">
+          <h3>روابط سريعة</h3>
+          <ul>
+            <li><a href="../index.html">الرئيسية</a></li>
+            <li><a href="index.html">أدواتنا</a></li>
+            <li><a href="../index.html#contact">تواصل معنا</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h3>تواصل معنا</h3>
+          <ul>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 384 512">
+                <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+              </svg>
+              <span>مصر</span>
+            </li>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-phone"></use>
+              </svg>
+              <span>+20 100 224 1591</span>
+            </li>
+            <li>
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-envelope"></use>
+              </svg>
+              <span>salla1zid@gmail.com</span>
+            </li>
+          </ul>
+          <div class="footer-social">
+            <a href="https://wa.me/201002241591" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/salla1zid/" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-instagram"></use>
+              </svg>
+            </a>
+            <a href="https://twitter.com/salla1zid" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-twitter"></use>
+              </svg>
+            </a>
+            <a href="https://t.me/cssfree1" target="_blank">
+              <svg class="svg-icon" viewBox="0 0 496 512">
+                <use href="../assets/images/icons.svg#icon-telegram"></use>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | بوابة الأدوات مفتوحة المصدر</p>
+      </div>
+    </div>
+  </footer>
+  <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+    <svg class="svg-icon" viewBox="0 0 448 512">
+      <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+    </svg>
+  </a>
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    // MP4 to JPG logic
+    const mp4Input = document.getElementById('mp4Input');
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadText = document.getElementById('uploadText');
+    const resultPreview = document.getElementById('resultPreview');
+    const form = document.getElementById('mp4ToJpgForm');
+    const frameOption = document.getElementById('frameOption');
+    let selectedFile = null;
+    uploadArea.addEventListener('click', () => mp4Input.click());
+    uploadArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        mp4Input.files = e.dataTransfer.files;
+        handleFile(mp4Input.files[0]);
+      }
+    });
+    mp4Input.addEventListener('change', e => {
+      if (mp4Input.files.length) {
+        handleFile(mp4Input.files[0]);
+      }
+    });
+    function handleFile(file) {
+      selectedFile = file;
+      uploadText.textContent = file.name;
+    }
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      resultPreview.innerHTML = '';
+      if (!selectedFile) {
+        alert('يرجى اختيار ملف MP4.');
+        return;
+      }
+      uploadText.textContent = 'جاري التحويل...';
+      // Use browser APIs to extract frames
+      const url = URL.createObjectURL(selectedFile);
+      const video = document.createElement('video');
+      video.src = url;
+      video.crossOrigin = 'anonymous';
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.style.display = 'none';
+      document.body.appendChild(video);
+      await new Promise(res => video.onloadedmetadata = res);
+      let frames = [];
+      let canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      let ctx = canvas.getContext('2d');
+      if (frameOption.value === 'first') {
+        video.currentTime = 0;
+        await new Promise(res => video.onseeked = res);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        let imgUrl = canvas.toDataURL('image/jpeg');
+        frames.push(imgUrl);
+      } else {
+        let duration = video.duration;
+        let fps = 1; // extract 1 frame per second for performance
+        for (let t = 0; t < duration; t += 1) {
+          video.currentTime = t;
+          await new Promise(res => video.onseeked = res);
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          let imgUrl = canvas.toDataURL('image/jpeg');
+          frames.push(imgUrl);
+        }
+      }
+      document.body.removeChild(video);
+      uploadText.textContent = selectedFile.name;
+      // Show preview
+      frames.forEach((img, i) => {
+        let a = document.createElement('a');
+        a.href = img;
+        a.download = `frame_${i+1}.jpg`;
+        let image = document.createElement('img');
+        image.src = img;
+        a.appendChild(image);
+        resultPreview.appendChild(a);
+      });
+      if (frames.length > 1) {
+        let zipBtn = document.createElement('button');
+        zipBtn.className = 'download-all-btn';
+        zipBtn.textContent = 'تحميل جميع الصور (ZIP)';
+        zipBtn.onclick = async function() {
+          const zip = new JSZip();
+          frames.forEach((img, i) => {
+            zip.file(`frame_${i+1}.jpg`, img.split(',')[1], {base64: true});
+          });
+          const blob = await zip.generateAsync({type:'blob'});
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'frames.zip';
+          link.click();
+        };
+        resultPreview.appendChild(zipBtn);
+      }
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
