@@ -14,6 +14,7 @@
       padding: 80px 0;
       min-height: 70vh;
       background: var(--bg-color-alt);
+      transition: background 0.3s;
     }
     .converter-box {
       background: var(--card-bg);
@@ -24,15 +25,18 @@
       box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.08);
       text-align: center;
       border: 1px solid rgba(var(--primary-rgb), 0.1);
+      transition: background 0.3s, color 0.3s, border 0.3s;
     }
     .converter-box h1 {
       color: var(--primary-color);
       font-size: 2.2rem;
       margin-bottom: 20px;
+      transition: color 0.3s;
     }
     .converter-box p {
       color: var(--text-color-light);
       margin-bottom: 30px;
+      transition: color 0.3s;
     }
     .upload-area {
       border: 2px dashed var(--primary-color);
@@ -41,11 +45,14 @@
       background: var(--bg-color);
       margin-bottom: 30px;
       cursor: pointer;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, background 0.3s, color 0.3s;
+      color: var(--text-color);
+      font-weight: 500;
     }
     .upload-area.dragover {
       border-color: var(--accent-color);
       background: var(--light-purple);
+      color: var(--primary-dark);
     }
     .upload-area input[type="file"] {
       display: none;
@@ -63,6 +70,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       background: #fff;
       padding: 4px;
+      transition: background 0.3s;
     }
     .download-all-btn {
       margin-top: 20px;
@@ -80,68 +88,128 @@
     .download-all-btn:hover {
       background: var(--secondary-gradient);
     }
+    /* دارك مود مخصص */
+    [data-theme="dark"] .converter-section {
+      background: var(--bg-color);
+    }
+    [data-theme="dark"] .converter-box {
+      background: var(--bg-color-alt);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.10);
+    }
+    [data-theme="dark"] .converter-box h1 {
+      color: var(--light-purple);
+    }
+    [data-theme="dark"] .converter-box p {
+      color: var(--text-color-muted);
+    }
+    [data-theme="dark"] .upload-area {
+      background: var(--input-bg);
+      color: var(--text-color);
+      border-color: var(--secondary-purple);
+    }
+    [data-theme="dark"] .upload-area.dragover {
+      background: var(--secondary-purple);
+      color: #fff;
+      border-color: var(--primary-light);
+    }
+    [data-theme="dark"] .result-preview img {
+      background: var(--bg-color-alt);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.10);
+    }
+    [data-theme="dark"] .download-all-btn {
+      background: var(--secondary-gradient);
+      color: #fff;
+    }
+    [data-theme="dark"] .download-all-btn:hover {
+      background: var(--primary-gradient);
+    }
+    @media (max-width: 700px) {
+      .converter-box {
+        padding: 20px 8px;
+      }
+      .upload-area {
+        padding: 25px 8px;
+      }
+    }
   </style>
 </head>
-<body class="theme-aware">
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <a href="../index.html">
-            <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
-          </a>
-        </div>
-        <nav class="nav">
-          <ul class="nav-links">
-            <li><a href="../index.html#home">الرئيسية</a></li>
-            <li><a href="../index.html#about">من نحن</a></li>
-            <li><a href="../index.html#services">خدماتنا</a></li>
-            <li><a href="../works.html">أعمالنا</a></li>
-            <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
-            <li><a href="index.html">أدواتنا</a></li>
-            <li><a href="../index.html#contact">تواصل معنا</a></li>
-            <li><a href="../index.html#payment">الدفع</a></li>
-          </ul>
-        </nav>
-        <div class="header-actions">
-          <div class="theme-toggle" onclick="toggleTheme()">
-            <svg class="svg-icon" viewBox="0 0 512 512">
-              <use href="../assets/images/icons.svg#icon-moon"></use>
-            </svg>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
+      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">⭐</div>
+      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">🔥</div>
+      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">💎</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">🎯</div>
+      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
+    </div>
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
           </div>
-          <div class="mobile-toggle">
-            <svg class="svg-icon" viewBox="0 0 448 512">
-              <use href="../assets/images/icons.svg#icon-bars"></use>
-            </svg>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="tools-listing-wrapper" style="padding-top:120px;">
+      <div class="container">
+        <div style="text-align: center">
+          <h1 style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;">محول MP4 إلى JPG</h1>
+          <p style="color: var(--text-color-light); max-width: 600px; margin: 0 auto; margin-bottom: 30px;">
+            حوّل فيديو MP4 إلى صور JPG عالية الجودة بسهولة وسرعة. يدعم استخراج جميع الإطارات أو إطار واحد فقط مع إمكانية تحميل جميع الصور دفعة واحدة.
+          </p>
+        </div>
+        <div class="tools-grid" style="justify-content:center;">
+          <div class="tool-card" style="max-width:600px;margin:0 auto;">
+            <form id="mp4ToJpgForm">
+              <label class="upload-area" id="uploadArea">
+                <span id="uploadText">اسحب ملف MP4 هنا أو اضغط لاختيار ملف</span>
+                <input type="file" id="mp4Input" accept="video/mp4" />
+              </label>
+              <div style="margin-bottom:20px;">
+                <label style="font-weight:500; color:var(--text-color);">عدد الإطارات:
+                  <select id="frameOption" style="margin-right:10px; border-radius:8px; padding:6px 12px;">
+                    <option value="all">كل الإطارات</option>
+                    <option value="first">الإطار الأول فقط</option>
+                  </select>
+                </label>
+              </div>
+              <button type="submit" class="download-all-btn" id="convertBtn">بدء التحويل</button>
+            </form>
+            <div class="result-preview" id="resultPreview"></div>
           </div>
         </div>
       </div>
     </div>
-  </header>
-  <section class="converter-section">
-    <div class="container">
-      <div class="converter-box">
-        <h1>محول MP4 إلى JPG</h1>
-        <p>حوّل فيديو MP4 إلى صور JPG عالية الجودة بسهولة وسرعة. يدعم استخراج جميع الإطارات أو إطار واحد فقط.</p>
-        <form id="mp4ToJpgForm">
-          <label class="upload-area" id="uploadArea">
-            <span id="uploadText">اسحب ملف MP4 هنا أو اضغط لاختيار ملف</span>
-            <input type="file" id="mp4Input" accept="video/mp4" />
-          </label>
-          <div style="margin-bottom:20px;">
-            <label style="font-weight:500; color:var(--text-color);">عدد الإطارات:
-              <select id="frameOption" style="margin-right:10px; border-radius:8px; padding:6px 12px;">
-                <option value="all">كل الإطارات</option>
-                <option value="first">الإطار الأول فقط</option>
-              </select>
-            </label>
-          </div>
-          <button type="submit" class="download-all-btn" id="convertBtn">بدء التحويل</button>
-        </form>
-        <div class="result-preview" id="resultPreview"></div>
-      </div>
-    </div>
-  </section>
   <footer class="footer" id="footer_aboutus">
     <div class="container">
       <div class="footer-content">
