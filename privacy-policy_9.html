@@ -20,17 +20,23 @@
     />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="assets/images/logo ico.svg" type="image/svg+xml" />
+
     <link rel="stylesheet" href="assets/css/fonts.css" />
     <link rel="stylesheet" href="assets/css/svg-icons.css" />
     <script src="assets/js/svg-icons.js" defer></script>
+
     <link rel="stylesheet" href="assets/css/style.css" />
     <link rel="stylesheet" href="assets/css/floating-whatsapp.css" />
     <link rel="stylesheet" href="assets/css/animations.css" />
     <link rel="stylesheet" href="assets/css/design-enhancements.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
       .privacy-page {
         min-height: 100vh;
         padding: 120px 0 80px;
+        background-color: transparent;
       }
 
       .privacy-header {
@@ -43,6 +49,22 @@
           rgba(var(--primary-rgb), 0.05) 100%
         );
         border-radius: var(--border-radius-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .privacy-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="2" cy="2" r="1" fill="rgba(138,125,219,0.1)"/></svg>');
+        opacity: 0.6;
+      }
+
+      .privacy-header h1,
+      .privacy-header p {
+        position: relative;
+        z-index: 1;
       }
 
       .privacy-header h1 {
@@ -54,7 +76,8 @@
         background: var(--card-bg);
         border-radius: var(--border-radius-lg);
         padding: 30px 24px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
       }
 
       .policy-pane {
@@ -92,9 +115,63 @@
         margin-top: 20px;
         text-decoration: none;
       }
+
+      .simple-footer {
+        text-align: center;
+        margin-top: 24px;
+        color: var(--text-color-light);
+      }
     </style>
   </head>
-  <body>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="index.html">
+              <img src="assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="index.html#home">الرئيسية</a></li>
+              <li><a href="works.html">أعمالنا</a></li>
+              <li><a href="privacy-policy_9.html" class="active">سياسة الخصوصية</a></li>
+              <li><a href="index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <a
+              href="https://wa.me/201002241591"
+              class="header-whatsapp-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-whatsapp"></use>
+              </svg>
+              <span>تواصل معنا</span>
+            </a>
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" aria-hidden="true">
+                <use xlink:href="assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
     <main class="privacy-page">
       <div class="container">
         <header class="privacy-header">
@@ -220,6 +297,10 @@
 
           <a href="index.html" class="btn back-link">العودة للرئيسية</a>
         </section>
+
+        <footer class="simple-footer">
+          جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed
+        </footer>
       </div>
     </main>
 
@@ -262,5 +343,6 @@
         });
       })();
     </script>
+    <script src="assets/js/three-bg.js"></script>
   </body>
 </html>
