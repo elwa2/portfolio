@@ -37,7 +37,7 @@
         padding: 120px 0 80px;
       }
 
-      .contact-header {
+      .contact-page-header {
         text-align: center;
         margin-bottom: 30px;
         padding: 35px 20px;
@@ -49,13 +49,19 @@
         border-radius: var(--border-radius-lg);
       }
 
-      .contact-header h1 {
+      .contact-page-header h1 {
         color: var(--primary-color);
         margin-bottom: 10px;
       }
 
       .contact-page .contact-section {
+        background: transparent !important;
         padding-top: 10px;
+      }
+
+      .contact-page .contact-section::before,
+      .contact-page .contact-section::after {
+        display: none !important;
       }
     </style>
   </head>
@@ -114,7 +120,7 @@
 
     <main class="contact-page">
       <div class="container">
-        <header class="contact-header">
+        <header class="contact-page-header">
           <h1>تواصل معنا</h1>
           <p>نحن هنا للإجابة على استفساراتك وتنفيذ طلباتك.</p>
         </header>
