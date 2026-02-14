@@ -521,6 +521,41 @@
         return null;
       }
 
+      function stretchLayoutToPageHeight() {
+        if (!state.tiles.length) return;
+
+        const pageHeight = page.getBoundingClientRect().height;
+        const top = Math.min(...state.tiles.map((t) => t.y));
+        const bottom = Math.max(...state.tiles.map((t) => t.y + t.h));
+        const usedHeight = bottom - top;
+        if (usedHeight <= 0) return;
+
+        const rawScale = pageHeight / usedHeight;
+        if (rawScale <= 1.05) return;
+
+        const scaleY = Math.min(rawScale, 2.8);
+        const centeredOffset = (pageHeight - usedHeight * scaleY) / 2;
+
+        state.tiles.forEach((tile, index) => {
+          tile.y = (tile.y - top) * scaleY + centeredOffset;
+          tile.h = tile.h * scaleY;
+
+          if (tile.shape === "circle") {
+            tile.radius = Math.min(tile.w, tile.h) / 2;
+          } else if (tile.shape === "rounded") {
+            tile.radius = Math.max(14, Math.min(28, Math.min(tile.w, tile.h) * 0.14));
+          } else {
+            tile.radius = 10;
+          }
+
+          const el = page.children[index];
+          if (!el) return;
+          el.style.top = `${tile.y}px`;
+          el.style.height = `${tile.h}px`;
+          el.style.borderRadius = `${tile.radius}px`;
+        });
+      }
+
       function makeLayout() {
         page.innerHTML = "";
         state.tiles = [];
@@ -532,12 +567,16 @@
 
         const rect = page.getBoundingClientRect();
         const pageW = rect.width;
-        const pageH = rect.height;
-        const cols = Number(columnsInput.value);
+        const inputCols = Number(columnsInput.value);
+        const smartCols = Math.min(
+          inputCols,
+          Math.max(2, Math.ceil(Math.sqrt(state.images.length + 2)))
+        );
+        const cols = smartCols;
         const gap = Number(gapInput.value);
         const circleChance = Number(roundnessInput.value) / 100;
         const cell = (pageW - gap * (cols - 1)) / cols;
-        const rows = Math.max(4, Math.floor((pageH + gap) / (cell + gap)));
+        const rows = Math.max(4, Math.ceil((state.images.length * 1.5) / cols));
         const used = Array.from({ length: rows }, () => Array(cols).fill(false));
 
         const sizes = [
@@ -579,8 +618,11 @@
 
           const typeRand = Math.random();
           let radius = 10;
+          let shape = "rect";
           if (typeRand < circleChance) radius = Math.min(w, h) / 2;
           else if (typeRand < circleChance + 0.3) radius = 24;
+          if (typeRand < circleChance) shape = "circle";
+          else if (typeRand < circleChance + 0.3) shape = "rounded";
 
           const tile = document.createElement("div");
           tile.className = "tile";
@@ -603,10 +645,12 @@
             w,
             h,
             radius,
+            shape,
           });
           placed++;
         }
 
+        stretchLayoutToPageHeight();
         setStat(`تم وضع ${placed} صورة من أصل ${state.images.length} داخل شبكة A4.`);
       }
 
