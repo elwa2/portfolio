@@ -678,8 +678,7 @@
         canvas.width = canvasW;
         canvas.height = canvasH;
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvasW, canvasH);
+        ctx.clearRect(0, 0, canvasW, canvasH);
 
         for (const tile of state.tiles) {
           const x = tile.x * scaleX;
