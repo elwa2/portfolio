@@ -1,0 +1,614 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-1B3TL3YJ0J');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ضاغط الصور الذكي | Ali Ahmed</title>
+    <meta
+      name="description"
+      content="أداة مجانية لضغط وتحويل الصور محليًا داخل المتصفح مع هدف حجم محدد، نفس الصيغة أو صيغ مختلفة، ودقة 300/150/70."
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+
+      .tool-container {
+        max-width: 980px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .drop-zone {
+        border: 3px dashed rgba(var(--primary-rgb), 0.25);
+        border-radius: 16px;
+        padding: 42px 20px;
+        background: rgba(var(--primary-rgb), 0.02);
+        cursor: pointer;
+        transition: 0.3s;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .drop-zone:hover,
+      .drop-zone.dragover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.06);
+      }
+
+      .drop-zone i {
+        font-size: 2.4rem;
+        color: var(--primary-color);
+        margin-bottom: 12px;
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field label {
+        font-size: 0.92rem;
+        color: var(--text-color-light);
+      }
+
+      .field input,
+      .field select {
+        border: 1px solid var(--border-color);
+        background: var(--bg-color-alt);
+        color: var(--text-color);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-family: inherit;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 11px 18px;
+        cursor: pointer;
+        font-weight: 700;
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: #fff;
+      }
+
+      .btn-secondary {
+        background: rgba(var(--primary-rgb), 0.12);
+        color: var(--text-color);
+      }
+
+      .hint {
+        font-size: 0.9rem;
+        color: var(--text-color-light);
+        margin-bottom: 14px;
+      }
+
+      #results {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .result-card {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px;
+        background: var(--bg-color-alt);
+      }
+
+      .result-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      .result-meta {
+        font-size: 0.86rem;
+        color: var(--text-color-light);
+        line-height: 1.7;
+      }
+
+      .result-status.ok {
+        color: #14b86a;
+      }
+
+      .result-status.warn {
+        color: #e79b10;
+      }
+
+      .download-link {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+        background: var(--secondary-purple);
+        color: #fff;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+
+      .progress-wrap {
+        margin-top: 10px;
+        margin-bottom: 16px;
+      }
+
+      progress {
+        width: 100%;
+        height: 8px;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 30px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">ضاغط الصور الذكي</h1>
+          <p style="color: var(--text-color-light)">
+            ضغط الصور لهدف محدد (مثل أقل من 1MB) مع تحويل الصيغ أو الإبقاء على نفس الصيغة،
+            وتقليل الدقة من 300 إلى 150 أو 70.
+          </p>
+        </div>
+
+        <div class="tool-container">
+          <div class="drop-zone" id="dropZone">
+            <i class="fas fa-images"></i>
+            <h3>اسحب الصور هنا أو اضغط للاختيار</h3>
+            <p class="hint">يدعم PNG / JPG / WEBP. كل المعالجة تتم محليًا داخل المتصفح.</p>
+            <input id="fileInput" type="file" multiple accept="image/png,image/jpeg,image/webp" style="display: none" />
+          </div>
+
+          <div class="settings-grid">
+            <div class="field">
+              <label for="formatSelect">الصيغة النهائية</label>
+              <select id="formatSelect">
+                <option value="same">نفس الصيغة</option>
+                <option value="png">PNG</option>
+                <option value="jpeg">JPG</option>
+                <option value="webp">WEBP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="targetMb">الحد الأقصى للحجم (MB)</label>
+              <input id="targetMb" type="number" min="0.05" step="0.05" value="1" />
+            </div>
+            <div class="field">
+              <label for="sourceDpi">دقة المصدر (DPI)</label>
+              <select id="sourceDpi">
+                <option value="300" selected>300</option>
+                <option value="240">240</option>
+                <option value="200">200</option>
+                <option value="150">150</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="targetDpi">الدقة المطلوبة (DPI)</label>
+              <select id="targetDpi">
+                <option value="150" selected>150</option>
+                <option value="70">70</option>
+                <option value="96">96</option>
+                <option value="120">120</option>
+                <option value="300">300</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="minScale">أقل نسبة أبعاد مسموحة</label>
+              <input id="minScale" type="number" min="0.2" max="1" step="0.05" value="0.4" />
+            </div>
+            <div class="field">
+              <label for="jpegQuality">جودة JPG/WEBP (%)</label>
+              <input id="jpegQuality" type="number" min="35" max="95" step="1" value="88" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="startBtn" class="btn btn-primary"><i class="fas fa-bolt"></i> ابدأ المعالجة</button>
+            <button id="clearBtn" class="btn btn-secondary"><i class="fas fa-trash"></i> مسح النتائج</button>
+          </div>
+
+          <div class="progress-wrap" id="progressWrap" style="display: none">
+            <progress id="progressBar" max="100" value="0"></progress>
+            <div class="hint" id="progressText">جاري المعالجة...</div>
+          </div>
+
+          <div id="results"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS
+              لجعل متجرك فريدًا ومميزًا.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            بوابة الأدوات مفتوحة المصدر
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const state = {
+        files: [],
+      };
+
+      const fileInput = document.getElementById('fileInput');
+      const dropZone = document.getElementById('dropZone');
+      const startBtn = document.getElementById('startBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const results = document.getElementById('results');
+      const progressWrap = document.getElementById('progressWrap');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        state.files = Array.from(e.target.files || []);
+        progressText.textContent = state.files.length
+          ? `تم اختيار ${state.files.length} ملف.`
+          : 'جاري المعالجة...';
+      });
+
+      ['dragenter', 'dragover'].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const files = Array.from(e.dataTransfer.files || []).filter((f) => f.type.startsWith('image/'));
+        state.files = files;
+        progressText.textContent = state.files.length
+          ? `تم اختيار ${state.files.length} ملف.`
+          : 'جاري المعالجة...';
+      });
+
+      clearBtn.addEventListener('click', () => {
+        results.innerHTML = '';
+        progressWrap.style.display = 'none';
+        progressBar.value = 0;
+        fileInput.value = '';
+        state.files = [];
+      });
+
+      startBtn.addEventListener('click', async () => {
+        if (!state.files.length) {
+          alert('اختر صورة واحدة على الأقل.');
+          return;
+        }
+
+        results.innerHTML = '';
+        progressWrap.style.display = 'block';
+        progressBar.value = 0;
+
+        const options = readOptions();
+
+        for (let i = 0; i < state.files.length; i++) {
+          const file = state.files[i];
+          const processed = await optimizeFile(file, options);
+          renderResult(processed);
+          progressBar.value = ((i + 1) / state.files.length) * 100;
+          progressText.textContent = `تمت معالجة ${i + 1} من ${state.files.length}`;
+        }
+      });
+
+      function readOptions() {
+        const format = document.getElementById('formatSelect').value;
+        const targetMb = Math.max(0.05, Number(document.getElementById('targetMb').value || 1));
+        const sourceDpi = Math.max(1, Number(document.getElementById('sourceDpi').value || 300));
+        const targetDpi = Math.max(1, Number(document.getElementById('targetDpi').value || 150));
+        const minScale = Math.min(1, Math.max(0.2, Number(document.getElementById('minScale').value || 0.4)));
+        const quality = Math.min(0.95, Math.max(0.35, Number(document.getElementById('jpegQuality').value || 88) / 100));
+
+        return {
+          format,
+          targetBytes: Math.round(targetMb * 1024 * 1024),
+          sourceDpi,
+          targetDpi,
+          minScale,
+          quality,
+        };
+      }
+
+      function mimeFromSelection(selection, originalType) {
+        if (selection === 'same') {
+          if (['image/png', 'image/jpeg', 'image/webp'].includes(originalType)) {
+            return originalType;
+          }
+          return 'image/png';
+        }
+        if (selection === 'png') return 'image/png';
+        if (selection === 'webp') return 'image/webp';
+        return 'image/jpeg';
+      }
+
+      function extensionFromMime(mime) {
+        if (mime === 'image/png') return 'png';
+        if (mime === 'image/webp') return 'webp';
+        return 'jpg';
+      }
+
+      async function optimizeFile(file, options) {
+        const bitmap = await createImageBitmap(file);
+        const mime = mimeFromSelection(options.format, file.type);
+
+        const dpiRatio = Math.min(1, options.targetDpi / options.sourceDpi);
+        const baseWidth = Math.max(1, Math.round(bitmap.width * dpiRatio));
+        const baseHeight = Math.max(1, Math.round(bitmap.height * dpiRatio));
+
+        let scale = 1;
+        let quality = options.quality;
+        let bestBlob = null;
+        let bestWidth = baseWidth;
+        let bestHeight = baseHeight;
+
+        for (let step = 0; step < 18; step++) {
+          const width = Math.max(1, Math.round(baseWidth * scale));
+          const height = Math.max(1, Math.round(baseHeight * scale));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d', { alpha: true });
+          ctx.drawImage(bitmap, 0, 0, width, height);
+
+          const blob = await canvasToBlob(canvas, mime, quality);
+          if (blob) {
+            bestBlob = blob;
+            bestWidth = width;
+            bestHeight = height;
+          }
+
+          if (blob && blob.size <= options.targetBytes) {
+            break;
+          }
+
+          if (mime === 'image/png') {
+            scale *= 0.88;
+          } else {
+            if (quality > 0.5) {
+              quality -= 0.07;
+            } else {
+              scale *= 0.9;
+            }
+          }
+
+          if (scale < options.minScale) {
+            scale = options.minScale;
+          }
+
+          if (scale === options.minScale && quality <= 0.5 && bestBlob && bestBlob.size > options.targetBytes) {
+            break;
+          }
+        }
+
+        bitmap.close();
+
+        const outputBlob = bestBlob || file;
+        const outputUrl = URL.createObjectURL(outputBlob);
+        const ext = extensionFromMime(mime);
+        const originalBase = file.name.replace(/\.[^.]+$/, '');
+
+        return {
+          name: file.name,
+          outputName: `${originalBase}_optimized.${ext}`,
+          beforeBytes: file.size,
+          afterBytes: outputBlob.size,
+          mime,
+          outputUrl,
+          width: bestWidth,
+          height: bestHeight,
+          hitTarget: outputBlob.size <= options.targetBytes,
+          sourceDpi: options.sourceDpi,
+          targetDpi: options.targetDpi,
+        };
+      }
+
+      function renderResult(result) {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+
+        const ratio = result.beforeBytes ? ((result.beforeBytes - result.afterBytes) / result.beforeBytes) * 100 : 0;
+        const statusClass = result.hitTarget ? 'ok' : 'warn';
+        const statusText = result.hitTarget ? 'وصل للحد المطلوب' : 'لم يصل للحد المطلوب';
+
+        card.innerHTML = `
+          <img src="${result.outputUrl}" alt="${result.outputName}" />
+          <div style="font-weight: 700; margin-bottom: 8px">${escapeHtml(result.outputName)}</div>
+          <div class="result-meta">
+            قبل: ${formatBytes(result.beforeBytes)}<br />
+            بعد: ${formatBytes(result.afterBytes)}<br />
+            التوفير: ${ratio > 0 ? ratio.toFixed(1) : '0.0'}%<br />
+            الأبعاد: ${result.width} x ${result.height}<br />
+            DPI: ${result.sourceDpi} -> ${result.targetDpi}<br />
+            النوع: ${result.mime}
+          </div>
+          <div class="result-status ${statusClass}">${statusText}</div>
+          <a class="download-link" href="${result.outputUrl}" download="${escapeHtml(result.outputName)}">
+            <i class="fas fa-download"></i> تنزيل
+          </a>
+        `;
+
+        results.appendChild(card);
+      }
+
+      function canvasToBlob(canvas, mime, quality) {
+        return new Promise((resolve) => {
+          canvas.toBlob(
+            (blob) => resolve(blob),
+            mime,
+            quality,
+          );
+        });
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes) return '0 B';
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+      }
+
+      function escapeHtml(input) {
+        return String(input)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+    </script>
+  </body>
+</html>
