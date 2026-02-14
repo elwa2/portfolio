@@ -141,6 +141,36 @@
         gap: 10px;
         margin-top: 10px;
       }
+      .page-tools {
+        margin-top: 8px;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: rgba(var(--primary-rgb), 0.05);
+      }
+      .page-tools-head {
+        font-size: 0.86rem;
+        color: var(--text-color-light);
+        margin-bottom: 8px;
+      }
+      .page-tools-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 8px;
+      }
+      .page-tools-row select {
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color);
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-family: inherit;
+      }
+      .page-btn {
+        width: auto;
+        min-width: 44px;
+        padding: 8px 10px;
+      }
 
       .btn {
         cursor: pointer;
@@ -375,9 +405,20 @@
 
               <div class="actions">
                 <button id="shuffleBtn" class="btn btn-primary">توليد شبكة جديدة</button>
-                <button id="downloadBtn" class="btn btn-secondary">تنزيل PNG</button>
+                <button id="downloadBtn" class="btn btn-secondary">تنزيل PNG للصفحة الحالية</button>
                 <button id="copyBtn" class="btn btn-secondary">نسخ كصورة (Clipboard)</button>
                 <button id="printBtn" class="btn btn-secondary">طباعة / حفظ PDF</button>
+              </div>
+
+              <div class="page-tools">
+                <div class="page-tools-head">
+                  إدارة الصفحات: <span id="pageCounter">0 / 0</span>
+                </div>
+                <div class="page-tools-row">
+                  <select id="pageSelect"></select>
+                  <button id="prevPageBtn" class="btn btn-secondary page-btn" type="button">السابق</button>
+                  <button id="nextPageBtn" class="btn btn-secondary page-btn" type="button">التالي</button>
+                </div>
               </div>
 
               <div id="stat" class="stat">لا توجد صور مرفوعة بعد.</div>
@@ -475,12 +516,16 @@
       const downloadBtn = document.getElementById("downloadBtn");
       const copyBtn = document.getElementById("copyBtn");
       const printBtn = document.getElementById("printBtn");
+      const pageSelect = document.getElementById("pageSelect");
+      const pageCounter = document.getElementById("pageCounter");
+      const prevPageBtn = document.getElementById("prevPageBtn");
+      const nextPageBtn = document.getElementById("nextPageBtn");
       const page = document.getElementById("page");
       const stat = document.getElementById("stat");
 
       const state = {
-        images: [],
-        tiles: [],
+        pages: [],
+        currentPageIndex: 0,
       };
 
       document.getElementById("currentYear").textContent = new Date().getFullYear();
@@ -549,12 +594,74 @@
         return null;
       }
 
-      function stretchLayoutToPageHeight() {
-        if (!state.tiles.length) return;
+      function getCurrentPageState() {
+        if (!state.pages.length) return null;
+        return state.pages[state.currentPageIndex] || null;
+      }
+
+      function clampPageIndex(index) {
+        if (!state.pages.length) return 0;
+        return Math.max(0, Math.min(state.pages.length - 1, index));
+      }
+
+      function updatePageControls() {
+        const total = state.pages.length;
+        pageCounter.textContent = total ? `${state.currentPageIndex + 1} / ${total}` : "0 / 0";
+
+        pageSelect.innerHTML = "";
+        if (!total) {
+          const opt = document.createElement("option");
+          opt.textContent = "لا توجد صفحات";
+          opt.value = "0";
+          pageSelect.appendChild(opt);
+          pageSelect.disabled = true;
+          prevPageBtn.disabled = true;
+          nextPageBtn.disabled = true;
+          return;
+        }
+
+        state.pages.forEach((pg, idx) => {
+          const opt = document.createElement("option");
+          opt.value = String(idx);
+          opt.textContent = `${idx + 1}. ${pg.name}`;
+          pageSelect.appendChild(opt);
+        });
+        pageSelect.value = String(state.currentPageIndex);
+        pageSelect.disabled = false;
+        prevPageBtn.disabled = state.currentPageIndex === 0;
+        nextPageBtn.disabled = state.currentPageIndex >= total - 1;
+      }
+
+      function createTileElement(tile) {
+        const tileEl = document.createElement("div");
+        tileEl.className = "tile";
+        tileEl.style.left = `${tile.x}px`;
+        tileEl.style.top = `${tile.y}px`;
+        tileEl.style.width = `${tile.w}px`;
+        tileEl.style.height = `${tile.h}px`;
+        tileEl.style.borderRadius = `${tile.radius}px`;
+        tileEl.style.transform = `rotate(${tile.rotate}deg)`;
+
+        const image = document.createElement("img");
+        image.src = tile.url;
+        image.alt = tile.name;
+        tileEl.appendChild(image);
+        return tileEl;
+      }
+
+      function renderCurrentPageFromTiles() {
+        const pageState = getCurrentPageState();
+        page.innerHTML = "";
+        if (!pageState || !pageState.tiles.length) return;
+        pageState.tiles.forEach((tile) => page.appendChild(createTileElement(tile)));
+      }
+
+      function stretchLayoutToPageHeight(pageState) {
+        if (!pageState || !pageState.tiles.length) return;
 
         const pageHeight = page.getBoundingClientRect().height;
-        const top = Math.min(...state.tiles.map((t) => t.y));
-        const bottom = Math.max(...state.tiles.map((t) => t.y + t.h));
+        const top = Math.min(...pageState.tiles.map((t) => t.y));
+        const bottom = Math.max(...pageState.tiles.map((t) => t.y + t.h));
         const usedHeight = bottom - top;
         if (usedHeight <= 0) return;
 
@@ -564,26 +671,21 @@
         const scaleY = Math.min(rawScale, 2.8);
         const centeredOffset = (pageHeight - usedHeight * scaleY) / 2;
 
-        state.tiles.forEach((tile, index) => {
+        pageState.tiles.forEach((tile) => {
           tile.y = (tile.y - top) * scaleY + centeredOffset;
           tile.h = tile.h * scaleY;
           tile.radius = calcRadius(tile.shape, tile.w, tile.h);
-
-          const el = page.children[index];
-          if (!el) return;
-          el.style.top = `${tile.y}px`;
-          el.style.height = `${tile.h}px`;
-          el.style.borderRadius = `${tile.radius}px`;
-          el.style.transform = `rotate(${tile.rotate}deg)`;
         });
       }
 
       function makeLayout() {
+        const pageState = getCurrentPageState();
         page.innerHTML = "";
-        state.tiles = [];
+        if (pageState) pageState.tiles = [];
 
-        if (!state.images.length) {
+        if (!pageState || !pageState.images.length) {
           setStat("لا توجد صور مرفوعة بعد.");
+          updatePageControls();
           return;
         }
 
@@ -592,14 +694,14 @@
         const inputCols = Number(columnsInput.value);
         const smartCols = Math.min(
           inputCols,
-          Math.max(2, Math.ceil(Math.sqrt(state.images.length + 2)))
+          Math.max(2, Math.ceil(Math.sqrt(pageState.images.length + 2)))
         );
         const cols = smartCols;
         const gap = Number(gapInput.value);
         const maxRotation = Number(rotationInput.value);
         const circleChance = Number(roundnessInput.value) / 100;
         const cell = (pageW - gap * (cols - 1)) / cols;
-        const rows = Math.max(4, Math.ceil((state.images.length * 1.5) / cols));
+        const rows = Math.max(4, Math.ceil((pageState.images.length * 1.5) / cols));
         const used = Array.from({ length: rows }, () => Array(cols).fill(false));
 
         const sizes = [
@@ -617,8 +719,8 @@
         ];
 
         let placed = 0;
-        for (let i = 0; i < state.images.length; i++) {
-          const imgObj = state.images[i];
+        for (let i = 0; i < pageState.images.length; i++) {
+          const imgObj = pageState.images[i];
           const first = randomChoice(sizes);
           const sizeList = [first, ...fallback];
           let slot = null;
@@ -646,23 +748,10 @@
           const radius = calcRadius(shape, w, h);
           const rotate = shape === "circle" ? 0 : (Math.random() * 2 - 1) * maxRotation;
 
-          const tile = document.createElement("div");
-          tile.className = "tile";
-          tile.style.left = `${x}px`;
-          tile.style.top = `${y}px`;
-          tile.style.width = `${w}px`;
-          tile.style.height = `${h}px`;
-          tile.style.borderRadius = `${radius}px`;
-          tile.style.transform = `rotate(${rotate}deg)`;
-
-          const image = document.createElement("img");
-          image.src = imgObj.url;
-          image.alt = imgObj.name;
-          tile.appendChild(image);
-          page.appendChild(tile);
-
-          state.tiles.push({
+          pageState.tiles.push({
             image: imgObj.img,
+            url: imgObj.url,
+            name: imgObj.name,
             x,
             y,
             w,
@@ -674,8 +763,39 @@
           placed++;
         }
 
-        stretchLayoutToPageHeight();
-        setStat(`تم وضع ${placed} صورة من أصل ${state.images.length} داخل شبكة A4.`);
+        stretchLayoutToPageHeight(pageState);
+        renderCurrentPageFromTiles();
+        setStat(
+          `الصفحة ${state.currentPageIndex + 1} (${pageState.name}): تم وضع ${placed} صورة من أصل ${pageState.images.length}.`
+        );
+        updatePageControls();
+      }
+
+      function openPage(index, forceRegenerate = false) {
+        if (!state.pages.length) {
+          page.innerHTML = "";
+          setStat("لا توجد صفحات.");
+          updatePageControls();
+          return;
+        }
+
+        state.currentPageIndex = clampPageIndex(index);
+        const pageState = getCurrentPageState();
+        if (!pageState) {
+          setStat("تعذر فتح الصفحة.");
+          updatePageControls();
+          return;
+        }
+
+        if (forceRegenerate || !pageState.tiles.length) {
+          makeLayout();
+        } else {
+          renderCurrentPageFromTiles();
+          setStat(
+            `الصفحة ${state.currentPageIndex + 1} (${pageState.name}): ${pageState.images.length} صورة.`
+          );
+          updatePageControls();
+        }
       }
 
       async function fileToImage(file) {
@@ -686,6 +806,37 @@
         return { name: file.name, url, img };
       }
 
+      function clearObjectUrls() {
+        state.pages.forEach((pg) => {
+          pg.images.forEach((imgObj) => URL.revokeObjectURL(imgObj.url));
+        });
+      }
+
+      function parsePageNameFromFile(file) {
+        const rel = (file.webkitRelativePath || "").replace(/\\/g, "/");
+        if (!rel) return "صفحة 1";
+        const parts = rel.split("/").filter(Boolean);
+        if (parts.length >= 3) return parts[1];
+        if (parts.length === 2) return "الصور الرئيسية";
+        return "صفحة 1";
+      }
+
+      function groupFilesByFolder(files) {
+        const groups = new Map();
+
+        files.forEach((file) => {
+          const pageName = file.webkitRelativePath
+            ? parsePageNameFromFile(file)
+            : "الصور الرئيسية";
+          if (!groups.has(pageName)) {
+            groups.set(pageName, []);
+          }
+          groups.get(pageName).push(file);
+        });
+
+        return groups;
+      }
+
       async function loadFiles(fileList) {
         const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
         if (!files.length) {
@@ -693,20 +844,33 @@
           return;
         }
 
-        for (const item of state.images) URL.revokeObjectURL(item.url);
-        state.images = [];
-
         setStat("جاري تجهيز الصور...");
-        const results = [];
-        for (const file of files) {
-          try {
-            results.push(await fileToImage(file));
-          } catch (_) {}
+        clearObjectUrls();
+        state.pages = [];
+        state.currentPageIndex = 0;
+
+        const groups = groupFilesByFolder(files);
+        const pages = [];
+        for (const [folderName, folderFiles] of groups.entries()) {
+          const images = [];
+          for (const file of folderFiles) {
+            try {
+              images.push(await fileToImage(file));
+            } catch (_) {}
+          }
+          if (images.length) {
+            pages.push({
+              name: folderName,
+              images,
+              tiles: [],
+            });
+          }
         }
 
-        state.images = results;
-        setStat(`تم رفع ${state.images.length} صورة. اضغط "توليد شبكة جديدة".`);
-        makeLayout();
+        state.pages = pages;
+        state.currentPageIndex = 0;
+        updatePageControls();
+        openPage(0, true);
       }
 
       function roundedRect(ctx, x, y, w, h, r) {
@@ -730,7 +894,8 @@
       }
 
       async function renderExportCanvas() {
-        if (!state.tiles.length) return null;
+        const pageState = getCurrentPageState();
+        if (!pageState || !pageState.tiles.length) return null;
         const dpi = Number(dpiInput.value);
         const portrait = orientationInput.value === "portrait";
         const mmW = portrait ? 210 : 297;
@@ -748,7 +913,7 @@
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvasW, canvasH);
 
-        for (const tile of state.tiles) {
+        for (const tile of pageState.tiles) {
           const x = tile.x * scaleX;
           const y = tile.y * scaleY;
           const w = tile.w * scaleX;
@@ -771,8 +936,10 @@
       async function downloadResult() {
         const canvas = await renderExportCanvas();
         if (!canvas) return setStat("لا يوجد تصميم للتنزيل.");
+        const pageState = getCurrentPageState();
+        const pageName = (pageState?.name || "page").replace(/[^\w\u0600-\u06FF-]+/g, "-");
         const link = document.createElement("a");
-        link.download = `a4-photo-grid-${Date.now()}.png`;
+        link.download = `a4-photo-grid-${pageName}-${state.currentPageIndex + 1}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       }
@@ -789,7 +956,8 @@
       }
 
       function printPage() {
-        if (!state.tiles.length) return setStat("لا يوجد تصميم للطباعة.");
+        const pageState = getCurrentPageState();
+        if (!pageState || !pageState.tiles.length) return setStat("لا يوجد تصميم للطباعة.");
         window.print();
       }
 
@@ -822,37 +990,41 @@
 
       orientationInput.addEventListener("change", () => {
         updateA4Aspect();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
       columnsInput.addEventListener("input", () => {
         updateRangeLabels();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
       gapInput.addEventListener("input", () => {
         updateRangeLabels();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
       roundnessInput.addEventListener("input", () => {
         updateRangeLabels();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
       curveInput.addEventListener("input", () => {
         updateRangeLabels();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
       rotationInput.addEventListener("input", () => {
         updateRangeLabels();
-        makeLayout();
+        openPage(state.currentPageIndex, true);
       });
-      shuffleBtn.addEventListener("click", makeLayout);
+      shuffleBtn.addEventListener("click", () => openPage(state.currentPageIndex, true));
       downloadBtn.addEventListener("click", downloadResult);
       copyBtn.addEventListener("click", () =>
         copyResult().catch(() => setStat("تعذر النسخ. جرّب HTTPS أو Chrome."))
       );
       printBtn.addEventListener("click", printPage);
+      prevPageBtn.addEventListener("click", () => openPage(state.currentPageIndex - 1));
+      nextPageBtn.addEventListener("click", () => openPage(state.currentPageIndex + 1));
+      pageSelect.addEventListener("change", () => openPage(Number(pageSelect.value)));
 
       updateA4Aspect();
       updateRangeLabels();
+      updatePageControls();
     </script>
   </body>
 </html>
