@@ -191,6 +191,7 @@
         overflow: hidden;
         background: #f3f4f6;
         border: 1px solid rgba(0, 0, 0, 0.06);
+        transform-origin: center center;
       }
 
       .tile img {
@@ -355,6 +356,16 @@
               </div>
 
               <div class="field">
+                <label for="curve">نسبة الكيرف: <span id="curveValue">55</span>%</label>
+                <input id="curve" type="range" min="0" max="100" value="55" />
+              </div>
+
+              <div class="field">
+                <label for="rotation">الدوران: <span id="rotationValue">0</span>°</label>
+                <input id="rotation" type="range" min="0" max="25" value="0" />
+              </div>
+
+              <div class="field">
                 <label for="dpi">جودة التصدير</label>
                 <select id="dpi">
                   <option value="150">150 DPI</option>
@@ -452,10 +463,14 @@
       const columnsInput = document.getElementById("columns");
       const gapInput = document.getElementById("gap");
       const roundnessInput = document.getElementById("roundness");
+      const curveInput = document.getElementById("curve");
+      const rotationInput = document.getElementById("rotation");
       const dpiInput = document.getElementById("dpi");
       const columnsValue = document.getElementById("columnsValue");
       const gapValue = document.getElementById("gapValue");
       const roundnessValue = document.getElementById("roundnessValue");
+      const curveValue = document.getElementById("curveValue");
+      const rotationValue = document.getElementById("rotationValue");
       const shuffleBtn = document.getElementById("shuffleBtn");
       const downloadBtn = document.getElementById("downloadBtn");
       const copyBtn = document.getElementById("copyBtn");
@@ -484,6 +499,19 @@
         columnsValue.textContent = columnsInput.value;
         gapValue.textContent = gapInput.value;
         roundnessValue.textContent = roundnessInput.value;
+        curveValue.textContent = curveInput.value;
+        rotationValue.textContent = rotationInput.value;
+      }
+
+      function calcRadius(shape, w, h) {
+        const curveFactor = Number(curveInput.value) / 100;
+        if (shape === "circle") return Math.min(w, h) / 2;
+        if (shape === "rounded") {
+          const target = Math.min(w, h) * (0.06 + curveFactor * 0.34);
+          return Math.max(8, Math.min(Math.min(w, h) / 2, target));
+        }
+        const target = 4 + curveFactor * 16;
+        return Math.max(2, Math.min(Math.min(w, h) / 2, target));
       }
 
       function randomChoice(weighted) {
@@ -539,20 +567,14 @@
         state.tiles.forEach((tile, index) => {
           tile.y = (tile.y - top) * scaleY + centeredOffset;
           tile.h = tile.h * scaleY;
-
-          if (tile.shape === "circle") {
-            tile.radius = Math.min(tile.w, tile.h) / 2;
-          } else if (tile.shape === "rounded") {
-            tile.radius = Math.max(14, Math.min(28, Math.min(tile.w, tile.h) * 0.14));
-          } else {
-            tile.radius = 10;
-          }
+          tile.radius = calcRadius(tile.shape, tile.w, tile.h);
 
           const el = page.children[index];
           if (!el) return;
           el.style.top = `${tile.y}px`;
           el.style.height = `${tile.h}px`;
           el.style.borderRadius = `${tile.radius}px`;
+          el.style.transform = `rotate(${tile.rotate}deg)`;
         });
       }
 
@@ -574,6 +596,7 @@
         );
         const cols = smartCols;
         const gap = Number(gapInput.value);
+        const maxRotation = Number(rotationInput.value);
         const circleChance = Number(roundnessInput.value) / 100;
         const cell = (pageW - gap * (cols - 1)) / cols;
         const rows = Math.max(4, Math.ceil((state.images.length * 1.5) / cols));
@@ -617,12 +640,11 @@
           const h = picked.h * cell + (picked.h - 1) * gap;
 
           const typeRand = Math.random();
-          let radius = 10;
           let shape = "rect";
-          if (typeRand < circleChance) radius = Math.min(w, h) / 2;
-          else if (typeRand < circleChance + 0.3) radius = 24;
           if (typeRand < circleChance) shape = "circle";
           else if (typeRand < circleChance + 0.3) shape = "rounded";
+          const radius = calcRadius(shape, w, h);
+          const rotate = shape === "circle" ? 0 : (Math.random() * 2 - 1) * maxRotation;
 
           const tile = document.createElement("div");
           tile.className = "tile";
@@ -631,6 +653,7 @@
           tile.style.width = `${w}px`;
           tile.style.height = `${h}px`;
           tile.style.borderRadius = `${radius}px`;
+          tile.style.transform = `rotate(${rotate}deg)`;
 
           const image = document.createElement("img");
           image.src = imgObj.url;
@@ -646,6 +669,7 @@
             h,
             radius,
             shape,
+            rotate,
           });
           placed++;
         }
@@ -730,10 +754,15 @@
           const w = tile.w * scaleX;
           const h = tile.h * scaleY;
           const radius = tile.radius * Math.min(scaleX, scaleY);
+          const angle = (tile.rotate * Math.PI) / 180;
+          const cx = x + w / 2;
+          const cy = y + h / 2;
           ctx.save();
-          roundedRect(ctx, x, y, w, h, radius);
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          roundedRect(ctx, -w / 2, -h / 2, w, h, radius);
           ctx.clip();
-          drawCover(ctx, tile.image, x, y, w, h);
+          drawCover(ctx, tile.image, -w / 2, -h / 2, w, h);
           ctx.restore();
         }
         return canvas;
@@ -804,6 +833,14 @@
         makeLayout();
       });
       roundnessInput.addEventListener("input", () => {
+        updateRangeLabels();
+        makeLayout();
+      });
+      curveInput.addEventListener("input", () => {
+        updateRangeLabels();
+        makeLayout();
+      });
+      rotationInput.addEventListener("input", () => {
         updateRangeLabels();
         makeLayout();
       });
