@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A4 Photo Grid Studio | Ali Ahmed</title>
+    <meta
+      name="description"
+      content="أداة مجانية لتوليد شبكة صور تلقائية على مقاس A4 بأحجام وأشكال مختلفة مع تنزيل PNG أو نسخ التصميم للحافظة."
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+
+      .tool-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 20px;
+      }
+
+      .panel {
+        background: var(--bg-color-alt);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .controls {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      .field label {
+        color: var(--text-color-light);
+        font-size: 0.92rem;
+      }
+
+      .field input,
+      .field select,
+      .btn {
+        width: 100%;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-family: inherit;
+      }
+
+      .field input[type="range"] {
+        padding: 0;
+      }
+
+      .drop-group {
+        display: grid;
+        gap: 10px;
+      }
+
+      .drop-zone {
+        display: block;
+        position: relative;
+        border: 2px dashed rgba(var(--primary-rgb), 0.3);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+        cursor: pointer;
+        background: rgba(var(--primary-rgb), 0.04);
+        color: var(--text-color-light);
+        transition: 0.25s;
+      }
+
+      .drop-zone:hover,
+      .drop-zone.dragover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.08);
+      }
+
+      .file-picker-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        border: 0;
+        padding: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+      }
+
+      .actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+      }
+
+      .btn-secondary {
+        background: rgba(var(--primary-rgb), 0.12);
+      }
+
+      .stat {
+        margin-top: 10px;
+        background: rgba(var(--primary-rgb), 0.08);
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        color: var(--text-color);
+        border-radius: 10px;
+        font-size: 0.88rem;
+        padding: 10px;
+      }
+
+      .a4-stage {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 10px;
+        overflow: auto;
+        min-height: 720px;
+      }
+
+      .a4-page {
+        width: 820px;
+        aspect-ratio: 210 / 297;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        position: relative;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .tile {
+        position: absolute;
+        overflow: hidden;
+        background: #f3f4f6;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      @media (max-width: 1050px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .a4-page {
+          width: min(95vw, 820px);
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+        }
+
+        .header,
+        .footer,
+        .tool-page-wrapper > .container > div:first-child,
+        .controls {
+          display: none !important;
+        }
+
+        .tool-page-wrapper,
+        .tool-container,
+        .layout,
+        .panel,
+        .a4-stage {
+          margin: 0;
+          padding: 0;
+          border: 0;
+          box-shadow: none;
+          background: #fff;
+          display: block;
+          min-height: auto;
+        }
+
+        .a4-page {
+          width: 210mm;
+          height: 297mm;
+          max-width: 100%;
+          border: 0;
+          box-shadow: none;
+          border-radius: 0;
+          break-inside: avoid;
+        }
+
+        body.landscape-print .a4-page {
+          width: 297mm;
+          height: 210mm;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 30px">
+          <h1 style="font-size: 2.5rem; color: var(--primary-color)">A4 Photo Grid Studio</h1>
+          <p style="color: var(--text-color-light)">
+            ارفع فولدر صور أو صور متعددة، وولّد شبكة A4 تلقائية بأحجام وأشكال مختلفة ثم نزّل الناتج أو انسخه.
+          </p>
+        </div>
+
+        <div class="tool-container">
+          <div class="layout">
+            <section class="panel controls">
+              <div class="drop-group">
+                <label class="drop-zone" id="folderDropZone" for="folderInput">
+                  <i class="fas fa-folder-open"></i>
+                  <div>رفع فولدر صور كامل</div>
+                  <input
+                    id="folderInput"
+                    class="file-picker-input"
+                    type="file"
+                    webkitdirectory
+                    directory
+                    multiple
+                  />
+                </label>
+                <label class="drop-zone" id="filesDropZone" for="filesInput">
+                  <i class="fas fa-images"></i>
+                  <div>أو اختيار صور متعددة</div>
+                  <input
+                    id="filesInput"
+                    class="file-picker-input"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                  />
+                </label>
+              </div>
+
+              <div class="field">
+                <label for="orientation">اتجاه الصفحة</label>
+                <select id="orientation">
+                  <option value="portrait">A4 عمودي</option>
+                  <option value="landscape">A4 أفقي</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="columns">عدد الأعمدة: <span id="columnsValue">6</span></label>
+                <input id="columns" type="range" min="4" max="12" value="6" />
+              </div>
+
+              <div class="field">
+                <label for="gap">المسافة بين الصور: <span id="gapValue">8</span> px</label>
+                <input id="gap" type="range" min="0" max="24" value="8" />
+              </div>
+
+              <div class="field">
+                <label for="roundness">نسبة الدوائر: <span id="roundnessValue">30</span>%</label>
+                <input id="roundness" type="range" min="0" max="100" value="30" />
+              </div>
+
+              <div class="field">
+                <label for="dpi">جودة التصدير</label>
+                <select id="dpi">
+                  <option value="150">150 DPI</option>
+                  <option value="300" selected>300 DPI</option>
+                </select>
+              </div>
+
+              <div class="actions">
+                <button id="shuffleBtn" class="btn btn-primary">توليد شبكة جديدة</button>
+                <button id="downloadBtn" class="btn btn-secondary">تنزيل PNG</button>
+                <button id="copyBtn" class="btn btn-secondary">نسخ كصورة (Clipboard)</button>
+                <button id="printBtn" class="btn btn-secondary">طباعة / حفظ PDF</button>
+              </div>
+
+              <div id="stat" class="stat">لا توجد صور مرفوعة بعد.</div>
+            </section>
+
+            <section class="panel">
+              <div class="a4-stage">
+                <div id="page" class="a4-page"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS
+              لجعل متجرك فريدًا ومميزًا.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            بوابة الأدوات مفتوحة المصدر
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const folderInput = document.getElementById("folderInput");
+      const filesInput = document.getElementById("filesInput");
+      const orientationInput = document.getElementById("orientation");
+      const columnsInput = document.getElementById("columns");
+      const gapInput = document.getElementById("gap");
+      const roundnessInput = document.getElementById("roundness");
+      const dpiInput = document.getElementById("dpi");
+      const columnsValue = document.getElementById("columnsValue");
+      const gapValue = document.getElementById("gapValue");
+      const roundnessValue = document.getElementById("roundnessValue");
+      const shuffleBtn = document.getElementById("shuffleBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const printBtn = document.getElementById("printBtn");
+      const page = document.getElementById("page");
+      const stat = document.getElementById("stat");
+
+      const state = {
+        images: [],
+        tiles: [],
+      };
+
+      document.getElementById("currentYear").textContent = new Date().getFullYear();
+
+      function setStat(text) {
+        stat.textContent = text;
+      }
+
+      function updateA4Aspect() {
+        const portrait = orientationInput.value === "portrait";
+        page.style.aspectRatio = portrait ? "210 / 297" : "297 / 210";
+        document.body.classList.toggle("landscape-print", !portrait);
+      }
+
+      function updateRangeLabels() {
+        columnsValue.textContent = columnsInput.value;
+        gapValue.textContent = gapInput.value;
+        roundnessValue.textContent = roundnessInput.value;
+      }
+
+      function randomChoice(weighted) {
+        const sum = weighted.reduce((acc, item) => acc + item.weight, 0);
+        let pick = Math.random() * sum;
+        for (const item of weighted) {
+          pick -= item.weight;
+          if (pick <= 0) return item;
+        }
+        return weighted[weighted.length - 1];
+      }
+
+      function canFit(used, c, r, w, h, cols, rows) {
+        if (c + w > cols || r + h > rows) return false;
+        for (let y = r; y < r + h; y++) {
+          for (let x = c; x < c + w; x++) {
+            if (used[y][x]) return false;
+          }
+        }
+        return true;
+      }
+
+      function markUsed(used, c, r, w, h) {
+        for (let y = r; y < r + h; y++) {
+          for (let x = c; x < c + w; x++) used[y][x] = true;
+        }
+      }
+
+      function findSlot(used, w, h, cols, rows) {
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (canFit(used, c, r, w, h, cols, rows)) return { c, r };
+          }
+        }
+        return null;
+      }
+
+      function makeLayout() {
+        page.innerHTML = "";
+        state.tiles = [];
+
+        if (!state.images.length) {
+          setStat("لا توجد صور مرفوعة بعد.");
+          return;
+        }
+
+        const rect = page.getBoundingClientRect();
+        const pageW = rect.width;
+        const pageH = rect.height;
+        const cols = Number(columnsInput.value);
+        const gap = Number(gapInput.value);
+        const circleChance = Number(roundnessInput.value) / 100;
+        const cell = (pageW - gap * (cols - 1)) / cols;
+        const rows = Math.max(4, Math.floor((pageH + gap) / (cell + gap)));
+        const used = Array.from({ length: rows }, () => Array(cols).fill(false));
+
+        const sizes = [
+          { w: 1, h: 1, weight: 6 },
+          { w: 2, h: 1, weight: 3 },
+          { w: 1, h: 2, weight: 3 },
+          { w: 2, h: 2, weight: 2 },
+          { w: 3, h: 2, weight: cols >= 7 ? 1.2 : 0.2 },
+        ];
+        const fallback = [
+          { w: 1, h: 1 },
+          { w: 2, h: 1 },
+          { w: 1, h: 2 },
+          { w: 2, h: 2 },
+        ];
+
+        let placed = 0;
+        for (let i = 0; i < state.images.length; i++) {
+          const imgObj = state.images[i];
+          const first = randomChoice(sizes);
+          const sizeList = [first, ...fallback];
+          let slot = null;
+          let picked = null;
+
+          for (const size of sizeList) {
+            slot = findSlot(used, size.w, size.h, cols, rows);
+            if (slot) {
+              picked = size;
+              break;
+            }
+          }
+          if (!slot || !picked) break;
+
+          markUsed(used, slot.c, slot.r, picked.w, picked.h);
+          const x = slot.c * (cell + gap);
+          const y = slot.r * (cell + gap);
+          const w = picked.w * cell + (picked.w - 1) * gap;
+          const h = picked.h * cell + (picked.h - 1) * gap;
+
+          const typeRand = Math.random();
+          let radius = 10;
+          if (typeRand < circleChance) radius = Math.min(w, h) / 2;
+          else if (typeRand < circleChance + 0.3) radius = 24;
+
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          tile.style.left = `${x}px`;
+          tile.style.top = `${y}px`;
+          tile.style.width = `${w}px`;
+          tile.style.height = `${h}px`;
+          tile.style.borderRadius = `${radius}px`;
+
+          const image = document.createElement("img");
+          image.src = imgObj.url;
+          image.alt = imgObj.name;
+          tile.appendChild(image);
+          page.appendChild(tile);
+
+          state.tiles.push({
+            image: imgObj.img,
+            x,
+            y,
+            w,
+            h,
+            radius,
+          });
+          placed++;
+        }
+
+        setStat(`تم وضع ${placed} صورة من أصل ${state.images.length} داخل شبكة A4.`);
+      }
+
+      async function fileToImage(file) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+        return { name: file.name, url, img };
+      }
+
+      async function loadFiles(fileList) {
+        const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+        if (!files.length) {
+          setStat("لم يتم العثور على ملفات صور.");
+          return;
+        }
+
+        for (const item of state.images) URL.revokeObjectURL(item.url);
+        state.images = [];
+
+        setStat("جاري تجهيز الصور...");
+        const results = [];
+        for (const file of files) {
+          try {
+            results.push(await fileToImage(file));
+          } catch (_) {}
+        }
+
+        state.images = results;
+        setStat(`تم رفع ${state.images.length} صورة. اضغط "توليد شبكة جديدة".`);
+        makeLayout();
+      }
+
+      function roundedRect(ctx, x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+      }
+
+      function drawCover(ctx, img, dx, dy, dw, dh) {
+        const scale = Math.max(dw / img.naturalWidth, dh / img.naturalHeight);
+        const sw = dw / scale;
+        const sh = dh / scale;
+        const sx = (img.naturalWidth - sw) / 2;
+        const sy = (img.naturalHeight - sh) / 2;
+        ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+      }
+
+      async function renderExportCanvas() {
+        if (!state.tiles.length) return null;
+        const dpi = Number(dpiInput.value);
+        const portrait = orientationInput.value === "portrait";
+        const mmW = portrait ? 210 : 297;
+        const mmH = portrait ? 297 : 210;
+        const canvasW = Math.round((mmW / 25.4) * dpi);
+        const canvasH = Math.round((mmH / 25.4) * dpi);
+
+        const previewRect = page.getBoundingClientRect();
+        const scaleX = canvasW / previewRect.width;
+        const scaleY = canvasH / previewRect.height;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasW;
+        canvas.height = canvasH;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvasW, canvasH);
+
+        for (const tile of state.tiles) {
+          const x = tile.x * scaleX;
+          const y = tile.y * scaleY;
+          const w = tile.w * scaleX;
+          const h = tile.h * scaleY;
+          const radius = tile.radius * Math.min(scaleX, scaleY);
+          ctx.save();
+          roundedRect(ctx, x, y, w, h, radius);
+          ctx.clip();
+          drawCover(ctx, tile.image, x, y, w, h);
+          ctx.restore();
+        }
+        return canvas;
+      }
+
+      async function downloadResult() {
+        const canvas = await renderExportCanvas();
+        if (!canvas) return setStat("لا يوجد تصميم للتنزيل.");
+        const link = document.createElement("a");
+        link.download = `a4-photo-grid-${Date.now()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      async function copyResult() {
+        const canvas = await renderExportCanvas();
+        if (!canvas) return setStat("لا يوجد تصميم للنسخ.");
+        if (!window.ClipboardItem || !navigator.clipboard) {
+          return setStat("المتصفح لا يدعم نسخ الصور للحافظة.");
+        }
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        setStat("تم نسخ الصورة. يمكنك لصقها داخل Illustrator مباشرة.");
+      }
+
+      function printPage() {
+        if (!state.tiles.length) return setStat("لا يوجد تصميم للطباعة.");
+        window.print();
+      }
+
+      function bindDragDrop(zone, loader) {
+        ["dragenter", "dragover"].forEach((eventName) => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.add("dragover");
+          });
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          zone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            zone.classList.remove("dragover");
+          });
+        });
+
+        zone.addEventListener("drop", (e) => {
+          const files = Array.from(e.dataTransfer.files || []);
+          loader(files);
+        });
+      }
+
+      folderInput.addEventListener("change", () => loadFiles(folderInput.files));
+      filesInput.addEventListener("change", () => loadFiles(filesInput.files));
+
+      bindDragDrop(document.getElementById("folderDropZone"), loadFiles);
+      bindDragDrop(document.getElementById("filesDropZone"), loadFiles);
+
+      orientationInput.addEventListener("change", () => {
+        updateA4Aspect();
+        makeLayout();
+      });
+      columnsInput.addEventListener("input", () => {
+        updateRangeLabels();
+        makeLayout();
+      });
+      gapInput.addEventListener("input", () => {
+        updateRangeLabels();
+        makeLayout();
+      });
+      roundnessInput.addEventListener("input", () => {
+        updateRangeLabels();
+        makeLayout();
+      });
+      shuffleBtn.addEventListener("click", makeLayout);
+      downloadBtn.addEventListener("click", downloadResult);
+      copyBtn.addEventListener("click", () =>
+        copyResult().catch(() => setStat("تعذر النسخ. جرّب HTTPS أو Chrome."))
+      );
+      printBtn.addEventListener("click", printPage);
+
+      updateA4Aspect();
+      updateRangeLabels();
+    </script>
+  </body>
+</html>
