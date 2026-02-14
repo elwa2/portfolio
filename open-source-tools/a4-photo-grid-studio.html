@@ -420,6 +420,19 @@
                 </select>
               </div>
 
+              <div class="field">
+                <label for="exportBgMode">خلفية التصدير</label>
+                <select id="exportBgMode">
+                  <option value="transparent" selected>PNG شفاف</option>
+                  <option value="color">لون مخصص</option>
+                </select>
+              </div>
+
+              <div class="field" id="exportBgColorWrap" style="display: none">
+                <label for="exportBgColor">لون الخلفية</label>
+                <input id="exportBgColor" type="color" value="#ffffff" />
+              </div>
+
               <div class="actions">
                 <button id="shuffleBtn" class="btn btn-primary">توليد شبكة جديدة</button>
                 <button id="downloadBtn" class="btn btn-secondary">تنزيل PNG للصفحة الحالية</button>
@@ -524,6 +537,9 @@
       const curveInput = document.getElementById("curve");
       const rotationInput = document.getElementById("rotation");
       const dpiInput = document.getElementById("dpi");
+      const exportBgModeInput = document.getElementById("exportBgMode");
+      const exportBgColorInput = document.getElementById("exportBgColor");
+      const exportBgColorWrap = document.getElementById("exportBgColorWrap");
       const columnsValue = document.getElementById("columnsValue");
       const gapValue = document.getElementById("gapValue");
       const roundnessValue = document.getElementById("roundnessValue");
@@ -563,6 +579,11 @@
         roundnessValue.textContent = roundnessInput.value;
         curveValue.textContent = curveInput.value;
         rotationValue.textContent = rotationInput.value;
+      }
+
+      function updateExportBgControls() {
+        exportBgColorWrap.style.display =
+          exportBgModeInput.value === "color" ? "block" : "none";
       }
 
       function calcRadius(shape, w, h) {
@@ -1017,7 +1038,12 @@
         canvas.width = canvasW;
         canvas.height = canvasH;
         const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvasW, canvasH);
+        if (exportBgModeInput.value === "color") {
+          ctx.fillStyle = exportBgColorInput.value || "#ffffff";
+          ctx.fillRect(0, 0, canvasW, canvasH);
+        } else {
+          ctx.clearRect(0, 0, canvasW, canvasH);
+        }
 
         for (const tile of pageState.tiles) {
           const x = tile.x * scaleX;
@@ -1127,9 +1153,11 @@
       prevPageBtn.addEventListener("click", () => openPage(state.currentPageIndex - 1));
       nextPageBtn.addEventListener("click", () => openPage(state.currentPageIndex + 1));
       pageSelect.addEventListener("change", () => openPage(Number(pageSelect.value)));
+      exportBgModeInput.addEventListener("change", updateExportBgControls);
 
       updateA4Aspect();
       updateRangeLabels();
+      updateExportBgControls();
       updatePageControls();
     </script>
   </body>
