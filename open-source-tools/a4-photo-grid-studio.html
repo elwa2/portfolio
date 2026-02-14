@@ -54,11 +54,12 @@
         padding: 24px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(var(--primary-rgb), 0.1);
+        overflow: hidden;
       }
 
       .layout {
         display: grid;
-        grid-template-columns: 360px 1fr;
+        grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
         gap: 20px;
       }
 
@@ -67,6 +68,7 @@
         border: 1px solid var(--border-color);
         border-radius: 16px;
         padding: 16px;
+        min-width: 0;
       }
 
       .controls {
@@ -147,6 +149,7 @@
         border: 1px solid var(--border-color);
         border-radius: 10px;
         background: rgba(var(--primary-rgb), 0.05);
+        overflow: hidden;
       }
       .page-tools-head {
         font-size: 0.86rem;
@@ -155,21 +158,33 @@
       }
       .page-tools-row {
         display: grid;
-        grid-template-columns: 1fr auto auto;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "select select"
+          "prev next";
         gap: 8px;
       }
       .page-tools-row select {
+        grid-area: select;
         border: 1px solid var(--border-color);
         background: var(--card-bg);
         color: var(--text-color);
         border-radius: 10px;
         padding: 8px 10px;
         font-family: inherit;
+        width: 100%;
+        min-width: 0;
       }
       .page-btn {
-        width: auto;
-        min-width: 44px;
+        width: 100%;
+        min-width: 0;
         padding: 8px 10px;
+      }
+      #prevPageBtn {
+        grid-area: prev;
+      }
+      #nextPageBtn {
+        grid-area: next;
       }
 
       .btn {
@@ -204,10 +219,11 @@
         padding: 10px;
         overflow: auto;
         min-height: 720px;
+        width: 100%;
       }
 
       .a4-page {
-        width: 820px;
+        width: min(100%, 820px);
         aspect-ratio: 210 / 297;
         background: #fff;
         border: 1px solid #d1d5db;
@@ -237,7 +253,7 @@
         }
 
         .a4-page {
-          width: min(95vw, 820px);
+          width: min(100%, 820px);
         }
       }
 
