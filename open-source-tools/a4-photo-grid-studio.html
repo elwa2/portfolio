@@ -230,6 +230,7 @@
         border-radius: 8px;
         position: relative;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
       }
 
       .tile {
@@ -388,7 +389,7 @@
 
               <div class="field">
                 <label for="columns">عدد الأعمدة: <span id="columnsValue">6</span></label>
-                <input id="columns" type="range" min="4" max="12" value="6" />
+                <input id="columns" type="range" min="1" max="12" value="6" />
               </div>
 
               <div class="field">
@@ -566,6 +567,7 @@
 
       function calcRadius(shape, w, h) {
         const curveFactor = Number(curveInput.value) / 100;
+        if (curveFactor <= 0) return 0;
         if (shape === "circle") return Math.min(w, h) / 2;
         if (shape === "rounded") {
           const target = Math.min(w, h) * (0.06 + curveFactor * 0.34);
@@ -694,6 +696,72 @@
         });
       }
 
+      function pickShape(circleChance) {
+        const r = Math.random();
+        if (r < circleChance) return "circle";
+        if (r < circleChance + 0.3) return "rounded";
+        return "rect";
+      }
+
+      function smallSetLayout(pageState, pageW, pageH, gap, maxRotation, circleChance) {
+        const n = pageState.images.length;
+        const pad = Math.max(6, gap);
+        const innerX = pad;
+        const innerY = pad;
+        const innerW = pageW - pad * 2;
+        const innerH = pageH - pad * 2;
+        const tiles = [];
+
+        const addTile = (imgObj, x, y, w, h) => {
+          const shape = pickShape(circleChance);
+          const radius = calcRadius(shape, w, h);
+          const rotate = shape === "circle" ? 0 : (Math.random() * 2 - 1) * maxRotation;
+          tiles.push({
+            image: imgObj.img,
+            url: imgObj.url,
+            name: imgObj.name,
+            x,
+            y,
+            w,
+            h,
+            radius,
+            shape,
+            rotate,
+          });
+        };
+
+        if (n === 1) {
+          addTile(pageState.images[0], innerX, innerY, innerW, innerH);
+          return tiles;
+        }
+
+        if (n === 2) {
+          const portrait = pageH >= pageW;
+          if (portrait) {
+            const h = (innerH - gap) / 2;
+            addTile(pageState.images[0], innerX, innerY, innerW, h);
+            addTile(pageState.images[1], innerX, innerY + h + gap, innerW, h);
+          } else {
+            const w = (innerW - gap) / 2;
+            addTile(pageState.images[0], innerX, innerY, w, innerH);
+            addTile(pageState.images[1], innerX + w + gap, innerY, w, innerH);
+          }
+          return tiles;
+        }
+
+        if (n === 3) {
+          const topH = innerH * 0.58;
+          const bottomH = innerH - topH - gap;
+          addTile(pageState.images[0], innerX, innerY, innerW, topH);
+          const w2 = (innerW - gap) / 2;
+          addTile(pageState.images[1], innerX, innerY + topH + gap, w2, bottomH);
+          addTile(pageState.images[2], innerX + w2 + gap, innerY + topH + gap, w2, bottomH);
+          return tiles;
+        }
+
+        return null;
+      }
+
       function makeLayout() {
         const pageState = getCurrentPageState();
         page.innerHTML = "";
@@ -707,6 +775,7 @@
 
         const rect = page.getBoundingClientRect();
         const pageW = rect.width;
+        const pageH = rect.height;
         const inputCols = Number(columnsInput.value);
         const smartCols = Math.min(
           inputCols,
@@ -716,6 +785,27 @@
         const gap = Number(gapInput.value);
         const maxRotation = Number(rotationInput.value);
         const circleChance = Number(roundnessInput.value) / 100;
+
+        if (pageState.images.length <= 3) {
+          const smartTiles = smallSetLayout(
+            pageState,
+            pageW,
+            pageH,
+            gap,
+            maxRotation,
+            circleChance
+          );
+          if (smartTiles) {
+            pageState.tiles = smartTiles;
+            renderCurrentPageFromTiles();
+            setStat(
+              `الصفحة ${state.currentPageIndex + 1} (${pageState.name}): توزيع ذكي لعدد قليل (${pageState.images.length}) صورة.`
+            );
+            updatePageControls();
+            return;
+          }
+        }
+
         const cell = (pageW - gap * (cols - 1)) / cols;
         const rows = Math.max(4, Math.ceil((pageState.images.length * 1.5) / cols));
         const used = Array.from({ length: rows }, () => Array(cols).fill(false));
