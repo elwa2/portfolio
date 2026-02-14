@@ -449,7 +449,6 @@
           return;
         }
 
-        dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
           const files = Array.from(e.target.files || []);
           setSelectedFiles(files);
