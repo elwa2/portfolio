@@ -53,6 +53,8 @@
       }
 
       .drop-zone {
+        display: block;
+        position: relative;
         border: 3px dashed rgba(var(--primary-rgb), 0.25);
         border-radius: 16px;
         padding: 42px 20px;
@@ -73,6 +75,55 @@
         font-size: 2.4rem;
         color: var(--primary-color);
         margin-bottom: 12px;
+      }
+
+      .file-picker-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        border: 0;
+        padding: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+      }
+
+      .selected-preview-wrap {
+        margin-bottom: 18px;
+      }
+
+      #selectedPreview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+        gap: 10px;
+      }
+
+      .selected-item {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 8px;
+        background: var(--bg-color-alt);
+      }
+
+      .selected-item img {
+        width: 100%;
+        height: 95px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .selected-item-name {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .selected-item-size {
+        font-size: 0.78rem;
+        color: var(--text-color-light);
       }
 
       .settings-grid {
@@ -243,11 +294,16 @@
         </div>
 
         <div class="tool-container">
-          <div class="drop-zone" id="dropZone">
+          <label class="drop-zone" id="dropZone" for="fileInput">
             <i class="fas fa-images"></i>
             <h3>اسحب الصور هنا أو اضغط للاختيار</h3>
             <p class="hint">يدعم PNG / JPG / WEBP. كل المعالجة تتم محليًا داخل المتصفح.</p>
-            <input id="fileInput" type="file" multiple accept="image/png,image/jpeg,image/webp" style="display: none" />
+            <input id="fileInput" class="file-picker-input" type="file" multiple accept="image/png,image/jpeg,image/webp" />
+          </label>
+
+          <div class="selected-preview-wrap">
+            <p class="hint" id="selectionInfo">لم يتم اختيار صور بعد.</p>
+            <div id="selectedPreview"></div>
           </div>
 
           <div class="settings-grid">
@@ -372,79 +428,131 @@
     </footer>
 
     <script>
-      const state = {
-        files: [],
-      };
+      document.addEventListener('DOMContentLoaded', () => {
+        const state = {
+          files: [],
+          previewUrls: [],
+        };
 
-      const fileInput = document.getElementById('fileInput');
-      const dropZone = document.getElementById('dropZone');
-      const startBtn = document.getElementById('startBtn');
-      const clearBtn = document.getElementById('clearBtn');
-      const results = document.getElementById('results');
-      const progressWrap = document.getElementById('progressWrap');
-      const progressBar = document.getElementById('progressBar');
-      const progressText = document.getElementById('progressText');
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const startBtn = document.getElementById('startBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const results = document.getElementById('results');
+        const selectedPreview = document.getElementById('selectedPreview');
+        const selectionInfo = document.getElementById('selectionInfo');
+        const progressWrap = document.getElementById('progressWrap');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
 
-      dropZone.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', (e) => {
-        state.files = Array.from(e.target.files || []);
-        progressText.textContent = state.files.length
-          ? `تم اختيار ${state.files.length} ملف.`
-          : 'جاري المعالجة...';
-      });
-
-      ['dragenter', 'dragover'].forEach((eventName) => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          dropZone.classList.add('dragover');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach((eventName) => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          dropZone.classList.remove('dragover');
-        });
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        const files = Array.from(e.dataTransfer.files || []).filter((f) => f.type.startsWith('image/'));
-        state.files = files;
-        progressText.textContent = state.files.length
-          ? `تم اختيار ${state.files.length} ملف.`
-          : 'جاري المعالجة...';
-      });
-
-      clearBtn.addEventListener('click', () => {
-        results.innerHTML = '';
-        progressWrap.style.display = 'none';
-        progressBar.value = 0;
-        fileInput.value = '';
-        state.files = [];
-      });
-
-      startBtn.addEventListener('click', async () => {
-        if (!state.files.length) {
-          alert('اختر صورة واحدة على الأقل.');
+        if (!fileInput || !dropZone || !startBtn || !clearBtn || !results || !selectedPreview || !selectionInfo || !progressWrap || !progressBar || !progressText) {
           return;
         }
 
-        results.innerHTML = '';
-        progressWrap.style.display = 'block';
-        progressBar.value = 0;
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+          const files = Array.from(e.target.files || []);
+          setSelectedFiles(files);
+        });
 
-        const options = readOptions();
+        ['dragenter', 'dragover'].forEach((eventName) => {
+          dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+          });
+        });
 
-        for (let i = 0; i < state.files.length; i++) {
-          const file = state.files[i];
-          const processed = await optimizeFile(file, options);
-          renderResult(processed);
-          progressBar.value = ((i + 1) / state.files.length) * 100;
-          progressText.textContent = `تمت معالجة ${i + 1} من ${state.files.length}`;
+        ['dragleave', 'drop'].forEach((eventName) => {
+          dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+          });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+          const files = Array.from(e.dataTransfer.files || []).filter((f) => f.type.startsWith('image/'));
+          setSelectedFiles(files);
+        });
+
+        clearBtn.addEventListener('click', () => {
+          results.innerHTML = '';
+          progressWrap.style.display = 'none';
+          progressBar.value = 0;
+          fileInput.value = '';
+          clearSelectedFiles();
+        });
+
+        startBtn.addEventListener('click', async () => {
+          if (!state.files.length) {
+            alert('اختر صورة واحدة على الأقل.');
+            return;
+          }
+
+          results.innerHTML = '';
+          progressWrap.style.display = 'block';
+          progressBar.value = 0;
+
+          const options = readOptions();
+
+          for (let i = 0; i < state.files.length; i++) {
+            const file = state.files[i];
+            try {
+              const processed = await optimizeFile(file, options);
+              renderResult(processed);
+            } catch (error) {
+              progressText.textContent = `تعذر معالجة ملف: ${file.name}`;
+            }
+            progressBar.value = ((i + 1) / state.files.length) * 100;
+            progressText.textContent = `تمت معالجة ${i + 1} من ${state.files.length}`;
+          }
+        });
+
+        function setSelectedFiles(files) {
+          clearPreviewUrls();
+          state.files = files.filter((f) => f.type.startsWith('image/'));
+
+          if (!state.files.length) {
+            selectedPreview.innerHTML = '';
+            selectionInfo.textContent = 'لم يتم اختيار صور بعد.';
+            progressText.textContent = 'جاري المعالجة...';
+            return;
+          }
+
+          selectionInfo.textContent = `تم اختيار ${state.files.length} صورة.`;
+          progressText.textContent = `تم اختيار ${state.files.length} ملف.`;
+          renderSelectedPreview();
         }
-      });
 
-      function readOptions() {
+        function renderSelectedPreview() {
+          selectedPreview.innerHTML = '';
+
+          state.files.forEach((file) => {
+            const url = URL.createObjectURL(file);
+            state.previewUrls.push(url);
+            const item = document.createElement('div');
+            item.className = 'selected-item';
+            item.innerHTML = `
+              <img src="${url}" alt="${escapeHtml(file.name)}" />
+              <div class="selected-item-name">${escapeHtml(file.name)}</div>
+              <div class="selected-item-size">${formatBytes(file.size)}</div>
+            `;
+            selectedPreview.appendChild(item);
+          });
+        }
+
+        function clearPreviewUrls() {
+          state.previewUrls.forEach((url) => URL.revokeObjectURL(url));
+          state.previewUrls = [];
+        }
+
+        function clearSelectedFiles() {
+          clearPreviewUrls();
+          state.files = [];
+          selectedPreview.innerHTML = '';
+          selectionInfo.textContent = 'لم يتم اختيار صور بعد.';
+        }
+
+        function readOptions() {
         const format = document.getElementById('formatSelect').value;
         const targetMb = Math.max(0.05, Number(document.getElementById('targetMb').value || 1));
         const sourceDpi = Math.max(1, Number(document.getElementById('sourceDpi').value || 300));
@@ -460,9 +568,9 @@
           minScale,
           quality,
         };
-      }
+        }
 
-      function mimeFromSelection(selection, originalType) {
+        function mimeFromSelection(selection, originalType) {
         if (selection === 'same') {
           if (['image/png', 'image/jpeg', 'image/webp'].includes(originalType)) {
             return originalType;
@@ -472,16 +580,16 @@
         if (selection === 'png') return 'image/png';
         if (selection === 'webp') return 'image/webp';
         return 'image/jpeg';
-      }
+        }
 
-      function extensionFromMime(mime) {
+        function extensionFromMime(mime) {
         if (mime === 'image/png') return 'png';
         if (mime === 'image/webp') return 'webp';
         return 'jpg';
-      }
+        }
 
-      async function optimizeFile(file, options) {
-        const bitmap = await createImageBitmap(file);
+        async function optimizeFile(file, options) {
+          const bitmap = await loadBitmap(file);
         const mime = mimeFromSelection(options.format, file.type);
 
         const dpiRatio = Math.min(1, options.targetDpi / options.sourceDpi);
@@ -502,7 +610,8 @@
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d', { alpha: true });
-          ctx.drawImage(bitmap, 0, 0, width, height);
+          const drawSource = bitmap._img || bitmap;
+          ctx.drawImage(drawSource, 0, 0, width, height);
 
           const blob = await canvasToBlob(canvas, mime, quality);
           if (blob) {
@@ -534,7 +643,9 @@
           }
         }
 
-        bitmap.close();
+        if (typeof bitmap.close === 'function') {
+          bitmap.close();
+        }
 
         const outputBlob = bestBlob || file;
         const outputUrl = URL.createObjectURL(outputBlob);
@@ -554,9 +665,36 @@
           sourceDpi: options.sourceDpi,
           targetDpi: options.targetDpi,
         };
-      }
+        }
 
-      function renderResult(result) {
+        async function loadBitmap(file) {
+          if ('createImageBitmap' in window) {
+            return createImageBitmap(file);
+          }
+          const img = await fileToImage(file);
+          return {
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            close: () => {},
+            _img: img,
+          };
+        }
+
+        function fileToImage(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const img = new Image();
+              img.onload = () => resolve(img);
+              img.onerror = reject;
+              img.src = reader.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+
+        function renderResult(result) {
         const card = document.createElement('div');
         card.className = 'result-card';
 
@@ -582,9 +720,9 @@
         `;
 
         results.appendChild(card);
-      }
+        }
 
-      function canvasToBlob(canvas, mime, quality) {
+        function canvasToBlob(canvas, mime, quality) {
         return new Promise((resolve) => {
           canvas.toBlob(
             (blob) => resolve(blob),
@@ -592,23 +730,24 @@
             quality,
           );
         });
-      }
+        }
 
-      function formatBytes(bytes) {
+        function formatBytes(bytes) {
         if (!bytes) return '0 B';
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
-      }
+        }
 
-      function escapeHtml(input) {
-        return String(input)
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#039;');
-      }
+        function escapeHtml(input) {
+          return String(input)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+      });
     </script>
   </body>
 </html>
