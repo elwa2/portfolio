@@ -1113,6 +1113,7 @@
         cutLines.push({ id: lineId, y: y });
         cutLines.sort((a, b) => a.y - b.y);
         updateCutLinesDisplay();
+        saveCurrentCutLines();
       }
 
       // Update Cut Lines Display
@@ -1200,12 +1201,14 @@
         draggedLine = null;
         document.onmousemove = null;
         document.onmouseup = null;
+        saveCurrentCutLines();
       }
 
       // Remove Cut Line
       function removeCutLine(lineId) {
         cutLines = cutLines.filter(l => l.id !== lineId);
         updateCutLinesDisplay();
+        saveCurrentCutLines();
       }
 
       // Clear All Lines
@@ -1234,6 +1237,7 @@
         }
 
         updateCutLinesDisplay();
+        saveCurrentCutLines();
       }
 
       // Process Image
@@ -1269,12 +1273,6 @@
             segCanvas.height = height;
             const segCtx = segCanvas.getContext('2d');
 
-            // Fill white background for JPEG
-            if (format === 'image/jpeg') {
-              segCtx.fillStyle = '#FFFFFF';
-              segCtx.fillRect(0, 0, segCanvas.width, segCanvas.height);
-            }
-
             // Draw segment
             segCtx.drawImage(
               canvas,
@@ -1282,20 +1280,24 @@
               0, 0, canvas.width, height
             );
 
-            // Convert to blob
-            const blob = await new Promise(resolve => {
-              segCanvas.toBlob(resolve, format, quality);
-            });
+            // Auto-compress each segment to stay below 1MB.
+            const compressedSegment = await compressSegmentToLimit(
+              segCanvas,
+              format,
+              quality,
+              MAX_SEGMENT_SIZE_BYTES
+            );
 
-            const extension = getFileExtension(format);
+            const blob = compressedSegment.blob;
+            const extension = getFileExtension(compressedSegment.format);
             const url = URL.createObjectURL(blob);
 
             segments.push({
               id: i + 1,
               blob: blob,
               url: url,
-              width: canvas.width,
-              height: height,
+              width: compressedSegment.width,
+              height: compressedSegment.height,
               name: `segment_${i + 1}.${extension}`
             });
           }
@@ -1399,6 +1401,7 @@
         }
 
         currentImage = null;
+        currentImageSignature = null;
         cutLines = [];
         segments = [];
         lineIdCounter = 0;
@@ -1414,6 +1417,173 @@
       }
 
       // Utility Functions
+      async function createImageSignature(file, img) {
+        const safeName = (file.name || 'image').trim().toLowerCase();
+        return `${safeName}_${img.width}x${img.height}`;
+      }
+
+      function getSavedCutPresets() {
+        try {
+          const raw = localStorage.getItem(CROP_STORAGE_KEY);
+          if (!raw) return {};
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveCutPresets(presets) {
+        try {
+          localStorage.setItem(CROP_STORAGE_KEY, JSON.stringify(presets));
+        } catch (error) {
+          // Ignore storage write errors (quota/privacy mode).
+        }
+      }
+
+      function saveCurrentCutLines() {
+        if (!currentImageSignature || !canvas || canvas.height === 0) return;
+
+        const presets = getSavedCutPresets();
+        presets[currentImageSignature] = {
+          width: canvas.width,
+          height: canvas.height,
+          ratios: cutLines
+            .map(line => Number((line.y / canvas.height).toFixed(6)))
+            .filter(ratio => ratio > 0 && ratio < 1),
+          updatedAt: Date.now()
+        };
+
+        const trimmedEntries = Object.entries(presets)
+          .sort((a, b) => (b[1].updatedAt || 0) - (a[1].updatedAt || 0))
+          .slice(0, MAX_SAVED_PRESETS);
+
+        const trimmedPresets = {};
+        trimmedEntries.forEach(([key, value]) => {
+          trimmedPresets[key] = value;
+        });
+
+        saveCutPresets(trimmedPresets);
+      }
+
+      function restoreSavedCutLines() {
+        if (!currentImageSignature || !canvas || canvas.height === 0) return;
+
+        const presets = getSavedCutPresets();
+        const preset = presets[currentImageSignature];
+        if (!preset || !Array.isArray(preset.ratios)) return;
+        if (preset.width !== canvas.width || preset.height !== canvas.height) return;
+
+        const restoredLines = preset.ratios
+          .map(ratio => Number(ratio))
+          .filter(ratio => Number.isFinite(ratio) && ratio > 0 && ratio < 1)
+          .map(ratio => ({ id: ++lineIdCounter, y: Math.round(ratio * canvas.height) }))
+          .filter(line => line.y >= 10 && line.y <= canvas.height - 10);
+
+        cutLines = restoredLines.sort((a, b) => a.y - b.y);
+        updateCutLinesDisplay();
+      }
+
+      function getCompressionFormatOrder(preferredFormat) {
+        if (preferredFormat === 'image/jpeg') return ['image/jpeg', 'image/webp'];
+        if (preferredFormat === 'image/webp') return ['image/webp', 'image/jpeg'];
+        return ['image/png', 'image/webp', 'image/jpeg'];
+      }
+
+      async function compressSegmentToLimit(segmentCanvas, preferredFormat, preferredQuality, maxBytes) {
+        const formatOrder = getCompressionFormatOrder(preferredFormat);
+        const quality = clamp(preferredQuality, 0.05, 1);
+
+        for (const format of formatOrder) {
+          const candidate = await encodeUnderLimit(segmentCanvas, format, quality, maxBytes);
+          if (candidate) {
+            return {
+              ...candidate,
+              width: segmentCanvas.width,
+              height: segmentCanvas.height
+            };
+          }
+        }
+
+        throw new Error('تعذر ضغط جزء لأقل من 1MB. حاول زيادة عدد الأجزاء.');
+      }
+
+      async function encodeUnderLimit(sourceCanvas, format, preferredQuality, maxBytes) {
+        if (format === 'image/png') {
+          const pngBlob = await canvasToBlobSafe(sourceCanvas, format);
+          if (pngBlob.size <= maxBytes) {
+            return { blob: pngBlob, format: format };
+          }
+          return null;
+        }
+
+        let low = 0.05;
+        let high = clamp(preferredQuality, 0.05, 1);
+        let bestBlob = null;
+
+        const firstBlob = await canvasToBlobSafe(sourceCanvas, format, high);
+        if (firstBlob.size <= maxBytes) {
+          bestBlob = firstBlob;
+          low = high;
+        } else {
+          for (let i = 0; i < 8; i++) {
+            const mid = (low + high) / 2;
+            const midBlob = await canvasToBlobSafe(sourceCanvas, format, mid);
+
+            if (midBlob.size <= maxBytes) {
+              bestBlob = midBlob;
+              low = mid;
+            } else {
+              high = mid;
+            }
+          }
+        }
+
+        if (bestBlob && bestBlob.size <= maxBytes) {
+          return { blob: bestBlob, format: format };
+        }
+
+        const minBlob = await canvasToBlobSafe(sourceCanvas, format, 0.05);
+        if (minBlob.size <= maxBytes) {
+          return { blob: minBlob, format: format };
+        }
+
+        return null;
+      }
+
+      function canvasToBlobSafe(sourceCanvas, format, quality) {
+        return new Promise((resolve, reject) => {
+          let exportCanvas = sourceCanvas;
+
+          if (format === 'image/jpeg') {
+            exportCanvas = document.createElement('canvas');
+            exportCanvas.width = sourceCanvas.width;
+            exportCanvas.height = sourceCanvas.height;
+
+            const exportCtx = exportCanvas.getContext('2d');
+            exportCtx.fillStyle = '#FFFFFF';
+            exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+            exportCtx.drawImage(sourceCanvas, 0, 0);
+          }
+
+          exportCanvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Image encoding failed.'));
+                return;
+              }
+              resolve(blob);
+            },
+            format,
+            format === 'image/png' ? undefined : quality
+          );
+        });
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
       function getFileExtension(format) {
         const map = {
           'image/png': 'png',
