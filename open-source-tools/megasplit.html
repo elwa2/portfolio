@@ -999,6 +999,11 @@
       let isDragging = false;
       let draggedLine = null;
       let dragOffsetY = 0;
+      let currentImageSignature = null;
+
+      const MAX_SEGMENT_SIZE_BYTES = 1024 * 1024; // 1MB
+      const CROP_STORAGE_KEY = 'megasplit.savedCuts.v1';
+      const MAX_SAVED_PRESETS = 50;
 
       // Initialize
       document.addEventListener('DOMContentLoaded', () => {
@@ -1051,9 +1056,11 @@
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
-          img.onload = () => {
+          img.onload = async () => {
             currentImage = img;
+            currentImageSignature = await createImageSignature(file, img);
             loadImageToCanvas(img);
+            restoreSavedCutLines();
             showEditor();
           };
           img.onerror = () => {
