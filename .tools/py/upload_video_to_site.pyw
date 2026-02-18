@@ -65,7 +65,7 @@ def upload_video(status_var, log_box):
 
         # Ensure we are up to date before pushing
         try:
-            run_git(["pull", "--rebase"], REPO_ROOT)
+            run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
         except subprocess.CalledProcessError as exc:
             error_text = exc.stderr.strip() or exc.stdout.strip() or "فشل git pull."
             log_box.insert("end", f"فشل git pull:\n{error_text}\n")
@@ -115,6 +115,27 @@ def main():
 
     log_box = Text(frame, height=10)
     log_box.pack(fill="both", expand=True)
+
+    def copy_latest_link():
+        content = log_box.get("1.0", "end")
+        lines = [line.strip() for line in content.splitlines() if line.strip()]
+        link = ""
+        for line in reversed(lines):
+            if line.startswith("الرابط:"):
+                link = line.replace("الرابط:", "", 1).strip()
+                break
+        if not link:
+            messagebox.showwarning("تنبيه", "لا يوجد رابط لنسخه بعد.")
+            return
+        root.clipboard_clear()
+        root.clipboard_append(link)
+        status_var.set("تم نسخ الرابط.")
+
+    ttk.Button(
+        frame,
+        text="نسخ رابط آخر فيديو",
+        command=copy_latest_link,
+    ).pack(pady=6, anchor="w")
 
     ttk.Label(frame, textvariable=status_var).pack(anchor="w", pady=(8, 0))
 
