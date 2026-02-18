@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Comment Cleaner | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      :root {
+        --tool-primary: #5d3dcd;
+        --tool-primary-rgb: 93, 61, 205;
+        --tool-accent: #00b8d4;
+        --tool-danger: #dc3545;
+        --tool-bg: #f4f6fc;
+        --tool-card-bg: #ffffff;
+        --tool-text: #212529;
+        --tool-border: #e0e5ec;
+      }
+
+      [data-theme="dark"] {
+        --tool-bg: transparent;
+        --tool-card-bg: rgba(30, 30, 30, 0.66);
+        --tool-text: #ffffff;
+        --tool-border: rgba(255, 255, 255, 0.2);
+      }
+
+      html,
+      body {
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-color: var(--tool-bg);
+        z-index: -3;
+      }
+
+      .grain-overlay,
+      #three-canvas-container,
+      .floating-background {
+        position: fixed;
+        inset: 0;
+      }
+
+      .floating-background {
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      .grain-overlay {
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      .tool-page-wrapper {
+        position: relative;
+        z-index: 10;
+        padding: 130px 0;
+      }
+
+      .tool-shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--tool-card-bg);
+        border-radius: 24px;
+        border: 1px solid var(--tool-border);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .tool-header {
+        padding: 30px;
+        border-bottom: 1px solid var(--tool-border);
+        background: rgba(var(--tool-primary-rgb), 0.05);
+        text-align: center;
+      }
+
+      .tool-header h1 {
+        margin: 0;
+        color: var(--tool-primary);
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+      }
+
+      .tool-header p {
+        margin: 12px auto 0;
+        max-width: 720px;
+        color: var(--text-color-light);
+      }
+
+      .tool-content {
+        padding: 30px;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(var(--tool-primary-rgb), 0.03);
+        border: 1px solid var(--tool-border);
+        border-radius: 12px;
+        padding: 12px;
+        color: var(--tool-text);
+      }
+
+      .option-item input {
+        accent-color: var(--tool-primary);
+      }
+
+      .editors-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .editor-card {
+        border: 1px solid var(--tool-border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(var(--tool-primary-rgb), 0.02);
+      }
+
+      .editor-title {
+        margin: 0;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--tool-border);
+        font-size: 1rem;
+        color: var(--tool-text);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 420px;
+        resize: vertical;
+        border: none;
+        outline: none;
+        padding: 16px;
+        font-size: 14px;
+        line-height: 1.7;
+        background: transparent;
+        color: var(--tool-text);
+        font-family: "Roboto Mono", Consolas, monospace;
+      }
+      #outputCode {
+        cursor: copy;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .btn-tool {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.25s ease;
+      }
+
+      .btn-tool:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: var(--tool-primary);
+        color: #fff;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: #fff;
+      }
+
+      .btn-accent {
+        background: var(--tool-accent);
+        color: #fff;
+      }
+
+      .btn-danger {
+        background: var(--tool-danger);
+        color: #fff;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .stat-card {
+        border: 1px solid var(--tool-border);
+        border-radius: 14px;
+        padding: 12px;
+        background: rgba(var(--tool-primary-rgb), 0.03);
+        text-align: center;
+      }
+
+      .stat-card .label {
+        color: var(--text-color-light);
+        font-size: 0.86rem;
+      }
+
+      .stat-card .value {
+        color: var(--tool-primary);
+        font-weight: 800;
+        font-size: 1.15rem;
+        margin-top: 4px;
+      }
+
+      .drop-note {
+        margin-top: 10px;
+        color: var(--text-color-light);
+        font-size: 0.92rem;
+      }
+
+      .editor-card.drop-zone {
+        border-color: var(--tool-primary);
+        box-shadow: 0 0 0 3px rgba(var(--tool-primary-rgb), 0.15);
+      }
+      .copy-toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(12px);
+        background: var(--tool-primary);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.2s ease;
+        z-index: 10000;
+      }
+      .copy-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 900px) {
+        .tool-content {
+          padding: 18px;
+        }
+        .editors-grid {
+          grid-template-columns: 1fr;
+        }
+        textarea {
+          min-height: 320px;
+        }
+      }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s">🧹</div>
+      <div class="floating-icon" style="left: 25%; animation-duration: 10s">JS</div>
+      <div class="floating-icon" style="left: 40%; animation-duration: 12s">⚡</div>
+      <div class="floating-icon" style="left: 55%; animation-duration: 9s">{ }</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 11s">//</div>
+      <div class="floating-icon" style="left: 85%; animation-duration: 13s">/* */</div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div class="tool-shell">
+          <div class="tool-header">
+            <h1>JavaScript Comment Cleaner</h1>
+            <p>
+              أداة احترافية لإزالة تعليقات JavaScript فقط، مع الحفاظ على النصوص والـ template literals والـ regex literals بدون كسر الكود.
+            </p>
+          </div>
+
+          <div class="tool-content">
+            <div class="options-grid">
+              <label class="option-item"><input type="checkbox" id="removeLineComments" checked /> إزالة تعليقات السطر `//`</label>
+              <label class="option-item"><input type="checkbox" id="removeBlockComments" checked /> إزالة تعليقات البلوك `/* */`</label>
+              <label class="option-item"><input type="checkbox" id="preserveLicense" checked /> الحفاظ على تعليقات الرخصة `/*!` و `@license`</label>
+              <label class="option-item"><input type="checkbox" id="preserveSourceMap" checked /> الحفاظ على `sourceMappingURL`</label>
+              <label class="option-item"><input type="checkbox" id="trimTrailingSpaces" checked /> حذف المسافات الزائدة بنهاية الأسطر</label>
+              <label class="option-item"><input type="checkbox" id="collapseEmptyLines" checked /> تقليل الأسطر الفارغة المتتالية</label>
+            </div>
+
+            <div class="toolbar">
+              <button class="btn-tool btn-primary" id="runBtn"><i class="fas fa-broom"></i> تنظيف الكود</button>
+              <button class="btn-tool btn-accent" id="sampleBtn"><i class="fas fa-vial"></i> تحميل مثال</button>
+              <button class="btn-tool btn-secondary" id="copyBtn"><i class="fas fa-copy"></i> نسخ النتيجة</button>
+              <button class="btn-tool btn-secondary" id="downloadBtn"><i class="fas fa-download"></i> تنزيل ملف JS</button>
+              <button class="btn-tool btn-danger" id="clearBtn"><i class="fas fa-eraser"></i> مسح الكل</button>
+            </div>
+            <p class="drop-note">يمكنك سحب ملف `.js` وإفلاته داخل مربع الإدخال.</p>
+
+            <div class="editors-grid">
+              <div class="editor-card" id="inputCard">
+                <h3 class="editor-title">الكود الأصلي</h3>
+                <textarea id="inputCode" spellcheck="false" placeholder="الصق كود JavaScript هنا..."></textarea>
+              </div>
+              <div class="editor-card">
+                <h3 class="editor-title">الكود بعد إزالة التعليقات</h3>
+                <textarea id="outputCode" spellcheck="false" readonly placeholder="النتيجة ستظهر هنا..."></textarea>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card"><div class="label">حجم قبل</div><div class="value" id="beforeSize">0 B</div></div>
+              <div class="stat-card"><div class="label">حجم بعد</div><div class="value" id="afterSize">0 B</div></div>
+              <div class="stat-card"><div class="label">توفير</div><div class="value" id="savedSize">0 B</div></div>
+              <div class="stat-card"><div class="label">النسبة</div><div class="value" id="savedPercent">0%</div></div>
+              <div class="stat-card"><div class="label">التعليقات المحذوفة</div><div class="value" id="removedCount">0</div></div>
+              <div class="stat-card"><div class="label">زمن المعالجة</div><div class="value" id="processTime">0 ms</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميز.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li><svg class="svg-icon" viewBox="0 0 384 512"><use href="../assets/images/icons.svg#icon-map-marker-alt"></use></svg><span>مصر</span></li>
+              <li><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-phone"></use></svg><span>+20 100 224 1591</span></li>
+              <li><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-envelope"></use></svg><span>salla1zid@gmail.com</span></li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank"><svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg></a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank"><svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-instagram"></use></svg></a>
+              <a href="https://twitter.com/salla1zid" target="_blank"><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-twitter"></use></svg></a>
+              <a href="https://t.me/cssfree1" target="_blank"><svg class="svg-icon" viewBox="0 0 496 512"><use href="../assets/images/icons.svg#icon-telegram"></use></svg></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | JavaScript Comment Cleaner</p>
+        </div>
+      </div>
+    </footer>
+
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+    <div id="copyToast" class="copy-toast">تم النسخ</div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let toastTimer = null;
+
+      function debounce(fn, delay = 250) {
+        let timer = null;
+        return (...args) => {
+          clearTimeout(timer);
+          timer = setTimeout(() => fn(...args), delay);
+        };
+      }
+
+      function showToast(message) {
+        const toast = $("copyToast");
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 1400);
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes) return "0 B";
+        const units = ["B", "KB", "MB"];
+        let val = bytes;
+        let idx = 0;
+        while (val >= 1024 && idx < units.length - 1) {
+          val /= 1024;
+          idx += 1;
+        }
+        return `${val.toFixed(idx === 0 ? 0 : 2)} ${units[idx]}`;
+      }
+
+      function rtrimLines(text) {
+        return text
+          .split("\n")
+          .map((line) => line.replace(/[ \t]+$/g, ""))
+          .join("\n");
+      }
+
+      function collapseBlankLines(text) {
+        return text
+          .replace(/\r\n?/g, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .replace(/^\s*\n/, "")
+          .replace(/\n\s*$/, "\n");
+      }
+
+      function consumeStringLiteral(source, start, quote) {
+        let i = start + 1;
+        while (i < source.length) {
+          const ch = source[i];
+          if (ch === "\\") {
+            i += 2;
+            continue;
+          }
+          if (ch === quote) {
+            return i + 1;
+          }
+          i += 1;
+        }
+        return source.length;
+      }
+
+      function consumeRegexLiteral(source, start) {
+        let i = start + 1;
+        let inClass = false;
+        while (i < source.length) {
+          const ch = source[i];
+          if (ch === "\\") {
+            i += 2;
+            continue;
+          }
+          if (ch === "[") {
+            inClass = true;
+            i += 1;
+            continue;
+          }
+          if (ch === "]") {
+            inClass = false;
+            i += 1;
+            continue;
+          }
+          if (ch === "/" && !inClass) {
+            i += 1;
+            while (i < source.length && /[a-z]/i.test(source[i])) {
+              i += 1;
+            }
+            return i;
+          }
+          if (ch === "\n" || ch === "\r") {
+            return start + 1;
+          }
+          i += 1;
+        }
+        return source.length;
+      }
+
+      function isRegexAllowed(prevToken) {
+        const allowed = new Set([
+          "start",
+          "operator",
+          "openParen",
+          "openBracket",
+          "openBrace",
+          "comma",
+          "colon",
+          "semicolon",
+          "question",
+          "keywordPrefix",
+          "arrow",
+        ]);
+        return allowed.has(prevToken);
+      }
+
+      function tokenizeWord(word) {
+        const prefixKeywords = new Set([
+          "return",
+          "throw",
+          "case",
+          "delete",
+          "void",
+          "typeof",
+          "instanceof",
+          "in",
+          "of",
+          "yield",
+          "await",
+          "new",
+          "do",
+          "else",
+        ]);
+        if (prefixKeywords.has(word)) return "keywordPrefix";
+        return "identifier";
+      }
+
+      function parseCode(source, index, stopAtTemplateExprEnd, options, counters) {
+        let out = "";
+        let i = index;
+        let prevToken = "start";
+        let braceDepth = 0;
+
+        while (i < source.length) {
+          const ch = source[i];
+          const nx = source[i + 1];
+
+          if (stopAtTemplateExprEnd && ch === "}" && braceDepth === 0) {
+            return { text: out, index: i };
+          }
+
+          if (ch === "\"" || ch === "'") {
+            const end = consumeStringLiteral(source, i, ch);
+            out += source.slice(i, end);
+            i = end;
+            prevToken = "literal";
+            continue;
+          }
+
+          if (ch === "`") {
+            let j = i + 1;
+            out += "`";
+            while (j < source.length) {
+              const tc = source[j];
+              const tn = source[j + 1];
+
+              if (tc === "\\") {
+                out += source.slice(j, j + 2);
+                j += 2;
+                continue;
+              }
+
+              if (tc === "`") {
+                out += "`";
+                j += 1;
+                break;
+              }
+
+              if (tc === "$" && tn === "{") {
+                out += "${";
+                const nested = parseCode(source, j + 2, true, options, counters);
+                out += nested.text;
+                out += "}";
+                j = nested.index + 1;
+                continue;
+              }
+
+              out += tc;
+              j += 1;
+            }
+            i = j;
+            prevToken = "literal";
+            continue;
+          }
+
+          if (ch === "/" && nx === "/") {
+            let j = i + 2;
+            while (j < source.length && source[j] !== "\n" && source[j] !== "\r") {
+              j += 1;
+            }
+            const comment = source.slice(i, j);
+            const shouldKeep =
+              !options.removeLineComments ||
+              (options.preserveSourceMap && comment.includes("sourceMappingURL"));
+
+            if (shouldKeep) {
+              out += comment;
+            } else {
+              counters.removed += 1;
+            }
+
+            i = j;
+            continue;
+          }
+
+          if (ch === "/" && nx === "*") {
+            let j = i + 2;
+            while (j < source.length && !(source[j] === "*" && source[j + 1] === "/")) {
+              j += 1;
+            }
+            j = Math.min(source.length, j + 2);
+            const comment = source.slice(i, j);
+            const isLicense =
+              /^\/\*!/.test(comment) || /@license|@preserve/i.test(comment);
+            const shouldKeep =
+              !options.removeBlockComments ||
+              (options.preserveLicense && isLicense);
+
+            if (shouldKeep) {
+              out += comment;
+            } else {
+              counters.removed += 1;
+              const lineBreaks = comment.match(/\n/g);
+              if (lineBreaks && lineBreaks.length) {
+                out += "\n".repeat(lineBreaks.length);
+              }
+            }
+
+            i = j;
+            continue;
+          }
+
+          if (ch === "/" && isRegexAllowed(prevToken)) {
+            const end = consumeRegexLiteral(source, i);
+            if (end > i + 1) {
+              out += source.slice(i, end);
+              i = end;
+              prevToken = "literal";
+              continue;
+            }
+          }
+
+          if (/[A-Za-z_$]/.test(ch)) {
+            let j = i + 1;
+            while (j < source.length && /[A-Za-z0-9_$]/.test(source[j])) {
+              j += 1;
+            }
+            const word = source.slice(i, j);
+            out += word;
+            prevToken = tokenizeWord(word);
+            i = j;
+            continue;
+          }
+
+          if (/[0-9]/.test(ch)) {
+            let j = i + 1;
+            while (j < source.length && /[0-9._xobA-Fa-f]/.test(source[j])) {
+              j += 1;
+            }
+            out += source.slice(i, j);
+            prevToken = "literal";
+            i = j;
+            continue;
+          }
+
+          if (ch === "=") {
+            if (nx === ">") {
+              out += "=>";
+              i += 2;
+              prevToken = "arrow";
+              continue;
+            }
+            out += ch;
+            i += 1;
+            prevToken = "operator";
+            continue;
+          }
+
+          if ("+-*%&|^!~<>".includes(ch)) {
+            out += ch;
+            i += 1;
+            prevToken = "operator";
+            continue;
+          }
+
+          if (ch === "(") prevToken = "openParen";
+          else if (ch === ")") prevToken = "closeParen";
+          else if (ch === "[") prevToken = "openBracket";
+          else if (ch === "]") prevToken = "closeBracket";
+          else if (ch === "{") {
+            braceDepth += 1;
+            prevToken = "openBrace";
+          } else if (ch === "}") {
+            braceDepth = Math.max(0, braceDepth - 1);
+            prevToken = "closeBrace";
+          } else if (ch === ",") prevToken = "comma";
+          else if (ch === ":") prevToken = "colon";
+          else if (ch === ";") prevToken = "semicolon";
+          else if (ch === "?") prevToken = "question";
+
+          out += ch;
+          i += 1;
+        }
+
+        return { text: out, index: i };
+      }
+
+      function stripJsComments(source, options) {
+        const counters = { removed: 0 };
+        const parsed = parseCode(source.replace(/\r\n?/g, "\n"), 0, false, options, counters);
+        let result = parsed.text;
+
+        if (options.trimTrailingSpaces) {
+          result = rtrimLines(result);
+        }
+
+        if (options.collapseEmptyLines) {
+          result = collapseBlankLines(result);
+        }
+
+        return { code: result, removed: counters.removed };
+      }
+
+      function getOptions() {
+        return {
+          removeLineComments: $("removeLineComments").checked,
+          removeBlockComments: $("removeBlockComments").checked,
+          preserveLicense: $("preserveLicense").checked,
+          preserveSourceMap: $("preserveSourceMap").checked,
+          trimTrailingSpaces: $("trimTrailingSpaces").checked,
+          collapseEmptyLines: $("collapseEmptyLines").checked,
+        };
+      }
+
+      function updateStats(before, after, removed, timeMs) {
+        const beforeBytes = new Blob([before]).size;
+        const afterBytes = new Blob([after]).size;
+        const saved = Math.max(0, beforeBytes - afterBytes);
+        const pct = beforeBytes > 0 ? ((saved / beforeBytes) * 100).toFixed(2) : "0.00";
+
+        $("beforeSize").textContent = formatBytes(beforeBytes);
+        $("afterSize").textContent = formatBytes(afterBytes);
+        $("savedSize").textContent = formatBytes(saved);
+        $("savedPercent").textContent = `${pct}%`;
+        $("removedCount").textContent = String(removed);
+        $("processTime").textContent = `${timeMs.toFixed(2)} ms`;
+      }
+
+      function runCleaner() {
+        const input = $("inputCode").value;
+        if (!input.trim()) {
+          $("outputCode").value = "";
+          updateStats("", "", 0, 0);
+          return;
+        }
+
+        const t0 = performance.now();
+        const result = stripJsComments(input, getOptions());
+        const t1 = performance.now();
+
+        $("outputCode").value = result.code;
+        updateStats(input, result.code, result.removed, t1 - t0);
+      }
+
+      async function copyOutput() {
+        const out = $("outputCode").value;
+        if (!out.trim()) return;
+        try {
+          await navigator.clipboard.writeText(out);
+          showToast("تم النسخ");
+        } catch (err) {
+          showToast("تعذر النسخ");
+        }
+      }
+
+      function downloadOutput() {
+        const out = $("outputCode").value;
+        if (!out.trim()) return;
+        const blob = new Blob([out], { type: "application/javascript" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "cleaned-script.js";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function clearAll() {
+        $("inputCode").value = "";
+        $("outputCode").value = "";
+        updateStats("", "", 0, 0);
+      }
+
+      function loadSample() {
+        $("inputCode").value = String.raw`// 1) تعليق عربي عادي
+const userName = "Ali"; // تعليق بعد السطر
+
+/* 2) تعليق متعدد الأسطر
+   يشرح الكود
+*/
+function greet(name) {
+  const url = "https://example.com/path"; // لا يجب كسر الرابط
+  const regex = /https?:\/\/[^\s]+/g; // لا يجب كسر regex
+  const text = \`مرحبا \${name} // هذا ليس تعليق داخل template literal\`;
+  return text;
+}
+
+/*! @license Example License */
+//# sourceMappingURL=app.js.map
+console.log(greet(userName));`;
+        runCleaner();
+      }
+
+      function setupDropZone() {
+        const inputCard = $("inputCard");
+        const inputCode = $("inputCode");
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          inputCard.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            inputCard.classList.add("drop-zone");
+          });
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          inputCard.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            inputCard.classList.remove("drop-zone");
+          });
+        });
+
+        inputCard.addEventListener("drop", (e) => {
+          const file = e.dataTransfer.files?.[0];
+          if (!file) return;
+          if (!file.name.toLowerCase().endsWith(".js")) {
+            alert("الملف يجب أن يكون بصيغة .js");
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            inputCode.value = String(reader.result || "");
+            runCleaner();
+          };
+          reader.readAsText(file, "UTF-8");
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const autoRunCleaner = debounce(runCleaner, 220);
+        $("runBtn").addEventListener("click", runCleaner);
+        $("copyBtn").addEventListener("click", copyOutput);
+        $("downloadBtn").addEventListener("click", downloadOutput);
+        $("clearBtn").addEventListener("click", clearAll);
+        $("sampleBtn").addEventListener("click", loadSample);
+        $("outputCode").addEventListener("click", copyOutput);
+
+        $("inputCode").addEventListener("input", () => {
+          if ($("inputCode").value.trim() === "") {
+            $("outputCode").value = "";
+            updateStats("", "", 0, 0);
+            return;
+          }
+          autoRunCleaner();
+        });
+        document.querySelectorAll(".options-grid input[type='checkbox']").forEach((el) => {
+          el.addEventListener("change", runCleaner);
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            runCleaner();
+          }
+        });
+
+        setupDropZone();
+      });
+    </script>
+  </body>
+</html>
