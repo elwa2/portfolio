@@ -153,6 +153,38 @@
         margin: 0 auto;
         max-width: 290px;
       }
+      .wheel-wrap {
+        position: relative;
+        width: 260px;
+        margin: 0 auto;
+      }
+      #harmonyGuide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 260px;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .guide-fill {
+        fill: rgba(255, 255, 255, 0.36);
+      }
+      .guide-line {
+        stroke: rgba(255, 255, 255, 0.9);
+        stroke-width: 1.2;
+        fill: none;
+      }
+      .guide-node {
+        fill: transparent;
+        stroke: #ffffff;
+        stroke-width: 2.5;
+      }
+      .guide-center {
+        fill: rgba(255, 255, 255, 0.15);
+        stroke: rgba(255, 255, 255, 0.8);
+        stroke-width: 1.4;
+      }
 
       .mini-info {
         margin-top: 12px;
@@ -462,7 +494,17 @@
             <div class="top-grid">
               <div class="panel picker-panel">
                 <h3 class="panel-title">Color Wheel</h3>
-                <div id="iroPicker"></div>
+                <div class="wheel-wrap">
+                  <div id="iroPicker"></div>
+                  <svg id="harmonyGuide" viewBox="0 0 260 260" aria-hidden="true">
+                    <polygon id="guideTriangle" class="guide-fill"></polygon>
+                    <polyline id="guideOutline" class="guide-line"></polyline>
+                    <circle id="guideNodeA" class="guide-node" r="6"></circle>
+                    <circle id="guideNodeB" class="guide-node" r="5"></circle>
+                    <circle id="guideNodeC" class="guide-node" r="5"></circle>
+                    <circle id="guideCenter" class="guide-center" r="5"></circle>
+                  </svg>
+                </div>
                 <div class="mini-info">
                   <div class="mini-box"><strong>HEX</strong><span id="hexRead">#050F2C</span></div>
                   <div class="mini-box"><strong>Opacity</strong><span id="opacityRead">100%</span></div>
@@ -744,6 +786,55 @@
         );
       }
 
+      function pointOnCircle(cx, cy, r, angleDeg) {
+        const rad = angleDeg * (Math.PI / 180);
+        return {
+          x: cx + r * Math.cos(rad),
+          y: cy + r * Math.sin(rad),
+        };
+      }
+
+      function updateWheelGuide(hue) {
+        const cx = 130;
+        const cy = 130;
+        const outerRadius = 112;
+        const innerBlend = 0.82;
+
+        const a = pointOnCircle(cx, cy, outerRadius, hue);
+        const b = pointOnCircle(cx, cy, outerRadius, shiftHue(hue, 120));
+        const c = pointOnCircle(cx, cy, outerRadius, shiftHue(hue, 240));
+
+        const ia = {
+          x: cx + (a.x - cx) * innerBlend,
+          y: cy + (a.y - cy) * innerBlend,
+        };
+        const ib = {
+          x: cx + (b.x - cx) * innerBlend,
+          y: cy + (b.y - cy) * innerBlend,
+        };
+        const ic = {
+          x: cx + (c.x - cx) * innerBlend,
+          y: cy + (c.y - cy) * innerBlend,
+        };
+
+        $("guideTriangle").setAttribute(
+          "points",
+          `${ia.x},${ia.y} ${ib.x},${ib.y} ${ic.x},${ic.y}`
+        );
+        $("guideOutline").setAttribute(
+          "points",
+          `${ia.x},${ia.y} ${ib.x},${ib.y} ${ic.x},${ic.y} ${ia.x},${ia.y}`
+        );
+        $("guideNodeA").setAttribute("cx", ia.x);
+        $("guideNodeA").setAttribute("cy", ia.y);
+        $("guideNodeB").setAttribute("cx", ib.x);
+        $("guideNodeB").setAttribute("cy", ib.y);
+        $("guideNodeC").setAttribute("cx", ic.x);
+        $("guideNodeC").setAttribute("cy", ic.y);
+        $("guideCenter").setAttribute("cx", cx);
+        $("guideCenter").setAttribute("cy", cy);
+      }
+
       function renderColorLine(containerId, colors) {
         const el = $(containerId);
         el.innerHTML = "";
@@ -834,6 +925,7 @@
         $("hRead").textContent = Math.round(hsl.h);
         $("sRead").textContent = Math.round(hsl.s);
         $("lRead").textContent = Math.round(hsl.l);
+        updateWheelGuide(hsl.h);
 
         renderColorLine("tintsSwatches", [0.9, 0.78, 0.66, 0.54, 0.42, 0.3, 0.18, 0.08].map((v) => mixWith(primary, "#FFFFFF", v * 100)));
         renderColorLine("shadesSwatches", [0.1, 0.2, 0.3, 0.42, 0.52, 0.62, 0.72, 0.82].map((v) => mixWith(primary, "#000000", v * 100)));
