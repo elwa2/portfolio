@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mistral OCR Studio | Ali Ahmed</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+      :root {
+        --ocr-bg: #f4f6fc;
+        --ocr-card: #ffffff;
+        --ocr-border: rgba(var(--primary-rgb), 0.16);
+        --ocr-text: #1a2233;
+        --ocr-muted: #6c748a;
+        --ocr-primary: var(--primary-color);
+        --ocr-primary-soft: rgba(var(--primary-rgb), 0.08);
+      }
+
+      [data-theme="dark"] {
+        --ocr-bg: transparent;
+        --ocr-card: rgba(24, 24, 27, 0.72);
+        --ocr-border: rgba(255, 255, 255, 0.16);
+        --ocr-text: #f4f6fb;
+        --ocr-muted: #c5cada;
+        --ocr-primary-soft: rgba(var(--primary-rgb), 0.2);
+      }
+
+      html,
+      body {
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-color: var(--ocr-bg);
+        z-index: -3;
+      }
+
+      .grain-overlay,
+      #three-canvas-container,
+      .floating-background {
+        position: fixed;
+        inset: 0;
+      }
+
+      .floating-background {
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      .grain-overlay {
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      .tool-page-wrapper {
+        position: relative;
+        z-index: 10;
+        padding: 130px 0 90px;
+      }
+
+      .tool-shell {
+        max-width: 1240px;
+        margin: 0 auto;
+        border: 1px solid var(--ocr-border);
+        border-radius: 24px;
+        overflow: hidden;
+        background: var(--ocr-card);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      }
+
+      .tool-header {
+        padding: 30px;
+        text-align: center;
+        border-bottom: 1px solid var(--ocr-border);
+        background: var(--ocr-primary-soft);
+      }
+
+      .tool-header h1 {
+        margin: 0;
+        color: var(--ocr-primary);
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+      }
+
+      .tool-header p {
+        margin: 12px auto 0;
+        max-width: 850px;
+        color: var(--ocr-muted);
+      }
+
+      .tool-content {
+        padding: 24px;
+      }
+
+      .actions-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .api-pill {
+        border: 1px solid var(--ocr-border);
+        border-radius: 100px;
+        padding: 8px 14px;
+        font-size: 0.88rem;
+        color: var(--ocr-text);
+        background: var(--ocr-primary-soft);
+      }
+
+      .btn-tool {
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-tool:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: var(--ocr-primary);
+        color: #fff;
+      }
+
+      .btn-secondary {
+        background: #64748b;
+        color: #fff;
+      }
+
+      .upload-zone {
+        border: 2px dashed var(--ocr-border);
+        border-radius: 18px;
+        background: var(--ocr-card);
+        min-height: 240px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .upload-zone:hover,
+      .upload-zone.dragover {
+        border-color: var(--ocr-primary);
+        background: var(--ocr-primary-soft);
+      }
+
+      .upload-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: rgba(var(--primary-rgb), 0.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ocr-primary);
+        font-size: 24px;
+      }
+
+      .upload-zone h3 {
+        margin: 0;
+        color: var(--ocr-text);
+      }
+
+      .upload-zone p {
+        margin: 0;
+        color: var(--ocr-muted);
+      }
+
+      .upload-zone .formats {
+        margin-top: 6px;
+        font-size: 0.84rem;
+      }
+
+      .hidden-input {
+        display: none;
+      }
+
+      .processing {
+        margin-top: 14px;
+        display: none;
+      }
+
+      .processing.active {
+        display: block;
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 8px;
+        background: rgba(var(--primary-rgb), 0.12);
+        border-radius: 100px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        width: 0%;
+        height: 100%;
+        background: var(--ocr-primary);
+        transition: width 0.28s ease;
+      }
+      .progress-fill.done {
+        width: 100%;
+      }
+
+      .results {
+        margin-top: 18px;
+        display: none;
+      }
+
+      .results.active {
+        display: block;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.95fr) 1.3fr;
+        gap: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--ocr-border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--ocr-card);
+      }
+
+      .card-head {
+        border-bottom: 1px solid var(--ocr-border);
+        padding: 12px 14px;
+        font-weight: 700;
+        color: var(--ocr-text);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .card-body {
+        padding: 12px;
+      }
+
+      .preview-container {
+        min-height: 380px;
+        max-height: 600px;
+        overflow: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--primary-rgb), 0.03);
+        border-radius: 12px;
+      }
+
+      .preview-container img,
+      .preview-container canvas {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .preview-controls {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .small-btn {
+        border: 1px solid var(--ocr-border);
+        border-radius: 10px;
+        background: var(--ocr-card);
+        color: var(--ocr-text);
+        cursor: pointer;
+        padding: 9px 10px;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+      }
+
+      .small-btn:hover {
+        border-color: var(--ocr-primary);
+      }
+
+      .editor-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .editor {
+        min-height: 420px;
+        max-height: 600px;
+        overflow: auto;
+        border: 1px solid var(--ocr-border);
+        border-radius: 12px;
+        padding: 14px;
+        color: var(--ocr-text);
+        line-height: 1.85;
+      }
+
+      .recent-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .recent-item {
+        border: 1px solid var(--ocr-border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(var(--primary-rgb), 0.03);
+      }
+
+      .recent-item .title {
+        font-weight: 700;
+        color: var(--ocr-text);
+      }
+
+      .recent-item .meta {
+        color: var(--ocr-muted);
+        font-size: 0.86rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%) translateY(12px);
+        background: var(--ocr-primary);
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.2s ease;
+        z-index: 10000;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+      }
+
+      .modal.show {
+        display: flex;
+      }
+
+      .modal-box {
+        width: min(480px, 92vw);
+        border: 1px solid var(--ocr-border);
+        border-radius: 16px;
+        background: var(--ocr-card);
+        padding: 18px;
+      }
+
+      .modal-box h3 {
+        margin: 0 0 10px;
+        color: var(--ocr-text);
+      }
+
+      .modal-box input {
+        width: 100%;
+        border: 1px solid var(--ocr-border);
+        border-radius: 12px;
+        background: var(--ocr-card);
+        color: var(--ocr-text);
+        padding: 11px;
+        font-family: "Cairo", sans-serif;
+      }
+
+      .modal-actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+      }
+
+      @media (max-width: 1024px) {
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s">OCR</div>
+      <div class="floating-icon" style="left: 26%; animation-duration: 11s">AI</div>
+      <div class="floating-icon" style="left: 43%; animation-duration: 9s">PDF</div>
+      <div class="floating-icon" style="left: 60%; animation-duration: 13s">TXT</div>
+      <div class="floating-icon" style="left: 78%; animation-duration: 10s">API</div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div class="tool-shell">
+          <div class="tool-header">
+            <h1>Mistral OCR Studio</h1>
+            <p>
+              أداة OCR متكاملة لاستخراج النص من الصور وملفات PDF مع معاينة، تحرير،
+              نسخ، تنزيل، وسجل عمليات حديث.
+            </p>
+            <div style="margin-top: 12px; color: var(--ocr-muted); font-size: 0.95rem; line-height: 1.7">
+              للحصول على مفتاح API:
+              <ol style="margin: 8px 0 0; padding: 0 18px">
+                <li>
+                  افتح لوحة Mistral من هذا الرابط:
+                  <a href="https://console.mistral.ai/home?workspace_dialog=apiKeys" target="_blank" rel="noopener">console.mistral.ai</a>
+                </li>
+                <li>سجّل الدخول أو أنشئ حسابًا جديدًا.</li>
+                <li>من صفحة Workspace اختر تبويب مفاتيح API.</li>
+                <li>اضغط "Create API Key" ثم انسخ المفتاح.</li>
+                <li>الصق المفتاح هنا واضغط "حفظ المفتاح".</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="tool-content">
+            <div class="actions-row">
+              <div class="api-pill" id="apiStatus">API Key: غير مضبوط</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+                <input
+                  id="apiKeyInline"
+                  type="password"
+                  placeholder="ضع مفتاح Mistral API هنا"
+                  style="
+                    border: 1px solid var(--ocr-border);
+                    border-radius: 12px;
+                    padding: 10px 12px;
+                    min-width: 240px;
+                    background: var(--ocr-card);
+                    color: var(--ocr-text);
+                    font-family: 'Cairo', sans-serif;
+                  "
+                />
+                <button class="btn-tool btn-primary" id="saveApiInline" type="button">
+                  حفظ المفتاح
+                </button>
+                <button class="btn-tool btn-secondary" id="settingsBtn" type="button">
+                  <i class="fas fa-cog"></i> إعدادات API
+                </button>
+              </div>
+            </div>
+
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <h3>رفع ملف OCR</h3>
+              <p>اسحب الملف هنا أو اضغط للاختيار</p>
+              <p class="formats">PDF, PNG, JPG, JPEG, WEBP, BMP, TIFF - حتى 50MB</p>
+            </div>
+
+            <input class="hidden-input" id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tiff" />
+
+            <div class="processing" id="processing">
+              <div style="margin-bottom: 8px; color: var(--ocr-muted)">جارٍ تحليل الملف...</div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+            <div
+              id="debugLog"
+              style="
+                display: none;
+                margin-top: 12px;
+                padding: 10px 12px;
+                border: 1px dashed rgba(220, 38, 38, 0.6);
+                border-radius: 12px;
+                color: #dc2626;
+                background: rgba(220, 38, 38, 0.05);
+                font-size: 0.9rem;
+                white-space: pre-wrap;
+              "
+            ></div>
+
+            <div class="results" id="results">
+              <div class="results-grid">
+                <div class="card">
+                  <div class="card-head">
+                    <span>المعاينة</span>
+                    <span id="pageCounter">1 / 1</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="preview-container" id="previewContainer"></div>
+                    <div class="preview-controls">
+                      <button class="small-btn" id="prevPageBtn" type="button">السابق</button>
+                      <button class="small-btn" id="nextPageBtn" type="button">التالي</button>
+                      <button class="small-btn" id="zoomBtn" type="button">تكبير</button>
+                      <button class="small-btn" id="cameraBtn" type="button">كاميرا</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head">
+                    <span>النص المستخرج</span>
+                    <span id="wordCount">0 كلمة</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="editor-toolbar">
+                      <button class="small-btn" data-cmd="bold" type="button"><b>B</b></button>
+                      <button class="small-btn" data-cmd="italic" type="button"><i>I</i></button>
+                      <button class="small-btn" data-cmd="underline" type="button"><u>U</u></button>
+                      <button class="small-btn" id="copyBtn" type="button">نسخ</button>
+                      <button class="small-btn" id="downloadBtn" type="button">تنزيل TXT</button>
+                      <button class="small-btn" id="printBtn" type="button">طباعة</button>
+                    </div>
+                    <div id="editor" class="editor" contenteditable="true"></div>
+                    <div class="recent-list" id="recentList"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميز.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li><svg class="svg-icon" viewBox="0 0 384 512"><use href="../assets/images/icons.svg#icon-map-marker-alt"></use></svg><span>مصر</span></li>
+              <li><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-phone"></use></svg><span>+20 100 224 1591</span></li>
+              <li><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-envelope"></use></svg><span>salla1zid@gmail.com</span></li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank"><svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg></a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank"><svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-instagram"></use></svg></a>
+              <a href="https://twitter.com/salla1zid" target="_blank"><svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-twitter"></use></svg></a>
+              <a href="https://t.me/cssfree1" target="_blank"><svg class="svg-icon" viewBox="0 0 496 512"><use href="../assets/images/icons.svg#icon-telegram"></use></svg></a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | Mistral OCR Studio</p>
+        </div>
+      </div>
+    </footer>
+
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <div class="modal" id="apiModal">
+      <div class="modal-box">
+        <h3>إعداد مفتاح Mistral API</h3>
+        <input id="apiKeyInput" type="password" placeholder="ضع المفتاح هنا..." />
+        <div class="modal-actions">
+          <button class="btn-tool btn-secondary" id="cancelApiBtn" type="button">إلغاء</button>
+          <button class="btn-tool btn-primary" id="saveApiBtn" type="button">حفظ</button>
+        </div>
+      </div>
+    </div>
+
+    <input class="hidden-input" id="cameraInput" type="file" accept="image/*" capture="environment" />
+    <div class="toast" id="toast">تم</div>
+
+<script src="mistral-ocr-studio.js" defer></script>
+  </body>
+</html>
