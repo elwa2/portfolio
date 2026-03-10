@@ -37,6 +37,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="../assets/js/three-bg.js" defer></script>
     <script src="../assets/js/main.js" defer></script>
     <script src="../assets/js/svg-icons.js" defer></script>
@@ -767,10 +768,10 @@
       <div class="container">
         <div class="megasplit-container">
           <div class="tool-hero">
-            <h1><i class="fas fa-cut"></i> MegaSplit - أداة تقسيم الصور</h1>
+            <h1><i class="fas fa-cut"></i> MegaSplit - أداة تقسيم الصور و PDF</h1>
             <p>
-              قم بتقسيم صورك الكبيرة والطويلة إلى عدة أجزاء بدقة عالية وبدون فقدان الجودة.
-              مثالية لصور المنتجات، البانرات، والتصاميم الطويلة!
+              قم بتقسيم صورك والملفات pdf الكبيرة والطويلة إلى عدة أجزاء بدقة عالية وبدون فقدان الجودة.
+              مثالية لصور المنتجات، البانرات، والتصاميم الطويلة و وثائق PDF!
             </p>
           </div>
 
@@ -786,11 +787,12 @@
                   <span class="format-badge">PNG</span>
                   <span class="format-badge">WebP</span>
                   <span class="format-badge">GIF</span>
+                  <span class="format-badge">PDF</span>
                 </div>
                 <p style="font-size: 0.85rem; margin-top: 16px; color: var(--text-color-muted);">
                   الحد الأقصى: 20MB
                 </p>
-                <input type="file" id="fileInput" accept="image/*" />
+                <input type="file" id="fileInput" accept="image/*,.pdf" />
               </div>
             </div>
 
@@ -1000,6 +1002,8 @@
       let draggedLine = null;
       let dragOffsetY = 0;
       let currentImageSignature = null;
+      let currentPdfPages = [];
+      let currentPageIndex = 0;
 
       const MAX_SEGMENT_SIZE_BYTES = 1024 * 1024; // 1MB
       const CROP_STORAGE_KEY = 'megasplit.savedCuts.v1';
@@ -1038,10 +1042,12 @@
           e.preventDefault();
           uploadZone.classList.remove('drag-over');
           const file = e.dataTransfer.files[0];
-          if (file && file.type.startsWith('image/')) {
-            handleFile(file);
-          } else {
-            alert('يرجى رفع ملف صورة صالح');
+          if (file) {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+              handleFile(file);
+            } else {
+              alert('يرجى رفع ملف صورة أو PDF صالح');
+            }
           }
         });
       }
@@ -1053,11 +1059,24 @@
           return;
         }
 
+        if (file.type === 'application/pdf') {
+          handlePdfFile(file);
+        } else if (file.type.startsWith('image/')) {
+          handleImageFile(file);
+        } else {
+          alert('نوع الملف غير مدعوم');
+        }
+      }
+
+      // Handle Image File
+      function handleImageFile(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
           img.onload = async () => {
             currentImage = img;
+            currentPdfPages = [];
+            currentPageIndex = 0;
             currentImageSignature = await createImageSignature(file, img);
             loadImageToCanvas(img);
             restoreSavedCutLines();
@@ -1069,6 +1088,142 @@
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+      }
+
+      // Handle PDF File
+      async function handlePdfFile(file) {
+        showProgress();
+        try {
+          const fileData = await file.arrayBuffer();
+          // اعرض علامات لاختيار أي صفحة
+          let html = '<div style="text-align: center; color: white; padding: 20px;">';
+          html += '<p style="margin-bottom: 20px;">جاري تحميل ملف PDF...</p>';
+          html += '<div class="progress-spinner"></div>';
+          html += '</div>';
+          
+          const doc = await pdfjsLib.getDocument({ data: fileData }).promise;
+          currentPdfPages = [];
+          
+          // تحويل كل صفحة من صفحات PDF إلى صورة
+          for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
+            const page = await doc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2 }); // scale 2 لجودة أفضل
+            
+            // إنشاء canvas مؤقت
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = viewport.width;
+            tempCanvas.height = viewport.height;
+            
+            // رسم الصفحة على Canvas
+            await page.render({
+              canvasContext: tempCtx,
+              viewport: viewport
+            }).promise;
+            
+            currentPdfPages.push({
+              canvas: tempCanvas,
+              pageNum: pageNum,
+              width: tempCanvas.width,
+              height: tempCanvas.height
+            });
+          }
+          
+          hideProgress();
+          
+          if (currentPdfPages.length > 0) {
+            // اعرض الصفحة الأولى
+            currentPageIndex = 0;
+            displayPdfPage(0, file);
+          }
+        } catch (error) {
+          hideProgress();
+          console.error('خطأ في معالجة PDF:', error);
+          alert('فشل في معالجة ملف PDF. تأكد من أن الملف صحيح.');
+        }
+      }
+
+      // Display PDF Page
+      async function displayPdfPage(pageIndex, file) {
+        if (pageIndex < 0 || pageIndex >= currentPdfPages.length) return;
+        
+        currentPageIndex = pageIndex;
+        const pageData = currentPdfPages[pageIndex];
+        
+        // رسم صفحة PDF على الـ canvas الرئيسي
+        canvas.width = pageData.width;
+        canvas.height = pageData.height;
+        ctx.drawImage(pageData.canvas, 0, 0);
+        
+        // إنشاء signature للصفحة
+        currentImageSignature = await createImageSignature(file, {
+          width: pageData.width,
+          height: pageData.height,
+          page: pageIndex + 1,
+          totalPages: currentPdfPages.length
+        });
+        
+        // Setup canvas click for adding cut lines
+        canvas.onclick = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          const clickY = (e.clientY - rect.top) * scaleY;
+          
+          addCutLine(clickY);
+        };
+        
+        // Reset cut lines
+        cutLines = [];
+        updateCutLinesDisplay();
+        
+        restoreSavedCutLines();
+        showEditor(true);
+      }
+
+      // Show PDF Page Controls
+      function showPdfPageControls() {
+        const editorHeader = document.querySelector('.editor-header h3');
+        if (!editorHeader) return;
+        
+        let pageControlsHtml = `<span style="color: var(--text-color-light); font-size: 0.9rem; margin-left: 20px;">
+          الصفحة <strong>${currentPageIndex + 1}</strong> من <strong>${currentPdfPages.length}</strong>
+        </span>`;
+        
+        if (currentPdfPages.length > 1) {
+          pageControlsHtml += `<div style="display: flex; gap: 10px; margin-left: 20px;">
+            <button class="btn btn-secondary btn-sm" onclick="previousPdfPage()">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="nextPdfPage()">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+          </div>`;
+        }
+        
+        // Update the editor header if needed
+        const pageControl = document.getElementById('pdfPageControl');
+        if (pageControl) {
+          pageControl.innerHTML = pageControlsHtml;
+        }
+      }
+
+      function previousPdfPage() {
+        if (currentPageIndex > 0) {
+          const fileInput = document.getElementById('fileInput');
+          const file = fileInput.files[0];
+          displayPdfPage(currentPageIndex - 1, file);
+          showPdfPageControls();
+        }
+      }
+
+      function nextPdfPage() {
+        if (currentPageIndex < currentPdfPages.length - 1) {
+          const fileInput = document.getElementById('fileInput');
+          const file = fileInput.files[0];
+          displayPdfPage(currentPageIndex + 1, file);
+          showPdfPageControls();
+        }
       }
 
       // Load Image to Canvas
@@ -1097,10 +1252,14 @@
       }
 
       // Show Editor
-      function showEditor() {
+      function showEditor(isPdf = false) {
         document.getElementById('uploadSection').style.display = 'none';
         document.getElementById('editorSection').classList.add('active');
         document.getElementById('segmentsSection').classList.remove('active');
+        
+        if (isPdf && currentPdfPages.length > 1) {
+          showPdfPageControls();
+        }
       }
 
       // Add Cut Line
@@ -1242,11 +1401,6 @@
 
       // Process Image
       async function processImage() {
-        if (cutLines.length === 0) {
-          alert('يرجى إضافة خط قطع واحد على الأقل');
-          return;
-        }
-
         showProgress();
         
         // Small delay to show progress
@@ -1259,7 +1413,10 @@
           segments = [];
 
           // Get Y positions and add start/end
-          const yPositions = [0, ...cutLines.map(l => l.y), canvas.height];
+          // إذا لم تكن هناك خطوط قطع، سيتم التعامل مع الصورة كصورة واحدة
+          const yPositions = cutLines.length === 0 ? 
+            [0, canvas.height] : 
+            [0, ...cutLines.map(l => l.y), canvas.height];
 
           // Create segments
           for (let i = 0; i < yPositions.length - 1; i++) {
@@ -1402,6 +1559,8 @@
 
         currentImage = null;
         currentImageSignature = null;
+        currentPdfPages = [];
+        currentPageIndex = 0;
         cutLines = [];
         segments = [];
         lineIdCounter = 0;
