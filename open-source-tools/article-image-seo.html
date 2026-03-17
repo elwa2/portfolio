@@ -1,239 +1,626 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" class="salla-dark-mode" style="--smartsvg-icon-color: #ffffff;">
-<head>
-  <meta charset="UTF-8">
-  <title>أداة تهيئة صور المقالات 1200×628</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/design-enhancements.css">
-  <link rel="stylesheet" href="../assets/css/animations.css">
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin: 0; padding: 20px; background: #f4f5f7; display: flex; justify-content: center; }
-    .container { background: #fff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); max-width: 900px; width: 100%; }
-    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    h1 { margin-top: 0; margin-bottom: 0; font-size: 22px; }
-    .reset-btn { margin-top: 0; background: #64748b; padding: 6px 14px; font-size: 13px; }
-    .reset-btn:hover { background: #475569; }
-    p.small { margin-top: 0; margin-bottom: 20px; font-size: 13px; color: #555; }
-    label { display: block; margin: 14px 0 6px; font-size: 14px; font-weight: 600; }
-    input[type="file"], input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d0d7de; font-size: 14px; }
-    button { margin-top: 18px; padding: 10px 18px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: #2563eb; color: white; }
-    button:disabled { background: #cbd5f5; cursor: not-allowed; }
-    .hidden { display: none; }
-    .preview-wrapper { margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 18px; }
-    .preview-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr); gap: 16px; }
-    .preview-box { border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; background: #fafafa; }
-    #previewImage { width: 100%; border-radius: 10px; border: 1px solid #e5e7eb; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header-flex">
-      <h1>أداة تهيئة صورة المقال 1200×628 (WebP + SEO)</h1>
-      <button id="resetBtn" class="reset-btn">🔄 عمل صورة جديدة</button>
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-1B3TL3YJ0J');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أداة تهيئة صور المقالات SEO - Ali Ahmed</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+
+    <style>
+      :root {
+        --tool-primary: #5d3dcd;
+        --tool-accent: #00b8d4;
+        --tool-bg: #f4f6fc;
+        --tool-card-bg: #ffffff;
+        --tool-text: #212529;
+        --tool-border: #e0e5ec;
+        --primary-rgb: 93, 61, 205;
+      }
+
+      [data-theme="dark"] {
+        --tool-bg: transparent;
+        --tool-card-bg: rgba(30, 30, 30, 0.65);
+        --tool-text: #ffffff;
+        --tool-border: rgba(255, 255, 255, 0.2);
+        --bg-color: #0f0f15;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: transparent !important;
+        color: var(--tool-text);
+        overflow-x: hidden;
+        font-family: 'Cairo', sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--tool-bg);
+        z-index: -3;
+      }
+
+      #three-canvas-container,
+      .floating-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        pointer-events: none;
+      }
+
+      .grain-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .header {
+        position: fixed;
+        top: 0; left: 0; right: -15%;
+        z-index: 1000;
+        background: rgba(var(--primary-rgb), 0.08);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--tool-border);
+      }
+
+      .header .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .header-content {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        min-height: 82px;
+      }
+
+      .header-content .logo {
+        justify-self: end;
+      }
+
+      .header-content .nav {
+        justify-self: center;
+      }
+
+      .logo img { height: 40px; }
+
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-links a {
+        color: var(--tool-text);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        opacity: 0.85;
+      }
+
+      .nav-links a.active,
+      .nav-links a:hover {
+        color: var(--tool-primary);
+        opacity: 1;
+      }
+
+      @media (max-width: 900px) {
+        .nav-links {
+          display: none;
+        }
+
+        .header-content {
+          grid-template-columns: 1fr;
+          justify-items: center;
+        }
+
+        .header-content .logo {
+          justify-self: center;
+        }
+      }
+
+      .site-footer {
+        margin-top: 40px;
+        border-top: 1px solid var(--tool-border);
+        background: rgba(var(--primary-rgb), 0.08);
+        backdrop-filter: blur(10px);
+      }
+
+      .site-footer .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 22px 20px;
+      }
+
+      .footer-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 14px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .footer-links a {
+        text-decoration: none;
+        color: var(--tool-text);
+        opacity: 0.85;
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      .footer-links a:hover {
+        color: var(--tool-primary);
+        opacity: 1;
+      }
+
+      .footer-copy {
+        font-size: 0.85rem;
+        opacity: 0.8;
+        margin: 0;
+      }
+
+      @media (max-width: 700px) {
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+
+      .optimizer-section {
+        padding: 120px 20px 60px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .optimizer-header {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+
+      .optimizer-header h1 {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        margin-bottom: 10px;
+        font-weight: 800;
+        color: var(--tool-text);
+      }
+
+      .optimizer-workspace {
+        background: var(--tool-card-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--tool-border);
+        border-radius: 24px;
+        padding: 35px;
+        width: 100%;
+        max-width: 900px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      }
+
+      .input-group { margin-bottom: 20px; }
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--tool-text);
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 14px;
+        background: rgba(var(--primary-rgb), 0.03);
+        border: 1px solid var(--tool-border);
+        border-radius: 12px;
+        color: var(--tool-text);
+        font-size: 0.95rem;
+        transition: 0.3s;
+      }
+
+      .input-group input:focus {
+        background: rgba(var(--primary-rgb), 0.05);
+        border-color: var(--tool-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+      }
+
+      .btn-reset {
+        background: transparent;
+        border: 1px solid var(--tool-border);
+        color: var(--tool-text);
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: 0.3s;
+        margin-top: 5px;
+      }
+      .btn-reset:hover { border-color: #ff4d4d; color: #ff4d4d; }
+
+      .preview-section {
+        margin-top: 35px;
+        padding-top: 35px;
+        border-top: 1px solid var(--tool-border);
+      }
+
+      .preview-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 25px;
+      }
+
+      @media (max-width: 850px) {
+        .preview-grid { grid-template-columns: 1fr; }
+      }
+
+      .preview-card {
+        background: rgba(var(--primary-rgb), 0.02);
+        padding: 20px;
+        border-radius: 18px;
+        border: 1px solid var(--tool-border);
+      }
+
+      .preview-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .preview-image-container img {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      }
+
+      .stats-item { margin-top: 12px; font-size: 0.85rem; opacity: 0.8; font-weight: 600; }
+      .stats-item span { color: var(--tool-primary); font-weight: 800; margin-right: 5px; }
+
+      .alt-box {
+        margin-top: 15px;
+        background: rgba(var(--primary-rgb), 0.05);
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--tool-border);
+      }
+
+      .btn-download {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        margin-top: 15px;
+        padding: 14px;
+        background: var(--tool-primary);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 1rem;
+      }
+
+      .btn-download:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.3); }
+
+      .hidden { display: none; }
+      
+      .processing-indicator {
+        font-size: 0.75rem;
+        color: var(--tool-primary);
+        margin-top: 4px;
+        font-weight: 700;
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
+      <div class="floating-icon" style="left: 30%; animation-duration: 10s; animation-delay: 2s">✨</div>
+      <div class="floating-icon" style="left: 50%; animation-duration: 12s; animation-delay: 4s">💎</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 9s; animation-delay: 1s">⚡</div>
+      <div class="floating-icon" style="left: 90%; animation-duration: 11s; animation-delay: 3s">🎯</div>
     </div>
-    <label for="imageInput">1️⃣ رفع الصورة الأصلية أو لصقها (Ctrl+V)</label>
-    <input type="file" id="imageInput" accept="image/*">
-    <label for="siteNameInput">رابط البادج (يظهر على الصورة)</label>
-    <input type="text" id="siteNameInput" placeholder="مثال: www.najdnetwork.com">
-    <label for="keywordInput">2️⃣ الكلمة المفتاحية الرئيسية</label>
-    <input type="text" id="keywordInput" placeholder="مثال: افضل مقاس صور المقالات">
-    <button id="processBtn" disabled>⚙️ معالجة الصورة</button>
-    <canvas id="canvas" width="1200" height="628" class="hidden"></canvas>
-    <div id="previewSection" class="preview-wrapper hidden">
-      <div class="preview-grid">
-        <div class="preview-box">
-          <h2>معاينة الصورة النهائية</h2>
-          <img id="previewImage">
-          <p>الحجم النهائي: <span id="fileSize">--</span></p>
-          <p>الجودة: <span id="qualityUsed">--</span></p>
-        </div>
-        <div class="preview-box">
-          <h2>بيانات السيو</h2>
-          <p>اسم الملف: <span id="fileNamePreview">--</span></p>
-          <input id="altOutput" readonly>
-          <button id="downloadBtn">⬇️ تحميل الصورة</button>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
         </div>
       </div>
-    </div>
-  </div>
-  <script>
-    // استرجاع رابط البادج من LocalStorage أو القيمة الافتراضية
-    function getLastSiteName() {
-      return localStorage.getItem('lastArticleSiteName') || 'www.najdnetwork.com';
-    }
-    function saveLastSiteName(val) {
-      localStorage.setItem('lastArticleSiteName', val);
-    }
-    let siteName = getLastSiteName();
-    const siteNameInput = document.getElementById("siteNameInput");
-    siteNameInput.value = siteName;
-    siteNameInput.addEventListener('input', function() {
-      siteName = siteNameInput.value.trim() || 'www.najdnetwork.com';
-      saveLastSiteName(siteName);
-    });
-    const imageInput = document.getElementById("imageInput");
-    const keywordInput = document.getElementById("keywordInput");
-    const processBtn = document.getElementById("processBtn");
-    const canvas = document.getElementById("canvas");
-    const previewSection = document.getElementById("previewSection");
-    const previewImage = document.getElementById("previewImage");
-    const fileSizeSpan = document.getElementById("fileSize");
-    const qualityUsedSpan = document.getElementById("qualityUsed");
-    const fileNamePreview = document.getElementById("fileNamePreview");
-    const altOutput = document.getElementById("altOutput");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const TARGET_WIDTH = 1200;
-    const TARGET_HEIGHT = 628;
-    const MAX_BYTES = 200 * 1024;
-    // مسح البيانات للبدء من جديد
-    resetBtn.onclick = () => {
-      imageInput.value = "";
-      keywordInput.value = "";
-      processBtn.disabled = true;
-      previewSection.classList.add("hidden");
-      localStorage.removeItem('lastArticleImage');
-      localStorage.removeItem('lastArticleKeyword');
-      // رابط البادج لا يتم حذفه كما طلبت
-    };
-    // دعم لصق الصورة
-    window.addEventListener('paste', function(e) {
-      if (e.clipboardData && e.clipboardData.items) {
-        for (let i = 0; i < e.clipboardData.items.length; i++) {
-          const item = e.clipboardData.items[i];
-          if (item.type.indexOf('image') !== -1) {
-            const file = item.getAsFile();
-            imageInput.files = new DataTransfer().files; // clear
+    </header>
+
+    <section class="optimizer-section">
+      <div class="optimizer-header">
+        <h1>أداة تهيئة صور المقالات SEO</h1>
+        <p>قم بالتحويل الفوري لمقاس 1200×628 مع تحويل WebP وبادج احترافي</p>
+      </div>
+
+      <div class="optimizer-workspace">
+        <div class="input-group">
+          <label><i class="fas fa-image"></i> الرفع أو لصق الصورة (Ctrl+V)</label>
+          <input type="file" id="imageInput" accept="image/*" />
+          <div id="status" class="processing-indicator">جاري التحسين الذكي...</div>
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-link"></i> اسم الموقع في البادج</label>
+          <input type="text" id="siteNameInput" />
+        </div>
+
+        <div class="input-group">
+          <label><i class="fas fa-search"></i> الكلمة المفتاحية للسيو</label>
+          <input type="text" id="keywordInput" placeholder="اكتب الكلمة هنا للتحديث الفوري..." />
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button id="resetBtn" class="btn-reset"><i class="fas fa-redo"></i> البدء من جديد</button>
+        </div>
+
+        <canvas id="canvas" width="1200" height="628" class="hidden"></canvas>
+
+        <div id="previewSection" class="preview-section hidden">
+          <div class="preview-grid">
+            <div class="preview-card">
+              <h3><i class="fas fa-eye"></i> معاينة النتيجة</h3>
+              <div class="preview-image-container">
+                <img id="previewImage" alt="SEO Optimized Image" />
+              </div>
+              <div class="stats-item">الحجم التقديري: <span id="fileSize">--</span></div>
+            </div>
+
+            <div class="preview-card">
+              <h3><i class="fas fa-check-circle"></i> جاهز للنشر</h3>
+              <div class="stats-item">اسم الملف الذكي: <span id="fileNamePreview" style="display:block; margin-top:5px; font-size:0.8rem; word-break:all; color:var(--tool-primary);">--</span></div>
+              
+              <div class="alt-box">
+                <label style="font-size:0.8rem; opacity:0.7">نص الـ ALT المعتمد:</label>
+                <div id="altOutput" style="font-weight:700; margin-top:5px; color:var(--tool-text);">--</div>
+              </div>
+
+              <button id="downloadBtn" class="btn-download">
+                <i class="fas fa-download"></i> تحميل نسخة الـ WebP
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <p class="footer-copy">© 2026 Ali Ahmed - جميع الحقوق محفوظة</p>
+          <ul class="footer-links">
+            <li><a href="../index.html#home">الرئيسية</a></li>
+            <li><a href="../works.html">أعمالنا</a></li>
+            <li><a href="../contact.html">تواصل معنا</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const siteNameInput = document.getElementById("siteNameInput");
+      const imageInput = document.getElementById("imageInput");
+      const keywordInput = document.getElementById("keywordInput");
+      const canvas = document.getElementById("canvas");
+      const previewSection = document.getElementById("previewSection");
+      const previewImage = document.getElementById("previewImage");
+      const fileSizeSpan = document.getElementById("fileSize");
+      const fileNamePreview = document.getElementById("fileNamePreview");
+      const altDisplay = document.getElementById("altOutput");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const statusInd = document.getElementById("status");
+
+      const TARGET_WIDTH = 1200;
+      const TARGET_HEIGHT = 628;
+
+      // Persistence Init
+      siteNameInput.value = localStorage.getItem('lastArticleSiteName') || 'www.najdnetwork.com';
+      siteNameInput.oninput = () => {
+        localStorage.setItem('lastArticleSiteName', siteNameInput.value);
+        processImage();
+      };
+
+      keywordInput.oninput = () => processImage();
+
+      resetBtn.onclick = () => {
+        localStorage.removeItem('lastArticleImage');
+        localStorage.removeItem('lastArticleKeyword');
+        location.reload();
+      };
+
+      // Auto-Trigger on Change/Paste
+      imageInput.onchange = () => processImage();
+
+      window.addEventListener("paste", e => {
+        const item = Array.from(e.clipboardData.items).find(x => x.type.includes("image"));
+        if (item) {
+          const file = item.getAsFile();
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          imageInput.files = dt.files;
+          processImage();
+        }
+      });
+
+      // Fallback لبعض المتصفحات التي لا تمرر صورة داخل paste event بشكل مباشر
+      window.addEventListener("keydown", async e => {
+        if (!(e.ctrlKey && (e.key === "v" || e.key === "V"))) return;
+        if (!navigator.clipboard || !navigator.clipboard.read) return;
+        try {
+          const items = await navigator.clipboard.read();
+          for (const item of items) {
+            const imageType = item.types.find(type => type.startsWith("image/"));
+            if (!imageType) continue;
+            const blob = await item.getType(imageType);
+            const file = new File([blob], "pasted-image.png", { type: blob.type });
             const dt = new DataTransfer();
             dt.items.add(file);
             imageInput.files = dt.files;
-            processBtn.disabled = false;
+            processImage();
             break;
           }
+        } catch (_) {
+          // تجاهل الخطأ إذا المتصفح رفض إذن Clipboard API
         }
-      }
-    });
-    imageInput.addEventListener("change", () => {
-      processBtn.disabled = !imageInput.files.length;
-    });
-    function dataUrlSizeBytes(dataURL) {
-      const base64 = dataURL.split(",")[1] || "";
-      return Math.floor((base64.length * 3) / 4);
-    }
-    function slugify(str) {
-      return str.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-    }
-    function drawRoundedRect(ctx, x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-    }
-    // حفظ آخر رابط صورة في LocalStorage
-    function saveLastImage(dataUrl) {
-      localStorage.setItem('lastArticleImage', dataUrl);
-    }
-    function getLastImage() {
-      return localStorage.getItem('lastArticleImage');
-    }
-    function saveLastKeyword(keyword) {
-      localStorage.setItem('lastArticleKeyword', keyword);
-    }
-    function getLastKeyword() {
-      return localStorage.getItem('lastArticleKeyword') || '';
-    }
-    // عند تحميل الصفحة: استرجع آخر صورة وكلمة مفتاحية
-    window.addEventListener('DOMContentLoaded', function() {
-      const lastImg = getLastImage();
-      const lastKeyword = getLastKeyword();
-      const lastSite = getLastSiteName();
-      if (lastImg) {
-        previewImage.src = lastImg;
-        previewSection.classList.remove("hidden");
-        fileSizeSpan.textContent = (dataUrlSizeBytes(lastImg) / 1024).toFixed(1) + " KB";
-        qualityUsedSpan.textContent = '--';
-        fileNamePreview.textContent = slugify(lastKeyword) + ".webp";
-        altOutput.value = lastKeyword || "صورة رئيسية";
-      }
-      if (lastKeyword) keywordInput.value = lastKeyword;
-      if (lastSite) siteNameInput.value = lastSite;
-      siteName = lastSite;
-    });
-    processBtn.onclick = () => {
-      const file = imageInput.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          const ctx = canvas.getContext("2d");
-          canvas.width = TARGET_WIDTH;
-          canvas.height = TARGET_HEIGHT;
-          const ratio = Math.max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height);
-          const newWidth = img.width * ratio;
-          const newHeight = img.height * ratio;
-          const offsetX = (TARGET_WIDTH - newWidth) / 2;
-          const offsetY = (TARGET_HEIGHT - newHeight) / 2;
-          ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-          // البادج الاحترافي
-          const fontSize = 26;
-          ctx.font = "600 " + fontSize + "px sans-serif";
-          ctx.textAlign = "center";
-          const badgeText = siteNameInput.value.trim() || 'www.najdnetwork.com';
-          const textWidth = ctx.measureText(badgeText).width;
-          const paddingX = 28;
-          const paddingY = 12;
-          const boxWidth = textWidth + paddingX * 2;
-          const boxHeight = fontSize + paddingY * 2;
-          const boxX = (TARGET_WIDTH - boxWidth) / 2;
-          const boxY = TARGET_HEIGHT - boxHeight - 22;
-          ctx.fillStyle = "rgba(0,0,0,0.60)";
-          drawRoundedRect(ctx, boxX, boxY, boxWidth, boxHeight, 40);
-          ctx.fill();
-          ctx.fillStyle = "#fff";
-          ctx.fillText(badgeText, TARGET_WIDTH / 2, boxY + boxHeight / 2 + 8);
-          // تصدير WebP
-          let quality = 0.9;
-          let dataURL = canvas.toDataURL("image/webp", quality);
-          let size = dataUrlSizeBytes(dataURL);
-          while (size > MAX_BYTES && quality > 0.4) {
-            quality -= 0.1;
-            dataURL = canvas.toDataURL("image/webp", quality);
-            size = dataUrlSizeBytes(dataURL);
-          }
-          previewImage.src = dataURL;
-          fileSizeSpan.textContent = (size / 1024).toFixed(1) + " KB";
-          qualityUsedSpan.textContent = quality.toFixed(1);
-          const keyword = keywordInput.value.trim();
-          const altText = keyword || "صورة رئيسية";
-          altOutput.value = altText;
-          const fileName = slugify(keyword) + ".webp";
-          fileNamePreview.textContent = fileName;
-          downloadBtn.onclick = () => {
-            const a = document.createElement("a");
-            a.href = dataURL;
-            a.download = fileName;
-            a.click();
+      });
+
+      function processImage() {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        statusInd.style.display = "block";
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const ctx = canvas.getContext("2d");
+            canvas.width = TARGET_WIDTH;
+            canvas.height = TARGET_HEIGHT;
+
+            const ratio = Math.max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height);
+            const w = img.width * ratio;
+            const h = img.height * ratio;
+            ctx.drawImage(img, (TARGET_WIDTH - w)/2, (TARGET_HEIGHT - h)/2, w, h);
+
+      // Badge with blur proxy
+            const badgeText = siteNameInput.value.trim() || 'www.najdnetwork.com';
+            ctx.font = "600 24px Cairo, sans-serif";
+            const tw = ctx.measureText(badgeText).width;
+            const bw = tw + 40;
+            const bh = 48;
+            const bx = (TARGET_WIDTH - bw) / 2;
+            const by = TARGET_HEIGHT - bh - 25;
+
+            ctx.fillStyle = "rgba(15, 15, 21, 0.85)";
+            drawRoundedRect(ctx, bx, by, bw, bh, 15);
+            ctx.fill();
+            
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(badgeText, TARGET_WIDTH / 2, by + bh / 2 + 2);
+
+            let quality = 0.82;
+            let dataURL = canvas.toDataURL("image/webp", quality);
+            
+            previewImage.src = dataURL;
+            fileSizeSpan.textContent = Math.round(dataURL.length / 1350) + " KB";
+            
+            const kw = keywordInput.value.trim();
+            const safeName = (kw.toLowerCase()
+              .replace(/[^a-z0-9\u0600-\u06FF]+/g, "-") || "seo-image") + ".webp";
+            
+            fileNamePreview.textContent = safeName;
+            altDisplay.textContent = kw || "صورة مقال سيو";
+
+            downloadBtn.onclick = () => {
+              const a = document.createElement("a");
+              a.href = dataURL;
+              a.download = safeName;
+              a.click();
+            };
+
+            previewSection.classList.remove("hidden");
+            statusInd.style.display = "none";
+            
+            setTimeout(() => {
+              previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
           };
-          previewSection.classList.remove("hidden");
-          // حفظ آخر صورة وكلمة مفتاحية ورابط البادج
-          saveLastImage(dataURL);
-          saveLastKeyword(keyword);
-          saveLastSiteName(badgeText);
+          img.src = e.target.result;
         };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    };
-  </script>
-</body>
+        reader.readAsDataURL(file);
+      }
+
+      function drawRoundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+    </script>
+  </body>
 </html>
