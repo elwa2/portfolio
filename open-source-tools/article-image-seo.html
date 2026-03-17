@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="salla-dark-mode" style="--smartsvg-icon-color: #ffffff;">
+<head>
+  <meta charset="UTF-8">
+  <title>أداة تهيئة صور المقالات 1200×628</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/design-enhancements.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 20px; background: #f4f5f7; display: flex; justify-content: center; }
+    .container { background: #fff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); max-width: 900px; width: 100%; }
+    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    h1 { margin-top: 0; margin-bottom: 0; font-size: 22px; }
+    .reset-btn { margin-top: 0; background: #64748b; padding: 6px 14px; font-size: 13px; }
+    .reset-btn:hover { background: #475569; }
+    p.small { margin-top: 0; margin-bottom: 20px; font-size: 13px; color: #555; }
+    label { display: block; margin: 14px 0 6px; font-size: 14px; font-weight: 600; }
+    input[type="file"], input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #d0d7de; font-size: 14px; }
+    button { margin-top: 18px; padding: 10px 18px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: #2563eb; color: white; }
+    button:disabled { background: #cbd5f5; cursor: not-allowed; }
+    .hidden { display: none; }
+    .preview-wrapper { margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 18px; }
+    .preview-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr); gap: 16px; }
+    .preview-box { border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; background: #fafafa; }
+    #previewImage { width: 100%; border-radius: 10px; border: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-flex">
+      <h1>أداة تهيئة صورة المقال 1200×628 (WebP + SEO)</h1>
+      <button id="resetBtn" class="reset-btn">🔄 عمل صورة جديدة</button>
+    </div>
+    <label for="imageInput">1️⃣ رفع الصورة الأصلية أو لصقها (Ctrl+V)</label>
+    <input type="file" id="imageInput" accept="image/*">
+    <label for="siteNameInput">رابط البادج (يظهر على الصورة)</label>
+    <input type="text" id="siteNameInput" placeholder="مثال: www.najdnetwork.com">
+    <label for="keywordInput">2️⃣ الكلمة المفتاحية الرئيسية</label>
+    <input type="text" id="keywordInput" placeholder="مثال: افضل مقاس صور المقالات">
+    <button id="processBtn" disabled>⚙️ معالجة الصورة</button>
+    <canvas id="canvas" width="1200" height="628" class="hidden"></canvas>
+    <div id="previewSection" class="preview-wrapper hidden">
+      <div class="preview-grid">
+        <div class="preview-box">
+          <h2>معاينة الصورة النهائية</h2>
+          <img id="previewImage">
+          <p>الحجم النهائي: <span id="fileSize">--</span></p>
+          <p>الجودة: <span id="qualityUsed">--</span></p>
+        </div>
+        <div class="preview-box">
+          <h2>بيانات السيو</h2>
+          <p>اسم الملف: <span id="fileNamePreview">--</span></p>
+          <input id="altOutput" readonly>
+          <button id="downloadBtn">⬇️ تحميل الصورة</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // استرجاع رابط البادج من LocalStorage أو القيمة الافتراضية
+    function getLastSiteName() {
+      return localStorage.getItem('lastArticleSiteName') || 'www.najdnetwork.com';
+    }
+    function saveLastSiteName(val) {
+      localStorage.setItem('lastArticleSiteName', val);
+    }
+    let siteName = getLastSiteName();
+    const siteNameInput = document.getElementById("siteNameInput");
+    siteNameInput.value = siteName;
+    siteNameInput.addEventListener('input', function() {
+      siteName = siteNameInput.value.trim() || 'www.najdnetwork.com';
+      saveLastSiteName(siteName);
+    });
+    const imageInput = document.getElementById("imageInput");
+    const keywordInput = document.getElementById("keywordInput");
+    const processBtn = document.getElementById("processBtn");
+    const canvas = document.getElementById("canvas");
+    const previewSection = document.getElementById("previewSection");
+    const previewImage = document.getElementById("previewImage");
+    const fileSizeSpan = document.getElementById("fileSize");
+    const qualityUsedSpan = document.getElementById("qualityUsed");
+    const fileNamePreview = document.getElementById("fileNamePreview");
+    const altOutput = document.getElementById("altOutput");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const TARGET_WIDTH = 1200;
+    const TARGET_HEIGHT = 628;
+    const MAX_BYTES = 200 * 1024;
+    // مسح البيانات للبدء من جديد
+    resetBtn.onclick = () => {
+      imageInput.value = "";
+      keywordInput.value = "";
+      processBtn.disabled = true;
+      previewSection.classList.add("hidden");
+      localStorage.removeItem('lastArticleImage');
+      localStorage.removeItem('lastArticleKeyword');
+      // رابط البادج لا يتم حذفه كما طلبت
+    };
+    // دعم لصق الصورة
+    window.addEventListener('paste', function(e) {
+      if (e.clipboardData && e.clipboardData.items) {
+        for (let i = 0; i < e.clipboardData.items.length; i++) {
+          const item = e.clipboardData.items[i];
+          if (item.type.indexOf('image') !== -1) {
+            const file = item.getAsFile();
+            imageInput.files = new DataTransfer().files; // clear
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            imageInput.files = dt.files;
+            processBtn.disabled = false;
+            break;
+          }
+        }
+      }
+    });
+    imageInput.addEventListener("change", () => {
+      processBtn.disabled = !imageInput.files.length;
+    });
+    function dataUrlSizeBytes(dataURL) {
+      const base64 = dataURL.split(",")[1] || "";
+      return Math.floor((base64.length * 3) / 4);
+    }
+    function slugify(str) {
+      return str.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    }
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+    // حفظ آخر رابط صورة في LocalStorage
+    function saveLastImage(dataUrl) {
+      localStorage.setItem('lastArticleImage', dataUrl);
+    }
+    function getLastImage() {
+      return localStorage.getItem('lastArticleImage');
+    }
+    function saveLastKeyword(keyword) {
+      localStorage.setItem('lastArticleKeyword', keyword);
+    }
+    function getLastKeyword() {
+      return localStorage.getItem('lastArticleKeyword') || '';
+    }
+    // عند تحميل الصفحة: استرجع آخر صورة وكلمة مفتاحية
+    window.addEventListener('DOMContentLoaded', function() {
+      const lastImg = getLastImage();
+      const lastKeyword = getLastKeyword();
+      const lastSite = getLastSiteName();
+      if (lastImg) {
+        previewImage.src = lastImg;
+        previewSection.classList.remove("hidden");
+        fileSizeSpan.textContent = (dataUrlSizeBytes(lastImg) / 1024).toFixed(1) + " KB";
+        qualityUsedSpan.textContent = '--';
+        fileNamePreview.textContent = slugify(lastKeyword) + ".webp";
+        altOutput.value = lastKeyword || "صورة رئيسية";
+      }
+      if (lastKeyword) keywordInput.value = lastKeyword;
+      if (lastSite) siteNameInput.value = lastSite;
+      siteName = lastSite;
+    });
+    processBtn.onclick = () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const ctx = canvas.getContext("2d");
+          canvas.width = TARGET_WIDTH;
+          canvas.height = TARGET_HEIGHT;
+          const ratio = Math.max(TARGET_WIDTH / img.width, TARGET_HEIGHT / img.height);
+          const newWidth = img.width * ratio;
+          const newHeight = img.height * ratio;
+          const offsetX = (TARGET_WIDTH - newWidth) / 2;
+          const offsetY = (TARGET_HEIGHT - newHeight) / 2;
+          ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+          // البادج الاحترافي
+          const fontSize = 26;
+          ctx.font = "600 " + fontSize + "px sans-serif";
+          ctx.textAlign = "center";
+          const badgeText = siteNameInput.value.trim() || 'www.najdnetwork.com';
+          const textWidth = ctx.measureText(badgeText).width;
+          const paddingX = 28;
+          const paddingY = 12;
+          const boxWidth = textWidth + paddingX * 2;
+          const boxHeight = fontSize + paddingY * 2;
+          const boxX = (TARGET_WIDTH - boxWidth) / 2;
+          const boxY = TARGET_HEIGHT - boxHeight - 22;
+          ctx.fillStyle = "rgba(0,0,0,0.60)";
+          drawRoundedRect(ctx, boxX, boxY, boxWidth, boxHeight, 40);
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.fillText(badgeText, TARGET_WIDTH / 2, boxY + boxHeight / 2 + 8);
+          // تصدير WebP
+          let quality = 0.9;
+          let dataURL = canvas.toDataURL("image/webp", quality);
+          let size = dataUrlSizeBytes(dataURL);
+          while (size > MAX_BYTES && quality > 0.4) {
+            quality -= 0.1;
+            dataURL = canvas.toDataURL("image/webp", quality);
+            size = dataUrlSizeBytes(dataURL);
+          }
+          previewImage.src = dataURL;
+          fileSizeSpan.textContent = (size / 1024).toFixed(1) + " KB";
+          qualityUsedSpan.textContent = quality.toFixed(1);
+          const keyword = keywordInput.value.trim();
+          const altText = keyword || "صورة رئيسية";
+          altOutput.value = altText;
+          const fileName = slugify(keyword) + ".webp";
+          fileNamePreview.textContent = fileName;
+          downloadBtn.onclick = () => {
+            const a = document.createElement("a");
+            a.href = dataURL;
+            a.download = fileName;
+            a.click();
+          };
+          previewSection.classList.remove("hidden");
+          // حفظ آخر صورة وكلمة مفتاحية ورابط البادج
+          saveLastImage(dataURL);
+          saveLastKeyword(keyword);
+          saveLastSiteName(badgeText);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+  </script>
+</body>
+</html>
