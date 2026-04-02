@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>محرر الصور الاحترافي | Pro Image Editor</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      .editor-shell {
+        background: linear-gradient(
+          160deg,
+          rgba(10, 16, 28, 0.96),
+          rgba(16, 26, 44, 0.95)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        padding: 24px;
+        color: #e7edf6;
+      }
+
+      .editor-title {
+        margin: 0 0 10px;
+        color: #f7fbff;
+        font-size: 2rem;
+      }
+
+      .editor-subtitle {
+        margin: 0;
+        color: rgba(231, 237, 246, 0.8);
+      }
+
+      .editor-layout {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 20px;
+        margin-top: 24px;
+      }
+
+      .preview-panel,
+      .controls-panel {
+        background: rgba(4, 10, 20, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .upload-zone {
+        border: 2px dashed rgba(88, 166, 255, 0.55);
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        margin-bottom: 14px;
+        background: rgba(32, 60, 104, 0.18);
+      }
+
+      .upload-zone.dragover {
+        border-color: #8ed1ff;
+        background: rgba(80, 130, 200, 0.22);
+      }
+
+      .preview-wrap {
+        position: relative;
+        width: 100%;
+        height: clamp(300px, 62vh, 620px);
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(83, 132, 201, 0.35), transparent 35%),
+          radial-gradient(circle at 80% 0%, rgba(37, 87, 156, 0.35), transparent 30%),
+          repeating-conic-gradient(
+            from 45deg,
+            #0d1422 0deg 10deg,
+            #111b2d 10deg 20deg
+          );
+      }
+
+      #imageCanvas,
+      #overlayCanvas {
+        display: block;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: none;
+        max-height: none;
+      }
+
+      #overlayCanvas {
+        pointer-events: none;
+      }
+
+      .canvas-empty {
+        min-height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(231, 237, 246, 0.75);
+        text-align: center;
+        padding: 20px;
+      }
+
+      .controls-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 74vh;
+        overflow: auto;
+      }
+
+      .control-group {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 0;
+      }
+
+      .transform-pair {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .transform-pair .btn-tool {
+        width: 100%;
+      }
+
+      #group-transform {
+        order: 1;
+      }
+
+      #group-color {
+        order: 2;
+      }
+
+      #group-tone {
+        order: 3;
+      }
+
+      #group-effects {
+        order: 4;
+      }
+
+      .control-group h3 {
+        font-size: 1rem;
+        margin: 0 0 10px;
+        color: #c9e4ff;
+      }
+
+      .control-row {
+        margin-bottom: 10px;
+      }
+
+      .control-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .control-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.88rem;
+        margin-bottom: 6px;
+      }
+
+      .control-label span.value {
+        color: #8bd0ff;
+        font-weight: 700;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #4cb3ff;
+      }
+
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .btn-tool {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #f4f8ff;
+        background: linear-gradient(135deg, #1f5aa8, #2f7ec7);
+        cursor: pointer;
+        font-family: "Cairo", sans-serif;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn-tool:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(41, 124, 209, 0.35);
+      }
+
+      .btn-tool.secondary {
+        background: linear-gradient(135deg, #4f6075, #445265);
+      }
+
+      .btn-tool.warn {
+        background: linear-gradient(135deg, #9d5a0e, #d98a26);
+      }
+
+      .btn-tool.danger {
+        background: linear-gradient(135deg, #8a2d2d, #b94545);
+      }
+
+      .btn-tool.active {
+        box-shadow: 0 0 0 2px rgba(145, 203, 255, 0.5) inset;
+      }
+
+      .tiny-note {
+        font-size: 0.8rem;
+        color: rgba(231, 237, 246, 0.72);
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      .paste-catcher {
+        position: fixed;
+        left: -9999px;
+        top: -9999px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      @media (max-width: 1100px) {
+        .editor-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .controls-panel {
+          max-height: none;
+        }
+      }
+
+      /* Fix for 3D background overlap */
+      #three-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+  </head>
+
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
+      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">⭐</div>
+      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">🔥</div>
+      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">💎</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">🎯</div>
+      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <section class="editor-shell">
+          <h1 class="editor-title">محرر الصور الاحترافي / Pro Image Editor</h1>
+          <p class="editor-subtitle">
+            رفع الصورة، تعديل الألوان والتأثيرات، القص، التدوير، والمقارنة قبل/بعد مع معالجة كاملة داخل المتصفح.
+          </p>
+
+          <div class="editor-layout">
+            <div class="preview-panel">
+              <label class="upload-zone" id="uploadZone" for="fileInput">
+                <div><strong>اسحب الصورة هنا أو اضغط للرفع / Drag & Drop or Click to Upload</strong></div>
+                <div class="tiny-note">يدعم: PNG, JPG, WEBP + لصق مباشر Ctrl+V</div>
+              </label>
+              <input id="fileInput" type="file" accept="image/*" />
+              <textarea
+                id="pasteCatcher"
+                class="paste-catcher"
+                aria-hidden="true"
+                tabindex="-1"
+              ></textarea>
+
+              <div class="btn-row" style="margin-bottom: 12px">
+                <button class="btn-tool secondary" id="pasteImageBtn" type="button">
+                  Paste Image / لصق صورة
+                </button>
+              </div>
+
+              <div class="preview-wrap" id="previewWrap">
+                <div class="canvas-empty" id="emptyState">
+                  ارفع صورة لبدء التعديل الكامل<br />
+                  Upload an image to start editing
+                </div>
+                <canvas id="imageCanvas"></canvas>
+                <canvas id="overlayCanvas"></canvas>
+              </div>
+            </div>
+
+            <aside class="controls-panel">
+              <div class="control-group" id="group-color">
+                <h3>Color / الألوان</h3>
+                <div class="control-row">
+                  <div class="control-label">Red / الأحمر <span class="value" id="val-red">100%</span></div>
+                  <input id="red" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Green / الأخضر <span class="value" id="val-green">100%</span></div>
+                  <input id="green" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Blue / الأزرق <span class="value" id="val-blue">100%</span></div>
+                  <input id="blue" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Hue Rotation / تدوير الهيو <span class="value" id="val-hue">0deg</span></div>
+                  <input id="hue" type="range" min="-180" max="180" value="0" />
+                </div>
+                <div class="btn-row">
+                  <button class="btn-tool secondary" id="toggleSepia" type="button">Sepia / سيبيا</button>
+                  <button class="btn-tool secondary" id="toggleGray" type="button">Grayscale / تدرج رمادي</button>
+                </div>
+              </div>
+
+              <div class="control-group" id="group-tone">
+                <h3>Tone / الإضاءة</h3>
+                <div class="control-row">
+                  <div class="control-label">Brightness / السطوع <span class="value" id="val-brightness">100%</span></div>
+                  <input id="brightness" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Contrast / التباين <span class="value" id="val-contrast">100%</span></div>
+                  <input id="contrast" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Saturation / التشبع <span class="value" id="val-saturation">100%</span></div>
+                  <input id="saturation" type="range" min="0" max="200" value="100" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Exposure / التعريض <span class="value" id="val-exposure">0.00</span></div>
+                  <input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" />
+                </div>
+              </div>
+
+              <div class="control-group" id="group-effects">
+                <h3>Effects / المؤثرات</h3>
+                <div class="control-row">
+                  <div class="control-label">Blur / التمويه <span class="value" id="val-blur">0px</span></div>
+                  <input id="blur" type="range" min="0" max="12" step="0.1" value="0" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Sharpen / الحدة <span class="value" id="val-sharpen">0%</span></div>
+                  <input id="sharpen" type="range" min="0" max="100" value="0" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Noise / التشويش <span class="value" id="val-noise">0%</span></div>
+                  <input id="noise" type="range" min="0" max="100" value="0" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Vignette Intensity / شدة الفينيت <span class="value" id="val-vigIntensity">0%</span></div>
+                  <input id="vigIntensity" type="range" min="0" max="100" value="0" />
+                </div>
+                <div class="control-row">
+                  <div class="control-label">Vignette Spread / انتشار الفينيت <span class="value" id="val-vigSpread">65%</span></div>
+                  <input id="vigSpread" type="range" min="10" max="100" value="65" />
+                </div>
+              </div>
+
+              <div class="control-group" id="group-transform">
+                <h3>Transform / التحويل</h3>
+                <div class="control-row">
+                  <div class="control-label">Rotation / التدوير <span class="value" id="val-rotate">0deg</span></div>
+                  <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
+                </div>
+                <div class="transform-pair" style="margin-bottom: 8px">
+                  <button class="btn-tool secondary" id="rotateLeft" type="button">-90°</button>
+                  <button class="btn-tool secondary" id="rotateRight" type="button">+90°</button>
+                </div>
+                <div class="transform-pair" style="margin-bottom: 8px">
+                  <button class="btn-tool secondary" id="flipH" type="button">Flip H / عكس أفقي</button>
+                  <button class="btn-tool secondary" id="flipV" type="button">Flip V / عكس رأسي</button>
+                </div>
+                <div class="btn-row" style="margin-bottom: 8px">
+                  <button class="btn-tool warn" id="cropMode" type="button">Crop Tool / أداة القص</button>
+                  <button class="btn-tool warn" id="applyCrop" type="button">Apply Crop / تطبيق القص</button>
+                  <button class="btn-tool secondary" id="cancelCrop" type="button">Cancel Crop / إلغاء القص</button>
+                </div>
+                <div class="btn-row">
+                  <button class="btn-tool secondary" id="beforeAfter" type="button">Before / After</button>
+                  <button class="btn-tool danger" id="resetAll" type="button">Reset All / إعادة تعيين</button>
+                  <button class="btn-tool" id="downloadPng" type="button">Download PNG / تنزيل PNG</button>
+                </div>
+                <p class="tiny-note" style="margin-top: 8px">
+                  القص يتم بالسحب على الصورة ثم Apply Crop.
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميز.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      (() => {
+        const fileInput = document.getElementById("fileInput");
+        const uploadZone = document.getElementById("uploadZone");
+        const emptyState = document.getElementById("emptyState");
+        const previewWrap = document.getElementById("previewWrap");
+        const pasteCatcher = document.getElementById("pasteCatcher");
+
+        const imageCanvas = document.getElementById("imageCanvas");
+        const overlayCanvas = document.getElementById("overlayCanvas");
+        const imageCtx = imageCanvas.getContext("2d", { willReadFrequently: true });
+        const overlayCtx = overlayCanvas.getContext("2d");
+
+        const state = {
+          red: 100,
+          green: 100,
+          blue: 100,
+          hue: 0,
+          brightness: 100,
+          contrast: 100,
+          saturation: 100,
+          exposure: 0,
+          blur: 0,
+          sharpen: 0,
+          noise: 0,
+          vigIntensity: 0,
+          vigSpread: 65,
+          rotate: 0,
+          flipH: false,
+          flipV: false,
+          sepia: false,
+          gray: false,
+          showOriginal: false,
+          cropMode: false,
+        };
+
+        const rangeMap = [
+          ["red", "val-red", "%"],
+          ["green", "val-green", "%"],
+          ["blue", "val-blue", "%"],
+          ["hue", "val-hue", "deg"],
+          ["brightness", "val-brightness", "%"],
+          ["contrast", "val-contrast", "%"],
+          ["saturation", "val-saturation", "%"],
+          ["exposure", "val-exposure", ""],
+          ["blur", "val-blur", "px"],
+          ["sharpen", "val-sharpen", "%"],
+          ["noise", "val-noise", "%"],
+          ["vigIntensity", "val-vigIntensity", "%"],
+          ["vigSpread", "val-vigSpread", "%"],
+          ["rotate", "val-rotate", "deg"],
+        ];
+
+        let originalImage = null;
+        let cropSelection = null;
+        let isDraggingCrop = false;
+        let cropStart = null;
+
+        function clamp(v) {
+          return Math.max(0, Math.min(255, v));
+        }
+
+        function updateValueLabels() {
+          rangeMap.forEach(([key, out, suffix]) => {
+            const el = document.getElementById(out);
+            if (!el) return;
+            if (key === "exposure") {
+              el.textContent = Number(state[key]).toFixed(2);
+              return;
+            }
+            el.textContent = `${state[key]}${suffix}`;
+          });
+        }
+
+        function bindRanges() {
+          rangeMap.forEach(([key]) => {
+            const input = document.getElementById(key);
+            if (!input) return;
+            input.addEventListener("input", () => {
+              state[key] = Number(input.value);
+              updateValueLabels();
+              render();
+            });
+          });
+          updateValueLabels();
+        }
+
+        function buildTransformedCanvas() {
+          const w = originalImage.width;
+          const h = originalImage.height;
+          const rad = (state.rotate * Math.PI) / 180;
+          const absCos = Math.abs(Math.cos(rad));
+          const absSin = Math.abs(Math.sin(rad));
+          const outW = Math.max(1, Math.round(w * absCos + h * absSin));
+          const outH = Math.max(1, Math.round(w * absSin + h * absCos));
+
+          const transformed = document.createElement("canvas");
+          transformed.width = outW;
+          transformed.height = outH;
+
+          const tctx = transformed.getContext("2d");
+          tctx.translate(outW / 2, outH / 2);
+          tctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
+          tctx.rotate(rad);
+          tctx.drawImage(originalImage, -w / 2, -h / 2);
+
+          return transformed;
+        }
+
+        function applySharpen(imageData, amount) {
+          if (amount <= 0) return;
+          const w = imageData.width;
+          const h = imageData.height;
+          const src = new Uint8ClampedArray(imageData.data);
+          const out = imageData.data;
+          const f = (amount / 100) * 1.25;
+
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const idx = (y * w + x) * 4;
+              const left = idx - 4;
+              const right = idx + 4;
+              const up = idx - w * 4;
+              const down = idx + w * 4;
+
+              for (let c = 0; c < 3; c++) {
+                const center = src[idx + c] * (1 + 4 * f);
+                const edge = f * (src[left + c] + src[right + c] + src[up + c] + src[down + c]);
+                out[idx + c] = clamp(center - edge);
+              }
+            }
+          }
+        }
+
+        function applyPixelEffects(imageData) {
+          const { width, height, data } = imageData;
+          const rf = state.red / 100;
+          const gf = state.green / 100;
+          const bf = state.blue / 100;
+
+          const vigIntensity = state.vigIntensity / 100;
+          const vigSpread = state.vigSpread / 100;
+          const noiseAmount = state.noise / 100;
+
+          const cx = width / 2;
+          const cy = height / 2;
+          const maxDist = Math.sqrt(cx * cx + cy * cy);
+
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              const idx = (y * width + x) * 4;
+
+              let r = data[idx] * rf;
+              let g = data[idx + 1] * gf;
+              let b = data[idx + 2] * bf;
+
+              if (vigIntensity > 0) {
+                const dist = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+                const d = dist / maxDist;
+                const t = Math.max(0, (d - vigSpread) / Math.max(0.0001, 1 - vigSpread));
+                const vignette = 1 - vigIntensity * Math.min(1, t * t);
+                r *= vignette;
+                g *= vignette;
+                b *= vignette;
+              }
+
+              if (noiseAmount > 0) {
+                const n = (Math.random() * 2 - 1) * noiseAmount * 64;
+                r += n;
+                g += n;
+                b += n;
+              }
+
+              data[idx] = clamp(r);
+              data[idx + 1] = clamp(g);
+              data[idx + 2] = clamp(b);
+            }
+          }
+        }
+
+        function drawCropOverlay() {
+          overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+          if (!state.cropMode || !cropSelection) return;
+
+          const { x, y, w, h } = cropSelection;
+          overlayCtx.fillStyle = "rgba(0, 0, 0, 0.35)";
+          overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+          overlayCtx.clearRect(x, y, w, h);
+
+          overlayCtx.strokeStyle = "#7ad0ff";
+          overlayCtx.lineWidth = 2;
+          overlayCtx.setLineDash([8, 6]);
+          overlayCtx.strokeRect(x, y, w, h);
+          overlayCtx.setLineDash([]);
+        }
+
+        function fitCanvasDisplaySize() {
+          if (!imageCanvas.width || !imageCanvas.height) return;
+
+          const padding = 16;
+          const areaW = Math.max(1, previewWrap.clientWidth - padding * 2);
+          const areaH = Math.max(1, previewWrap.clientHeight - padding * 2);
+          const scale = Math.min(areaW / imageCanvas.width, areaH / imageCanvas.height, 1);
+
+          const displayW = Math.max(1, Math.round(imageCanvas.width * scale));
+          const displayH = Math.max(1, Math.round(imageCanvas.height * scale));
+
+          imageCanvas.style.width = `${displayW}px`;
+          imageCanvas.style.height = `${displayH}px`;
+          overlayCanvas.style.width = `${displayW}px`;
+          overlayCanvas.style.height = `${displayH}px`;
+        }
+
+        function renderOriginalPreview() {
+          const transformed = buildTransformedCanvas();
+          imageCanvas.width = transformed.width;
+          imageCanvas.height = transformed.height;
+          overlayCanvas.width = transformed.width;
+          overlayCanvas.height = transformed.height;
+          fitCanvasDisplaySize();
+          imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+          imageCtx.drawImage(transformed, 0, 0);
+          drawCropOverlay();
+        }
+
+        function render() {
+          if (!originalImage) return;
+          emptyState.style.display = "none";
+
+          if (state.showOriginal) {
+            renderOriginalPreview();
+            return;
+          }
+
+          const transformed = buildTransformedCanvas();
+
+          const filtered = document.createElement("canvas");
+          filtered.width = transformed.width;
+          filtered.height = transformed.height;
+          const fctx = filtered.getContext("2d", { willReadFrequently: true });
+
+          const exposureBrightness = Math.round(state.brightness * Math.pow(2, state.exposure));
+          fctx.filter = `brightness(${exposureBrightness}%) contrast(${state.contrast}%) saturate(${state.saturation}%) hue-rotate(${state.hue}deg) blur(${state.blur}px) sepia(${state.sepia ? 100 : 0}%) grayscale(${state.gray ? 100 : 0}%)`;
+          fctx.drawImage(transformed, 0, 0);
+
+          let imageData = fctx.getImageData(0, 0, filtered.width, filtered.height);
+          applySharpen(imageData, state.sharpen);
+          applyPixelEffects(imageData);
+          fctx.putImageData(imageData, 0, 0);
+
+          imageCanvas.width = filtered.width;
+          imageCanvas.height = filtered.height;
+          overlayCanvas.width = filtered.width;
+          overlayCanvas.height = filtered.height;
+          fitCanvasDisplaySize();
+          imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+          imageCtx.drawImage(filtered, 0, 0);
+          drawCropOverlay();
+        }
+
+        function setImageFromDataUrl(dataUrl) {
+          const img = new Image();
+          img.onload = () => {
+            originalImage = img;
+            cropSelection = null;
+            render();
+          };
+          img.src = dataUrl;
+        }
+
+        function loadImageFile(file) {
+          if (!file || !file.type.startsWith("image/")) return;
+          const reader = new FileReader();
+          reader.onload = (event) => setImageFromDataUrl(event.target.result);
+          reader.readAsDataURL(file);
+        }
+
+        function extractImageFromDataTransfer(dataTransfer) {
+          if (!dataTransfer) return null;
+
+          if (dataTransfer.files && dataTransfer.files.length > 0) {
+            for (let i = 0; i < dataTransfer.files.length; i++) {
+              const file = dataTransfer.files[i];
+              if (file && file.type && file.type.startsWith("image/")) {
+                return file;
+              }
+            }
+          }
+
+          const items = dataTransfer.items;
+          if (!items) return null;
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item && item.type && item.type.startsWith("image/")) {
+              return item.getAsFile();
+            }
+          }
+
+          return null;
+        }
+
+        function handlePasteEvent(event) {
+          const file = extractImageFromDataTransfer(event.clipboardData);
+          if (!file) return false;
+
+          event.preventDefault();
+          loadImageFile(file);
+          return true;
+        }
+
+        async function readClipboardImageViaApi() {
+          if (!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.read) {
+            return false;
+          }
+
+          try {
+            const items = await navigator.clipboard.read();
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+              const imageType = item.types.find((type) => type.startsWith("image/"));
+              if (!imageType) continue;
+
+              const blob = await item.getType(imageType);
+              const file = new File([blob], `pasted-${Date.now()}.png`, {
+                type: blob.type || "image/png",
+              });
+              loadImageFile(file);
+              return true;
+            }
+          } catch (error) {
+            return false;
+          }
+
+          return false;
+        }
+
+        function isEditableElement(target) {
+          if (!target) return false;
+          const tag = (target.tagName || "").toLowerCase();
+          return (
+            tag === "input" ||
+            tag === "textarea" ||
+            target.isContentEditable
+          );
+        }
+
+        function getCanvasPoint(event) {
+          const rect = overlayCanvas.getBoundingClientRect();
+          const sx = overlayCanvas.width / rect.width;
+          const sy = overlayCanvas.height / rect.height;
+          return {
+            x: Math.max(0, Math.min(overlayCanvas.width, (event.clientX - rect.left) * sx)),
+            y: Math.max(0, Math.min(overlayCanvas.height, (event.clientY - rect.top) * sy)),
+          };
+        }
+
+        function normalizeRect(a, b) {
+          const x = Math.min(a.x, b.x);
+          const y = Math.min(a.y, b.y);
+          const w = Math.abs(a.x - b.x);
+          const h = Math.abs(a.y - b.y);
+          return { x, y, w, h };
+        }
+
+        function updateToggleButtons() {
+          document.getElementById("toggleSepia").classList.toggle("active", state.sepia);
+          document.getElementById("toggleGray").classList.toggle("active", state.gray);
+          document.getElementById("flipH").classList.toggle("active", state.flipH);
+          document.getElementById("flipV").classList.toggle("active", state.flipV);
+          document.getElementById("cropMode").classList.toggle("active", state.cropMode);
+          document.getElementById("beforeAfter").classList.toggle("active", state.showOriginal);
+        }
+
+        function resetAdjustments() {
+          Object.assign(state, {
+            red: 100,
+            green: 100,
+            blue: 100,
+            hue: 0,
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            exposure: 0,
+            blur: 0,
+            sharpen: 0,
+            noise: 0,
+            vigIntensity: 0,
+            vigSpread: 65,
+            rotate: 0,
+            flipH: false,
+            flipV: false,
+            sepia: false,
+            gray: false,
+            showOriginal: false,
+            cropMode: false,
+          });
+
+          rangeMap.forEach(([key]) => {
+            const input = document.getElementById(key);
+            if (!input) return;
+            input.value = state[key];
+          });
+
+          cropSelection = null;
+          overlayCanvas.style.pointerEvents = "none";
+          updateValueLabels();
+          updateToggleButtons();
+          render();
+        }
+
+        function applyCrop() {
+          if (!originalImage || !cropSelection) {
+            alert("حدد منطقة القص أولاً / Select crop area first");
+            return;
+          }
+
+          if (cropSelection.w < 5 || cropSelection.h < 5) {
+            alert("منطقة القص صغيرة جدًا / Crop area is too small");
+            return;
+          }
+
+          const transformed = buildTransformedCanvas();
+          const cropCanvas = document.createElement("canvas");
+          cropCanvas.width = Math.round(cropSelection.w);
+          cropCanvas.height = Math.round(cropSelection.h);
+          const cctx = cropCanvas.getContext("2d");
+
+          cctx.drawImage(
+            transformed,
+            cropSelection.x,
+            cropSelection.y,
+            cropSelection.w,
+            cropSelection.h,
+            0,
+            0,
+            cropCanvas.width,
+            cropCanvas.height,
+          );
+
+          state.rotate = 0;
+          state.flipH = false;
+          state.flipV = false;
+          document.getElementById("rotate").value = 0;
+          cropSelection = null;
+          state.cropMode = false;
+          overlayCanvas.style.pointerEvents = "none";
+          updateValueLabels();
+          updateToggleButtons();
+          setImageFromDataUrl(cropCanvas.toDataURL("image/png"));
+        }
+
+        function initEvents() {
+          fileInput.addEventListener("change", (event) => {
+            loadImageFile(event.target.files[0]);
+          });
+
+          ["dragenter", "dragover"].forEach((evt) => {
+            uploadZone.addEventListener(evt, (event) => {
+              event.preventDefault();
+              uploadZone.classList.add("dragover");
+            });
+          });
+
+          ["dragleave", "drop"].forEach((evt) => {
+            uploadZone.addEventListener(evt, (event) => {
+              event.preventDefault();
+              uploadZone.classList.remove("dragover");
+            });
+          });
+
+          uploadZone.addEventListener("drop", (event) => {
+            const file = event.dataTransfer.files[0];
+            loadImageFile(file);
+          });
+
+          document.addEventListener("paste", (event) => {
+            handlePasteEvent(event);
+          });
+
+          window.addEventListener("paste", (event) => {
+            handlePasteEvent(event);
+          });
+
+          window.addEventListener("keydown", async (event) => {
+            const isPasteShortcut = (event.ctrlKey || event.metaKey) &&
+              String(event.key).toLowerCase() === "v";
+
+            if (!isPasteShortcut || isEditableElement(event.target)) return;
+
+            const loadedFromApi = await readClipboardImageViaApi();
+            if (loadedFromApi) {
+              event.preventDefault();
+              return;
+            }
+
+            // Fallback path for non-secure contexts to ensure paste target exists.
+            pasteCatcher.focus();
+            setTimeout(() => pasteCatcher.blur(), 100);
+          });
+
+          document.getElementById("pasteImageBtn").addEventListener("click", async () => {
+            const loaded = await readClipboardImageViaApi();
+            if (loaded) return;
+
+            alert("استخدم Ctrl+V بعد التركيز على الصفحة، أو امنح إذن الحافظة للمتصفح / Use Ctrl+V with page focus or allow clipboard permission.");
+          });
+
+          document.getElementById("toggleSepia").addEventListener("click", () => {
+            state.sepia = !state.sepia;
+            updateToggleButtons();
+            render();
+          });
+
+          document.getElementById("toggleGray").addEventListener("click", () => {
+            state.gray = !state.gray;
+            updateToggleButtons();
+            render();
+          });
+
+          document.getElementById("flipH").addEventListener("click", () => {
+            state.flipH = !state.flipH;
+            updateToggleButtons();
+            render();
+          });
+
+          document.getElementById("flipV").addEventListener("click", () => {
+            state.flipV = !state.flipV;
+            updateToggleButtons();
+            render();
+          });
+
+          document.getElementById("rotateLeft").addEventListener("click", () => {
+            state.rotate = Math.max(-180, state.rotate - 90);
+            document.getElementById("rotate").value = state.rotate;
+            updateValueLabels();
+            render();
+          });
+
+          document.getElementById("rotateRight").addEventListener("click", () => {
+            state.rotate = Math.min(180, state.rotate + 90);
+            document.getElementById("rotate").value = state.rotate;
+            updateValueLabels();
+            render();
+          });
+
+          document.getElementById("cropMode").addEventListener("click", () => {
+            if (!originalImage) return;
+            state.cropMode = !state.cropMode;
+            cropSelection = null;
+            overlayCanvas.style.pointerEvents = state.cropMode ? "auto" : "none";
+            updateToggleButtons();
+            drawCropOverlay();
+          });
+
+          document.getElementById("cancelCrop").addEventListener("click", () => {
+            state.cropMode = false;
+            cropSelection = null;
+            overlayCanvas.style.pointerEvents = "none";
+            updateToggleButtons();
+            drawCropOverlay();
+          });
+
+          document.getElementById("applyCrop").addEventListener("click", applyCrop);
+
+          overlayCanvas.addEventListener("mousedown", (event) => {
+            if (!state.cropMode || !originalImage) return;
+            isDraggingCrop = true;
+            cropStart = getCanvasPoint(event);
+            cropSelection = { x: cropStart.x, y: cropStart.y, w: 0, h: 0 };
+            drawCropOverlay();
+          });
+
+          overlayCanvas.addEventListener("mousemove", (event) => {
+            if (!isDraggingCrop || !state.cropMode) return;
+            const point = getCanvasPoint(event);
+            cropSelection = normalizeRect(cropStart, point);
+            drawCropOverlay();
+          });
+
+          window.addEventListener("mouseup", () => {
+            isDraggingCrop = false;
+          });
+
+          document.getElementById("beforeAfter").addEventListener("click", () => {
+            state.showOriginal = !state.showOriginal;
+            updateToggleButtons();
+            render();
+          });
+
+          document.getElementById("resetAll").addEventListener("click", () => {
+            if (!originalImage) return;
+            resetAdjustments();
+          });
+
+          document.getElementById("downloadPng").addEventListener("click", () => {
+            if (!originalImage) {
+              alert("ارفع صورة أولاً / Upload an image first");
+              return;
+            }
+            const link = document.createElement("a");
+            link.href = imageCanvas.toDataURL("image/png");
+            link.download = "pro-image-editor-output.png";
+            link.click();
+          });
+        }
+
+        bindRanges();
+        initEvents();
+        updateToggleButtons();
+        overlayCanvas.style.pointerEvents = "none";
+
+        window.addEventListener("resize", () => {
+          if (originalImage) {
+            fitCanvasDisplaySize();
+            drawCropOverlay();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
