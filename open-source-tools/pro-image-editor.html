@@ -81,6 +81,9 @@
       }
 
       .upload-zone {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
         border: 2px dashed rgba(88, 166, 255, 0.55);
         border-radius: 14px;
         padding: 16px;
@@ -219,6 +222,10 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+      }
+
+      .upload-actions {
+        justify-content: center;
       }
 
       .btn-tool {
@@ -369,7 +376,7 @@
                 tabindex="-1"
               ></textarea>
 
-              <div class="btn-row" style="margin-bottom: 12px">
+              <div class="btn-row upload-actions" style="margin-bottom: 12px">
                 <button class="btn-tool secondary" id="pasteImageBtn" type="button">
                   Paste Image / لصق صورة
                 </button>
@@ -633,6 +640,7 @@
         let cropSelection = null;
         let isDraggingCrop = false;
         let cropStart = null;
+        const beforeAfterBtn = document.getElementById("beforeAfter");
 
         function clamp(v) {
           return Math.max(0, Math.min(255, v));
@@ -947,7 +955,33 @@
           document.getElementById("flipH").classList.toggle("active", state.flipH);
           document.getElementById("flipV").classList.toggle("active", state.flipV);
           document.getElementById("cropMode").classList.toggle("active", state.cropMode);
-          document.getElementById("beforeAfter").classList.toggle("active", state.showOriginal);
+          beforeAfterBtn.classList.toggle("active", state.showOriginal);
+          beforeAfterBtn.textContent = state.showOriginal
+            ? "Showing Before / عرض قبل التعديل"
+            : "Before / After";
+        }
+
+        function hasAnyEdits() {
+          return (
+            state.red !== 100 ||
+            state.green !== 100 ||
+            state.blue !== 100 ||
+            state.hue !== 0 ||
+            state.brightness !== 100 ||
+            state.contrast !== 100 ||
+            state.saturation !== 100 ||
+            state.exposure !== 0 ||
+            state.blur !== 0 ||
+            state.sharpen !== 0 ||
+            state.noise !== 0 ||
+            state.vigIntensity !== 0 ||
+            state.vigSpread !== 65 ||
+            state.rotate !== 0 ||
+            state.flipH ||
+            state.flipV ||
+            state.sepia ||
+            state.gray
+          );
         }
 
         function resetAdjustments() {
@@ -1160,11 +1194,37 @@
             isDraggingCrop = false;
           });
 
-          document.getElementById("beforeAfter").addEventListener("click", () => {
+          beforeAfterBtn.addEventListener("click", () => {
+            if (!originalImage) return;
+            if (!hasAnyEdits()) {
+              alert("لا توجد تعديلات للمقارنة حالياً / No edits yet to compare.");
+              return;
+            }
             state.showOriginal = !state.showOriginal;
             updateToggleButtons();
             render();
           });
+
+          const holdStart = () => {
+            if (!originalImage || !hasAnyEdits()) return;
+            state.showOriginal = true;
+            updateToggleButtons();
+            render();
+          };
+
+          const holdEnd = () => {
+            if (!originalImage || !hasAnyEdits()) return;
+            state.showOriginal = false;
+            updateToggleButtons();
+            render();
+          };
+
+          beforeAfterBtn.addEventListener("mousedown", holdStart);
+          beforeAfterBtn.addEventListener("mouseup", holdEnd);
+          beforeAfterBtn.addEventListener("mouseleave", holdEnd);
+          beforeAfterBtn.addEventListener("touchstart", holdStart, { passive: true });
+          beforeAfterBtn.addEventListener("touchend", holdEnd);
+          beforeAfterBtn.addEventListener("touchcancel", holdEnd);
 
           document.getElementById("resetAll").addEventListener("click", () => {
             if (!originalImage) return;
