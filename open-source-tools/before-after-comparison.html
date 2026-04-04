@@ -520,7 +520,139 @@
         transform-origin: top left;
         will-change: transform;
         pointer-events: none;
+        max-width: 100vw;
       }
+
+      /* In single-view modes, hide the unused side completely to prevent bleed-through */
+      #comparison-overlay.mode-before #after-side { visibility: hidden; }
+      #comparison-overlay.mode-after  #before-side { visibility: hidden; }
+
+      /* ============================
+         AUTO SCROLL BUTTON
+      ============================ */
+      #auto-scroll-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.92rem;
+        cursor: pointer;
+        transition: all 0.22s ease;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      #auto-scroll-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+        font-family: "Cairo", sans-serif;
+      }
+
+      #auto-scroll-btn:hover::after { opacity: 1; }
+
+      #auto-scroll-btn:hover {
+        transform: translateY(-2px) scale(1.1);
+        background: rgba(255,255,255,0.18);
+        color: white;
+        border-color: rgba(255,255,255,0.3);
+      }
+
+      #auto-scroll-btn.playing {
+        background: rgba(251,191,36,0.55);
+        border-color: rgba(251,191,36,0.5);
+        color: white;
+        box-shadow: 0 3px 12px rgba(251,191,36,0.4);
+      }
+
+      #auto-scroll-btn.playing:hover {
+        background: rgba(251,191,36,0.8);
+      }
+
+      /* Speed control buttons */
+      .scroll-speed-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.13);
+        background: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        position: relative;
+        line-height: 1;
+      }
+
+      .scroll-speed-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+        font-family: "Cairo", sans-serif;
+      }
+
+      .scroll-speed-btn:hover::after { opacity: 1; }
+
+      .scroll-speed-btn:hover {
+        background: rgba(255,255,255,0.16);
+        color: white;
+        border-color: rgba(255,255,255,0.28);
+        transform: scale(1.1);
+      }
+
+      .scroll-speed-btn:disabled {
+        opacity: 0.22;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      /* Speed badge */
+      #scroll-speed-badge {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.5);
+        min-width: 26px;
+        text-align: center;
+        font-family: monospace;
+        letter-spacing: 0.5px;
+        user-select: none;
+        transition: color 0.2s ease;
+      }
+
+      #scroll-speed-badge.fast { color: rgba(251,191,36,0.95); }
+      #scroll-speed-badge.slow { color: rgba(148,163,184,0.8); }
 
       /* ============================
          SIDE LABELS
@@ -1353,6 +1485,14 @@
         <button class="overlay-btn reset" onclick="resetAll()" title="صور جديدة">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
         </button>
+        <div class="ctrl-sep"></div>
+        <button class="scroll-speed-btn" id="scroll-slower-btn" onclick="changeScrollSpeed(-1)" title="تبطيء السرعة">−</button>
+        <span id="scroll-speed-badge">×1</span>
+        <button class="scroll-speed-btn" id="scroll-faster-btn" onclick="changeScrollSpeed(+1)" title="تسريع السرعة">+</button>
+        <div class="ctrl-sep"></div>
+        <button id="auto-scroll-btn" onclick="toggleAutoScroll()" title="تمرير تلقائي">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
       </div>
 
     </div>
@@ -1641,6 +1781,7 @@
          RESET ALL
       ================================================ */
       function resetAll() {
+        stopAutoScroll();
         beforeDataURL = null;
         afterDataURL = null;
         beforeRenderedH = 0;
@@ -1721,8 +1862,15 @@
       ================================================ */
       let viewMode = 'split'; // 'before' | 'split' | 'after'
 
-      function setViewMode(mode) {
+      // keepScroll=true → do NOT reset scroll to top (used by auto-scroll internally)
+      function setViewMode(mode, keepScroll) {
         viewMode = mode;
+
+        // Reset scroll to top unless explicitly told to keep it
+        if (!keepScroll) {
+          scrollOffset = 0;
+          applyScroll();
+        }
 
         // Update active button
         document.querySelectorAll('.view-mode-btn').forEach(function(btn) {
@@ -1730,6 +1878,7 @@
         });
         document.querySelector('.view-mode-btn.mode-' + mode).classList.add('active');
 
+        const overlay      = document.getElementById('comparison-overlay');
         const dividerLine  = document.getElementById('divider-line');
         const afterSide    = document.getElementById('after-side');
         const beforeSide   = document.getElementById('before-side');
@@ -1738,8 +1887,9 @@
         const centerBtnEl  = document.getElementById('center-btn');
 
         if (mode === 'before') {
-          // Show only before image — move divider fully to the right
-          document.getElementById('comparison-overlay').classList.remove('mode-after');
+          // Show only before image
+          overlay.classList.remove('mode-after');
+          overlay.classList.add('mode-before');
           dividerLine.style.display  = 'none';
           afterSide.style.clipPath   = 'inset(0 0 0 100%)';
           beforeLabel.style.opacity  = '1';
@@ -1748,6 +1898,7 @@
           centerBtnEl.style.pointerEvents = 'none';
           stopSparkles();
         } else if (mode === 'after') {
+          overlay.classList.remove('mode-before');
           // Cinematic reveal then show after image
           triggerAfterReveal();
           dividerLine.style.display  = 'none';
@@ -1758,8 +1909,10 @@
           centerBtnEl.style.pointerEvents = 'none';
         } else {
           // Split comparison mode
-          document.getElementById('comparison-overlay').classList.remove('mode-after');
+          overlay.classList.remove('mode-after');
+          overlay.classList.remove('mode-before');
           dividerLine.style.display  = 'block';
+          afterSide.style.clipPath   = '';
           beforeLabel.style.opacity  = '1';
           afterLabel.style.opacity   = '1';
           centerBtnEl.style.opacity  = '1';
@@ -1939,6 +2092,8 @@
       document.addEventListener("mousedown", function (e) {
         const overlay = document.getElementById("comparison-overlay");
         if (overlay.style.display === "none") return;
+        // Stop auto-scroll on any manual interaction (except the auto-scroll button itself)
+        if (!e.target.closest('#auto-scroll-btn')) stopAutoScroll();
         // Only drag in split mode
         if (viewMode !== 'split') return;
         // Don't intercept button clicks in controls bar
@@ -1975,6 +2130,8 @@
         function (e) {
           const overlay = document.getElementById("comparison-overlay");
           if (overlay.style.display === "none") return;
+          // Stop auto-scroll on manual touch (except the auto-scroll button itself)
+          if (!e.target.closest('#auto-scroll-btn')) stopAutoScroll();
           if (viewMode !== 'split') return;
           if (e.target.closest(".overlay-controls")) return;
           if (e.target.closest(".view-mode-bar")) return;
@@ -2113,6 +2270,132 @@
         scrollOffset = Math.min(scrollOffset, maxScroll);
         applyScroll();
       });
+
+      /* ================================================
+         AUTO SCROLL
+      ================================================ */
+      let autoScrollRAF = null;
+      let autoScrollPhase = 'idle'; // 'idle' | 'before' | 'after'
+
+      // Speed levels (px per frame at ~60fps)
+      const SPEED_LEVELS = [0.4, 0.8, 1.5, 2.8, 5.0];
+      const SPEED_LABELS = ['×¼', '×½', '×1', '×2', '×3'];
+      let scrollSpeedIdx = 2; // default: 1.5
+
+      function currentScrollSpeed() {
+        return SPEED_LEVELS[scrollSpeedIdx];
+      }
+
+      function changeScrollSpeed(delta) {
+        scrollSpeedIdx = Math.max(0, Math.min(SPEED_LEVELS.length - 1, scrollSpeedIdx + delta));
+        updateSpeedBadge();
+      }
+
+      function updateSpeedBadge() {
+        const badge     = document.getElementById('scroll-speed-badge');
+        const slowerBtn = document.getElementById('scroll-slower-btn');
+        const fasterBtn = document.getElementById('scroll-faster-btn');
+        if (!badge) return;
+        badge.textContent = SPEED_LABELS[scrollSpeedIdx];
+        badge.className   = scrollSpeedIdx > 2 ? 'fast' : scrollSpeedIdx < 2 ? 'slow' : '';
+        if (slowerBtn) slowerBtn.disabled = (scrollSpeedIdx === 0);
+        if (fasterBtn) fasterBtn.disabled = (scrollSpeedIdx === SPEED_LEVELS.length - 1);
+      }
+
+      // Init badge on load
+      document.addEventListener('DOMContentLoaded', function() { updateSpeedBadge(); });
+
+      function toggleAutoScroll() {
+        if (autoScrollRAF) {
+          stopAutoScroll();
+          return;
+        }
+        startAutoScroll();
+      }
+
+      function startAutoScroll() {
+        // If currently in 'after' mode → scroll browser page to top, then stop
+        if (viewMode === 'after') {
+          stopAutoScroll();
+          document.getElementById('comparison-overlay').style.display = 'none';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        // Start from 'before' phase: switch to before-only, reset scroll to top
+        setViewMode('before');  // resets scroll via keepScroll=false (default)
+        autoScrollPhase = 'before';
+
+        const btn = document.getElementById('auto-scroll-btn');
+        btn.classList.add('playing');
+        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+        btn.title = 'إيقاف التمرير';
+
+        function step() {
+          const currentMax = autoScrollPhase === 'before' ? beforeScrollMax() : afterScrollMax();
+          scrollOffset += currentScrollSpeed();
+
+          if (scrollOffset >= currentMax) {
+            scrollOffset = currentMax;
+            applyScroll();
+
+            if (autoScrollPhase === 'before') {
+              // Finished scrolling before → switch to after-only
+              autoScrollPhase = 'after';
+              setViewMode('after', true); // keepScroll=true: we manage scroll ourselves
+              scrollOffset = 0;
+              applyScroll();
+              // Use a sentinel value (-1) so stopAutoScroll knows we're between phases
+              autoScrollRAF = -1;
+              // Brief pause then continue scrolling after
+              setTimeout(function () {
+                if (autoScrollRAF !== null) {
+                  autoScrollRAF = requestAnimationFrame(step);
+                }
+              }, 900);
+              return;
+            } else {
+              // Finished scrolling after → stop
+              stopAutoScroll();
+              return;
+            }
+          }
+
+          applyScroll();
+          autoScrollRAF = requestAnimationFrame(step);
+        }
+
+        autoScrollRAF = requestAnimationFrame(step);
+      }
+
+      function stopAutoScroll() {
+        if (autoScrollRAF && autoScrollRAF !== -1) {
+          cancelAnimationFrame(autoScrollRAF);
+        }
+        autoScrollRAF = null;
+        autoScrollPhase = 'idle';
+        const btn = document.getElementById('auto-scroll-btn');
+        if (btn) {
+          btn.classList.remove('playing');
+          btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+          btn.title = 'تمرير تلقائي';
+        }
+      }
+
+      function beforeScrollMax() {
+        return Math.max(0, beforeRenderedH - window.innerHeight);
+      }
+
+      function afterScrollMax() {
+        return Math.max(0, afterRenderedH - window.innerHeight);
+      }
+
+      // Stop auto-scroll if user manually scrolls or interacts (but not the auto-scroll button itself)
+      document.addEventListener('wheel', function(e) {
+        const overlay = document.getElementById('comparison-overlay');
+        if (!overlay || overlay.style.display !== 'block') return;
+        if (autoScrollRAF) stopAutoScroll();
+      }, { passive: true, capture: true });
 
       /* ================================================
          KEY HINT TOGGLE
