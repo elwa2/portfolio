@@ -11,3 +11,34 @@
  portfolio\open-source-tools\index.html
 
  شغل كل الميزات كاملة ولا تضع شي قريبا ابدا 
+
+
+
+
+
+
+You are an expert front-end developer specializing in interactive UI components. Build a single self-contained HTML file with all CSS and JavaScript inline.
+
+**What to build:** A full-screen before/after website screenshot comparison tool with the following behavior:
+
+**Paste functionality:**
+- The user can paste images using `Ctrl+V` anywhere on the page
+- The first paste sets the **"Before"** image, the second paste sets the **"After"** image
+- Show a clear visual prompt guiding the user to paste each image in order (e.g., "الصق صورة قبل" then "الصق صورة بعد")
+
+**Comparison viewer:**
+- Both images fill the entire viewport (100vw × 100vh) — no borders, no scrollbars, full bleed
+- A vertical **draggable divider** splits the screen left/right between Before and After
+- The divider can be dragged with the mouse from **anywhere on the screen** (not just the handle) — clicking and dragging left/right anywhere updates the split position in real time
+- The divider handle should be visually prominent (e.g., a circle with arrows ◀▶)
+
+**Scroll behavior:**
+- Scrolling the mouse wheel **up/down** pans both images vertically in sync, simulating scrolling through the full webpage screenshot
+- The images should be sized so their **width fills the viewport** and their full height is accessible via this vertical scroll — like scrolling through a real website
+
+**Technical requirements:**
+- Pure HTML/CSS/JS — no external libraries or CDN dependencies
+- All logic in one file, no build step required
+- Smooth drag and scroll transitions
+- Works in modern browsers (Chrome/Edge/Firefox)
+- Use `object-fit: none` and CSS transforms or `background-position` to handle large tall images correctly so the scroll pans through them naturally

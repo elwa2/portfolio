@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مقارنة قبل وبعد للمواقع | Ali Ahmed</title>
+    <meta
+      name="description"
+      content="أداة مقارنة قبل وبعد للمواقع - الصق لقطات شاشة المواقع وقارن بينها بسحب المقسّم التفاعلي. مثالية لعرض التحسينات لعملائك."
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      /* ============================
+         TOOL PAGE LAYOUT
+      ============================ */
+      .tool-page-wrapper {
+        padding: 50px 0 100px;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      #three-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* ============================
+         TOOL HEADER
+      ============================ */
+      .tool-header-section {
+        text-align: center;
+        margin-bottom: 55px;
+      }
+
+      .tool-icon-large {
+        width: 85px;
+        height: 85px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        color: white;
+        margin: 0 auto 28px;
+        box-shadow: 0 12px 35px rgba(var(--primary-rgb), 0.35);
+        transition: transform 0.3s ease;
+      }
+
+      .tool-icon-large:hover {
+        transform: rotate(5deg) scale(1.05);
+      }
+
+      .tool-header-section h1 {
+        font-size: 2.6rem;
+        color: var(--primary-color);
+        margin-bottom: 18px;
+        font-weight: 800;
+      }
+
+      .tool-header-section p {
+        color: var(--text-color-light);
+        font-size: 1.05rem;
+        max-width: 640px;
+        margin: 0 auto;
+        line-height: 1.8;
+      }
+
+      /* ============================
+         INSTRUCTIONS BOX
+      ============================ */
+      .instructions-box {
+        max-width: 900px;
+        margin: 0 auto 45px;
+        background: var(--card-bg);
+        border-radius: 18px;
+        padding: 28px 35px;
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+      }
+
+      .instructions-box .icon {
+        font-size: 1.6rem;
+        color: var(--primary-color);
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .instructions-box h4 {
+        font-size: 1.05rem;
+        color: var(--text-color);
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      .instructions-box ul {
+        padding-right: 22px;
+        color: var(--text-color-light);
+        font-size: 0.92rem;
+        line-height: 2;
+        margin: 0;
+      }
+
+      .instructions-box ul li strong {
+        color: var(--primary-color);
+      }
+
+      kbd {
+        background: rgba(var(--primary-rgb), 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.25);
+        border-radius: 5px;
+        padding: 2px 7px;
+        font-size: 0.82rem;
+        font-family: monospace;
+        color: var(--primary-color);
+        font-weight: 700;
+      }
+
+      /* ============================
+         PASTE STEPS
+      ============================ */
+      .paste-steps {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        max-width: 900px;
+        margin: 0 auto 30px;
+      }
+
+      @media (max-width: 680px) {
+        .paste-steps {
+          grid-template-columns: 1fr;
+        }
+        .tool-header-section h1 {
+          font-size: 1.9rem;
+        }
+      }
+
+      .paste-step {
+        background: var(--card-bg);
+        border-radius: 22px;
+        padding: 42px 30px 32px;
+        text-align: center;
+        border: 2px dashed rgba(var(--primary-rgb), 0.22);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        cursor: default;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      }
+
+      .paste-step.waiting {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      .paste-step.active {
+        border-color: var(--primary-color);
+        border-style: solid;
+        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.08),
+          0 15px 40px rgba(var(--primary-rgb), 0.15);
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+
+      .paste-step.done {
+        border-color: #22c55e;
+        border-style: solid;
+        background: rgba(34, 197, 94, 0.04);
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.12);
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.08),
+            0 15px 40px rgba(var(--primary-rgb), 0.15);
+        }
+        50% {
+          box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0.04),
+            0 15px 40px rgba(var(--primary-rgb), 0.22);
+        }
+      }
+
+      .step-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        color: white;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .paste-step.done .step-badge {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+      }
+
+      .paste-step.waiting .step-badge {
+        background: var(--text-color-light);
+      }
+
+      .paste-step-icon {
+        font-size: 3.2rem;
+        margin-bottom: 18px;
+        color: var(--primary-color);
+        transition: transform 0.3s ease;
+      }
+
+      .paste-step.active .paste-step-icon {
+        animation: bounce-icon 1.5s ease-in-out infinite;
+      }
+
+      .paste-step.done .paste-step-icon {
+        color: #22c55e;
+      }
+
+      @keyframes bounce-icon {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+
+      .paste-step h3 {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .paste-step p {
+        color: var(--text-color-light);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .step-preview-thumb {
+        width: 100%;
+        max-height: 110px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-top: 18px;
+        display: none;
+        border: 2px solid rgba(34, 197, 94, 0.3);
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15);
+      }
+
+      .paste-step.done .step-preview-thumb {
+        display: block;
+      }
+
+      /* File picker button */
+      .pick-file-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 18px;
+        padding: 11px 26px;
+        border-radius: 30px;
+        border: none;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        color: white;
+        font-weight: 700;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.88rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 18px rgba(var(--primary-rgb), 0.28);
+        position: relative;
+        z-index: 2;
+      }
+
+      .pick-file-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(var(--primary-rgb), 0.4);
+      }
+
+      .paste-step.waiting .pick-file-btn {
+        background: rgba(128, 128, 128, 0.35);
+        box-shadow: none;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .paste-step.done .pick-file-btn {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        box-shadow: 0 5px 18px rgba(34, 197, 94, 0.25);
+      }
+
+      .step-divider {
+        width: 80%;
+        height: 1px;
+        background: rgba(var(--primary-rgb), 0.15);
+        margin: 16px auto 0;
+      }
+
+      /* Drag-over highlight */
+      .paste-step.drag-over {
+        border-color: var(--secondary-purple) !important;
+        border-style: solid !important;
+        background: rgba(139, 92, 246, 0.06) !important;
+        transform: scale(1.02);
+      }
+
+      /* ============================
+         STATUS BAR
+      ============================ */
+      #status-bar {
+        max-width: 900px;
+        margin: 20px auto 0;
+        padding: 18px 25px;
+        border-radius: 14px;
+        background: rgba(34, 197, 94, 0.08);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+        text-align: center;
+        color: #16a34a;
+        font-weight: 700;
+        display: none;
+        font-size: 1rem;
+      }
+
+      /* ============================
+         ACTION BUTTONS
+      ============================ */
+      .tool-actions {
+        text-align: center;
+        margin-top: 30px;
+        display: none;
+      }
+
+      .btn-tool {
+        padding: 15px 38px;
+        border-radius: 14px;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Cairo", sans-serif;
+        font-size: 1rem;
+        margin: 0 8px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 5px 18px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .btn-tool:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.4);
+      }
+
+      .btn-tool.danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 5px 18px rgba(239, 68, 68, 0.3);
+      }
+
+      .btn-tool.danger:hover {
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+      }
+
+      /* ============================
+         FEATURES ROW
+      ============================ */
+      .features-row {
+        display: flex;
+        gap: 20px;
+        max-width: 900px;
+        margin: 50px auto 0;
+        flex-wrap: wrap;
+      }
+
+      .feature-chip {
+        flex: 1;
+        min-width: 180px;
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 22px 20px;
+        text-align: center;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .feature-chip:hover {
+        transform: translateY(-4px);
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.12);
+      }
+
+      .feature-chip .chip-icon {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+      }
+
+      .feature-chip h4 {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 5px;
+      }
+
+      .feature-chip p {
+        font-size: 0.8rem;
+        color: var(--text-color-light);
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      /* ============================
+         COMPARISON OVERLAY (FULL SCREEN)
+      ============================ */
+      #comparison-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        display: none;
+        cursor: col-resize;
+        user-select: none;
+        -webkit-user-select: none;
+        background: #0a0a0a;
+        overflow: hidden;
+      }
+
+      .compare-side {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #before-side {
+        z-index: 1;
+      }
+
+      #after-side {
+        z-index: 2;
+      }
+
+      .compare-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        display: block;
+        transform-origin: top left;
+        will-change: transform;
+        pointer-events: none;
+      }
+
+      /* ============================
+         SIDE LABELS
+      ============================ */
+      .side-label {
+        position: absolute;
+        top: 22px;
+        padding: 9px 22px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 1rem;
+        color: white;
+        z-index: 5;
+        pointer-events: none;
+        letter-spacing: 1px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.55);
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: opacity 0.3s ease;
+      }
+
+      #before-label {
+        left: 22px;
+      }
+
+      #after-label {
+        right: 22px;
+      }
+
+      #before-label::before {
+        content: "⬅";
+        font-size: 0.8rem;
+      }
+
+      #after-label::after {
+        content: "➡";
+        font-size: 0.8rem;
+      }
+
+      /* ============================
+         DIVIDER
+      ============================ */
+      #divider-line {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: white;
+        z-index: 10;
+        transform: translateX(-50%);
+        pointer-events: none;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.6), 0 0 5px rgba(255, 255, 255, 0.8);
+        transition: left 0.05s ease-out;
+        will-change: left;
+      }
+
+      #divider-handle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 58px;
+        height: 58px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        color: #222;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.3);
+        cursor: col-resize;
+        z-index: 11;
+        pointer-events: none;
+        gap: 4px;
+        font-weight: 900;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      #comparison-overlay:active #divider-handle {
+        transform: translate(-50%, -50%) scale(1.12);
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(255, 255, 255, 0.4);
+      }
+
+      /* ============================
+         SCROLL PROGRESS BAR
+      ============================ */
+      #scroll-progress-bar {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 55vh;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      #scroll-thumb-el {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.65);
+        border-radius: 3px;
+        position: absolute;
+        top: 0;
+        min-height: 28px;
+        transition: top 0.08s ease;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      }
+
+      /* ============================
+         SCROLL HINT
+      ============================ */
+      #scroll-hint {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.65);
+        color: white;
+        padding: 9px 20px;
+        border-radius: 30px;
+        font-size: 0.83rem;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        opacity: 1;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        white-space: nowrap;
+      }
+
+      /* ============================
+         SHORTCUT HINT (bottom-left)
+      ============================ */
+      #key-hint {
+        position: absolute;
+        bottom: 95px;
+        left: 22px;
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.55);
+        color: rgba(255, 255, 255, 0.7);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        backdrop-filter: blur(5px);
+        pointer-events: none;
+        line-height: 2;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* ============================
+         OVERLAY CONTROLS (bottom center)
+      ============================ */
+      .overlay-controls {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 25;
+        display: flex;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 50px;
+        padding: 10px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      }
+
+      .overlay-btn {
+        padding: 10px 22px;
+        border-radius: 30px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Cairo", sans-serif;
+        font-size: 0.88rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+      }
+
+      .overlay-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .overlay-btn.swap {
+        background: linear-gradient(
+          135deg,
+          rgba(139, 92, 246, 0.75),
+          rgba(109, 40, 217, 0.75)
+        );
+        color: white;
+        border: 1px solid rgba(139, 92, 246, 0.4);
+      }
+
+      .overlay-btn.swap:hover {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(109, 40, 217, 0.95));
+        box-shadow: 0 5px 18px rgba(139, 92, 246, 0.4);
+      }
+
+      .overlay-btn.reset {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+
+      .overlay-btn.reset:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .overlay-btn.center-btn {
+        background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.7), rgba(var(--primary-rgb), 0.9));
+        color: white;
+        border: 1px solid rgba(var(--primary-rgb), 0.3);
+      }
+
+      .overlay-btn.center-btn:hover {
+        background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.9), rgba(var(--primary-rgb), 1));
+        box-shadow: 0 5px 18px rgba(var(--primary-rgb), 0.4);
+      }
+
+      /* ============================
+         ZOOM INDICATOR
+      ============================ */
+      #zoom-indicator {
+        position: absolute;
+        top: 22px;
+        right: 160px;
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.55);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        display: none;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* ============================
+         DIVIDER PERCENTAGE BADGE
+      ============================ */
+      #divider-pct-badge {
+        position: absolute;
+        top: -38px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        color: #222;
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        pointer-events: none;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      #comparison-overlay.is-dragging #divider-pct-badge {
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >🖥️</div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >⚖️</div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >🔍</div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >✨</div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >📸</div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >🎯</div>
+    </div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== TOOL PAGE ==================== -->
+    <div class="tool-page-wrapper">
+      <div class="container">
+
+        <!-- Header Section -->
+        <div class="tool-header-section">
+          <div class="tool-icon-large">⚖️</div>
+          <h1>مقارنة قبل وبعد للمواقع</h1>
+          <p>
+            الصق لقطات شاشة موقعك قبل وبعد التعديل وقارن بينهما بسحب المقسّم
+            التفاعلي — مثالية لعرض التحسينات لعملائك بطريقة احترافية ومؤثرة.
+          </p>
+        </div>
+
+        <!-- Instructions Box -->
+        <div class="instructions-box">
+          <div class="icon"><i class="fas fa-info-circle"></i></div>
+          <div>
+            <h4>كيفية الاستخدام:</h4>
+            <ul>
+              <li>
+                خذ لقطة شاشة للموقع <strong>قبل</strong> التعديل ثم اضغط
+                <kbd>Ctrl+C</kbd> لنسخها
+              </li>
+              <li>
+                اضغط <kbd>Ctrl+V</kbd> في أي مكان على الصفحة لالصق صورة
+                <strong>قبل</strong>
+              </li>
+              <li>
+                كرر نفس الخطوة بصورة <strong>بعد</strong> التعديل
+              </li>
+              <li>
+                بعد الصقتين، تفتح أداة المقارنة تلقائياً في ملء الشاشة
+              </li>
+              <li>
+                اسحب من <strong>أي مكان</strong> لتحريك المقسّم •
+                <strong>عجلة الفأرة</strong> للتمرير عبر الصفحة كاملة •
+                مفاتيح <kbd>◀</kbd> <kbd>▶</kbd> للضبط الدقيق
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Paste Steps -->
+        <div class="paste-steps">
+          <!-- Hidden file inputs -->
+          <input type="file" id="before-file-input" accept="image/*" style="display:none" />
+          <input type="file" id="after-file-input"  accept="image/*" style="display:none" />
+
+          <!-- Step 1: Before -->
+          <div class="paste-step active" id="step1" tabindex="0">
+            <div class="step-badge">الخطوة ١</div>
+            <div class="paste-step-icon">
+              <i class="fas fa-clipboard"></i>
+            </div>
+            <h3>صورة قبل التعديل</h3>
+            <p>
+              اضغط <strong>Ctrl+V</strong> لالصق، أو اختر الصورة من جهازك
+            </p>
+            <button class="pick-file-btn" onclick="document.getElementById('before-file-input').click(); event.stopPropagation();">
+              <i class="fas fa-folder-open"></i> اختر صورة قبل
+            </button>
+            <div class="step-divider"></div>
+            <img
+              src=""
+              alt="معاينة قبل"
+              class="step-preview-thumb"
+              id="before-thumb"
+            />
+          </div>
+
+          <!-- Step 2: After -->
+          <div class="paste-step waiting" id="step2" tabindex="0">
+            <div class="step-badge">الخطوة ٢</div>
+            <div class="paste-step-icon">
+              <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3>صورة بعد التعديل</h3>
+            <p>
+              بعد الصق أو اختيار صورة قبل، اختر أو الصق صورة <strong>بعد</strong> التعديل
+            </p>
+            <button class="pick-file-btn" onclick="document.getElementById('after-file-input').click(); event.stopPropagation();">
+              <i class="fas fa-folder-open"></i> اختر صورة بعد
+            </button>
+            <div class="step-divider"></div>
+            <img
+              src=""
+              alt="معاينة بعد"
+              class="step-preview-thumb"
+              id="after-thumb"
+            />
+          </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="status-bar">
+          <i class="fas fa-check-circle"></i> تم تحميل كلتا الصورتين!
+          جاري فتح أداة المقارنة...
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="tool-actions" id="tool-actions">
+          <button class="btn-tool" onclick="openComparison()">
+            <i class="fas fa-eye"></i> فتح أداة المقارنة
+          </button>
+          <button class="btn-tool danger" onclick="resetAll()">
+            <i class="fas fa-redo"></i> البدء من جديد
+          </button>
+        </div>
+
+        <!-- Features Row -->
+        <div class="features-row">
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+            <h4>ملء الشاشة بالكامل</h4>
+            <p>عرض بدون حدود أو أشرطة تمرير</p>
+          </div>
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="fas fa-arrows-alt-h"></i></div>
+            <h4>سحب من أي مكان</h4>
+            <p>تحريك المقسّم بالنقر والسحب في أي موضع</p>
+          </div>
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="fas fa-mouse"></i></div>
+            <h4>تمرير متزامن</h4>
+            <p>عجلة الفأرة تُمرِّر كلتا الصورتين بتناسق تام</p>
+          </div>
+          <div class="feature-chip">
+            <div class="chip-icon"><i class="fas fa-exchange-alt"></i></div>
+            <h4>تبديل قبل/بعد</h4>
+            <p>اعكس الصورتين بضغطة واحدة</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== COMPARISON OVERLAY ==================== -->
+    <div id="comparison-overlay">
+
+      <!-- Before Side (behind) -->
+      <div class="compare-side" id="before-side">
+        <img id="before-img" class="compare-img" alt="قبل" />
+        <div class="side-label" id="before-label">قبل</div>
+      </div>
+
+      <!-- After Side (clipped to right of divider) -->
+      <div class="compare-side" id="after-side">
+        <img id="after-img" class="compare-img" alt="بعد" />
+        <div class="side-label" id="after-label">بعد</div>
+      </div>
+
+      <!-- Divider Line + Handle -->
+      <div id="divider-line">
+        <div id="divider-pct-badge">50%</div>
+        <div id="divider-handle">
+          <span>&#9664;</span>
+          <span>&#9654;</span>
+        </div>
+      </div>
+
+      <!-- Scroll Progress Bar -->
+      <div id="scroll-progress-bar">
+        <div id="scroll-thumb-el"></div>
+      </div>
+
+      <!-- Drag/Scroll Hint (auto-fades) -->
+      <div id="scroll-hint">
+        <i class="fas fa-hand-point-left"></i>
+        اسحب للمقارنة &nbsp;•&nbsp;
+        <i class="fas fa-mouse"></i>
+        عجلة الفأرة للتمرير
+      </div>
+
+      <!-- Keyboard Shortcuts Hint (bottom-left) -->
+      <div id="key-hint">
+        <div><kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:1px 6px;color:white;font-size:0.7rem;">◀ ▶</kbd> &nbsp;ضبط المقسّم</div>
+        <div><kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:1px 6px;color:white;font-size:0.7rem;">▲ ▼</kbd> &nbsp;التمرير</div>
+        <div><kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:1px 6px;color:white;font-size:0.7rem;">Esc</kbd> &nbsp;إغلاق</div>
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="overlay-controls">
+        <button class="overlay-btn center-btn" onclick="centerDivider()">
+          <i class="fas fa-align-center"></i> توسيط المقسّم
+        </button>
+        <button class="overlay-btn swap" onclick="swapImages()">
+          <i class="fas fa-exchange-alt"></i> تبديل قبل/بعد
+        </button>
+        <button class="overlay-btn reset" onclick="resetAll()">
+          <i class="fas fa-redo"></i> صور جديدة
+        </button>
+      </div>
+
+    </div>
+    <!-- /comparison-overlay -->
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات
+              تخصيص CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة
+              المستخدم وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy;
+            <span id="currentYear"></span> Ali Ahmed | أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+      /* ================================================
+         STATE
+      ================================================ */
+      let beforeDataURL = null;
+      let afterDataURL = null;
+      let beforeRenderedH = 0;   // image rendered height when width = 100vw
+      let afterRenderedH = 0;
+      let scrollOffset = 0;      // current vertical scroll in px
+      let maxScroll = 0;         // max scrollable distance
+      let dividerPct = 50;       // divider position 0-100%
+      let isDragging = false;
+
+      /* ================================================
+         PASTE HANDLER — Ctrl+V anywhere on page
+      ================================================ */
+      document.addEventListener("paste", function (e) {
+        if (!e.clipboardData) return;
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.startsWith("image/")) {
+            const blob = items[i].getAsFile();
+            if (!blob) continue;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+              handleImageData(ev.target.result);
+            };
+            reader.readAsDataURL(blob);
+            break; // only first image per paste
+          }
+        }
+      });
+
+      /* ================================================
+         DRAG & DROP on paste zones (alternative input)
+      ================================================ */
+      function setupDropZone(el, slot) {
+        el.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          el.classList.add("drag-over");
+        });
+        el.addEventListener("dragleave", function () {
+          el.classList.remove("drag-over");
+        });
+        el.addEventListener("drop", function (e) {
+          e.preventDefault();
+          el.classList.remove("drag-over");
+          const file = e.dataTransfer.files[0];
+          if (!file || !file.type.startsWith("image/")) return;
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            if (slot === "before" && !beforeDataURL) {
+              handleImageData(ev.target.result);
+            } else if (slot === "after" && beforeDataURL && !afterDataURL) {
+              handleImageData(ev.target.result);
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      setupDropZone(document.getElementById("step1"), "before");
+      setupDropZone(document.getElementById("step2"), "after");
+
+      /* ================================================
+         FILE INPUT HANDLERS
+      ================================================ */
+      document.getElementById("before-file-input").addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file || !file.type.startsWith("image/")) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          if (!beforeDataURL) handleImageData(ev.target.result);
+        };
+        reader.readAsDataURL(file);
+        this.value = ""; // reset so same file can be re-selected
+      });
+
+      document.getElementById("after-file-input").addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file || !file.type.startsWith("image/")) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          if (beforeDataURL && !afterDataURL) handleImageData(ev.target.result);
+        };
+        reader.readAsDataURL(file);
+        this.value = "";
+      });
+
+      /* ================================================
+         HANDLE IMAGE DATA (route to before/after)
+      ================================================ */
+      function handleImageData(dataURL) {
+        if (!beforeDataURL) {
+          beforeDataURL = dataURL;
+          loadBeforeImage(dataURL);
+        } else if (!afterDataURL) {
+          afterDataURL = dataURL;
+          loadAfterImage(dataURL);
+        }
+        // If both already set, ignore extra pastes
+      }
+
+      /* ================================================
+         LOAD BEFORE IMAGE
+      ================================================ */
+      function loadBeforeImage(dataURL) {
+        // Compute rendered height at 100vw
+        const img = new Image();
+        img.onload = function () {
+          const scale = window.innerWidth / img.naturalWidth;
+          beforeRenderedH = img.naturalHeight * scale;
+          document.getElementById("before-img").src = dataURL;
+          updateMaxScroll();
+        };
+        img.src = dataURL;
+
+        // UI: mark step 1 done, activate step 2
+        const step1 = document.getElementById("step1");
+        step1.classList.remove("active");
+        step1.classList.add("done");
+        step1.querySelector("h3").textContent = "✓ تم تحميل صورة قبل";
+
+        const thumb = document.getElementById("before-thumb");
+        thumb.src = dataURL;
+
+        const step2 = document.getElementById("step2");
+        step2.classList.remove("waiting");
+        step2.classList.add("active");
+      }
+
+      /* ================================================
+         LOAD AFTER IMAGE
+      ================================================ */
+      function loadAfterImage(dataURL) {
+        const img = new Image();
+        img.onload = function () {
+          const scale = window.innerWidth / img.naturalWidth;
+          afterRenderedH = img.naturalHeight * scale;
+          document.getElementById("after-img").src = dataURL;
+          updateMaxScroll();
+          // Auto-open comparison after brief visual feedback
+          setTimeout(openComparison, 700);
+        };
+        img.src = dataURL;
+
+        // UI: mark step 2 done
+        const step2 = document.getElementById("step2");
+        step2.classList.remove("active");
+        step2.classList.add("done");
+        step2.querySelector("h3").textContent = "✓ تم تحميل صورة بعد";
+
+        const thumb = document.getElementById("after-thumb");
+        thumb.src = dataURL;
+
+        // Show status + buttons
+        document.getElementById("status-bar").style.display = "block";
+        document.getElementById("tool-actions").style.display = "block";
+      }
+
+      /* ================================================
+         OPEN COMPARISON VIEWER
+      ================================================ */
+      function openComparison() {
+        const overlay = document.getElementById("comparison-overlay");
+        overlay.style.display = "block";
+
+        // Reset position
+        dividerPct = 50;
+        scrollOffset = 0;
+        applyDivider();
+        applyScroll();
+
+        // Auto-hide hint after 4 seconds
+        setTimeout(function () {
+          const hint = document.getElementById("scroll-hint");
+          if (hint) hint.style.opacity = "0";
+        }, 4000);
+      }
+
+      /* ================================================
+         RESET ALL
+      ================================================ */
+      function resetAll() {
+        beforeDataURL = null;
+        afterDataURL = null;
+        beforeRenderedH = 0;
+        afterRenderedH = 0;
+        scrollOffset = 0;
+        maxScroll = 0;
+        dividerPct = 50;
+
+        // Hide overlay
+        document.getElementById("comparison-overlay").style.display = "none";
+
+        // Clear images
+        document.getElementById("before-img").src = "";
+        document.getElementById("after-img").src = "";
+
+        // Reset step 1
+        const step1 = document.getElementById("step1");
+        step1.className = "paste-step active";
+        step1.querySelector("h3").textContent = "صورة قبل التعديل";
+        document.getElementById("before-thumb").src = "";
+
+        // Reset step 2
+        const step2 = document.getElementById("step2");
+        step2.className = "paste-step waiting";
+        step2.querySelector("h3").textContent = "صورة بعد التعديل";
+        document.getElementById("after-thumb").src = "";
+
+        // Hide status + buttons
+        document.getElementById("status-bar").style.display = "none";
+        document.getElementById("tool-actions").style.display = "none";
+
+        // Reset hint opacity
+        const hint = document.getElementById("scroll-hint");
+        if (hint) hint.style.opacity = "1";
+      }
+
+      /* ================================================
+         SWAP IMAGES (before ↔ after)
+      ================================================ */
+      function swapImages() {
+        // Swap data
+        const tmpURL = beforeDataURL;
+        beforeDataURL = afterDataURL;
+        afterDataURL = tmpURL;
+
+        const tmpH = beforeRenderedH;
+        beforeRenderedH = afterRenderedH;
+        afterRenderedH = tmpH;
+
+        // Apply to overlay images
+        document.getElementById("before-img").src = beforeDataURL;
+        document.getElementById("after-img").src = afterDataURL;
+
+        // Swap thumbnails
+        const bThumb = document.getElementById("before-thumb").src;
+        document.getElementById("before-thumb").src =
+          document.getElementById("after-thumb").src;
+        document.getElementById("after-thumb").src = bThumb;
+
+        updateMaxScroll();
+
+        // Brief flash animation on handle
+        const handle = document.getElementById("divider-handle");
+        handle.style.background = "var(--secondary-purple)";
+        handle.style.color = "white";
+        setTimeout(function () {
+          handle.style.background = "white";
+          handle.style.color = "#222";
+        }, 300);
+      }
+
+      /* ================================================
+         CENTER DIVIDER
+      ================================================ */
+      function centerDivider() {
+        dividerPct = 50;
+        applyDivider();
+      }
+
+      /* ================================================
+         APPLY DIVIDER POSITION
+      ================================================ */
+      function applyDivider() {
+        const dividerLine = document.getElementById("divider-line");
+        const afterSide = document.getElementById("after-side");
+        const badge = document.getElementById("divider-pct-badge");
+
+        // Position the divider line
+        dividerLine.style.left = dividerPct + "%";
+
+        // Clip after-side: show ONLY the portion to the right of dividerPct
+        // clip-path: inset(top right bottom left)
+        // inset(0 0 0 X%) = cut X% from the physical left → shows right (100-X)%
+        afterSide.style.clipPath = "inset(0 0 0 " + dividerPct + "%)";
+
+        // Update percentage badge
+        if (badge) badge.textContent = Math.round(dividerPct) + "%";
+      }
+
+      /* ================================================
+         UPDATE MAX SCROLL
+      ================================================ */
+      function updateMaxScroll() {
+        const tallest = Math.max(beforeRenderedH, afterRenderedH);
+        maxScroll = Math.max(0, tallest - window.innerHeight);
+        updateScrollProgressUI();
+      }
+
+      /* ================================================
+         APPLY SCROLL — pan both images vertically
+      ================================================ */
+      function applyScroll() {
+        const t = "translateY(-" + scrollOffset + "px)";
+        document.getElementById("before-img").style.transform = t;
+        document.getElementById("after-img").style.transform = t;
+        updateScrollProgressUI();
+      }
+
+      /* ================================================
+         SCROLL PROGRESS BAR
+      ================================================ */
+      function updateScrollProgressUI() {
+        if (!maxScroll) return;
+        const bar = document.getElementById("scroll-progress-bar");
+        const thumb = document.getElementById("scroll-thumb-el");
+        if (!bar || !thumb) return;
+
+        const barH = bar.offsetHeight;
+        const tallest = Math.max(beforeRenderedH, afterRenderedH, window.innerHeight);
+        const viewRatio = window.innerHeight / tallest;
+        const thumbH = Math.max(28, barH * viewRatio);
+        const scrollRatio = maxScroll > 0 ? scrollOffset / maxScroll : 0;
+
+        thumb.style.height = thumbH + "px";
+        thumb.style.top = scrollRatio * (barH - thumbH) + "px";
+      }
+
+      /* ================================================
+         MOUSE DRAG — from ANYWHERE on screen
+      ================================================ */
+      document.addEventListener("mousedown", function (e) {
+        const overlay = document.getElementById("comparison-overlay");
+        if (overlay.style.display === "none") return;
+        // Don't intercept button clicks in controls bar
+        if (e.target.closest(".overlay-controls")) return;
+        isDragging = true;
+        overlay.classList.add("is-dragging");
+        updateDividerFromX(e.clientX);
+      });
+
+      document.addEventListener("mousemove", function (e) {
+        if (!isDragging) return;
+        updateDividerFromX(e.clientX);
+      });
+
+      document.addEventListener("mouseup", function () {
+        if (isDragging) {
+          isDragging = false;
+          const overlay = document.getElementById("comparison-overlay");
+          overlay.classList.remove("is-dragging");
+        }
+      });
+
+      function updateDividerFromX(clientX) {
+        dividerPct = Math.max(1, Math.min(99, (clientX / window.innerWidth) * 100));
+        applyDivider();
+      }
+
+      /* ================================================
+         TOUCH SUPPORT (mobile/tablet)
+      ================================================ */
+      document.addEventListener(
+        "touchstart",
+        function (e) {
+          const overlay = document.getElementById("comparison-overlay");
+          if (overlay.style.display === "none") return;
+          if (e.target.closest(".overlay-controls")) return;
+          isDragging = true;
+          overlay.classList.add("is-dragging");
+          updateDividerFromX(e.touches[0].clientX);
+        },
+        { passive: true }
+      );
+
+      document.addEventListener(
+        "touchmove",
+        function (e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          updateDividerFromX(e.touches[0].clientX);
+        },
+        { passive: false }
+      );
+
+      document.addEventListener("touchend", function () {
+        isDragging = false;
+        const overlay = document.getElementById("comparison-overlay");
+        overlay.classList.remove("is-dragging");
+      });
+
+      /* ================================================
+         MOUSE WHEEL — sync-scroll both images
+      ================================================ */
+      document.addEventListener(
+        "wheel",
+        function (e) {
+          const overlay = document.getElementById("comparison-overlay");
+          if (overlay.style.display === "none") return;
+          e.preventDefault();
+          // deltaY can vary by device/OS; clamp to comfortable speed
+          const delta = e.deltaY * (e.deltaMode === 1 ? 30 : 1);
+          scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset + delta));
+          applyScroll();
+        },
+        { passive: false }
+      );
+
+      /* ================================================
+         KEYBOARD SHORTCUTS
+      ================================================ */
+      document.addEventListener("keydown", function (e) {
+        const overlay = document.getElementById("comparison-overlay");
+
+        // Escape — close overlay
+        if (e.key === "Escape" && overlay.style.display !== "none") {
+          overlay.style.display = "none";
+          return;
+        }
+
+        if (overlay.style.display === "none") return;
+
+        switch (e.key) {
+          case "ArrowLeft":
+            dividerPct = Math.max(1, dividerPct - (e.shiftKey ? 10 : 2));
+            applyDivider();
+            break;
+          case "ArrowRight":
+            dividerPct = Math.min(99, dividerPct + (e.shiftKey ? 10 : 2));
+            applyDivider();
+            break;
+          case "ArrowUp":
+            scrollOffset = Math.max(0, scrollOffset - (e.shiftKey ? 200 : 60));
+            applyScroll();
+            break;
+          case "ArrowDown":
+            scrollOffset = Math.min(maxScroll, scrollOffset + (e.shiftKey ? 200 : 60));
+            applyScroll();
+            break;
+          case "Home":
+            scrollOffset = 0;
+            applyScroll();
+            break;
+          case "End":
+            scrollOffset = maxScroll;
+            applyScroll();
+            break;
+          case " ":
+            e.preventDefault();
+            centerDivider();
+            break;
+        }
+      });
+
+      /* ================================================
+         WINDOW RESIZE — recalculate rendered heights
+      ================================================ */
+      window.addEventListener("resize", function () {
+        if (!beforeDataURL && !afterDataURL) return;
+
+        function recalc(imgEl, dataURL, callback) {
+          if (!dataURL) return;
+          const img = new Image();
+          img.onload = function () {
+            const scale = window.innerWidth / img.naturalWidth;
+            const renderedH = img.naturalHeight * scale;
+            imgEl.style.width = "100vw";
+            callback(renderedH);
+          };
+          img.src = dataURL;
+        }
+
+        recalc(
+          document.getElementById("before-img"),
+          beforeDataURL,
+          function (h) {
+            beforeRenderedH = h;
+            updateMaxScroll();
+          }
+        );
+
+        recalc(
+          document.getElementById("after-img"),
+          afterDataURL,
+          function (h) {
+            afterRenderedH = h;
+            updateMaxScroll();
+          }
+        );
+
+        // Clamp scroll to new max
+        scrollOffset = Math.min(scrollOffset, maxScroll);
+        applyScroll();
+      });
+
+      /* ================================================
+         YEAR
+      ================================================ */
+      document.addEventListener("DOMContentLoaded", function () {
+        const y = document.getElementById("currentYear");
+        if (y) y.textContent = new Date().getFullYear();
+      });
+    </script>
+  </body>
+</html>
