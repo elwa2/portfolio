@@ -1195,6 +1195,105 @@
       #comparison-overlay.is-dragging #divider-pct-badge {
         opacity: 1;
       }
+
+      /* ============================
+         MOBILE RESPONSIVE — overlay
+      ============================ */
+      @media (max-width: 600px) {
+
+        /* Smaller side labels */
+        .side-label {
+          padding: 10px 18px;
+          font-size: 1.2rem;
+          letter-spacing: 1px;
+          gap: 7px;
+          border-radius: 12px;
+        }
+
+        #before-label { left: 10px; }
+        #after-label  { right: 10px; }
+
+        /* Compact view-mode bar */
+        .view-mode-bar {
+          bottom: 76px;
+          gap: 2px;
+          padding: 5px;
+        }
+
+        .view-mode-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 0.82rem;
+        }
+
+        /* Compact controls bar */
+        .overlay-controls {
+          bottom: 16px;
+          gap: 5px;
+          padding: 6px 9px;
+        }
+
+        .overlay-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 0.8rem;
+        }
+
+        /* Smaller speed controls */
+        .scroll-speed-btn {
+          width: 26px;
+          height: 26px;
+          font-size: 0.88rem;
+        }
+
+        #scroll-speed-badge {
+          font-size: 0.62rem;
+          min-width: 22px;
+        }
+
+        #auto-scroll-btn {
+          width: 32px;
+          height: 32px;
+        }
+
+        /* Separators thinner */
+        .ctrl-sep {
+          height: 16px;
+        }
+
+        /* Divider handle smaller */
+        #divider-handle {
+          width: 44px;
+          height: 44px;
+          font-size: 0.88rem;
+        }
+
+        /* Key hint out of the way */
+        #key-hint-wrapper {
+          bottom: 76px;
+          left: 10px;
+        }
+
+        /* Scroll progress bar */
+        #scroll-progress-bar {
+          right: 8px;
+        }
+
+        /* Scroll hint smaller */
+        #scroll-hint {
+          font-size: 0.75rem;
+          padding: 7px 14px;
+          top: 14px;
+        }
+
+        /* Tooltips: disable on mobile (no hover) */
+        .overlay-btn::after,
+        .view-mode-btn::after,
+        .scroll-speed-btn::after,
+        #auto-scroll-btn::after {
+          display: none;
+        }
+      }
     </style>
   </head>
 
@@ -2278,9 +2377,9 @@
       let autoScrollPhase = 'idle'; // 'idle' | 'before' | 'after'
 
       // Speed levels (px per frame at ~60fps)
-      const SPEED_LEVELS = [0.4, 0.8, 1.5, 2.8, 5.0];
-      const SPEED_LABELS = ['×¼', '×½', '×1', '×2', '×3'];
-      let scrollSpeedIdx = 2; // default: 1.5
+      const SPEED_LEVELS = [0.4, 0.8, 1.5, 3.0, 4.5, 7.5, 10.5, 15.0];
+      const SPEED_LABELS = ['×¼', '×½', '×1', '×2', '×3', '×5', '×7', '×10'];
+      let scrollSpeedIdx = 2; // default: ×1 = 1.5px/frame
 
       function currentScrollSpeed() {
         return SPEED_LEVELS[scrollSpeedIdx];
