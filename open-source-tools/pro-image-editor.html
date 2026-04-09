@@ -297,6 +297,11 @@
         padding: 10px;
         font-family: Consolas, "Courier New", monospace;
         direction: ltr;
+        white-space: pre;
+        overflow-wrap: normal;
+        word-break: normal;
+        overflow-x: auto;
+        overflow-y: auto;
       }
 
       .custom-context-menu {
@@ -461,7 +466,12 @@
                 <textarea
                   id="dataUrlOutput"
                   class="data-url-output"
+                  wrap="off"
                   readonly
+                  spellcheck="false"
+                  autocapitalize="off"
+                  autocomplete="off"
+                  autocorrect="off"
                   placeholder="Load an image and edit it to generate data URL."
                 ></textarea>
                 <div class="btn-row" style="margin-top: 8px">
@@ -952,8 +962,49 @@
           }
         }
 
+        function normalizeDataUrl(value) {
+          return String(value || "").trim().replace(/\s+/g, "");
+        }
+
+        async function copyTextToClipboard(value) {
+          const text = String(value || "");
+          if (!text) return false;
+
+          if (navigator.clipboard && window.isSecureContext) {
+            try {
+              await navigator.clipboard.writeText(text);
+              return true;
+            } catch (error) {
+              // Continue to fallback copy path.
+            }
+          }
+
+          const temp = document.createElement("textarea");
+          temp.value = text;
+          temp.setAttribute("readonly", "");
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          temp.style.top = "-9999px";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          temp.setSelectionRange(0, temp.value.length);
+
+          let copied = false;
+          try {
+            copied = document.execCommand("copy");
+          } catch (error) {
+            copied = false;
+          }
+
+          document.body.removeChild(temp);
+          return copied;
+        }
+
         function updateDataUrlOutput() {
-          dataUrlOutput.value = getEditedDataUrl();
+          dataUrlOutput.value = normalizeDataUrl(getEditedDataUrl());
+          dataUrlOutput.scrollLeft = 0;
+          dataUrlOutput.scrollTop = 0;
         }
 
         function setImageFromDataUrl(dataUrl) {
@@ -1042,16 +1093,34 @@
           return false;
         }
 
-        function openEditedImageInNewTab() {
-          const dataUrl = getEditedDataUrl();
+        async function openEditedImageInNewTab() {
+          const dataUrl = normalizeDataUrl(getEditedDataUrl());
           if (!dataUrl) {
             alert("Upload an image first.");
             return;
           }
-          const newTab = window.open(dataUrl, "_blank", "noopener,noreferrer");
+          const newTab = window.open("", "_blank");
           if (!newTab) {
             alert("Browser blocked opening a new tab. Please allow popups for this site.");
+            return;
           }
+
+          try {
+            const blob = await new Promise((resolve) =>
+              imageCanvas.toBlob((result) => resolve(result), "image/png"),
+            );
+
+            if (blob) {
+              const objectUrl = URL.createObjectURL(blob);
+              newTab.location.replace(objectUrl);
+              setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+              return;
+            }
+          } catch (error) {
+            // Fall back to data URL rendering path below.
+          }
+
+          newTab.location.href = dataUrl;
         }
 
         function downloadEditedPdf() {
@@ -1102,9 +1171,8 @@
               return true;
             }
 
-            const dataUrl = getEditedDataUrl();
-            if (navigator.clipboard && dataUrl) {
-              await navigator.clipboard.writeText(dataUrl);
+            const dataUrl = normalizeDataUrl(getEditedDataUrl());
+            if (dataUrl && (await copyTextToClipboard(dataUrl))) {
               return true;
             }
           } catch (error) {
@@ -1115,20 +1183,22 @@
         }
 
         async function copyDataUrlText() {
-          const dataUrl = getEditedDataUrl();
+          const dataUrl = normalizeDataUrl(getEditedDataUrl());
           if (!dataUrl) {
             alert("Upload an image first.");
             return;
           }
 
-          try {
-            await navigator.clipboard.writeText(dataUrl);
+          const copied = await copyTextToClipboard(dataUrl);
+          if (copied) {
             alert("Data URL copied.");
-          } catch (error) {
-            dataUrlOutput.focus();
-            dataUrlOutput.select();
-            alert("Press Ctrl+C to copy Data URL.");
+            return;
           }
+
+          dataUrlOutput.focus();
+          dataUrlOutput.select();
+          dataUrlOutput.setSelectionRange(0, dataUrlOutput.value.length);
+          alert("Press Ctrl+C to copy Data URL.");
         }
 
         function hideContextMenu() {
