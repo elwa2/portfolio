@@ -277,6 +277,56 @@
         pointer-events: none;
       }
 
+      .export-actions {
+        margin: 12px 0 10px;
+      }
+
+      .data-url-panel {
+        margin-top: 12px;
+      }
+
+      .data-url-output {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(7, 15, 27, 0.85);
+        color: #dceaff;
+        padding: 10px;
+        font-family: Consolas, "Courier New", monospace;
+        direction: ltr;
+      }
+
+      .custom-context-menu {
+        position: fixed;
+        z-index: 9999;
+        min-width: 220px;
+        background: rgba(10, 18, 33, 0.98);
+        border: 1px solid rgba(140, 200, 255, 0.35);
+        border-radius: 12px;
+        padding: 8px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        display: none;
+      }
+
+      .context-menu-btn {
+        width: 100%;
+        text-align: right;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        color: #ecf5ff;
+        background: transparent;
+        cursor: pointer;
+        font-family: "Cairo", sans-serif;
+      }
+
+      .context-menu-btn:hover {
+        background: rgba(79, 150, 224, 0.2);
+      }
+
       @media (max-width: 1100px) {
         .editor-layout {
           grid-template-columns: 1fr;
@@ -301,6 +351,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+      defer
+    ></script>
     <script src="../assets/js/three-bg.js" defer></script>
     <script src="../assets/js/main.js" defer></script>
     <script src="../assets/js/svg-icons.js" defer></script>
@@ -389,6 +443,32 @@
                 </div>
                 <canvas id="imageCanvas"></canvas>
                 <canvas id="overlayCanvas"></canvas>
+              </div>
+
+              <div class="btn-row export-actions">
+                <button class="btn-tool secondary" id="openEditedTabBtn" type="button">
+                  Open Edited Image in New Tab
+                </button>
+                <button class="btn-tool secondary" id="copyEditedImageBtn" type="button">
+                  Copy Edited Image
+                </button>
+              </div>
+
+              <div class="data-url-panel">
+                <div class="control-label">
+                  <span>Edited Image Data URL</span>
+                </div>
+                <textarea
+                  id="dataUrlOutput"
+                  class="data-url-output"
+                  readonly
+                  placeholder="Load an image and edit it to generate data URL."
+                ></textarea>
+                <div class="btn-row" style="margin-top: 8px">
+                  <button class="btn-tool secondary" id="copyDataUrlBtn" type="button">
+                    Copy Data URL
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -484,6 +564,7 @@
                   <button class="btn-tool secondary" id="beforeAfter" type="button">Before / After</button>
                   <button class="btn-tool danger" id="resetAll" type="button">Reset All / إعادة تعيين</button>
                   <button class="btn-tool" id="downloadPng" type="button">Download PNG / تنزيل PNG</button>
+                  <button class="btn-tool" id="downloadPdf" type="button">Download PDF / تنزيل PDF</button>
                 </div>
                 <p class="tiny-note" style="margin-top: 8px">
                   القص يتم بالسحب على الصورة ثم Apply Crop.
@@ -493,6 +574,15 @@
           </div>
         </section>
       </div>
+    </div>
+
+    <div id="canvasContextMenu" class="custom-context-menu" role="menu" aria-hidden="true">
+      <button class="context-menu-btn" type="button" id="ctxOpenEdited" role="menuitem">
+        Open Edited Image in New Tab
+      </button>
+      <button class="context-menu-btn" type="button" id="ctxCopyEdited" role="menuitem">
+        Copy Edited Image
+      </button>
     </div>
 
     <footer class="footer" id="footer_aboutus">
@@ -590,6 +680,13 @@
         const emptyState = document.getElementById("emptyState");
         const previewWrap = document.getElementById("previewWrap");
         const pasteCatcher = document.getElementById("pasteCatcher");
+        const openEditedTabBtn = document.getElementById("openEditedTabBtn");
+        const copyEditedImageBtn = document.getElementById("copyEditedImageBtn");
+        const dataUrlOutput = document.getElementById("dataUrlOutput");
+        const copyDataUrlBtn = document.getElementById("copyDataUrlBtn");
+        const canvasContextMenu = document.getElementById("canvasContextMenu");
+        const ctxOpenEdited = document.getElementById("ctxOpenEdited");
+        const ctxCopyEdited = document.getElementById("ctxCopyEdited");
 
         const imageCanvas = document.getElementById("imageCanvas");
         const overlayCanvas = document.getElementById("overlayCanvas");
@@ -807,6 +904,7 @@
           imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
           imageCtx.drawImage(transformed, 0, 0);
           drawCropOverlay();
+          updateDataUrlOutput();
         }
 
         function render() {
@@ -842,6 +940,20 @@
           imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
           imageCtx.drawImage(filtered, 0, 0);
           drawCropOverlay();
+          updateDataUrlOutput();
+        }
+
+        function getEditedDataUrl() {
+          if (!originalImage || !imageCanvas.width || !imageCanvas.height) return "";
+          try {
+            return imageCanvas.toDataURL("image/png");
+          } catch (error) {
+            return "";
+          }
+        }
+
+        function updateDataUrlOutput() {
+          dataUrlOutput.value = getEditedDataUrl();
         }
 
         function setImageFromDataUrl(dataUrl) {
@@ -851,13 +963,22 @@
             cropSelection = null;
             render();
           };
+          img.onerror = () => {
+            alert("Failed to load image. Please try another file.");
+          };
           img.src = dataUrl;
         }
 
         function loadImageFile(file) {
-          if (!file || !file.type.startsWith("image/")) return;
+          if (!file || !file.type || !file.type.startsWith("image/")) {
+            alert("Please choose a valid image file.");
+            return;
+          }
           const reader = new FileReader();
           reader.onload = (event) => setImageFromDataUrl(event.target.result);
+          reader.onerror = () => {
+            alert("Cannot read this image file.");
+          };
           reader.readAsDataURL(file);
         }
 
@@ -919,6 +1040,116 @@
           }
 
           return false;
+        }
+
+        function openEditedImageInNewTab() {
+          const dataUrl = getEditedDataUrl();
+          if (!dataUrl) {
+            alert("Upload an image first.");
+            return;
+          }
+          const newTab = window.open(dataUrl, "_blank", "noopener,noreferrer");
+          if (!newTab) {
+            alert("Browser blocked opening a new tab. Please allow popups for this site.");
+          }
+        }
+
+        function downloadEditedPdf() {
+          if (!originalImage) {
+            alert("Upload an image first.");
+            return;
+          }
+
+          if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert("PDF library is still loading. Please try again in a moment.");
+            return;
+          }
+
+          const { jsPDF } = window.jspdf;
+          const width = Math.max(1, imageCanvas.width);
+          const height = Math.max(1, imageCanvas.height);
+          const orientation = width >= height ? "landscape" : "portrait";
+
+          const pdf = new jsPDF({
+            orientation,
+            unit: "px",
+            format: [width, height],
+            compress: true,
+          });
+
+          pdf.addImage(imageCanvas.toDataURL("image/png"), "PNG", 0, 0, width, height, undefined, "FAST");
+          pdf.save("pro-image-editor-output.pdf");
+        }
+
+        async function copyEditedImage() {
+          if (!originalImage) {
+            alert("Upload an image first.");
+            return false;
+          }
+
+          try {
+            const blob = await new Promise((resolve) =>
+              imageCanvas.toBlob((result) => resolve(result), "image/png"),
+            );
+
+            if (!blob) {
+              throw new Error("Blob conversion failed");
+            }
+
+            if (navigator.clipboard && window.ClipboardItem) {
+              const item = new ClipboardItem({ [blob.type]: blob });
+              await navigator.clipboard.write([item]);
+              return true;
+            }
+
+            const dataUrl = getEditedDataUrl();
+            if (navigator.clipboard && dataUrl) {
+              await navigator.clipboard.writeText(dataUrl);
+              return true;
+            }
+          } catch (error) {
+            return false;
+          }
+
+          return false;
+        }
+
+        async function copyDataUrlText() {
+          const dataUrl = getEditedDataUrl();
+          if (!dataUrl) {
+            alert("Upload an image first.");
+            return;
+          }
+
+          try {
+            await navigator.clipboard.writeText(dataUrl);
+            alert("Data URL copied.");
+          } catch (error) {
+            dataUrlOutput.focus();
+            dataUrlOutput.select();
+            alert("Press Ctrl+C to copy Data URL.");
+          }
+        }
+
+        function hideContextMenu() {
+          canvasContextMenu.style.display = "none";
+          canvasContextMenu.setAttribute("aria-hidden", "true");
+        }
+
+        function showContextMenu(event) {
+          if (!originalImage) return;
+          event.preventDefault();
+          const viewportW = window.innerWidth;
+          const viewportH = window.innerHeight;
+          const menuW = 240;
+          const menuH = 120;
+          const x = Math.min(event.clientX, viewportW - menuW - 10);
+          const y = Math.min(event.clientY, viewportH - menuH - 10);
+
+          canvasContextMenu.style.left = `${Math.max(8, x)}px`;
+          canvasContextMenu.style.top = `${Math.max(8, y)}px`;
+          canvasContextMenu.style.display = "block";
+          canvasContextMenu.setAttribute("aria-hidden", "false");
         }
 
         function isEditableElement(target) {
@@ -1063,6 +1294,10 @@
         }
 
         function initEvents() {
+          fileInput.addEventListener("click", () => {
+            fileInput.value = "";
+          });
+
           fileInput.addEventListener("change", (event) => {
             loadImageFile(event.target.files[0]);
           });
@@ -1094,6 +1329,10 @@
             handlePasteEvent(event);
           });
 
+          pasteCatcher.addEventListener("paste", (event) => {
+            handlePasteEvent(event);
+          });
+
           window.addEventListener("keydown", async (event) => {
             const isPasteShortcut = (event.ctrlKey || event.metaKey) &&
               String(event.key).toLowerCase() === "v";
@@ -1114,9 +1353,39 @@
           document.getElementById("pasteImageBtn").addEventListener("click", async () => {
             const loaded = await readClipboardImageViaApi();
             if (loaded) return;
+            pasteCatcher.focus();
 
             alert("استخدم Ctrl+V بعد التركيز على الصفحة، أو امنح إذن الحافظة للمتصفح / Use Ctrl+V with page focus or allow clipboard permission.");
           });
+
+          openEditedTabBtn.addEventListener("click", openEditedImageInNewTab);
+
+          copyEditedImageBtn.addEventListener("click", async () => {
+            const copied = await copyEditedImage();
+            alert(copied ? "Edited image copied." : "Could not copy image. Try copy Data URL.");
+          });
+
+          copyDataUrlBtn.addEventListener("click", copyDataUrlText);
+
+          previewWrap.addEventListener("contextmenu", showContextMenu);
+          canvasContextMenu.addEventListener("click", (event) => {
+            event.stopPropagation();
+          });
+
+          ctxOpenEdited.addEventListener("click", () => {
+            hideContextMenu();
+            openEditedImageInNewTab();
+          });
+
+          ctxCopyEdited.addEventListener("click", async () => {
+            hideContextMenu();
+            const copied = await copyEditedImage();
+            alert(copied ? "Edited image copied." : "Could not copy image. Try copy Data URL.");
+          });
+
+          document.addEventListener("click", hideContextMenu);
+          window.addEventListener("scroll", hideContextMenu);
+          window.addEventListener("resize", hideContextMenu);
 
           document.getElementById("toggleSepia").addEventListener("click", () => {
             state.sepia = !state.sepia;
@@ -1241,12 +1510,15 @@
             link.download = "pro-image-editor-output.png";
             link.click();
           });
+
+          document.getElementById("downloadPdf").addEventListener("click", downloadEditedPdf);
         }
 
         bindRanges();
         initEvents();
         updateToggleButtons();
         overlayCanvas.style.pointerEvents = "none";
+        updateDataUrlOutput();
 
         window.addEventListener("resize", () => {
           if (originalImage) {
