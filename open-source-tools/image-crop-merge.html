@@ -1,0 +1,1702 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>دمج وقص الصور - Image Crop & Merge | Ali Ahmed</title>
+    <meta name="description" content="ارفع صورتين، حدد منطقة القص لكل منهما مع إمكانية التدوير، ثم ادمجهما جنباً إلى جنب أو فوق بعضهما مع فلاتر متقدمة. مثالية لبطاقات الهوية والوثائق." />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+
+    <style>
+      /* =============================================
+         TOOL PAGE BASE
+      ============================================= */
+      #three-canvas-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+      .tool-page-wrapper {
+        padding: 50px 0 80px;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* =============================================
+         TOOL HEADER
+      ============================================= */
+      .tool-header {
+        text-align: center;
+        margin-bottom: 45px;
+      }
+      .tool-header h1 {
+        font-size: 2.6rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        font-weight: 800;
+      }
+      .tool-header h1 i {
+        margin-left: 12px;
+        opacity: 0.85;
+      }
+      .tool-header p {
+        color: var(--text-color-light);
+        max-width: 750px;
+        margin: 0 auto;
+        line-height: 1.8;
+        font-size: 1rem;
+      }
+
+      /* =============================================
+         MAIN CONTAINER
+      ============================================= */
+      .tool-main-container {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+
+      /* =============================================
+         SINGLE IMAGE TOGGLE BAR
+      ============================================= */
+      .single-mode-bar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 25px;
+        background: var(--card-bg);
+        border-radius: 14px;
+        padding: 14px 20px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      }
+      .single-mode-bar label {
+        font-size: 0.92rem;
+        color: var(--text-color);
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .single-mode-bar .hint {
+        font-size: 0.82rem;
+        color: var(--text-color-light);
+        margin-right: auto;
+      }
+
+      /* =============================================
+         IMAGES SECTION
+      ============================================= */
+      .images-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        margin-bottom: 25px;
+      }
+      @media (max-width: 860px) {
+        .images-section { grid-template-columns: 1fr; }
+      }
+
+      /* =============================================
+         IMAGE PANEL CARD
+      ============================================= */
+      .image-panel {
+        background: var(--card-bg);
+        border-radius: 22px;
+        padding: 26px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        transition: opacity 0.3s, pointer-events 0.3s;
+      }
+      .image-panel.disabled {
+        opacity: 0.42;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .panel-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text-color);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .panel-num {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      /* Upload Zone */
+      .upload-zone {
+        border: 2px dashed rgba(var(--primary-rgb), 0.3);
+        border-radius: 14px;
+        padding: 22px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(var(--primary-rgb), 0.02);
+        margin-bottom: 14px;
+      }
+      .upload-zone:hover, .upload-zone.drag-over {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.06);
+        transform: scale(1.01);
+      }
+      .upload-zone i {
+        font-size: 1.8rem;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+        display: block;
+      }
+      .upload-zone p {
+        color: var(--text-color-light);
+        font-size: 0.875rem;
+        margin: 0;
+      }
+      .upload-zone input[type="file"] { display: none; }
+
+      /* Canvas Wrapper */
+      .canvas-wrapper {
+        position: relative;
+        border-radius: 13px;
+        overflow: hidden;
+        background: #111827;
+        height: 310px;
+        margin-bottom: 15px;
+        cursor: crosshair;
+      }
+      .canvas-wrapper canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .canvas-empty-msg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #6b7280;
+        text-align: center;
+        font-size: 0.85rem;
+        line-height: 1.8;
+        pointer-events: none;
+      }
+      .canvas-empty-msg i { font-size: 2.2rem; opacity: 0.3; display: block; margin-bottom: 8px; }
+      .canvas-hint {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        pointer-events: none;
+        white-space: nowrap;
+        display: none;
+      }
+      .canvas-wrapper:hover .canvas-hint { display: block; }
+
+      /* Panel Controls */
+      .panel-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+      .ctrl-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .ctrl-label {
+        font-size: 0.82rem;
+        color: var(--text-color);
+        font-weight: 700;
+        white-space: nowrap;
+        min-width: 75px;
+      }
+      .range-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 120px;
+      }
+      .range-wrap input[type="range"] {
+        flex: 1;
+        -webkit-appearance: none;
+        height: 5px;
+        border-radius: 4px;
+        background: rgba(var(--primary-rgb), 0.18);
+        outline: none;
+        cursor: pointer;
+      }
+      .range-wrap input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 17px; height: 17px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.4);
+      }
+      .range-wrap input[type="range"]::-moz-range-thumb {
+        width: 17px; height: 17px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        border: none;
+      }
+      .range-val {
+        font-size: 0.78rem;
+        color: var(--primary-color);
+        font-weight: 800;
+        min-width: 38px;
+        text-align: center;
+        background: rgba(var(--primary-rgb), 0.08);
+        border-radius: 6px;
+        padding: 2px 5px;
+      }
+
+      /* Shape + Crop Info Row */
+      .crop-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .crop-info-badge {
+        flex: 1;
+        font-size: 0.78rem;
+        color: var(--text-color-light);
+        padding: 5px 12px;
+        background: rgba(var(--primary-rgb), 0.05);
+        border-radius: 8px;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .crop-info-badge span { color: var(--primary-color); font-weight: 800; }
+
+      /* =============================================
+         TOGGLE BUTTON GROUP
+      ============================================= */
+      .toggle-btn-group { display: flex; gap: 7px; flex-wrap: wrap; }
+      .toggle-btn {
+        padding: 7px 13px;
+        border-radius: 9px;
+        border: 1px solid rgba(var(--primary-rgb), 0.22);
+        background: transparent;
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        transition: all 0.22s ease;
+        white-space: nowrap;
+      }
+      .toggle-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+        box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.3);
+      }
+      .toggle-btn:hover:not(.active) {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      /* =============================================
+         SMALL BUTTONS
+      ============================================= */
+      .btn-sm {
+        padding: 7px 14px;
+        border-radius: 9px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-family: "Cairo", sans-serif;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid rgba(var(--primary-rgb), 0.28);
+        color: var(--text-color);
+      }
+      .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+      .btn-primary { background: var(--primary-color); color: white; }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(var(--primary-rgb), 0.35); }
+      .btn-secondary { background: var(--secondary-purple); color: white; }
+      .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(138,43,226,0.35); }
+      .btn-success { background: #22c55e; color: white; }
+      .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(34,197,94,0.35); }
+      .btn-dark { background: #1e293b; color: white; }
+      .btn-dark:hover { transform: translateY(-2px); }
+      .btn-danger { background: #ef4444; color: white; }
+      .btn-danger:hover { transform: translateY(-2px); }
+
+      /* =============================================
+         TOGGLE SWITCH
+      ============================================= */
+      .toggle-switch {
+        position: relative;
+        width: 46px; height: 25px;
+        display: inline-flex;
+        flex-shrink: 0;
+      }
+      .toggle-switch input { opacity: 0; width: 0; height: 0; }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: #cbd5e1;
+        transition: 0.3s;
+        border-radius: 25px;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 19px; width: 19px;
+        right: 3px; bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.3s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      }
+      .toggle-switch input:checked + .toggle-slider { background: var(--primary-color); }
+      .toggle-switch input:checked + .toggle-slider:before { transform: translateX(-21px); }
+
+      /* =============================================
+         MERGE + ADJUSTMENTS SECTION
+      ============================================= */
+      .merge-adj-section {
+        background: var(--card-bg);
+        border-radius: 22px;
+        padding: 32px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        margin-bottom: 25px;
+      }
+      .section-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--text-color);
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-title i { color: var(--primary-color); }
+      .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      @media (max-width: 700px) {
+        .settings-grid { grid-template-columns: 1fr; }
+      }
+      .settings-group h4 {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--text-color);
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .settings-group h4 i { color: var(--primary-color); }
+      .setting-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .setting-row label.s-label {
+        font-size: 0.83rem;
+        color: var(--text-color);
+        font-weight: 700;
+        min-width: 95px;
+        flex-shrink: 0;
+      }
+      input[type="color"] {
+        width: 38px; height: 38px;
+        border: 2px solid rgba(var(--primary-rgb), 0.2);
+        border-radius: 9px;
+        cursor: pointer;
+        padding: 2px;
+        background: transparent;
+        flex-shrink: 0;
+      }
+
+      /* Merge action button */
+      .merge-action {
+        margin-top: 30px;
+        text-align: center;
+      }
+      .btn-merge {
+        padding: 16px 55px;
+        border-radius: 16px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: white;
+        font-size: 1.12rem;
+        font-weight: 800;
+        font-family: "Cairo", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 22px rgba(var(--primary-rgb), 0.35);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-merge:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(var(--primary-rgb), 0.45);
+      }
+      .btn-merge:active { transform: translateY(-1px); }
+
+      /* =============================================
+         RESULT SECTION
+      ============================================= */
+      .result-section {
+        background: var(--card-bg);
+        border-radius: 22px;
+        padding: 32px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        display: none;
+        animation: fadeInUp 0.4s ease forwards;
+      }
+      .result-section.visible { display: block; }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .result-canvas-wrapper {
+        text-align: center;
+        background: repeating-conic-gradient(#e5e7eb 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 22px;
+        overflow: auto;
+      }
+      [data-theme="dark"] .result-canvas-wrapper {
+        background: repeating-conic-gradient(#1e293b 0% 25%, #111827 0% 50%) 0 0 / 20px 20px;
+      }
+      #resultCanvas {
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        display: block;
+        margin: 0 auto;
+      }
+      .result-info {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 0.83rem;
+        color: var(--text-color-light);
+      }
+      .result-info span { color: var(--primary-color); font-weight: 800; }
+      .export-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+      }
+      .btn-export {
+        padding: 12px 26px;
+        border-radius: 13px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.92rem;
+        font-weight: 800;
+        font-family: "Cairo", sans-serif;
+        transition: all 0.28s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-export:hover { transform: translateY(-3px); }
+
+      /* =============================================
+         TOAST NOTIFICATION
+      ============================================= */
+      .toast {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%) translateY(15px);
+        background: var(--primary-color);
+        color: white;
+        padding: 11px 28px;
+        border-radius: 30px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        opacity: 0;
+        transition: all 0.35s ease;
+        z-index: 9999;
+        pointer-events: none;
+        white-space: nowrap;
+        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.4);
+      }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      .toast.success { background: #22c55e; }
+      .toast.error { background: #ef4444; }
+
+      /* =============================================
+         RESPONSIVE
+      ============================================= */
+      @media (max-width: 600px) {
+        .tool-header h1 { font-size: 1.9rem; }
+        .merge-adj-section { padding: 20px; }
+        .btn-merge { padding: 14px 32px; font-size: 1rem; }
+      }
+    </style>
+  </head>
+
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left:10%;animation-duration:8s;animation-delay:0s">🖼️</div>
+      <div class="floating-icon" style="left:25%;animation-duration:10s;animation-delay:2s">✂️</div>
+      <div class="floating-icon" style="left:40%;animation-duration:12s;animation-delay:4s">🔄</div>
+      <div class="floating-icon" style="left:55%;animation-duration:9s;animation-delay:1s">🎨</div>
+      <div class="floating-icon" style="left:70%;animation-duration:11s;animation-delay:3s">📋</div>
+      <div class="floating-icon" style="left:85%;animation-duration:13s;animation-delay:5s">⬇️</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tool Page -->
+    <div class="tool-page-wrapper">
+      <div class="container">
+
+        <!-- Tool Header -->
+        <div class="tool-header">
+          <h1><i class="fas fa-id-card"></i>دمج وقص الصور</h1>
+          <p>
+            ارفع صورتين، حدد منطقة القص لكل منهما عن طريق السحب، مع إمكانية التدوير على كل الدرجات.
+            ادمجهما جنباً إلى جنب أو فوق بعضهما (مثل بطاقة الهوية)، ثم طبّق فلاتر احترافية للتوضيح والتحسين وحمّل النتيجة.
+          </p>
+        </div>
+
+        <div class="tool-main-container">
+
+          <!-- Single Image Mode Toggle -->
+          <div class="single-mode-bar">
+            <label class="toggle-switch">
+              <input type="checkbox" id="singleImageMode" onchange="toggleSingleMode()">
+              <span class="toggle-slider"></span>
+            </label>
+            <label for="singleImageMode" style="cursor:pointer;">وضع الصورة الواحدة فقط</label>
+            <span class="hint">عطّل الصورة الثانية إذا كنت تريد معالجة صورة واحدة فقط</span>
+          </div>
+
+          <!-- Images Section -->
+          <div class="images-section">
+
+            <!-- Panel 1 -->
+            <div class="image-panel" id="panel-card-0">
+              <div class="panel-title">
+                <span class="panel-num">١</span>
+                الصورة الأولى <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الأمامي)</small>
+              </div>
+
+              <div class="upload-zone" id="uploadZone0">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                <input type="file" id="fileInput0" accept="image/*" onchange="loadImageFromInput(0, this)">
+              </div>
+
+              <div class="canvas-wrapper" id="canvasWrapper0">
+                <canvas id="canvas0"></canvas>
+                <div class="canvas-empty-msg" id="emptyMsg0">
+                  <i class="fas fa-image"></i>
+                  ارفع صورة أولاً<br>
+                  <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
+                </div>
+                <div class="canvas-hint">اسحب لتحديد منطقة القص</div>
+              </div>
+
+              <div class="panel-controls">
+                <!-- Rotation -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label"><i class="fas fa-sync-alt"></i> التدوير</span>
+                  <div class="range-wrap">
+                    <input type="range" id="rotation0" min="0" max="360" value="0" oninput="updateRotation(0, this.value)">
+                    <span class="range-val" id="rotVal0">0°</span>
+                  </div>
+                </div>
+                <!-- Shape -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label">التحديد</span>
+                  <div class="toggle-btn-group">
+                    <button class="toggle-btn active" id="shape0-free" onclick="setShape(0,'free')"><i class="fas fa-vector-square"></i> حر</button>
+                    <button class="toggle-btn" id="shape0-square" onclick="setShape(0,'square')"><i class="fas fa-square"></i> مربع</button>
+                  </div>
+                </div>
+                <!-- Crop info + clear -->
+                <div class="crop-row">
+                  <div class="crop-info-badge" id="cropInfo0">لم يتم التحديد بعد</div>
+                  <button class="btn-sm btn-outline" onclick="clearSelection(0)"><i class="fas fa-times"></i> مسح</button>
+                  <button class="btn-sm btn-primary" onclick="useFullImage(0)"><i class="fas fa-expand"></i> كل الصورة</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2 -->
+            <div class="image-panel" id="panel-card-1">
+              <div class="panel-title">
+                <span class="panel-num">٢</span>
+                الصورة الثانية <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الخلفي)</small>
+              </div>
+
+              <div class="upload-zone" id="uploadZone1">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                <input type="file" id="fileInput1" accept="image/*" onchange="loadImageFromInput(1, this)">
+              </div>
+
+              <div class="canvas-wrapper" id="canvasWrapper1">
+                <canvas id="canvas1"></canvas>
+                <div class="canvas-empty-msg" id="emptyMsg1">
+                  <i class="fas fa-image"></i>
+                  ارفع صورة أولاً<br>
+                  <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
+                </div>
+                <div class="canvas-hint">اسحب لتحديد منطقة القص</div>
+              </div>
+
+              <div class="panel-controls">
+                <div class="ctrl-row">
+                  <span class="ctrl-label"><i class="fas fa-sync-alt"></i> التدوير</span>
+                  <div class="range-wrap">
+                    <input type="range" id="rotation1" min="0" max="360" value="0" oninput="updateRotation(1, this.value)">
+                    <span class="range-val" id="rotVal1">0°</span>
+                  </div>
+                </div>
+                <div class="ctrl-row">
+                  <span class="ctrl-label">التحديد</span>
+                  <div class="toggle-btn-group">
+                    <button class="toggle-btn active" id="shape1-free" onclick="setShape(1,'free')"><i class="fas fa-vector-square"></i> حر</button>
+                    <button class="toggle-btn" id="shape1-square" onclick="setShape(1,'square')"><i class="fas fa-square"></i> مربع</button>
+                  </div>
+                </div>
+                <div class="crop-row">
+                  <div class="crop-info-badge" id="cropInfo1">لم يتم التحديد بعد</div>
+                  <button class="btn-sm btn-outline" onclick="clearSelection(1)"><i class="fas fa-times"></i> مسح</button>
+                  <button class="btn-sm btn-primary" onclick="useFullImage(1)"><i class="fas fa-expand"></i> كل الصورة</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /images-section -->
+
+          <!-- Merge + Adjustments -->
+          <div class="merge-adj-section">
+            <div class="section-title">
+              <i class="fas fa-sliders-h"></i> إعدادات الدمج والفلاتر
+            </div>
+
+            <div class="settings-grid">
+
+              <!-- Merge settings -->
+              <div class="settings-group">
+                <h4><i class="fas fa-object-group"></i> إعدادات الدمج</h4>
+
+                <div class="setting-row">
+                  <label class="s-label">الترتيب</label>
+                  <div class="toggle-btn-group">
+                    <button class="toggle-btn active" id="arrangeSide" onclick="setArrangement('side')">
+                      <i class="fas fa-grip-lines-vertical"></i> جنب بجنب
+                    </button>
+                    <button class="toggle-btn" id="arrangeStack" onclick="setArrangement('stack')">
+                      <i class="fas fa-grip-lines"></i> فوق بعض
+                    </button>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">المسافة الفاصلة</label>
+                  <div class="range-wrap">
+                    <input type="range" id="gapSlider" min="0" max="100" value="10" oninput="gapVal=+this.value;document.getElementById('gapValTxt').textContent=this.value+'px'">
+                    <span class="range-val" id="gapValTxt">10px</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">لون الخلفية</label>
+                  <input type="color" id="bgColor" value="#ffffff">
+                  <span style="font-size:0.8rem;color:var(--text-color-light);">شفاف</span>
+                  <label class="toggle-switch" style="margin:0">
+                    <input type="checkbox" id="transparentBg">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">حجم الإخراج</label>
+                  <div class="toggle-btn-group">
+                    <button class="toggle-btn active" id="sizeOrig" onclick="setOutputSize('1')">أصلي</button>
+                    <button class="toggle-btn" id="size2x" onclick="setOutputSize('2')">×2</button>
+                    <button class="toggle-btn" id="sizeHalf" onclick="setOutputSize('0.5')">×0.5</button>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">محاذاة العناصر</label>
+                  <div class="toggle-btn-group">
+                    <button class="toggle-btn active" id="alignCenter" onclick="setAlignment('center')">وسط</button>
+                    <button class="toggle-btn" id="alignStart" onclick="setAlignment('start')">بداية</button>
+                    <button class="toggle-btn" id="alignEnd" onclick="setAlignment('end')">نهاية</button>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">حدود مستديرة</label>
+                  <div class="range-wrap">
+                    <input type="range" id="cornerRadius" min="0" max="60" value="0" oninput="document.getElementById('cornerRadiusVal').textContent=this.value+'px'">
+                    <span class="range-val" id="cornerRadiusVal">0px</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filters / Adjustments -->
+              <div class="settings-group">
+                <h4><i class="fas fa-magic"></i> فلاتر وتعديلات</h4>
+
+                <div class="setting-row">
+                  <label class="s-label">السطوع</label>
+                  <div class="range-wrap">
+                    <input type="range" id="brightness" min="-100" max="100" value="0" oninput="document.getElementById('brightnessVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="brightnessVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">التباين</label>
+                  <div class="range-wrap">
+                    <input type="range" id="contrast" min="-100" max="100" value="0" oninput="document.getElementById('contrastVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="contrastVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">التشبع</label>
+                  <div class="range-wrap">
+                    <input type="range" id="saturation" min="-100" max="100" value="0" oninput="document.getElementById('saturationVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="saturationVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">الحدة (Sharpen)</label>
+                  <div class="range-wrap">
+                    <input type="range" id="sharpen" min="0" max="10" value="0" step="0.5" oninput="document.getElementById('sharpenVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="sharpenVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">الدرجات (Levels)</label>
+                  <div class="range-wrap">
+                    <input type="range" id="levels" min="0" max="100" value="0" oninput="document.getElementById('levelsVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="levelsVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">الضبابية (Blur)</label>
+                  <div class="range-wrap">
+                    <input type="range" id="blurAmount" min="0" max="10" value="0" step="0.5" oninput="document.getElementById('blurVal').textContent=this.value;updateFilter()">
+                    <span class="range-val" id="blurVal">0</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">أبيض وأسود</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="bwToggle" onchange="updateFilter()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">عكس الألوان</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="invertToggle" onchange="updateFilter()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">إعادة تعيين الفلاتر</label>
+                  <button class="btn-sm btn-outline" onclick="resetFilters()"><i class="fas fa-undo"></i> إعادة</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Merge Action -->
+            <div class="merge-action">
+              <button class="btn-merge" onclick="mergeImages()">
+                <i class="fas fa-layer-group"></i>
+                دمج الصور وإنشاء النتيجة
+              </button>
+            </div>
+          </div>
+
+          <!-- Result Section -->
+          <div class="result-section" id="resultSection">
+            <div class="section-title">
+              <i class="fas fa-check-circle"></i> النتيجة النهائية
+            </div>
+            <div class="result-canvas-wrapper">
+              <canvas id="resultCanvas"></canvas>
+            </div>
+            <div class="result-info" id="resultInfo"></div>
+            <div class="export-grid">
+              <button class="btn-export btn-primary" onclick="downloadResult('png')">
+                <i class="fas fa-download"></i> تحميل PNG
+              </button>
+              <button class="btn-export btn-secondary" onclick="downloadResult('jpg')">
+                <i class="fas fa-download"></i> تحميل JPG
+              </button>
+              <button class="btn-export btn-success" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> نسخ للحافظة
+              </button>
+              <button class="btn-export btn-dark" onclick="downloadResult('webp')">
+                <i class="fas fa-download"></i> تحميل WebP
+              </button>
+              <button class="btn-export btn-danger" onclick="resetAll()">
+                <i class="fas fa-redo"></i> إعادة تعيين الكل
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /tool-main-container -->
+      </div><!-- /container -->
+    </div><!-- /tool-page-wrapper -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512"><use href="../assets/images/icons.svg#icon-map-marker-alt"></use></svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-phone"></use></svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-envelope"></use></svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-instagram"></use></svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-twitter"></use></svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512"><use href="../assets/images/icons.svg#icon-telegram"></use></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
+    </a>
+
+    <!-- ============================================================
+         TOOL JAVASCRIPT
+    ============================================================ -->
+    <script>
+    (function () {
+      'use strict';
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      const panels = [
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false },
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false }
+      ];
+
+      let arrangement  = 'side';   // 'side' | 'stack'
+      let alignment    = 'center'; // 'center' | 'start' | 'end'
+      let gapVal       = 10;
+      let outputScale  = 1;
+      let singleMode   = false;
+      let mergedRaw    = null;     // merged canvas before filters
+      let filteredCanvas = null;   // final canvas after filters
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        panels.forEach(function (p, idx) {
+          var canvas  = document.getElementById('canvas' + idx);
+          var wrapper = document.getElementById('canvasWrapper' + idx);
+
+          // Fix canvas resolution to wrapper size (once)
+          canvas.width  = wrapper.offsetWidth  || 600;
+          canvas.height = wrapper.offsetHeight || 310;
+
+          // Mouse events
+          canvas.addEventListener('mousedown',  function (e) { onDown(e, idx); });
+          canvas.addEventListener('mousemove',  function (e) { onMove(e, idx); });
+          canvas.addEventListener('mouseup',    function (e) { onUp(e, idx); });
+          canvas.addEventListener('mouseleave', function (e) { onUp(e, idx); });
+
+          // Touch events
+          canvas.addEventListener('touchstart', function (e) { e.preventDefault(); onDown(touchToMouse(e, canvas), idx); }, { passive: false });
+          canvas.addEventListener('touchmove',  function (e) { e.preventDefault(); onMove(touchToMouse(e, canvas), idx); }, { passive: false });
+          canvas.addEventListener('touchend',   function (e) { e.preventDefault(); onUp(touchToMouse(e, canvas), idx); }, { passive: false });
+
+          // Upload zone drag-drop
+          var zone = document.getElementById('uploadZone' + idx);
+          zone.addEventListener('click', function () { document.getElementById('fileInput' + idx).click(); });
+          zone.addEventListener('dragover',  function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+          zone.addEventListener('dragleave', function ()  { zone.classList.remove('drag-over'); });
+          zone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            var f = e.dataTransfer.files[0];
+            if (f && f.type.startsWith('image/')) loadImgFile(idx, f);
+          });
+
+          renderPanel(idx);
+        });
+      });
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function touchToMouse(e, canvas) {
+        var t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || {};
+        return { clientX: t.clientX || 0, clientY: t.clientY || 0 };
+      }
+
+      function getCanvasPos(e, canvas) {
+        var rect   = canvas.getBoundingClientRect();
+        var scaleX = canvas.width  / rect.width;
+        var scaleY = canvas.height / rect.height;
+        return {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top)  * scaleY
+        };
+      }
+
+      function clampPx(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+      function showToast(msg, type) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show' + (type ? ' ' + type : '');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.className = 'toast'; }, 2600);
+      }
+
+      // ============================================================
+      // IMAGE LOADING
+      // ============================================================
+      window.loadImageFromInput = function (idx, input) {
+        var f = input.files[0];
+        if (f) loadImgFile(idx, f);
+      };
+
+      function loadImgFile(idx, file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            panels[idx].img       = img;
+            panels[idx].sel       = null;
+            panels[idx].rotation  = 0;
+            panels[idx].useFullImg = false;
+            document.getElementById('rotation' + idx).value = 0;
+            document.getElementById('rotVal'   + idx).textContent = '0°';
+            document.getElementById('emptyMsg' + idx).style.display = 'none';
+            document.getElementById('cropInfo' + idx).innerHTML = 'اسحب لتحديد منطقة القص';
+            renderPanel(idx);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ============================================================
+      // ROTATION
+      // ============================================================
+      window.updateRotation = function (idx, val) {
+        panels[idx].rotation = Number(val);
+        document.getElementById('rotVal' + idx).textContent = val + '°';
+        renderPanel(idx);
+      };
+
+      // ============================================================
+      // SELECTION SHAPE / CLEAR / FULL IMAGE
+      // ============================================================
+      window.setShape = function (idx, shape) {
+        panels[idx].shape = shape;
+        ['free', 'square'].forEach(function (s) {
+          document.getElementById('shape' + idx + '-' + s).classList.toggle('active', s === shape);
+        });
+      };
+
+      window.clearSelection = function (idx) {
+        panels[idx].sel       = null;
+        panels[idx].useFullImg = false;
+        document.getElementById('cropInfo' + idx).textContent = 'لم يتم التحديد بعد';
+        renderPanel(idx);
+      };
+
+      window.useFullImage = function (idx) {
+        panels[idx].sel       = null;
+        panels[idx].useFullImg = true;
+        document.getElementById('cropInfo' + idx).innerHTML = '<span>كل الصورة</span>';
+        renderPanel(idx);
+      };
+
+      // ============================================================
+      // ROTATED DIMENSIONS
+      // ============================================================
+      function getRotDim(img, deg) {
+        var rad = deg * Math.PI / 180;
+        var cos = Math.abs(Math.cos(rad));
+        var sin = Math.abs(Math.sin(rad));
+        return {
+          rw: img.width  * cos + img.height * sin,
+          rh: img.width  * sin + img.height * cos
+        };
+      }
+
+      // Returns { scale, offX, offY, rw, rh } mapping rotated-image-space → canvas-display-space
+      function getDisplayMapping(idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var dim    = getRotDim(p.img, p.rotation);
+        var scale  = Math.min(canvas.width / dim.rw, canvas.height / dim.rh) * 0.94;
+        return {
+          scale : scale,
+          offX  : (canvas.width  - dim.rw * scale) / 2,
+          offY  : (canvas.height - dim.rh * scale) / 2,
+          rw    : dim.rw,
+          rh    : dim.rh
+        };
+      }
+
+      // ============================================================
+      // RENDER PANEL
+      // ============================================================
+      function renderPanel(idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var ctx    = canvas.getContext('2d');
+        var W      = canvas.width;
+        var H      = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+        if (!p.img) return;
+
+        var m = getDisplayMapping(idx);
+
+        // Draw rotated image
+        ctx.save();
+        ctx.translate(W / 2, H / 2);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.drawImage(p.img,
+          -p.img.width  * m.scale / 2,
+          -p.img.height * m.scale / 2,
+           p.img.width  * m.scale,
+           p.img.height * m.scale
+        );
+        ctx.restore();
+
+        // Selection overlay
+        if (p.sel && p.sel.w > 3 && p.sel.h > 3) {
+          var sx = p.sel.x, sy = p.sel.y, sw = p.sel.w, sh = p.sel.h;
+
+          // Dark overlay outside selection
+          ctx.fillStyle = 'rgba(0,0,0,0.45)';
+          ctx.fillRect(0, 0, W, H);
+
+          // Restore image inside selection
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(sx, sy, sw, sh);
+          ctx.clip();
+          ctx.translate(W / 2, H / 2);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.drawImage(p.img,
+            -p.img.width  * m.scale / 2,
+            -p.img.height * m.scale / 2,
+             p.img.width  * m.scale,
+             p.img.height * m.scale
+          );
+          ctx.restore();
+
+          // Selection border
+          ctx.strokeStyle = '#FF6B2B';
+          ctx.lineWidth   = 2;
+          ctx.setLineDash([6, 3]);
+          ctx.strokeRect(sx, sy, sw, sh);
+          ctx.setLineDash([]);
+
+          // Corner handles
+          ctx.fillStyle = '#FF6B2B';
+          [[sx,sy],[sx+sw,sy],[sx,sy+sh],[sx+sw,sy+sh]].forEach(function (pt) {
+            ctx.fillRect(pt[0] - 5, pt[1] - 5, 10, 10);
+          });
+
+          // Midpoint handles
+          ctx.fillStyle = 'rgba(255,107,43,0.6)';
+          [[sx+sw/2, sy],[sx+sw/2, sy+sh],[sx, sy+sh/2],[sx+sw, sy+sh/2]].forEach(function (pt) {
+            ctx.fillRect(pt[0] - 4, pt[1] - 4, 8, 8);
+          });
+
+          // Crop info
+          var actualW = Math.round(sw / m.scale);
+          var actualH = Math.round(sh / m.scale);
+          document.getElementById('cropInfo' + idx).innerHTML =
+            'المنطقة المحددة: <span>' + actualW + ' × ' + actualH + ' بكسل</span>';
+        } else if (p.useFullImg) {
+          // Light border around full image
+          ctx.strokeStyle = 'rgba(255,107,43,0.5)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(m.offX, m.offY, m.rw * m.scale, m.rh * m.scale);
+        }
+      }
+
+      // ============================================================
+      // MOUSE / TOUCH INTERACTION
+      // ============================================================
+      function onDown(e, idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var pos    = getCanvasPos(e, canvas);
+        p.isDragging = true;
+        p.startX = pos.x;
+        p.startY = pos.y;
+        p.sel    = { x: pos.x, y: pos.y, w: 0, h: 0 };
+        p.useFullImg = false;
+      }
+
+      function onMove(e, idx) {
+        var p = panels[idx];
+        if (!p.isDragging) return;
+        var canvas = document.getElementById('canvas' + idx);
+        var pos    = getCanvasPos(e, canvas);
+
+        var dx = pos.x - p.startX;
+        var dy = pos.y - p.startY;
+
+        if (p.shape === 'square') {
+          var side = Math.min(Math.abs(dx), Math.abs(dy));
+          dx = dx < 0 ? -side : side;
+          dy = dy < 0 ? -side : side;
+        }
+
+        p.sel = {
+          x: dx < 0 ? p.startX + dx : p.startX,
+          y: dy < 0 ? p.startY + dy : p.startY,
+          w: Math.abs(dx),
+          h: Math.abs(dy)
+        };
+
+        renderPanel(idx);
+      }
+
+      function onUp(e, idx) {
+        panels[idx].isDragging = false;
+        // If selection too small, discard
+        if (panels[idx].sel && (panels[idx].sel.w < 5 || panels[idx].sel.h < 5)) {
+          panels[idx].sel = null;
+          renderPanel(idx);
+        }
+      }
+
+      // ============================================================
+      // CROP PANEL → returns a canvas with the cropped portion
+      // ============================================================
+      function cropPanel(idx) {
+        var p = panels[idx];
+        if (!p.img) return null;
+
+        // Build full-resolution rotated canvas
+        var dim    = getRotDim(p.img, p.rotation);
+        var rotC   = document.createElement('canvas');
+        rotC.width  = Math.ceil(dim.rw);
+        rotC.height = Math.ceil(dim.rh);
+        var rCtx = rotC.getContext('2d');
+        rCtx.translate(rotC.width / 2, rotC.height / 2);
+        rCtx.rotate(p.rotation * Math.PI / 180);
+        rCtx.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
+
+        // If no selection or useFullImg, return entire rotated canvas
+        if (p.useFullImg || !p.sel || p.sel.w < 5 || p.sel.h < 5) {
+          return rotC;
+        }
+
+        // Map display selection → actual rotated-image coords
+        var m = getDisplayMapping(idx);
+        var ax = (p.sel.x - m.offX) / m.scale;
+        var ay = (p.sel.y - m.offY) / m.scale;
+        var aw = p.sel.w / m.scale;
+        var ah = p.sel.h / m.scale;
+
+        // Clamp to image bounds
+        var cx  = Math.max(0, ax);
+        var cy  = Math.max(0, ay);
+        var cw  = Math.min(aw, rotC.width  - cx);
+        var ch  = Math.min(ah, rotC.height - cy);
+        if (cw <= 0 || ch <= 0) return rotC;
+
+        var out   = document.createElement('canvas');
+        out.width  = Math.ceil(cw);
+        out.height = Math.ceil(ch);
+        out.getContext('2d').drawImage(rotC, cx, cy, cw, ch, 0, 0, cw, ch);
+        return out;
+      }
+
+      // ============================================================
+      // MERGE IMAGES
+      // ============================================================
+      window.mergeImages = function () {
+        var c0 = cropPanel(0);
+        if (!c0) { showToast('الرجاء رفع الصورة الأولى أولاً', 'error'); return; }
+
+        var c1 = (!singleMode) ? cropPanel(1) : null;
+
+        var sm   = outputScale;
+        var gap  = Number(document.getElementById('gapSlider').value);
+        var cr   = Number(document.getElementById('cornerRadius').value);
+
+        var totalW, totalH;
+
+        if (!c1) {
+          totalW = Math.ceil(c0.width  * sm);
+          totalH = Math.ceil(c0.height * sm);
+        } else if (arrangement === 'side') {
+          totalW = Math.ceil((c0.width + gap + c1.width) * sm);
+          totalH = Math.ceil(Math.max(c0.height, c1.height) * sm);
+        } else {
+          totalW = Math.ceil(Math.max(c0.width, c1.width) * sm);
+          totalH = Math.ceil((c0.height + gap + c1.height) * sm);
+        }
+
+        var outC   = document.createElement('canvas');
+        outC.width  = totalW;
+        outC.height = totalH;
+        var ctx    = outC.getContext('2d');
+
+        // Background
+        var transparent = document.getElementById('transparentBg').checked;
+        if (!transparent) {
+          ctx.fillStyle = document.getElementById('bgColor').value;
+          ctx.fillRect(0, 0, totalW, totalH);
+        }
+
+        function drawRounded(srcCanvas, dx, dy, dw, dh) {
+          if (cr <= 0) {
+            ctx.drawImage(srcCanvas, dx, dy, dw, dh);
+          } else {
+            ctx.save();
+            ctx.beginPath();
+            var r = Math.min(cr, dw / 2, dh / 2);
+            ctx.moveTo(dx + r, dy);
+            ctx.lineTo(dx + dw - r, dy);
+            ctx.quadraticCurveTo(dx + dw, dy, dx + dw, dy + r);
+            ctx.lineTo(dx + dw, dy + dh - r);
+            ctx.quadraticCurveTo(dx + dw, dy + dh, dx + dw - r, dy + dh);
+            ctx.lineTo(dx + r, dy + dh);
+            ctx.quadraticCurveTo(dx, dy + dh, dx, dy + dh - r);
+            ctx.lineTo(dx, dy + r);
+            ctx.quadraticCurveTo(dx, dy, dx + r, dy);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(srcCanvas, dx, dy, dw, dh);
+            ctx.restore();
+          }
+        }
+
+        function calcOffset(mainSize, itemSize) {
+          if (alignment === 'center') return (mainSize - itemSize * sm) / 2;
+          if (alignment === 'end')    return (mainSize - itemSize * sm);
+          return 0;
+        }
+
+        if (!c1) {
+          drawRounded(c0, 0, 0, c0.width * sm, c0.height * sm);
+        } else if (arrangement === 'side') {
+          var y0 = calcOffset(totalH, c0.height);
+          var y1 = calcOffset(totalH, c1.height);
+          drawRounded(c0, 0,                         y0, c0.width * sm, c0.height * sm);
+          drawRounded(c1, (c0.width + gap) * sm,     y1, c1.width * sm, c1.height * sm);
+        } else {
+          var x0 = calcOffset(totalW, c0.width);
+          var x1 = calcOffset(totalW, c1.width);
+          drawRounded(c0, x0, 0,                         c0.width * sm, c0.height * sm);
+          drawRounded(c1, x1, (c0.height + gap) * sm,   c1.width * sm, c1.height * sm);
+        }
+
+        mergedRaw = outC;
+        applyFiltersAndShow();
+
+        document.getElementById('resultSection').classList.add('visible');
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        showToast('تم دمج الصور بنجاح!', 'success');
+      };
+
+      // ============================================================
+      // FILTERS
+      // ============================================================
+      window.updateFilter = function () {
+        if (mergedRaw) applyFiltersAndShow();
+      };
+
+      window.resetFilters = function () {
+        ['brightness','contrast','saturation'].forEach(function (id) {
+          document.getElementById(id).value = 0;
+          document.getElementById(id + 'Val').textContent = '0';
+        });
+        document.getElementById('sharpen').value = 0;
+        document.getElementById('sharpenVal').textContent = '0';
+        document.getElementById('levels').value = 0;
+        document.getElementById('levelsVal').textContent = '0';
+        document.getElementById('blurAmount').value = 0;
+        document.getElementById('blurVal').textContent = '0';
+        document.getElementById('bwToggle').checked = false;
+        document.getElementById('invertToggle').checked = false;
+        if (mergedRaw) applyFiltersAndShow();
+      };
+
+      function applyFiltersAndShow() {
+        if (!mergedRaw) return;
+
+        var brightAdj  = Number(document.getElementById('brightness').value)  * 2.55;
+        var contrastV  = Number(document.getElementById('contrast').value);
+        var satV       = Number(document.getElementById('saturation').value);
+        var sharpenV   = Number(document.getElementById('sharpen').value);
+        var levelsV    = Number(document.getElementById('levels').value);
+        var blurV      = Number(document.getElementById('blurAmount').value);
+        var bw         = document.getElementById('bwToggle').checked;
+        var inv        = document.getElementById('invertToggle').checked;
+
+        var contrastF  = (contrastV + 100) / 100;      // 0 → 2
+        var satFactor  = bw ? 0 : (satV + 100) / 100;  // 0 → 2
+
+        // Work canvas
+        var wC   = document.createElement('canvas');
+        wC.width  = mergedRaw.width;
+        wC.height = mergedRaw.height;
+        var wCtx = wC.getContext('2d');
+
+        // Apply blur via CSS filter (fast)
+        if (blurV > 0) {
+          wCtx.filter = 'blur(' + blurV + 'px)';
+        }
+        wCtx.drawImage(mergedRaw, 0, 0);
+        wCtx.filter = 'none';
+
+        // Pixel manipulation
+        var imgData = wCtx.getImageData(0, 0, wC.width, wC.height);
+        var d       = imgData.data;
+
+        for (var i = 0; i < d.length; i += 4) {
+          var r = d[i], g = d[i+1], b = d[i+2];
+
+          // Brightness
+          r += brightAdj; g += brightAdj; b += brightAdj;
+
+          // Contrast (centre on 128)
+          r = contrastF * (r - 128) + 128;
+          g = contrastF * (g - 128) + 128;
+          b = contrastF * (b - 128) + 128;
+
+          // Saturation / B&W
+          var gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          r = gray + satFactor * (r - gray);
+          g = gray + satFactor * (g - gray);
+          b = gray + satFactor * (b - gray);
+
+          // Levels (black-point lift → text clarity)
+          if (levelsV > 0) {
+            var threshold = levelsV * 2.55;
+            var stretch   = 255 / (255 - threshold + 1e-6);
+            r = (r - threshold) * stretch;
+            g = (g - threshold) * stretch;
+            b = (b - threshold) * stretch;
+          }
+
+          // Invert
+          if (inv) { r = 255 - r; g = 255 - g; b = 255 - b; }
+
+          d[i]   = clampPx(r);
+          d[i+1] = clampPx(g);
+          d[i+2] = clampPx(b);
+        }
+
+        wCtx.putImageData(imgData, 0, 0);
+
+        // Sharpen (convolution unsharp mask)
+        if (sharpenV > 0) {
+          applySharpen(wCtx, wC.width, wC.height, Math.min(sharpenV / 5, 1));
+        }
+
+        filteredCanvas = wC;
+
+        // Display on result canvas (scaled to fit)
+        var resCanvas = document.getElementById('resultCanvas');
+        var maxW      = resCanvas.parentElement.clientWidth - 40;
+        var dispScale = Math.min(1, maxW / wC.width);
+        resCanvas.width  = wC.width;
+        resCanvas.height = wC.height;
+        resCanvas.style.width  = Math.round(wC.width  * dispScale) + 'px';
+        resCanvas.style.height = Math.round(wC.height * dispScale) + 'px';
+        resCanvas.getContext('2d').drawImage(wC, 0, 0);
+
+        document.getElementById('resultInfo').innerHTML =
+          'الأبعاد النهائية: <span>' + wC.width + ' × ' + wC.height + ' بكسل</span>';
+      }
+
+      function applySharpen(ctx, W, H, strength) {
+        var src   = ctx.getImageData(0, 0, W, H);
+        var copy  = new Uint8ClampedArray(src.data);
+        var out   = src.data;
+        var kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+
+        for (var y = 1; y < H - 1; y++) {
+          for (var x = 1; x < W - 1; x++) {
+            var base = (y * W + x) * 4;
+            var r = 0, g = 0, b = 0;
+            for (var ky = -1; ky <= 1; ky++) {
+              for (var kx = -1; kx <= 1; kx++) {
+                var ki  = (ky + 1) * 3 + (kx + 1);
+                var pi  = ((y + ky) * W + (x + kx)) * 4;
+                var k   = kernel[ki];
+                r += copy[pi]   * k;
+                g += copy[pi+1] * k;
+                b += copy[pi+2] * k;
+              }
+            }
+            out[base]   = clampPx(copy[base]   + (r - copy[base])   * strength);
+            out[base+1] = clampPx(copy[base+1] + (g - copy[base+1]) * strength);
+            out[base+2] = clampPx(copy[base+2] + (b - copy[base+2]) * strength);
+          }
+        }
+        ctx.putImageData(src, 0, 0);
+      }
+
+      // ============================================================
+      // SETTINGS HELPERS
+      // ============================================================
+      window.setArrangement = function (type) {
+        arrangement = type;
+        document.getElementById('arrangeSide').classList.toggle('active', type === 'side');
+        document.getElementById('arrangeStack').classList.toggle('active', type === 'stack');
+      };
+
+      window.setAlignment = function (val) {
+        alignment = val;
+        ['center','start','end'].forEach(function (v) {
+          document.getElementById('align' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('active', v === val);
+        });
+      };
+
+      window.setOutputSize = function (val) {
+        outputScale = Number(val);
+        document.getElementById('sizeOrig').classList.toggle('active', val === '1');
+        document.getElementById('size2x').classList.toggle('active', val === '2');
+        document.getElementById('sizeHalf').classList.toggle('active', val === '0.5');
+      };
+
+      window.toggleSingleMode = function () {
+        singleMode = document.getElementById('singleImageMode').checked;
+        var card = document.getElementById('panel-card-1');
+        card.classList.toggle('disabled', singleMode);
+      };
+
+      // ============================================================
+      // EXPORT
+      // ============================================================
+      window.downloadResult = function (fmt) {
+        var canvas = filteredCanvas || document.getElementById('resultCanvas');
+        if (!canvas || !canvas.width) { showToast('لا توجد نتيجة بعد', 'error'); return; }
+        var mimeMap  = { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp' };
+        var qualMap  = { png: 1, jpg: 0.92, webp: 0.9 };
+        var mime     = mimeMap[fmt] || 'image/png';
+        var quality  = qualMap[fmt] || 1;
+        var link     = document.createElement('a');
+        link.href    = canvas.toDataURL(mime, quality);
+        link.download = 'image-crop-merge-aliahmed.' + fmt;
+        link.click();
+        showToast('تم تحميل الصورة بصيغة ' + fmt.toUpperCase() + '!', 'success');
+      };
+
+      window.copyToClipboard = function () {
+        var canvas = filteredCanvas || document.getElementById('resultCanvas');
+        if (!canvas || !canvas.width) { showToast('لا توجد نتيجة بعد', 'error'); return; }
+        if (!navigator.clipboard || !window.ClipboardItem) {
+          showToast('المتصفح لا يدعم هذه الميزة', 'error');
+          return;
+        }
+        canvas.toBlob(function (blob) {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+            .then(function () { showToast('تم نسخ الصورة للحافظة!', 'success'); })
+            .catch(function (err) { showToast('فشل النسخ: ' + err.message, 'error'); });
+        });
+      };
+
+      window.resetAll = function () {
+        panels.forEach(function (p, idx) {
+          p.img        = null;
+          p.sel        = null;
+          p.rotation   = 0;
+          p.useFullImg = false;
+          document.getElementById('rotation' + idx).value = 0;
+          document.getElementById('rotVal'   + idx).textContent = '0°';
+          document.getElementById('emptyMsg' + idx).style.display = '';
+          document.getElementById('cropInfo' + idx).textContent = 'لم يتم التحديد بعد';
+          document.getElementById('fileInput' + idx).value = '';
+          renderPanel(idx);
+        });
+        mergedRaw      = null;
+        filteredCanvas = null;
+        document.getElementById('resultSection').classList.remove('visible');
+        resetFilters();
+        showToast('تم إعادة التعيين الكامل');
+      };
+
+    })(); // end IIFE
+    </script>
+  </body>
+</html>
