@@ -342,6 +342,95 @@
         }
       }
 
+      /* قسم روابط المتاجر */
+      .store-links-section {
+        padding: 60px 0;
+      }
+
+      .store-links-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .copy-all-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(var(--primary-rgb), 0.3);
+      }
+
+      .copy-all-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.4);
+      }
+
+      .copy-all-btn:active {
+        transform: translateY(0);
+      }
+
+      .copy-feedback {
+        font-size: 0.95rem;
+        color: #22c55e;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .copy-feedback.visible {
+        opacity: 1;
+      }
+
+      .store-links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+      }
+
+      .store-link-item {
+        display: block;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 18px;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-family: monospace, 'Tajawal', sans-serif;
+        transition: all 0.25s ease;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        direction: ltr;
+        text-align: left;
+      }
+
+      .store-link-item:hover {
+        background: rgba(var(--primary-rgb), 0.08);
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.15);
+        color: var(--primary-color);
+      }
+
+      @media (max-width: 768px) {
+        .store-links-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       /* Hidden pages */
       .works-page-content {
         display: none;
@@ -1353,6 +1442,78 @@
         </div>
       </section>
 
+      <!-- قسم روابط المتاجر -->
+      <section class="section store-links-section">
+        <div class="container">
+          <div class="section-title">
+            <h2>روابط المتاجر</h2>
+            <p>جميع المتاجر التي قمنا بتصميمها وتطويرها</p>
+          </div>
+
+          <div class="store-links-actions">
+            <button class="copy-all-btn" id="copyAllLinksBtn" onclick="copyAllStoreLinks()">
+              <svg viewBox="0 0 448 512" width="18" height="18" fill="currentColor">
+                <path d="M384 336H192c-8.8 0-16-7.2-16-16V64c0-8.8 7.2-16 16-16l140.1 0L400 115.9V320c0 8.8-7.2 16-16 16zM192 384H384c35.3 0 64-28.7 64-64V115.9c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1H192c-35.3 0-64 28.7-64 64V320c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H256c35.3 0 64-28.7 64-64V416H272v32c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192c0-8.8 7.2-16 16-16H96V128H64z"/>
+              </svg>
+              نسخ جميع الروابط
+            </button>
+            <span class="copy-feedback" id="copyFeedback"></span>
+          </div>
+
+          <div class="store-links-grid">
+            <a href="https://muysr.com/" target="_blank" rel="noopener" class="store-link-item">https://muysr.com/</a>
+            <a href="https://ssw-1.com/" target="_blank" rel="noopener" class="store-link-item">https://ssw-1.com/</a>
+            <a href="https://signgos.com/" target="_blank" rel="noopener" class="store-link-item">https://signgos.com/</a>
+            <a href="https://b7ther.com/" target="_blank" rel="noopener" class="store-link-item">https://b7ther.com/</a>
+            <a href="https://breezobrand.com/" target="_blank" rel="noopener" class="store-link-item">https://breezobrand.com/</a>
+            <a href="https://sharqi-atlas.com/" target="_blank" rel="noopener" class="store-link-item">https://sharqi-atlas.com/</a>
+            <a href="https://nublandebtikar.com/" target="_blank" rel="noopener" class="store-link-item">https://nublandebtikar.com/</a>
+            <a href="https://fancy-gold.com/" target="_blank" rel="noopener" class="store-link-item">https://fancy-gold.com/</a>
+            <a href="https://maysarsa.com/ar-eg/" target="_blank" rel="noopener" class="store-link-item">https://maysarsa.com/ar-eg/</a>
+            <a href="https://aieselstore1.com/" target="_blank" rel="noopener" class="store-link-item">https://aieselstore1.com/</a>
+            <a href="https://oboralqmah.com/" target="_blank" rel="noopener" class="store-link-item">https://oboralqmah.com/</a>
+            <a href="https://tzixho.zid.store/" target="_blank" rel="noopener" class="store-link-item">https://tzixho.zid.store/</a>
+            <a href="https://turath-re.com/" target="_blank" rel="noopener" class="store-link-item">https://turath-re.com/</a>
+            <a href="https://smartcellsa.com/ar" target="_blank" rel="noopener" class="store-link-item">https://smartcellsa.com/ar</a>
+            <a href="https://salla.sa/Tnsoud" target="_blank" rel="noopener" class="store-link-item">https://salla.sa/Tnsoud</a>
+            <a href="https://salla.sa/aldyem-334-gige" target="_blank" rel="noopener" class="store-link-item">https://salla.sa/aldyem-334-gige</a>
+            <a href="https://f1-jackets.com/" target="_blank" rel="noopener" class="store-link-item">https://f1-jackets.com/</a>
+            <a href="https://rancee.com/" target="_blank" rel="noopener" class="store-link-item">https://rancee.com/</a>
+            <a href="https://lojaso.com/" target="_blank" rel="noopener" class="store-link-item">https://lojaso.com/</a>
+            <a href="https://nebradoud.com/" target="_blank" rel="noopener" class="store-link-item">https://nebradoud.com/</a>
+            <a href="https://flornsa.com/" target="_blank" rel="noopener" class="store-link-item">https://flornsa.com/</a>
+            <a href="https://qitafaltabiea.com/" target="_blank" rel="noopener" class="store-link-item">https://qitafaltabiea.com/</a>
+            <a href="https://adeemlight.sa/" target="_blank" rel="noopener" class="store-link-item">https://adeemlight.sa/</a>
+            <a href="https://roy8ah.com/" target="_blank" rel="noopener" class="store-link-item">https://roy8ah.com/</a>
+            <a href="https://atayib.com.sa/" target="_blank" rel="noopener" class="store-link-item">https://atayib.com.sa/</a>
+            <a href="https://ormak.sa/ar" target="_blank" rel="noopener" class="store-link-item">https://ormak.sa/ar</a>
+            <a href="https://seedroastery.com/" target="_blank" rel="noopener" class="store-link-item">https://seedroastery.com/</a>
+            <a href="https://gamer2light.com/ar" target="_blank" rel="noopener" class="store-link-item">https://gamer2light.com/ar</a>
+            <a href="https://agsanalteeb.com/" target="_blank" rel="noopener" class="store-link-item">https://agsanalteeb.com/</a>
+            <a href="https://qrnas-ksa.com/" target="_blank" rel="noopener" class="store-link-item">https://qrnas-ksa.com/</a>
+            <a href="https://maharh-sa.com/" target="_blank" rel="noopener" class="store-link-item">https://maharh-sa.com/</a>
+            <a href="https://lastosa.com/" target="_blank" rel="noopener" class="store-link-item">https://lastosa.com/</a>
+            <a href="https://asraralward.net/" target="_blank" rel="noopener" class="store-link-item">https://asraralward.net/</a>
+            <a href="https://kabdi-store.com/ar" target="_blank" rel="noopener" class="store-link-item">https://kabdi-store.com/ar</a>
+            <a href="https://shurfa.shop/" target="_blank" rel="noopener" class="store-link-item">https://shurfa.shop/</a>
+            <a href="https://mininish.com/" target="_blank" rel="noopener" class="store-link-item">https://mininish.com/</a>
+            <a href="https://aldhali.sa/" target="_blank" rel="noopener" class="store-link-item">https://aldhali.sa/</a>
+            <a href="https://salla.sa/bigben1" target="_blank" rel="noopener" class="store-link-item">https://salla.sa/bigben1</a>
+            <a href="https://salla.sa/hyak-2026" target="_blank" rel="noopener" class="store-link-item">https://salla.sa/hyak-2026</a>
+            <a href="https://violetbouquets.com/ar" target="_blank" rel="noopener" class="store-link-item">https://violetbouquets.com/ar</a>
+            <a href="https://jazebia.com/" target="_blank" rel="noopener" class="store-link-item">https://jazebia.com/</a>
+            <a href="https://ora-store-sa.com/" target="_blank" rel="noopener" class="store-link-item">https://ora-store-sa.com/</a>
+            <a href="https://bitiajmal.com/" target="_blank" rel="noopener" class="store-link-item">https://bitiajmal.com/</a>
+            <a href="https://dafablanket.com/" target="_blank" rel="noopener" class="store-link-item">https://dafablanket.com/</a>
+            <a href="https://uniquescent.net/" target="_blank" rel="noopener" class="store-link-item">https://uniquescent.net/</a>
+            <a href="https://shefleraplants.com/" target="_blank" rel="noopener" class="store-link-item">https://shefleraplants.com/</a>
+            <a href="https://isupport.sa/" target="_blank" rel="noopener" class="store-link-item">https://isupport.sa/</a>
+            <a href="https://salla.sa/cybervault" target="_blank" rel="noopener" class="store-link-item">https://salla.sa/cybervault</a>
+            <a href="https://rs2cv5.zid.store/" target="_blank" rel="noopener" class="store-link-item">https://rs2cv5.zid.store/</a>
+          </div>
+        </div>
+      </section>
+
       <!-- قسم الدعوة للتواصل -->
       <section class="section cta-section">
         <div class="container">
@@ -1440,6 +1601,19 @@
         } else if (direction === "prev" && currentPage > 1) {
           goToPage(currentPage - 1);
         }
+      }
+
+      // Copy all store links
+      function copyAllStoreLinks() {
+        const links = Array.from(document.querySelectorAll('.store-link-item'))
+          .map(a => a.href)
+          .join('\n');
+        navigator.clipboard.writeText(links).then(() => {
+          const feedback = document.getElementById('copyFeedback');
+          feedback.textContent = '✓ تم نسخ ' + document.querySelectorAll('.store-link-item').length + ' رابط!';
+          feedback.classList.add('visible');
+          setTimeout(() => feedback.classList.remove('visible'), 3000);
+        });
       }
 
       // Theme toggle function
