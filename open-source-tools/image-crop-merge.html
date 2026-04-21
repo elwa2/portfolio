@@ -503,13 +503,17 @@
       .result-section {
         background: var(--card-bg);
         border-radius: 22px;
-        padding: 32px;
+        padding: 26px;
         border: 1px solid rgba(var(--primary-rgb), 0.1);
         box-shadow: 0 10px 30px rgba(0,0,0,0.07);
-        display: none;
-        animation: fadeInUp 0.4s ease forwards;
       }
-      .result-section.visible { display: block; }
+      .result-section:not(.visible) .result-canvas-wrapper,
+      .result-section:not(.visible) .result-info,
+      .result-section:not(.visible) .export-grid { display: none !important; }
+      .result-section.visible .live-preview-placeholder { display: none; }
+      .result-section.visible .result-canvas-wrapper { display: block; }
+      .result-section.visible .result-info { display: block; }
+      .result-section.visible .export-grid { display: flex; }
       @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -655,6 +659,58 @@
         outline: none;
       }
       input[type="number"].num-input:focus { border-color: var(--primary-color); }
+
+      /* =============================================
+         BOTTOM LAYOUT (Settings ← → Live Preview)
+      ============================================= */
+      .bottom-layout {
+        display: flex;
+        gap: 22px;
+        align-items: flex-start;
+        margin-bottom: 25px;
+      }
+      .settings-col {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      /* preview on the LEFT (second in DOM = left in RTL) */
+      .preview-col {
+        flex: 0 0 420px;
+        min-width: 300px;
+        position: sticky;
+        top: 85px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+      }
+      @media (max-width: 1000px) {
+        .bottom-layout { flex-direction: column; }
+        .preview-col { position: static; flex: 1 1 0; min-width: 0; width: 100%; max-height: none; }
+      }
+      .live-preview-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        gap: 14px;
+        color: var(--text-color-light);
+        text-align: center;
+        padding: 20px;
+      }
+      .live-preview-placeholder i { font-size: 3rem; opacity: 0.2; }
+      .live-preview-placeholder .ph-title {
+        font-size: 0.95rem; font-weight: 700;
+        color: var(--text-color); opacity: 0.55;
+      }
+      .live-preview-placeholder small { font-size: 0.78rem; opacity: 0.65; line-height: 1.7; }
+      /* Compact merge-action in settings column */
+      .merge-action-compact {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px dashed rgba(var(--primary-rgb), 0.12);
+        display: flex;
+        justify-content: flex-end;
+      }
     </style>
   </head>
 
@@ -745,6 +801,7 @@
               <div class="upload-zone" id="uploadZone0">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                <small style="font-size:0.73rem;color:var(--text-color-light);opacity:.7;">Ctrl+V للصق من الحافظة</small>
                 <input type="file" id="fileInput0" accept="image/*" onchange="loadImageFromInput(0, this)">
               </div>
 
@@ -794,6 +851,7 @@
               <div class="upload-zone" id="uploadZone1">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                <small style="font-size:0.73rem;color:var(--text-color-light);opacity:.7;">Ctrl+V للصق من الحافظة</small>
                 <input type="file" id="fileInput1" accept="image/*" onchange="loadImageFromInput(1, this)">
               </div>
 
@@ -832,6 +890,11 @@
 
           </div><!-- /images-section -->
 
+          <!-- Bottom Layout (Settings on RIGHT | Live Preview on LEFT in RTL) -->
+          <div class="bottom-layout">
+
+          <!-- Settings Column (RIGHT in RTL = first in DOM) -->
+          <div class="settings-col">
           <!-- Merge + Adjustments -->
           <div class="merge-adj-section">
             <div class="section-title">
@@ -938,9 +1001,9 @@
                 </div>
 
                 <div class="setting-row">
-                  <label class="s-label">الدرجات (Levels)</label>
+                  <label class="s-label">الدرجات (Levels) <small style="opacity:.65;font-size:.75em">− تبييض / + تسويد</small></label>
                   <div class="range-wrap">
-                    <input type="range" id="levels" min="0" max="100" value="0" oninput="document.getElementById('levelsVal').textContent=this.value;updateFilter()">
+                    <input type="range" id="levels" min="-100" max="100" value="0" oninput="document.getElementById('levelsVal').textContent=this.value;updateFilter()">
                     <span class="range-val" id="levelsVal">0</span>
                   </div>
                 </div>
@@ -1102,19 +1165,26 @@
               </div>
             </div>
 
-            <!-- Merge Action -->
-            <div class="merge-action">
-              <button class="btn-merge" onclick="mergeImages()">
-                <i class="fas fa-layer-group"></i>
-                دمج الصور وإنشاء النتيجة
+            <!-- Manual Refresh -->
+            <div class="merge-action-compact">
+              <button class="btn-sm btn-outline" onclick="mergeImages()">
+                <i class="fas fa-sync-alt"></i> تحديث يدوي
               </button>
             </div>
-          </div>
+          </div><!-- /merge-adj-section -->
+          </div><!-- /settings-col -->
 
-          <!-- Result Section -->
+          <!-- Preview Column (LEFT in RTL = second in DOM) -->
+          <div class="preview-col">
           <div class="result-section" id="resultSection">
-            <div class="section-title">
-              <i class="fas fa-check-circle"></i> النتيجة النهائية
+            <div class="section-title" style="margin-bottom:14px;">
+              <i class="fas fa-eye"></i> معاينة مباشرة
+            </div>
+            <!-- Placeholder shown until first image is loaded -->
+            <div class="live-preview-placeholder" id="previewPlaceholder">
+              <i class="fas fa-layer-group"></i>
+              <span class="ph-title">سيظهر الناتج هنا تلقائياً</span>
+              <small>ارفع صورة وستُحدّث المعاينة فوراً<br>دون الحاجة لضغط أي زر</small>
             </div>
             <div class="result-canvas-wrapper">
               <canvas id="resultCanvas"></canvas>
@@ -1137,7 +1207,10 @@
                 <i class="fas fa-redo"></i> إعادة تعيين الكل
               </button>
             </div>
-          </div>
+          </div><!-- /result-section -->
+          </div><!-- /preview-col -->
+
+          </div><!-- /bottom-layout -->
 
         </div><!-- /tool-main-container -->
       </div><!-- /container -->
@@ -1293,6 +1366,17 @@
       let filteredCanvas = null;   // final canvas after filters
       let outputRaw     = null;    // after A4/tile processing
 
+      // ============================================================
+      // AUTO-MERGE DEBOUNCE
+      // ============================================================
+      var _autoMergeTimer = null;
+      function scheduleAutoMerge() {
+        clearTimeout(_autoMergeTimer);
+        _autoMergeTimer = setTimeout(function () {
+          window.mergeImages(true); // silent = no toast / no scroll
+        }, 150);
+      }
+
       // A4 mode
       let a4Mode        = false;
       let a4Orientation = 'portrait';
@@ -1312,6 +1396,29 @@
       // ============================================================
       document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Clipboard paste → load into next empty panel (Ctrl+V)
+        document.addEventListener('paste', function (e) {
+          var items = (e.clipboardData || {}).items || [];
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+              var file = items[i].getAsFile();
+              if (!file) continue;
+              var targetIdx = (!panels[0].img) ? 0 : ((!panels[1].img && !singleMode) ? 1 : 0);
+              loadImgFile(targetIdx, file);
+              showToast('تم لصق الصورة في اللوحة ' + (targetIdx + 1), 'success');
+              break;
+            }
+          }
+        });
+
+        // Auto-merge when merge-settings inputs change
+        ['gapSlider', 'bgColor', 'transparentBg', 'cornerRadius'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('input',  scheduleAutoMerge);
+          el.addEventListener('change', scheduleAutoMerge);
+        });
 
         panels.forEach(function (p, idx) {
           var canvas  = document.getElementById('canvas' + idx);
@@ -1398,6 +1505,7 @@
             document.getElementById('emptyMsg' + idx).style.display = 'none';
             document.getElementById('cropInfo' + idx).innerHTML = 'اسحب لتحديد منطقة القص';
             renderPanel(idx);
+            scheduleAutoMerge();
           };
           img.src = e.target.result;
         };
@@ -1411,6 +1519,7 @@
         panels[idx].rotation = Number(val);
         document.getElementById('rotVal' + idx).textContent = val + '°';
         renderPanel(idx);
+        scheduleAutoMerge();
       };
 
       // ============================================================
@@ -1428,6 +1537,7 @@
         panels[idx].useFullImg = false;
         document.getElementById('cropInfo' + idx).textContent = 'لم يتم التحديد بعد';
         renderPanel(idx);
+        scheduleAutoMerge();
       };
 
       window.useFullImage = function (idx) {
@@ -1435,6 +1545,7 @@
         panels[idx].useFullImg = true;
         document.getElementById('cropInfo' + idx).innerHTML = '<span>كل الصورة</span>';
         renderPanel(idx);
+        scheduleAutoMerge();
       };
 
       // ============================================================
@@ -1641,11 +1752,12 @@
       function onUp(e, idx) {
         var p      = panels[idx];
         var canvas = document.getElementById('canvas' + idx);
+        var doMerge = false;
 
         if (p.dragHandle) {
           p.dragHandle = null;
-          // Restore cursor based on position
           canvas.style.cursor = 'crosshair';
+          doMerge = true;
         }
 
         if (p.isDragging) {
@@ -1653,8 +1765,12 @@
           if (p.sel && (p.sel.w < 5 || p.sel.h < 5)) {
             p.sel = null;
             renderPanel(idx);
+          } else if (p.sel) {
+            doMerge = true;
           }
         }
+
+        if (doMerge) scheduleAutoMerge();
       }
 
       // ============================================================
@@ -1809,9 +1925,9 @@
       // ============================================================
       // MERGE IMAGES
       // ============================================================
-      window.mergeImages = function () {
+      window.mergeImages = function (silent) {
         var c0 = cropPanel(0);
-        if (!c0) { showToast('الرجاء رفع الصورة الأولى أولاً', 'error'); return; }
+        if (!c0) { if (!silent) showToast('الرجاء رفع الصورة الأولى أولاً', 'error'); return; }
 
         var c1 = (!singleMode) ? cropPanel(1) : null;
 
@@ -1892,8 +2008,9 @@
         applyFiltersAndShow();
 
         document.getElementById('resultSection').classList.add('visible');
-        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        showToast('تم دمج الصور بنجاح!', 'success');
+        if (!silent) {
+          showToast('تم دمج الصور بنجاح!', 'success');
+        }
       };
 
       // ============================================================
@@ -1968,13 +2085,20 @@
           g = gray + satFactor * (g - gray);
           b = gray + satFactor * (b - gray);
 
-          // Levels (black-point lift → text clarity)
+          // Levels: positive → raise black point (darken/sharpen text)
+          //         negative → lower white point (brighten/whiten)
           if (levelsV > 0) {
             var threshold = levelsV * 2.55;
             var stretch   = 255 / (255 - threshold + 1e-6);
             r = (r - threshold) * stretch;
             g = (g - threshold) * stretch;
             b = (b - threshold) * stretch;
+          } else if (levelsV < 0) {
+            var whitePoint = 255 - (Math.abs(levelsV) * 2.55);
+            var wStretch   = 255 / (whitePoint + 1e-6);
+            r = r * wStretch;
+            g = g * wStretch;
+            b = b * wStretch;
           }
 
           // Invert
@@ -2043,6 +2167,7 @@
         arrangement = type;
         document.getElementById('arrangeSide').classList.toggle('active', type === 'side');
         document.getElementById('arrangeStack').classList.toggle('active', type === 'stack');
+        scheduleAutoMerge();
       };
 
       window.setAlignment = function (val) {
@@ -2050,6 +2175,7 @@
         ['center','start','end'].forEach(function (v) {
           document.getElementById('align' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('active', v === val);
         });
+        scheduleAutoMerge();
       };
 
       window.setOutputSize = function (val) {
@@ -2057,12 +2183,14 @@
         document.getElementById('sizeOrig').classList.toggle('active', val === '1');
         document.getElementById('size2x').classList.toggle('active', val === '2');
         document.getElementById('sizeHalf').classList.toggle('active', val === '0.5');
+        scheduleAutoMerge();
       };
 
       window.toggleSingleMode = function () {
         singleMode = document.getElementById('singleImageMode').checked;
         var card = document.getElementById('panel-card-1');
         card.classList.toggle('disabled', singleMode);
+        scheduleAutoMerge();
       };
 
       // ============================================================
