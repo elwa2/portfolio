@@ -1135,18 +1135,18 @@
                     <div class="setting-row">
                       <label class="s-label">الأعمدة <small style="font-weight:400;">(جنب بجنب)</small></label>
                       <input type="number" id="tileColsInput" class="num-input" min="1" max="10" value="2"
-                        oninput="tileCols=Math.max(1,parseInt(this.value)||1);onTileSettingChange()">
+                        oninput="onTileSettingChange()">
                     </div>
                     <div class="setting-row">
                       <label class="s-label">الصفوف <small style="font-weight:400;">(تحت بعض)</small></label>
                       <input type="number" id="tileRowsInput" class="num-input" min="1" max="10" value="1"
-                        oninput="tileRows=Math.max(1,parseInt(this.value)||1);onTileSettingChange()">
+                        oninput="onTileSettingChange()">
                     </div>
                     <div class="setting-row">
                       <label class="s-label">المسافة الفاصلة</label>
                       <div class="range-wrap">
                         <input type="range" id="tileSpacingSlider" min="0" max="120" value="10"
-                          oninput="tileSpacing=+this.value;document.getElementById('tileSpacingVal').textContent=this.value+'px';onTileSettingChange()">
+                          oninput="onTileSettingChange()">
                         <span class="range-val" id="tileSpacingVal">10px</span>
                       </div>
                     </div>
@@ -1831,9 +1831,9 @@
 
         // Step 1: Tile
         if (tileMode) {
-          var cols = Math.max(1, tileCols);
-          var rows = Math.max(1, tileRows);
-          var sp   = tileSpacing;
+          var cols = Math.max(1, parseInt(document.getElementById('tileColsInput').value) || 1);
+          var rows = Math.max(1, parseInt(document.getElementById('tileRowsInput').value) || 1);
+          var sp   = Number(document.getElementById('tileSpacingSlider').value);
           var tC   = document.createElement('canvas');
           tC.width  = src.width  * cols + sp * Math.max(0, cols - 1);
           tC.height = src.height * rows + sp * Math.max(0, rows - 1);
@@ -2293,6 +2293,9 @@
       };
 
       window.onTileSettingChange = function () {
+        // Update display label for spacing
+        var sp = document.getElementById('tileSpacingSlider').value;
+        document.getElementById('tileSpacingVal').textContent = sp + 'px';
         if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
       };
 
