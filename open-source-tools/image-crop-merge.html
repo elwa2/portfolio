@@ -755,7 +755,7 @@
                   ارفع صورة أولاً<br>
                   <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
                 </div>
-                <div class="canvas-hint">اسحب لتحديد منطقة القص</div>
+                <div class="canvas-hint">اسحب لتحديد • اسحب النقاط لضبط التحديد</div>
               </div>
 
               <div class="panel-controls">
@@ -804,7 +804,7 @@
                   ارفع صورة أولاً<br>
                   <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
                 </div>
-                <div class="canvas-hint">اسحب لتحديد منطقة القص</div>
+                <div class="canvas-hint">اسحب لتحديد • اسحب النقاط لضبط التحديد</div>
               </div>
 
               <div class="panel-controls">
@@ -847,10 +847,10 @@
                 <div class="setting-row">
                   <label class="s-label">الترتيب</label>
                   <div class="toggle-btn-group">
-                    <button class="toggle-btn active" id="arrangeSide" onclick="setArrangement('side')">
+                    <button class="toggle-btn" id="arrangeSide" onclick="setArrangement('side')">
                       <i class="fas fa-grip-lines-vertical"></i> جنب بجنب
                     </button>
-                    <button class="toggle-btn" id="arrangeStack" onclick="setArrangement('stack')">
+                    <button class="toggle-btn active" id="arrangeStack" onclick="setArrangement('stack')">
                       <i class="fas fa-grip-lines"></i> فوق بعض
                     </button>
                   </div>
@@ -1231,12 +1231,60 @@
       // ============================================================
       // STATE
       // ============================================================
+      // dragHandle: which handle is being dragged ('tl','tr','bl','br','tm','bm','ml','mr','move')
       const panels = [
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false },
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false }
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null },
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null }
       ];
 
-      let arrangement  = 'side';   // 'side' | 'stack'
+      var HANDLE_HIT = 14; // px hit radius for handles
+
+      function getHandleAt(sel, px, py) {
+        if (!sel || sel.w < 5 || sel.h < 5) return null;
+        var sx = sel.x, sy = sel.y, sw = sel.w, sh = sel.h;
+        var pts = [
+          {n:'tl',x:sx,      y:sy      }, {n:'tr',x:sx+sw,   y:sy      },
+          {n:'bl',x:sx,      y:sy+sh   }, {n:'br',x:sx+sw,   y:sy+sh   },
+          {n:'tm',x:sx+sw/2, y:sy      }, {n:'bm',x:sx+sw/2, y:sy+sh   },
+          {n:'ml',x:sx,      y:sy+sh/2 }, {n:'mr',x:sx+sw,   y:sy+sh/2 }
+        ];
+        for (var i=0;i<pts.length;i++) {
+          if (Math.abs(px-pts[i].x)<=HANDLE_HIT && Math.abs(py-pts[i].y)<=HANDLE_HIT) return pts[i].n;
+        }
+        if (px>sx+HANDLE_HIT && px<sx+sw-HANDLE_HIT && py>sy+HANDLE_HIT && py<sy+sh-HANDLE_HIT) return 'move';
+        return null;
+      }
+
+      function getCursorForHandle(h, active) {
+        if (!h) return 'crosshair';
+        var m={tl:'nwse-resize',br:'nwse-resize',tr:'nesw-resize',bl:'nesw-resize',
+               tm:'ns-resize',bm:'ns-resize',ml:'ew-resize',mr:'ew-resize',
+               move: active ? 'grabbing' : 'grab'};
+        return m[h] || 'crosshair';
+      }
+
+      function resizeSel(idx, handle, pos) {
+        var p = panels[idx];
+        if (!p.sel) return;
+        var s = p.sel;
+        var R = s.x+s.w, B = s.y+s.h, MIN=10;
+        switch(handle) {
+          case 'tl': s.x=Math.min(pos.x,R-MIN); s.y=Math.min(pos.y,B-MIN); s.w=R-s.x; s.h=B-s.y; break;
+          case 'tr': s.y=Math.min(pos.y,B-MIN); s.w=Math.max(MIN,pos.x-s.x); s.h=B-s.y; break;
+          case 'bl': s.x=Math.min(pos.x,R-MIN); s.w=R-s.x; s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'br': s.w=Math.max(MIN,pos.x-s.x); s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'tm': s.y=Math.min(pos.y,B-MIN); s.h=B-s.y; break;
+          case 'bm': s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'ml': s.x=Math.min(pos.x,R-MIN); s.w=R-s.x; break;
+          case 'mr': s.w=Math.max(MIN,pos.x-s.x); break;
+          case 'move':
+            var dx=pos.x-p.lastPos.x, dy=pos.y-p.lastPos.y;
+            s.x+=dx; s.y+=dy;
+            break;
+        }
+      }
+
+      let arrangement  = 'stack';  // 'side' | 'stack'
       let alignment    = 'center'; // 'center' | 'start' | 'end'
       let gapVal       = 10;
       let outputScale  = 1;
@@ -1467,23 +1515,43 @@
           );
           ctx.restore();
 
-          // Selection border
+          // Selection border — dashed orange
           ctx.strokeStyle = '#FF6B2B';
           ctx.lineWidth   = 2;
-          ctx.setLineDash([6, 3]);
+          ctx.setLineDash([7, 4]);
           ctx.strokeRect(sx, sy, sw, sh);
           ctx.setLineDash([]);
 
-          // Corner handles
-          ctx.fillStyle = '#FF6B2B';
+          // Rule-of-thirds grid lines (thin)
+          ctx.strokeStyle = 'rgba(255,107,43,0.25)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(sx+sw/3, sy); ctx.lineTo(sx+sw/3, sy+sh);
+          ctx.moveTo(sx+2*sw/3, sy); ctx.lineTo(sx+2*sw/3, sy+sh);
+          ctx.moveTo(sx, sy+sh/3); ctx.lineTo(sx+sw, sy+sh/3);
+          ctx.moveTo(sx, sy+2*sh/3); ctx.lineTo(sx+sw, sy+2*sh/3);
+          ctx.stroke();
+
+          // Corner handles — filled orange circles with white border
           [[sx,sy],[sx+sw,sy],[sx,sy+sh],[sx+sw,sy+sh]].forEach(function (pt) {
-            ctx.fillRect(pt[0] - 5, pt[1] - 5, 10, 10);
+            ctx.beginPath();
+            ctx.arc(pt[0], pt[1], 8, 0, Math.PI*2);
+            ctx.fillStyle = '#FF6B2B';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
           });
 
-          // Midpoint handles
-          ctx.fillStyle = 'rgba(255,107,43,0.6)';
-          [[sx+sw/2, sy],[sx+sw/2, sy+sh],[sx, sy+sh/2],[sx+sw, sy+sh/2]].forEach(function (pt) {
-            ctx.fillRect(pt[0] - 4, pt[1] - 4, 8, 8);
+          // Edge midpoint handles — white circles with orange border
+          [[sx+sw/2,sy],[sx+sw/2,sy+sh],[sx,sy+sh/2],[sx+sw,sy+sh/2]].forEach(function (pt) {
+            ctx.beginPath();
+            ctx.arc(pt[0], pt[1], 6, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#FF6B2B';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
           });
 
           // Crop info
@@ -1500,25 +1568,57 @@
       }
 
       // ============================================================
-      // MOUSE / TOUCH INTERACTION
+      // MOUSE / TOUCH INTERACTION (handles draggable)
       // ============================================================
       function onDown(e, idx) {
         var p      = panels[idx];
         var canvas = document.getElementById('canvas' + idx);
         var pos    = getCanvasPos(e, canvas);
+
+        // Check if clicking on an existing handle
+        if (p.sel && p.sel.w > 5 && p.sel.h > 5) {
+          var h = getHandleAt(p.sel, pos.x, pos.y);
+          if (h) {
+            p.dragHandle  = h;
+            p.lastPos     = pos;
+            p.isDragging  = false;
+            canvas.style.cursor = getCursorForHandle(h, true);
+            return;
+          }
+        }
+
+        // Start a new selection
+        p.dragHandle = null;
         p.isDragging = true;
-        p.startX = pos.x;
-        p.startY = pos.y;
-        p.sel    = { x: pos.x, y: pos.y, w: 0, h: 0 };
+        p.startX     = pos.x;
+        p.startY     = pos.y;
+        p.sel        = { x: pos.x, y: pos.y, w: 0, h: 0 };
         p.useFullImg = false;
+        canvas.style.cursor = 'crosshair';
       }
 
       function onMove(e, idx) {
-        var p = panels[idx];
-        if (!p.isDragging) return;
+        var p      = panels[idx];
         var canvas = document.getElementById('canvas' + idx);
         var pos    = getCanvasPos(e, canvas);
 
+        // Handle drag (resize / move)
+        if (p.dragHandle) {
+          resizeSel(idx, p.dragHandle, pos);
+          p.lastPos = pos;
+          renderPanel(idx);
+          return;
+        }
+
+        // Cursor feedback when hovering over handles
+        if (!p.isDragging && p.sel && p.sel.w > 5) {
+          var hov = getHandleAt(p.sel, pos.x, pos.y);
+          canvas.style.cursor = getCursorForHandle(hov);
+        }
+
+        if (!p.isDragging) return;
+
+        // Draw new selection
         var dx = pos.x - p.startX;
         var dy = pos.y - p.startY;
 
@@ -1539,11 +1639,21 @@
       }
 
       function onUp(e, idx) {
-        panels[idx].isDragging = false;
-        // If selection too small, discard
-        if (panels[idx].sel && (panels[idx].sel.w < 5 || panels[idx].sel.h < 5)) {
-          panels[idx].sel = null;
-          renderPanel(idx);
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+
+        if (p.dragHandle) {
+          p.dragHandle = null;
+          // Restore cursor based on position
+          canvas.style.cursor = 'crosshair';
+        }
+
+        if (p.isDragging) {
+          p.isDragging = false;
+          if (p.sel && (p.sel.w < 5 || p.sel.h < 5)) {
+            p.sel = null;
+            renderPanel(idx);
+          }
         }
       }
 
