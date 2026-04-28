@@ -1897,7 +1897,9 @@
 
         <!-- Track wrapper -->
         <div class="logos-slider-outer">
-          <div class="logos-track-wrap">
+          <button class="logos-nav-btn logos-nav-prev" id="logos-nav-prev" title="للخلف">&#10095;</button>
+          <button class="logos-nav-btn logos-nav-next" id="logos-nav-next" title="للأمام">&#10094;</button>
+          <div class="logos-track-wrap" id="logos-track-wrap">
             <div class="logos-track" id="logos-track">
               <!-- Cards injected by JS -->
             </div>
@@ -2098,38 +2100,77 @@
           text-align: center;
         }
 
+        /* ─── Slider nav buttons ─── */
+        .logos-nav-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 5;
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          background: rgba(139,92,246, 0.7);
+          border: 1px solid rgba(139,92,246, 0.45);
+          color: #fff;
+          font-size: 1.1rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background .2s, transform .2s;
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          box-shadow: 0 4px 16px rgba(0,0,0,.3);
+        }
+        .logos-nav-btn:hover {
+          background: rgba(139,92,246, 1);
+          transform: translateY(-50%) scale(1.12);
+        }
+        .logos-nav-prev { left: 10px; }
+        .logos-nav-next { right: 10px; }
+
+        /* ─── Drag cursor ─── */
+        .logos-track-wrap { cursor: grab; -webkit-user-select: none; user-select: none; }
+        .logos-track-wrap.dragging { cursor: grabbing; }
+        .logos-track-wrap.dragging .logo-card { pointer-events: none; }
+
         @media (max-width: 768px) {
           .logo-card { width: 200px; height: 155px; }
           .logos-slider-outer::before,
           .logos-slider-outer::after { width: 50px; }
+          .logos-nav-btn { width: 38px; height: 38px; font-size: .9rem; }
         }
       </style>
 
       <script>
       (function () {
-        var BASE      = 'assets/images/prt/logos/';
-        var EXTS      = ['webp', 'png', 'jpg', 'jpeg'];
-        var MAX_MISS  = 3;
-        var images    = [];   // [{src, index}]
+        var BASE     = 'assets/images/prt/logos/';
+        var EXTS     = ['webp', 'png', 'jpg', 'jpeg'];
+        var MAX_MISS = 3;
+        var images   = [];
         var lbCurrent = 0;
 
-        /* ── Probe one image number for any supported extension ── */
+        /* drag state */
+        var track, wrap;
+        var isManual     = false;
+        var currentX     = 0;
+        var dragInitialX = 0;
+        var dragStartX   = 0;
+        var isDragging   = false;
+        var dragMoved    = false;
+        var wasDragging  = false;
+        var resumeTimer  = null;
+        var sliderDuration = 35;
+        var CARD_STEP = 280; /* 260 card + 20 gap */
+
+        /* ── Probe one image ── */
         function probeImage(n) {
           return new Promise(function (resolve) {
-            var tried = 0;
-            var found = false;
+            var tried = 0, found = false;
             EXTS.forEach(function (ext) {
               var img = new Image();
-              img.onload = function () {
-                if (!found) {
-                  found = true;
-                  resolve(BASE + n + '.' + ext);
-                }
-              };
-              img.onerror = function () {
-                tried++;
-                if (tried === EXTS.length && !found) resolve(null);
-              };
+              img.onload = function () { if (!found) { found = true; resolve(BASE + n + '.' + ext); } };
+              img.onerror = function () { tried++; if (tried === EXTS.length && !found) resolve(null); };
               img.src = BASE + n + '.' + ext + '?_=' + Date.now();
             });
           });
@@ -2138,18 +2179,11 @@
         /* ── Scan sequentially ── */
         function scanAll() {
           return new Promise(function (resolve) {
-            var results = [];
-            var idx     = 1;
-            var miss    = 0;
-
+            var results = [], idx = 1, miss = 0;
             function next() {
               probeImage(idx).then(function (src) {
-                if (src) {
-                  results.push({ src: src, index: idx });
-                  miss = 0;
-                } else {
-                  miss++;
-                }
+                if (src) { results.push({ src: src, index: idx }); miss = 0; }
+                else { miss++; }
                 idx++;
                 if (miss >= MAX_MISS) resolve(results);
                 else next();
@@ -2159,19 +2193,78 @@
           });
         }
 
+        /* ── Read current CSS translateX ── */
+        function getComputedX(el) {
+          var tr = window.getComputedStyle(el).transform;
+          if (!tr || tr === 'none') return 0;
+          var m = tr.match(/matrix(?:3d)?\(([^)]+)\)/);
+          if (!m) return 0;
+          var v = m[1].split(',').map(parseFloat);
+          return tr.indexOf('matrix3d') !== -1 ? v[12] : v[4];
+        }
+
+        /* ── Pause auto-scroll, capture position ── */
+        function pauseAnim() {
+          if (isManual) return;
+          isManual = true;
+          currentX = getComputedX(track);
+          track.style.animation = 'none';
+          track.style.transform = 'translateX(' + currentX + 'px)';
+        }
+
+        /* ── Set X with infinite-loop wrapping ── */
+        function setX(x) {
+          var half = track.scrollWidth / 2;
+          if (half > 0) {
+            x = x % (-half);
+            if (x > 0) x -= half;
+          }
+          currentX = x;
+          track.style.transform = 'translateX(' + x + 'px)';
+        }
+
+        /* ── Resume auto-scroll from current position ── */
+        function resumeAnim() {
+          if (!isManual) return;
+          isManual = false;
+          clearTimeout(resumeTimer);
+          var half = track.scrollWidth / 2;
+          var x = currentX;
+          if (half > 0) { x = x % (-half); if (x > 0) x -= half; }
+          var progress = half > 0 ? Math.abs(x) / half : 0;
+          var delay = (progress * sliderDuration).toFixed(2);
+          track.style.animation = 'none';
+          track.style.transform = 'translateX(' + x + 'px)';
+          void track.offsetHeight;
+          track.style.transform = '';
+          track.style.animation = 'logos-scroll ' + sliderDuration + 's linear -' + delay + 's infinite';
+        }
+
+        function scheduleResume() {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(resumeAnim, 3000);
+        }
+
+        /* ── Nav button step ── */
+        function navStep(dir) {
+          if (!isManual) pauseAnim();
+          else clearTimeout(resumeTimer);
+          setX(currentX + dir * CARD_STEP);
+          scheduleResume();
+        }
+
         /* ── Build slider ── */
         function buildSlider(imgs) {
           if (!imgs.length) return;
-
           var section = document.getElementById('logos-section');
-          var track   = document.getElementById('logos-track');
-          if (!section || !track) return;
+          track = document.getElementById('logos-track');
+          wrap  = document.getElementById('logos-track-wrap');
+          if (!section || !track || !wrap) return;
 
           images = imgs;
+          sliderDuration = Math.max(20, imgs.length * 4);
 
-          /* Duplicate for seamless infinite loop */
           var doubled = imgs.concat(imgs);
-
           doubled.forEach(function (item, i) {
             var card = document.createElement('div');
             card.className = 'logo-card';
@@ -2181,6 +2274,7 @@
             imgEl.src = item.src;
             imgEl.alt = 'شعار ' + item.index;
             imgEl.loading = 'lazy';
+            imgEl.draggable = false;
 
             var overlay = document.createElement('div');
             overlay.className = 'logo-card-zoom';
@@ -2192,15 +2286,70 @@
             card.appendChild(overlay);
 
             card.addEventListener('click', function () {
+              if (wasDragging) return;
               openLightbox(parseInt(card.getAttribute('data-real-idx')));
             });
 
             track.appendChild(card);
           });
 
-          /* Adjust animation speed based on count */
-          var duration = Math.max(20, imgs.length * 4);
-          track.style.animationDuration = duration + 's';
+          track.style.animationDuration = sliderDuration + 's';
+
+          /* Nav buttons */
+          var btnPrev = document.getElementById('logos-nav-prev');
+          var btnNext = document.getElementById('logos-nav-next');
+          if (btnPrev) btnPrev.addEventListener('click', function () { navStep(+1); });
+          if (btnNext) btnNext.addEventListener('click', function () { navStep(-1); });
+
+          /* ── Mouse drag ── */
+          wrap.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return;
+            if (!isManual) pauseAnim(); else clearTimeout(resumeTimer);
+            dragInitialX = currentX;
+            dragStartX   = e.clientX;
+            isDragging   = true;
+            dragMoved    = false;
+            wrap.classList.add('dragging');
+            e.preventDefault();
+          });
+
+          document.addEventListener('mousemove', function (e) {
+            if (!isDragging) return;
+            var delta = e.clientX - dragStartX;
+            if (Math.abs(delta) > 4) dragMoved = true;
+            setX(dragInitialX + delta);
+          });
+
+          document.addEventListener('mouseup', function () {
+            if (!isDragging) return;
+            isDragging = false;
+            wrap.classList.remove('dragging');
+            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 150); }
+            scheduleResume();
+          });
+
+          /* ── Touch drag ── */
+          wrap.addEventListener('touchstart', function (e) {
+            if (!isManual) pauseAnim(); else clearTimeout(resumeTimer);
+            dragInitialX = currentX;
+            dragStartX   = e.touches[0].clientX;
+            isDragging   = true;
+            dragMoved    = false;
+          }, { passive: true });
+
+          wrap.addEventListener('touchmove', function (e) {
+            if (!isDragging) return;
+            var delta = e.touches[0].clientX - dragStartX;
+            if (Math.abs(delta) > 4) dragMoved = true;
+            setX(dragInitialX + delta);
+          }, { passive: true });
+
+          wrap.addEventListener('touchend', function () {
+            if (!isDragging) return;
+            isDragging = false;
+            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 150); }
+            scheduleResume();
+          });
 
           section.style.display = '';
         }
@@ -2209,50 +2358,38 @@
         function openLightbox(idx) {
           lbCurrent = idx;
           renderLightbox();
-          var lb = document.getElementById('logos-lightbox');
-          lb.classList.add('open');
+          document.getElementById('logos-lightbox').classList.add('open');
           document.body.style.overflow = 'hidden';
-
           document.addEventListener('keydown', lbKeyHandler);
         }
 
         function renderLightbox() {
-          var img     = document.getElementById('logos-lb-img');
-          var counter = document.getElementById('logos-lb-counter');
-          var prev    = document.getElementById('logos-lb-prev');
-          var next    = document.getElementById('logos-lb-next');
-
-          img.src = images[lbCurrent].src;
-          img.alt = 'شعار ' + images[lbCurrent].index;
-          counter.textContent = (lbCurrent + 1) + ' / ' + images.length;
-
-          prev.disabled = lbCurrent === 0;
-          next.disabled = lbCurrent === images.length - 1;
-          prev.style.opacity = lbCurrent === 0 ? '.3' : '1';
-          next.style.opacity = lbCurrent === images.length - 1 ? '.3' : '1';
+          document.getElementById('logos-lb-img').src = images[lbCurrent].src;
+          document.getElementById('logos-lb-img').alt = 'شعار ' + images[lbCurrent].index;
+          document.getElementById('logos-lb-counter').textContent = (lbCurrent + 1) + ' / ' + images.length;
+          document.getElementById('logos-lb-prev').style.opacity = lbCurrent === 0 ? '.3' : '1';
+          document.getElementById('logos-lb-next').style.opacity = lbCurrent === images.length - 1 ? '.3' : '1';
         }
 
         function lbKeyHandler(e) {
-          if (e.key === 'Escape')      logosCloseLightbox();
+          if (e.key === 'Escape')          logosCloseLightbox();
           else if (e.key === 'ArrowRight') logosLightboxNav(-1);
           else if (e.key === 'ArrowLeft')  logosLightboxNav(+1);
         }
 
         window.logosCloseLightbox = function () {
-          var lb = document.getElementById('logos-lightbox');
-          lb.classList.remove('open');
+          document.getElementById('logos-lightbox').classList.remove('open');
           document.body.style.overflow = '';
           document.removeEventListener('keydown', lbKeyHandler);
         };
 
         window.logosLightboxNav = function (dir) {
-          var next = lbCurrent + dir;
-          if (next < 0 || next >= images.length) return;
-          lbCurrent = next;
+          var n = lbCurrent + dir;
+          if (n < 0 || n >= images.length) return;
+          lbCurrent = n;
           renderLightbox();
         };
 
-        /* ── Init on DOM ready ── */
         document.addEventListener('DOMContentLoaded', function () {
           scanAll().then(buildSlider);
         });
