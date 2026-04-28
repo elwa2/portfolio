@@ -1907,7 +1907,7 @@
         </div>
 
         <!-- Lightbox -->
-        <div id="logos-lightbox" class="logos-lightbox" onclick="logosCloseLightbox()">
+        <div id="logos-lightbox" class="logos-lightbox">
           <button class="logos-lb-close" onclick="logosCloseLightbox()" title="إغلاق">✕</button>
           <button class="logos-lb-nav logos-lb-prev" id="logos-lb-prev" onclick="event.stopPropagation();logosLightboxNav(-1)" title="السابق">❮</button>
           <button class="logos-lb-nav logos-lb-next" id="logos-lb-next" onclick="event.stopPropagation();logosLightboxNav(+1)" title="التالي">❯</button>
@@ -2132,7 +2132,6 @@
         /* ─── Drag cursor ─── */
         .logos-track-wrap { cursor: grab; -webkit-user-select: none; user-select: none; }
         .logos-track-wrap.dragging { cursor: grabbing; }
-        .logos-track-wrap.dragging .logo-card { pointer-events: none; }
 
         @media (max-width: 768px) {
           .logo-card { width: 200px; height: 155px; }
@@ -2212,12 +2211,12 @@
           track.style.transform = 'translateX(' + currentX + 'px)';
         }
 
-        /* ── Set X with infinite-loop wrapping ── */
+        /* ── Set X with infinite-loop wrapping (euclidean modulo) ── */
         function setX(x) {
           var half = track.scrollWidth / 2;
           if (half > 0) {
-            x = x % (-half);
-            if (x > 0) x -= half;
+            /* always gives result in [-half, 0) regardless of sign of x */
+            x = ((x % half) + half) % half - half;
           }
           currentX = x;
           track.style.transform = 'translateX(' + x + 'px)';
@@ -2229,8 +2228,7 @@
           isManual = false;
           clearTimeout(resumeTimer);
           var half = track.scrollWidth / 2;
-          var x = currentX;
-          if (half > 0) { x = x % (-half); if (x > 0) x -= half; }
+          var x = ((currentX % half) + half) % half - half;
           var progress = half > 0 ? Math.abs(x) / half : 0;
           var delay = (progress * sliderDuration).toFixed(2);
           track.style.animation = 'none';
@@ -2310,13 +2308,12 @@
             isDragging   = true;
             dragMoved    = false;
             wrap.classList.add('dragging');
-            e.preventDefault();
           });
 
           document.addEventListener('mousemove', function (e) {
             if (!isDragging) return;
             var delta = e.clientX - dragStartX;
-            if (Math.abs(delta) > 4) dragMoved = true;
+            if (Math.abs(delta) > 10) dragMoved = true;
             setX(dragInitialX + delta);
           });
 
@@ -2324,7 +2321,7 @@
             if (!isDragging) return;
             isDragging = false;
             wrap.classList.remove('dragging');
-            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 150); }
+            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 200); }
             scheduleResume();
           });
 
@@ -2340,14 +2337,14 @@
           wrap.addEventListener('touchmove', function (e) {
             if (!isDragging) return;
             var delta = e.touches[0].clientX - dragStartX;
-            if (Math.abs(delta) > 4) dragMoved = true;
+            if (Math.abs(delta) > 10) dragMoved = true;
             setX(dragInitialX + delta);
           }, { passive: true });
 
           wrap.addEventListener('touchend', function () {
             if (!isDragging) return;
             isDragging = false;
-            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 150); }
+            if (dragMoved) { wasDragging = true; setTimeout(function () { wasDragging = false; }, 200); }
             scheduleResume();
           });
 
@@ -2355,12 +2352,22 @@
         }
 
         /* ── Lightbox ── */
+        function lbBackdropHandler(e) {
+          if (e.target === document.getElementById('logos-lightbox')) logosCloseLightbox();
+        }
+
         function openLightbox(idx) {
           lbCurrent = idx;
           renderLightbox();
-          document.getElementById('logos-lightbox').classList.add('open');
+          var lb = document.getElementById('logos-lightbox');
+          lb.classList.add('open');
           document.body.style.overflow = 'hidden';
           document.addEventListener('keydown', lbKeyHandler);
+          /* Delay adding backdrop-click handler so the current click event
+             that triggered openLightbox cannot immediately close the lightbox */
+          setTimeout(function () {
+            lb.addEventListener('click', lbBackdropHandler);
+          }, 0);
         }
 
         function renderLightbox() {
@@ -2378,7 +2385,9 @@
         }
 
         window.logosCloseLightbox = function () {
-          document.getElementById('logos-lightbox').classList.remove('open');
+          var lb = document.getElementById('logos-lightbox');
+          lb.classList.remove('open');
+          lb.removeEventListener('click', lbBackdropHandler);
           document.body.style.overflow = '';
           document.removeEventListener('keydown', lbKeyHandler);
         };
