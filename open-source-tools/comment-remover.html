@@ -124,15 +124,18 @@
       }
 
       /* =========================================
-         PANELS GRID
+         LAYOUT
       ========================================= */
-      .panels-grid {
+      --panel-max-h: 500px;
+
+      .mgrid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1.65fr;
         gap: 22px;
         margin-bottom: 22px;
+        align-items: start;
       }
-      @media (max-width: 860px) { .panels-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 960px) { .mgrid { grid-template-columns: 1fr; } }
 
       /* =========================================
          PANEL CARD
@@ -163,8 +166,8 @@
         font-size: 14px;
         flex-shrink: 0;
       }
-      .ph-icon.in  { background: rgba(84,160,255,.15); color: #54a0ff; }
-      .ph-icon.out { background: rgba(67,233,123,.12); color: #43e97b; }
+      .ph-icon.in     { background: rgba(84,160,255,.15); color: #54a0ff; }
+      .ph-icon.yellow { background: rgba(249,202,36,.12); color: #f9ca24; }
       .ph-title { font-size: 0.9rem; font-weight: 700; color: var(--text-color); }
       .ph-sub   { font-size: 0.74rem; color: var(--text-color-light); }
       .ph-right { display: flex; gap: 7px; align-items: center; }
@@ -184,6 +187,21 @@
         color: var(--primary-color);
         background: rgba(var(--primary-rgb), 0.07);
       }
+      .btn-copy-clean {
+        display: flex; align-items: center; gap: 6px;
+        padding: 5px 14px;
+        background: rgba(67,233,123,.1);
+        border: 1px solid rgba(67,233,123,.3);
+        border-radius: 999px;
+        cursor: pointer;
+        color: #43e97b;
+        font-size: 0.76rem;
+        font-weight: 700;
+        font-family: 'Cairo', sans-serif;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .btn-copy-clean:hover { background: rgba(67,233,123,.2); }
 
       /* =========================================
          TEXTAREA
@@ -191,11 +209,12 @@
       .panel-card textarea {
         width: 100%;
         flex: 1;
-        min-height: 320px;
+        min-height: 220px;
+        max-height: var(--panel-max-h);
         background: transparent;
         border: none;
         outline: none;
-        resize: vertical;
+        resize: none;
         color: var(--text-color);
         font-family: 'JetBrains Mono', monospace;
         font-size: 12.5px;
@@ -203,6 +222,7 @@
         padding: 18px;
         direction: ltr;
         text-align: left;
+        overflow-y: auto;
       }
       .panel-card textarea::placeholder {
         color: var(--text-color-light);
@@ -210,36 +230,6 @@
         direction: rtl;
         opacity: 0.65;
       }
-
-      /* =========================================
-         OUTPUT AREA
-      ========================================= */
-      .output-area {
-        flex: 1;
-        min-height: 320px;
-        padding: 18px;
-        overflow: auto;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12.5px;
-        line-height: 1.8;
-        white-space: pre-wrap;
-        word-break: break-all;
-        direction: ltr;
-        text-align: left;
-        color: var(--text-color);
-      }
-      .output-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 250px;
-        gap: 10px;
-        color: var(--text-color-light);
-        opacity: 0.5;
-      }
-      .output-placeholder i { font-size: 2.8rem; }
-      .output-placeholder p { font-size: 0.88rem; }
 
       /* =========================================
          ACTION BAR
@@ -336,93 +326,89 @@
       }
 
       /* =========================================
-         DIFF PANEL
+         DIFF — SIDE BY SIDE
       ========================================= */
-      .diff-card {
-        background: var(--card-bg);
-        border: 1px solid rgba(var(--primary-rgb), 0.1);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.07);
-      }
-      .diff-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 22px;
-        background: rgba(var(--primary-rgb), 0.04);
+      .dcolheads {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .diff-title { display: flex; align-items: center; gap: 10px; }
-      .diff-title-icon {
-        width: 32px; height: 32px;
-        background: rgba(249,202,36,0.12);
-        color: #f9ca24;
-        border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 14px;
         flex-shrink: 0;
       }
-      .diff-title-text  { font-size: 0.9rem; font-weight: 700; color: var(--text-color); }
-      .diff-title-sub   { font-size: 0.74rem; color: var(--text-color-light); }
-      .diff-legend { display: flex; gap: 10px; flex-wrap: wrap; }
-      .legend-badge {
-        padding: 3px 10px;
-        border-radius: 5px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
+      .dcolhead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        font-size: 0.76rem;
         font-weight: 700;
+        color: var(--text-color-light);
+        font-family: 'Cairo', sans-serif;
       }
-      .lb-rm { background: rgba(255,94,87,.1); border: 1px solid rgba(255,94,87,.35); color: #ff8a85; }
-      .lb-kp { background: rgba(67,233,123,.08); border: 1px solid rgba(67,233,123,.25); color: #43e97b; }
+      .dcolhead:last-child { border-right: 1px solid rgba(var(--primary-rgb), 0.1); }
+      .ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+      .ldot.r { background: #ff5e57; box-shadow: 0 0 6px rgba(255,94,87,.5); }
+      .ldot.g { background: #43e97b; box-shadow: 0 0 6px rgba(67,233,123,.45); }
 
-      .diff-body {
-        padding: 18px 22px;
-        max-height: 420px;
+      .dbody {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        max-height: var(--panel-max-h);
+        flex: 1;
+        overflow: hidden;
+      }
+      .dcol {
         overflow-y: auto;
+        padding: 14px;
         font-family: 'JetBrains Mono', monospace;
-        font-size: 12.5px;
-        line-height: 1.9;
+        font-size: 12px;
+        line-height: 1.85;
         direction: ltr;
         text-align: left;
       }
-      .diff-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100px;
-        gap: 6px;
-        color: var(--text-color-light);
-        opacity: 0.5;
-      }
-      .diff-placeholder i { font-size: 2rem; }
-      .diff-placeholder p { font-size: 0.85rem; }
+      .dcol:last-child { border-right: 1px solid rgba(var(--primary-rgb), 0.1); }
 
-      .diff-line { display: flex; gap: 10px; align-items: flex-start; }
-      .diff-num {
-        min-width: 32px;
+      .dline { display: flex; gap: 8px; align-items: flex-start; padding: 0 4px; }
+      .dnum {
+        min-width: 28px;
         color: var(--text-color-light);
         font-size: 11px;
         padding-top: 2px;
         text-align: end;
         user-select: none;
-        opacity: 0.6;
+        opacity: 0.5;
         flex-shrink: 0;
       }
-      .diff-code { flex: 1; white-space: pre-wrap; word-break: break-all; }
-      .diff-code.rm {
+      .dcode { flex: 1; white-space: pre-wrap; word-break: break-all; }
+      .dline.rm .dcode {
         background: rgba(255,94,87,.08);
         border-right: 3px solid #ff5e57;
-        padding: 1px 8px;
+        padding: 1px 6px;
         border-radius: 4px;
-        color: #ff8a85;
+        color: #ff9692;
         text-decoration: line-through;
-        opacity: 0.88;
       }
-      .diff-code.kp { color: var(--text-color-light); }
+      .dline.kp .dcode { color: var(--text-color-light); }
+      .dline.nw .dcode {
+        background: rgba(67,233,123,.07);
+        border-right: 3px solid #43e97b;
+        padding: 1px 6px;
+        border-radius: 4px;
+        color: #7dffb0;
+      }
+
+      .dph {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        gap: 10px;
+        color: var(--text-color-light);
+        grid-column: 1 / -1;
+        opacity: 0.5;
+      }
+      .dph i { font-size: 2.5rem; }
+      .dph p { font-size: 0.88rem; font-family: 'Cairo', sans-serif; }
 
       /* =========================================
          SCROLLBAR
@@ -532,7 +518,7 @@
         </div>
 
         <!-- PANELS -->
-        <div class="panels-grid">
+        <div class="mgrid">
 
           <!-- Input -->
           <div class="panel-card">
@@ -559,30 +545,33 @@ const x = 1; // تعليق جانبي
 let y = 2;"></textarea>
           </div>
 
-          <!-- Output -->
+          <!-- Diff — side by side -->
           <div class="panel-card">
             <div class="panel-head">
               <div class="ph-left">
-                <div class="ph-icon out"><i class="fas fa-check"></i></div>
+                <div class="ph-icon yellow"><i class="fas fa-columns"></i></div>
                 <div>
-                  <div class="ph-title">الكود بعد التنظيف</div>
-                  <div class="ph-sub">بدون تعليقات</div>
+                  <div class="ph-title">مقارنة التغييرات</div>
+                  <div class="ph-sub">الأصلي ↔ الكود النظيف</div>
                 </div>
               </div>
               <div class="ph-right">
-                <button class="btn-ph" title="نسخ" onclick="copyOutput()"><i class="fas fa-copy"></i></button>
-                <button class="btn-ph" title="تحميل" onclick="downloadOutput()"><i class="fas fa-download"></i></button>
+                <button class="btn-copy-clean" onclick="copyClean()"><i class="fas fa-copy"></i> نسخ الكود النظيف</button>
               </div>
             </div>
-            <div class="output-area" id="outputCode">
-              <div class="output-placeholder">
+            <div class="dcolheads">
+              <div class="dcolhead"><span class="ldot r"></span>الأصلي (مع التعليقات)</div>
+              <div class="dcolhead"><span class="ldot g"></span>النظيف (بدون تعليقات)</div>
+            </div>
+            <div class="dbody" id="diffBody">
+              <div class="dph">
                 <i class="fas fa-bolt"></i>
-                <p>النتيجة ستظهر هنا بعد التشغيل</p>
+                <p>اضغط «إزالة التعليقات» لرؤية الفرق هنا</p>
               </div>
             </div>
           </div>
 
-        </div><!-- /panels-grid -->
+        </div><!-- /mgrid -->
 
         <!-- ACTION BAR -->
         <div class="action-bar">
@@ -626,28 +615,7 @@ let y = 2;"></textarea>
           </div>
         </div>
 
-        <!-- DIFF PANEL -->
-        <div class="diff-card" id="diffCard" style="display:none;">
-          <div class="diff-head">
-            <div class="diff-title">
-              <div class="diff-title-icon"><i class="fas fa-search"></i></div>
-              <div>
-                <div class="diff-title-text">مقارنة الكود — ماذا تم حذفه؟</div>
-                <div class="diff-title-sub">الأسطر المحذوفة مميزة باللون الأحمر</div>
-              </div>
-            </div>
-            <div class="diff-legend">
-              <span class="legend-badge lb-rm">− محذوف</span>
-              <span class="legend-badge lb-kp">✓ محتفظ</span>
-            </div>
-          </div>
-          <div class="diff-body" id="diffBody">
-            <div class="diff-placeholder">
-              <i class="fas fa-code"></i>
-              <p>اضغط «إزالة التعليقات» لرؤية الفرق هنا</p>
-            </div>
-          </div>
-        </div>
+
 
       </div><!-- /container -->
     </div><!-- /tool-page-wrapper -->
@@ -750,7 +718,7 @@ let y = 2;"></textarea>
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     var selectedLang = 'auto';
-    var lastCleanedCode = '';
+    var cleanedCode   = '';
 
     /* ── Lang pills ── */
     document.querySelectorAll('.lang-pill').forEach(function (pill) {
@@ -774,22 +742,10 @@ let y = 2;"></textarea>
     function removeComments(code, lang) {
       var det = lang === 'auto' ? detectLang(code) : lang;
       var r = code;
-
-      if (['js', 'ts', 'css', 'scss', 'php'].indexOf(det) !== -1 || lang === 'auto') {
-        r = r.replace(/\/\*[\s\S]*?\*\//g, '');
-      }
-      if (['js', 'ts', 'php'].indexOf(det) !== -1 || lang === 'auto') {
-        r = r.replace(/(?<!:)\/\/.*$/gm, '');
-      }
-      if (det === 'html') {
-        r = r.replace(/<!--[\s\S]*?-->/g, '');
-      }
-      if (det === 'python') {
-        r = r.replace(/#.*$/gm, '');
-        r = r.replace(/"""[\s\S]*?"""/g, '');
-        r = r.replace(/'''[\s\S]*?'''/g, '');
-      }
-
+      if (['js', 'ts', 'css', 'scss', 'php'].indexOf(det) !== -1 || lang === 'auto') r = r.replace(/\/\*[\s\S]*?\*\//g, '');
+      if (['js', 'ts', 'php'].indexOf(det) !== -1 || lang === 'auto') r = r.replace(/(?<!:)\/\/.*$/gm, '');
+      if (det === 'html')   r = r.replace(/<!--[\s\S]*?-->/g, '');
+      if (det === 'python') { r = r.replace(/#.*$/gm, ''); r = r.replace(/"""[\s\S]*?"""/g, ''); r = r.replace(/'''[\s\S]*?'''/g, ''); }
       r = r.replace(/\n{3,}/g, '\n\n');
       r = r.split('\n').map(function (l) { return l.trimEnd(); }).join('\n').trim();
       return r;
@@ -797,53 +753,62 @@ let y = 2;"></textarea>
 
     /* ── Process ── */
     function processCode() {
-      var input = document.getElementById('inputCode').value.trim();
-      if (!input) { showToast('⚠️ الرجاء إدخال كود أولاً'); return; }
+      var input = document.getElementById('inputCode').value;
+      if (!input.trim()) { showToast('⚠️ الرجاء إدخال كود أولاً'); return; }
 
-      var cleaned = removeComments(input, selectedLang);
-      lastCleanedCode = cleaned;
+      cleanedCode = removeComments(input, selectedLang);
 
-      /* Output */
-      var outEl = document.getElementById('outputCode');
-      outEl.textContent = cleaned || '// الكود فارغ بعد الإزالة';
+      /* Build diff */
+      buildDiff(input.split('\n'), cleanedCode.split('\n'));
 
       /* Stats */
-      var inLines  = input.split('\n');
-      var outLines = cleaned.split('\n');
-      var removed  = Math.max(0, inLines.length - outLines.length);
-      var pct      = inLines.length > 0 ? Math.max(0, Math.round(removed / inLines.length * 100)) : 0;
-
-      document.getElementById('statRemoved').textContent = removed;
-      document.getElementById('statLines').textContent   = outLines.length;
-      document.getElementById('statTotal').textContent   = inLines.length;
-      document.getElementById('statSaved').textContent   = pct + '%';
+      var inL = input.split('\n').length, outL = cleanedCode.split('\n').length;
+      var rm  = Math.max(0, inL - outL);
+      document.getElementById('statRemoved').textContent = rm;
+      document.getElementById('statLines').textContent   = outL;
+      document.getElementById('statTotal').textContent   = inL;
+      document.getElementById('statSaved').textContent   = inL > 0 ? Math.max(0, Math.round(rm / inL * 100)) + '%' : '0%';
       document.getElementById('statsRow').style.display  = 'flex';
 
-      /* Diff */
-      buildDiff(inLines, outLines);
-      document.getElementById('diffCard').style.display = 'block';
-
       showToast('✅ تم تنظيف الكود بنجاح');
-      document.getElementById('diffCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    /* ── Build diff ── */
+    /* ── Build diff (side-by-side) ── */
     function buildDiff(origLines, cleanLines) {
       var cleanSet = new Set(cleanLines.map(function (l) { return l.trimEnd(); }));
-      var html = '';
+      var leftHtml = '', rightHtml = '';
+
       origLines.forEach(function (line, i) {
-        var t = line.trimEnd();
-        var isCmt = isCommentLine(t);
+        var t  = line.trimEnd();
+        var isCmt  = isCommentLine(t);
         var isGone = isCmt || (t !== '' && !cleanSet.has(t));
         var num = i + 1;
         if (isGone) {
-          html += '<div class="diff-line"><span class="diff-num">' + num + '</span><span class="diff-code rm">' + esc(line || ' ') + '</span></div>';
-        } else if (t !== '') {
-          html += '<div class="diff-line"><span class="diff-num">' + num + '</span><span class="diff-code kp">' + esc(line) + '</span></div>';
+          leftHtml += '<div class="dline rm"><span class="dnum">' + num + '</span><span class="dcode">' + esc(line || ' ') + '</span></div>';
+        } else {
+          leftHtml += '<div class="dline kp"><span class="dnum">' + num + '</span><span class="dcode">' + esc(line) + '</span></div>';
         }
       });
-      document.getElementById('diffBody').innerHTML = html ||
-        '<div class="diff-placeholder"><i class="fas fa-check-circle"></i><p>لا يوجد فرق — الكود نظيف بالفعل 🎉</p></div>';
+
+      cleanLines.forEach(function (line, i) {
+        rightHtml += '<div class="dline nw"><span class="dnum">' + (i + 1) + '</span><span class="dcode">' + esc(line) + '</span></div>';
+      });
+
+      var body = document.getElementById('diffBody');
+      if (!leftHtml) {
+        body.innerHTML = '<div class="dph"><i class="fas fa-check-circle"></i><p>الكود نظيف بالفعل 🎉</p></div>';
+        return;
+      }
+      body.innerHTML =
+        '<div class="dcol" id="dcolL">' + leftHtml  + '</div>' +
+        '<div class="dcol" id="dcolR">' + rightHtml + '</div>';
+
+      /* Sync scroll */
+      var lc = document.getElementById('dcolL');
+      var rc = document.getElementById('dcolR');
+      var syncing = false;
+      lc.addEventListener('scroll', function () { if (!syncing) { syncing = true; rc.scrollTop = lc.scrollTop; syncing = false; } });
+      rc.addEventListener('scroll', function () { if (!syncing) { syncing = true; lc.scrollTop = rc.scrollTop; syncing = false; } });
     }
 
     function isCommentLine(line) {
@@ -856,24 +821,10 @@ let y = 2;"></textarea>
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    /* ── Copy output ── */
-    function copyOutput() {
-      var text = document.getElementById('outputCode').textContent;
-      if (!text || text.includes('النتيجة ستظهر')) { showToast('⚠️ لا يوجد كود للنسخ'); return; }
-      navigator.clipboard.writeText(text).then(function () { showToast('📋 تم نسخ الكود النظيف!'); });
-    }
-
-    /* ── Download output ── */
-    function downloadOutput() {
-      if (!lastCleanedCode) { showToast('⚠️ شغّل الأداة أولاً'); return; }
-      var blob = new Blob([lastCleanedCode], { type: 'text/plain' });
-      var url  = URL.createObjectURL(blob);
-      var a    = document.createElement('a');
-      a.href = url;
-      a.download = 'cleaned-code.txt';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('⬇️ جارٍ التحميل...');
+    /* ── Copy clean ── */
+    function copyClean() {
+      if (!cleanedCode) { showToast('⚠️ شغّل الأداة أولاً'); return; }
+      navigator.clipboard.writeText(cleanedCode).then(function () { showToast('📋 تم نسخ الكود النظيف!'); });
     }
 
     /* ── Clear / Reset ── */
@@ -883,11 +834,10 @@ let y = 2;"></textarea>
     }
 
     function resetAll() {
-      lastCleanedCode = '';
-      document.getElementById('outputCode').innerHTML =
-        '<div class="output-placeholder"><i class="fas fa-bolt"></i><p>النتيجة ستظهر هنا بعد التشغيل</p></div>';
+      cleanedCode = '';
+      document.getElementById('diffBody').innerHTML =
+        '<div class="dph"><i class="fas fa-bolt"></i><p>اضغط «إزالة التعليقات» لرؤية الفرق هنا</p></div>';
       document.getElementById('statsRow').style.display = 'none';
-      document.getElementById('diffCard').style.display = 'none';
     }
 
     /* ── Toast ── */
