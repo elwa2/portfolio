@@ -123,15 +123,8 @@ function toggleTheme() {
   } else if (localStorage.getItem("theme") === "light") {
     setTheme("light");
   } else {
-    // التحقق من تفضيلات النظام
-    if (
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
+    // الوضع الافتراضي دائمًا داكن
+    setTheme("dark");
   }
 })();
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl" data-theme="dark">
   <head>
     <!-- Google tag (gtag.js) -->
     <script
@@ -35,63 +35,85 @@
 
     <style>
       .tools-listing-wrapper {
-        padding: 80px 0;
+        padding: var(--space-9) 0 var(--space-10);
         min-height: 70vh;
         position: relative;
         z-index: 1;
       }
       .tools-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 30px;
-        margin-top: 50px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--space-5);
+        margin-top: var(--space-7);
       }
 
       .tool-card {
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 40px;
+        background: var(--canvas-raised);
+        border-radius: 16px;
+        padding: var(--space-6);
         text-align: right;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        transition: transform 0.2s cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 0.2s ease,
+                    border-color 0.2s ease;
+        border: 1px solid var(--border-subtle);
         position: relative;
         text-decoration: none;
         color: inherit;
         display: flex;
         flex-direction: column;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+
+      /* Top highlight line */
+      .tool-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .tool-card:hover::before {
+        opacity: 0.8;
       }
 
       .tool-card:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 20px 40px rgba(var(--primary-rgb), 0.15);
-        border-color: var(--primary-color);
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg), var(--glow-accent);
+        border-color: var(--border-accent);
       }
       .tool-card-icon {
         width: 60px;
         height: 60px;
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          var(--secondary-purple)
-        );
-        border-radius: 15px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-warm));
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 22px;
         color: white;
-        margin-bottom: 25px;
+        margin-bottom: var(--space-5);
+        box-shadow: 0 4px 16px rgba(232,115,74,0.35);
+        transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      }
+      .tool-card:hover .tool-card-icon {
+        transform: scale(1.1) rotate(4deg);
       }
       .tool-card h3 {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-        color: var(--text-color);
+        font-size: var(--text-lg);
+        font-weight: 700;
+        margin-bottom: var(--space-3);
+        color: var(--text-primary);
+        letter-spacing: var(--tracking-snug);
       }
       .tool-card p {
-        color: var(--text-color-light);
-        font-size: 0.95rem;
-        line-height: 1.6;
+        color: var(--text-secondary);
+        font-size: var(--text-sm);
+        line-height: var(--leading-relaxed);
         flex-grow: 1;
       }
     </style>
@@ -103,45 +125,9 @@
   </head>
   <body class="theme-aware">
     <div class="grain-overlay"></div>
+    <div class="ambient-glow ambient-glow--primary"></div>
+    <div class="ambient-glow ambient-glow--secondary"></div>
     <div id="three-canvas-container"></div>
-    <div class="floating-background">
-      <div
-        class="floating-icon"
-        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
-      >
-        🚀
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
-      >
-        ⭐
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
-      >
-        🔥
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
-      >
-        💎
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
-      >
-        🎯
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
-      >
-        ⚡
-      </div>
-    </div>
 
     <header class="header">
       <div class="container">
@@ -182,20 +168,29 @@
     <div class="tools-listing-wrapper">
       <div class="container">
         <div style="text-align: center">
+          <span class="section-label">مفتوحة المصدر</span>
           <h1
             style="
-              font-size: 3rem;
-              color: var(--primary-color);
-              margin-bottom: 20px;
+              font-size: var(--text-3xl);
+              font-weight: 800;
+              letter-spacing: var(--tracking-tight);
+              background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-warm) 100%);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              margin-bottom: var(--space-4);
+              display: inline-block;
             "
           >
             الأدوات مفتوحة المصدر
           </h1>
           <p
             style="
-              color: var(--text-color-light);
+              color: var(--text-secondary);
               max-width: 600px;
               margin: 0 auto;
+              line-height: var(--leading-relaxed);
+              font-size: var(--text-base);
             "
           >
             استكشف مجموعتنا المتنوعة من الأدوات التي نطورها لمساعدتك في مشاريعك
@@ -579,3 +574,4 @@
     </a>
   </body>
 </html>
+
