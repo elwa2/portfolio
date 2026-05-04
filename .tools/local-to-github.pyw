@@ -1,0 +1,343 @@
+import webbrowser
+import threading
+import time
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs, urlencode
+import json
+
+PORT = 9877
+GITHUB_BASE = "https://elwa2.github.io/portfolio"
+
+HTML = r"""<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔗 محوّل روابط المشروع</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0d0f;--bg2:#141416;--bg3:#1a1a1e;
+  --glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text1:#f0ede8;--text2:#9b9693;--text3:#5c5855;
+  --acc:#e8734a;--acc2:#d4a843;--acc3:#6b9bd2;
+  --green:#4ade80;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px}
+.card{width:100%;max-width:680px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6)}
+.header{background:linear-gradient(135deg,#0f1014 0%,#141410 60%,#1a1208 100%);padding:28px 28px 22px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(107,155,210,0.12) 0%,transparent 70%);pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(107,155,210,0.1);border:1px solid rgba(107,155,210,0.22);border-radius:30px;padding:5px 14px;font-size:12px;color:var(--acc3);font-weight:600;margin-bottom:14px}
+.badge-dot{width:6px;height:6px;background:var(--acc3);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.header h1{font-size:20px;font-weight:800;color:var(--text1);margin-bottom:6px}
+.header h1 span{color:var(--acc3)}
+.header p{font-size:12px;color:var(--text2);line-height:1.7}
+.body{padding:26px 28px;display:flex;flex-direction:column;gap:20px}
+.field-label{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+.input-wrap{position:relative}
+.url-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:12px 48px 12px 14px;font-size:13px;color:var(--text1);font-family:'Cairo',sans-serif;outline:none;transition:border-color 0.2s;direction:ltr;text-align:left}
+.url-input:focus{border-color:var(--acc3)}
+.url-input::placeholder{color:var(--text3);direction:rtl;text-align:right}
+.clear-btn{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1;padding:2px;transition:color 0.15s}
+.clear-btn:hover{color:var(--text1)}
+.convert-btn{width:100%;background:var(--acc3);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(107,155,210,0.25)}
+.convert-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(107,155,210,0.4)}
+.convert-btn:active{transform:scale(0.98)}
+.result-section{display:none;flex-direction:column;gap:12px}
+.result-box{background:var(--bg3);border:1px solid rgba(107,155,210,0.2);border-radius:12px;padding:14px 16px}
+.result-url{font-size:13px;color:var(--acc3);word-break:break-all;direction:ltr;text-align:left;line-height:1.6;font-family:monospace}
+.result-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:120px;background:var(--glass);border:1px solid var(--border2);border-radius:9px;padding:9px 14px;font-size:12px;font-weight:700;color:var(--text1);cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.action-btn:hover{background:var(--glass2);border-color:var(--acc3)}
+.action-btn.primary{background:rgba(107,155,210,0.12);border-color:rgba(107,155,210,0.25);color:var(--acc3)}
+.action-btn.primary:hover{background:rgba(107,155,210,0.22)}
+.action-btn.green{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.25);color:var(--green)}
+.action-btn.green:hover{background:rgba(74,222,128,0.18)}
+.divider{height:1px;background:var(--border)}
+.history-section{display:none;flex-direction:column;gap:8px}
+.history-label{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase}
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
+.history-item{background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:all 0.15s}
+.history-item:hover{background:var(--glass2);border-color:var(--border2)}
+.history-url{font-size:11px;color:var(--acc3);font-family:monospace;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.history-copy{font-size:11px;color:var(--text3);flex-shrink:0;background:none;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:color 0.15s}
+.history-copy:hover{color:var(--text1)}
+.settings-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0}
+.settings-body{display:none;margin-top:12px;flex-direction:column;gap:10px}
+.settings-body.open{display:flex}
+.setting-row{display:flex;flex-direction:column;gap:6px}
+.small-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text1);font-family:monospace;outline:none;transition:border-color 0.2s;direction:ltr;text-align:left}
+.small-input:focus{border-color:var(--acc3)}
+.save-settings-btn{background:rgba(232,115,74,0.1);border:1px solid rgba(232,115,74,0.2);border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;color:var(--acc);cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.15s;align-self:flex-start}
+.save-settings-btn:hover{background:rgba(232,115,74,0.2)}
+.error-msg{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:9px;padding:10px 14px;font-size:12px;color:#f87171;display:none}
+.chevron{transition:transform 0.2s;color:var(--text3);font-size:14px}
+.chevron.open{transform:rotate(180deg)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="badge"><span class="badge-dot"></span> أداة المطور</div>
+    <h1>🔗 محوّل <span>روابط المشروع</span></h1>
+    <p>حوّل روابط المحلي (localhost) إلى روابط GitHub Pages بضغطة واحدة</p>
+  </div>
+
+  <div class="body">
+    <!-- Input -->
+    <div>
+      <div class="field-label">الرابط المحلي</div>
+      <div class="input-wrap">
+        <input class="url-input" id="inputUrl" type="text"
+          placeholder="http://127.0.0.1:5501/open-source-tools/page.html"
+          oninput="onInput()" onkeydown="if(event.key==='Enter')convert()">
+        <button class="clear-btn" onclick="clearInput()" title="مسح">✕</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <button class="convert-btn" onclick="convert()">⚡ تحويل الرابط</button>
+
+    <!-- Result -->
+    <div class="result-section" id="resultSection">
+      <div class="field-label">الرابط على GitHub Pages</div>
+      <div class="result-box">
+        <div class="result-url" id="resultUrl"></div>
+      </div>
+      <div class="result-actions">
+        <button class="action-btn primary" id="copyResultBtn" onclick="copyResult()">📋 نسخ الرابط</button>
+        <button class="action-btn green" onclick="openResult()">🌐 فتح في المتصفح</button>
+        <button class="action-btn" onclick="openBoth()">⚡ فتح الاثنين</button>
+      </div>
+    </div>
+
+    <div class="divider" id="historyDivider" style="display:none"></div>
+
+    <!-- History -->
+    <div class="history-section" id="historySection">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="history-label">السجل الأخير</div>
+        <button onclick="clearHistory()" style="background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;font-family:'Cairo',sans-serif">مسح الكل</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Settings -->
+    <div>
+      <div class="settings-toggle" onclick="toggleSettings()">
+        <div class="field-label" style="margin:0">⚙️ الإعدادات</div>
+        <span class="chevron" id="settingsChevron">▼</span>
+      </div>
+      <div class="settings-body" id="settingsBody">
+        <div class="setting-row">
+          <div class="field-label">قاعدة GitHub Pages</div>
+          <input class="small-input" id="githubBase" value="https://elwa2.github.io/portfolio">
+        </div>
+        <div class="setting-row">
+          <div class="field-label">المضيف المحلي (اتركه فارغاً لأي localhost)</div>
+          <input class="small-input" id="localHost" placeholder="127.0.0.1 أو localhost (اختياري)">
+        </div>
+        <button class="save-settings-btn" onclick="saveSettings()">✓ حفظ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentResult = '';
+
+function getSettings(){
+  return {
+    githubBase: localStorage.getItem('githubBase') || 'https://elwa2.github.io/portfolio'
+  };
+}
+
+function loadSettings(){
+  const s = getSettings();
+  document.getElementById('githubBase').value = s.githubBase;
+}
+
+function saveSettings(){
+  localStorage.setItem('githubBase', document.getElementById('githubBase').value.replace(/\/$/, ''));
+  const btn = event.target;
+  btn.textContent = '✓ تم الحفظ';
+  setTimeout(()=>{ btn.textContent = '✓ حفظ'; }, 1500);
+}
+
+function toggleSettings(){
+  const body = document.getElementById('settingsBody');
+  const chevron = document.getElementById('settingsChevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+function convert(){
+  const raw = document.getElementById('inputUrl').value.trim();
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'none';
+
+  if(!raw){ showError('أدخل رابطاً أولاً'); return; }
+
+  let parsed;
+  try { parsed = new URL(raw); } catch(e){ showError('رابط غير صالح — تأكد من صحة الصيغة'); return; }
+
+  const isLocal = parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost' || parsed.hostname === '0.0.0.0';
+  if(!isLocal){ showError('الرابط ليس محلياً — يجب أن يبدأ بـ 127.0.0.1 أو localhost'); return; }
+
+  const { githubBase } = getSettings();
+  const path = parsed.pathname; // e.g. /open-source-tools/page.html
+  const search = parsed.search || '';
+  const hash = parsed.hash || '';
+  const result = githubBase + path + search + hash;
+
+  currentResult = result;
+  document.getElementById('resultUrl').textContent = result;
+  document.getElementById('resultSection').style.display = 'flex';
+  document.getElementById('copyResultBtn').textContent = '📋 نسخ الرابط';
+  document.getElementById('copyResultBtn').style.color = '';
+
+  addToHistory(result);
+}
+
+function showError(msg){
+  const el = document.getElementById('errorMsg');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('resultSection').style.display = 'none';
+}
+
+function copyResult(){
+  navigator.clipboard.writeText(currentResult).then(()=>{
+    const btn = document.getElementById('copyResultBtn');
+    btn.textContent = '✓ تم النسخ!';
+    btn.style.color = 'var(--green)';
+    setTimeout(()=>{ btn.textContent = '📋 نسخ الرابط'; btn.style.color = ''; }, 2000);
+  });
+}
+
+function openResult(){
+  window.open(currentResult, '_blank');
+}
+
+function openBoth(){
+  window.open(document.getElementById('inputUrl').value.trim(), '_blank');
+  setTimeout(()=>{ window.open(currentResult, '_blank'); }, 300);
+}
+
+function clearInput(){
+  document.getElementById('inputUrl').value = '';
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('errorMsg').style.display = 'none';
+  currentResult = '';
+}
+
+function onInput(){
+  if(document.getElementById('errorMsg').style.display !== 'none'){
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+}
+
+// History
+function addToHistory(url){
+  let hist = JSON.parse(localStorage.getItem('urlHistory') || '[]');
+  hist = hist.filter(u => u !== url);
+  hist.unshift(url);
+  if(hist.length > 10) hist = hist.slice(0, 10);
+  localStorage.setItem('urlHistory', JSON.stringify(hist));
+  renderHistory();
+}
+
+function renderHistory(){
+  const hist = JSON.parse(localStorage.getItem('urlHistory') || '[]');
+  const list = document.getElementById('historyList');
+  const section = document.getElementById('historySection');
+  const divider = document.getElementById('historyDivider');
+  if(!hist.length){ section.style.display = 'none'; divider.style.display = 'none'; return; }
+  section.style.display = 'flex';
+  divider.style.display = 'block';
+  list.innerHTML = hist.map(u => `
+    <div class="history-item" onclick="useHistory('${u.replace(/'/g,"\\'")}')">
+      <span class="history-url">${u}</span>
+      <button class="history-copy" onclick="event.stopPropagation();copyHistoryItem('${u.replace(/'/g,"\\'")}',this)">نسخ</button>
+    </div>`).join('');
+}
+
+function useHistory(url){
+  // Reverse-convert: try to extract path from github URL
+  const { githubBase } = getSettings();
+  if(url.startsWith(githubBase)){
+    const path = url.slice(githubBase.length);
+    document.getElementById('inputUrl').value = 'http://127.0.0.1:5501' + path;
+  }
+  currentResult = url;
+  document.getElementById('resultUrl').textContent = url;
+  document.getElementById('resultSection').style.display = 'flex';
+}
+
+function copyHistoryItem(url, btn){
+  navigator.clipboard.writeText(url).then(()=>{
+    btn.textContent = '✓';
+    setTimeout(()=>{ btn.textContent = 'نسخ'; }, 1500);
+  });
+}
+
+function clearHistory(){
+  localStorage.removeItem('urlHistory');
+  renderHistory();
+}
+
+// Paste from clipboard on load
+window.addEventListener('load', ()=>{
+  loadSettings();
+  renderHistory();
+  // Try to read clipboard and auto-fill if it's a local URL
+  navigator.clipboard.readText().then(text => {
+    if(!text) return;
+    try {
+      const u = new URL(text.trim());
+      if(u.hostname === '127.0.0.1' || u.hostname === 'localhost'){
+        document.getElementById('inputUrl').value = text.trim();
+      }
+    } catch(e){}
+  }).catch(()=>{});
+});
+</script>
+</body>
+</html>
+"""
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Cache-Control', 'no-cache')
+        self.end_headers()
+        self.wfile.write(HTML.encode('utf-8'))
+
+    def log_message(self, format, *args):
+        pass  # suppress console output
+
+
+def open_browser():
+    time.sleep(0.6)
+    webbrowser.open(f'http://127.0.0.1:{PORT}')
+
+
+threading.Thread(target=open_browser, daemon=True).start()
+
+try:
+    server = HTTPServer(('127.0.0.1', PORT), Handler)
+    server.serve_forever()
+except OSError:
+    # Port in use, try next port
+    PORT2 = PORT + 1
+    webbrowser.open(f'http://127.0.0.1:{PORT2}')
+    server = HTTPServer(('127.0.0.1', PORT2), Handler)
+    server.serve_forever()

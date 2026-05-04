@@ -10,7 +10,7 @@
 --acc:#e8734a;--acc2:#d4a843;--acc3:#6b9bd2;
 --glow:rgba(232,115,74,0.18);--glow2:rgba(212,168,67,0.15);
 }
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);direction:rtl;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);direction:rtl;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px}
 .msg-card{width:100%;max-width:600px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04)}
 .header{background:linear-gradient(135deg,#1a1208 0%,#141410 50%,#0f1014 100%);padding:28px 28px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
 .header::before{content:'';position:absolute;top:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(232,115,74,0.12) 0%,transparent 70%);pointer-events:none}
@@ -62,6 +62,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);dire
 .services-grid>.service-item:nth-child(3){animation:fadeSlideUp 0.4s 0.22s both}
 .services-grid>.service-item:nth-child(4){animation:fadeSlideUp 0.4s 0.28s both}
 .copied{background:rgba(74,222,128,0.15)!important;border-color:rgba(74,222,128,0.3)!important;color:#4ade80!important}
+.promo-images{display:flex;flex-direction:column;gap:12px}
+.promo-img-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--bg3)}
+.promo-img{width:100%;display:block;border-radius:14px;cursor:context-menu}
+.img-copy-btn{width:100%;background:rgba(107,155,210,0.12);border:1px solid rgba(107,155,210,0.22);border-top:none;border-radius:0 0 14px 14px;padding:10px;font-size:12px;font-weight:700;color:var(--acc3);cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:6px}
+.img-copy-btn:hover{background:rgba(107,155,210,0.22)}
+.template-box{background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.template-text{padding:16px 18px;font-family:'Cairo',sans-serif;font-size:13px;line-height:1.85;color:var(--text1);white-space:pre-wrap;word-break:break-word;direction:rtl;text-align:right;margin:0}
+.copy-template-btn{width:100%;background:rgba(232,115,74,0.1);border:none;border-top:1px solid var(--border);padding:12px;font-size:13px;font-weight:700;color:var(--acc);cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:7px}
+.copy-template-btn:hover{background:rgba(232,115,74,0.18)}
 </style>
 
 <div class="msg-card">
@@ -126,6 +135,53 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);dire
         <p class="coupon-note">🔗 أو استخدم الرابط المباشر: <span style="color:var(--acc3);cursor:pointer" onclick="openLink('https://mtjr.at/YdyjfHefF9')">mtjr.at/YdyjfHefF9</span></p>
       </div>
     </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="sec-label">صور ترويجية — انسخها لواتساب</div>
+      <div class="promo-images">
+        <div class="promo-img-wrap">
+          <img src="../assets/images/12 (2).png" alt="صورة ترويجية" class="promo-img" id="promoImg1">
+          <button class="img-copy-btn" onclick="copyImage('promoImg1',this)">📋 نسخ الصورة</button>
+        </div>
+        <div class="promo-img-wrap">
+          <img src="../assets/images/12 (1).png" alt="صورة ترويجية" class="promo-img" id="promoImg2">
+          <button class="img-copy-btn" onclick="copyImage('promoImg2',this)">📋 نسخ الصورة</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="sec-label">الصيغة الترويجية — انسخها كاملة</div>
+      <div class="template-box">
+        <pre class="template-text" id="promoTemplate">🚀 جاهز ترفع مستوى متجرك وتزود مبيعاتك؟
+
+أنا متخصص في تصميم وتطوير المتاجر الإلكترونية بشكل احترافي 👇
+✔️ تصميم بنرات جذابة عالية التحويل
+✔️ تطوير واجهة المتجر (UI) بشكل عصري ومرتب
+✔️ أكواد CSS مخصصة لتحسين الشكل بالكامل
+✔️ إضافات JavaScript لزيادة التفاعل وتجربة المستخدم
+✔️ تنظيم وترتيب المتجر ليكون جاهز للبيع بقوة
+
+🎯 شوف معرض أعمالي بنفسك:
+https://elwa2.github.io/portfolio/works.html
+
+🔥 ولو بتستخدم سلة — عندي لك عرض قوي:
+خصم مميز على باقات (برو / بلس)
+
+🔗 رابط التفعيل:
+https://mtjr.at/YdyjfHefF9
+
+🎟️ كود الخصم:
+F-HSB0U3YN
+
+💬 لو حابب تطور متجرك أو تبدأ بشكل احترافي، ابعتلي وهنشتغل على طول.</pre>
+        <button class="copy-template-btn" id="copyTplBtn" onclick="copyTemplate()">📋 نسخ الصيغة كاملة</button>
+      </div>
+    </div>
   </div>
 
   <div class="footer">
@@ -141,5 +197,33 @@ function copyCode(){
   btn.textContent='تم النسخ ✓';
   btn.classList.add('copied');
   setTimeout(()=>{btn.textContent='نسخ الكود';btn.classList.remove('copied');},2000);
+}
+function copyImage(imgId,btn){
+  const img=document.getElementById(imgId);
+  const canvas=document.createElement('canvas');
+  canvas.width=img.naturalWidth;
+  canvas.height=img.naturalHeight;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0);
+  canvas.toBlob(async(blob)=>{
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      btn.textContent='✓ تم النسخ — الصق في واتساب';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='📋 نسخ الصورة';btn.classList.remove('copied');},2500);
+    }catch(e){
+      btn.textContent='انقر يمين على الصورة ← نسخ الصورة';
+      setTimeout(()=>{btn.textContent='📋 نسخ الصورة';},3000);
+    }
+  },'image/png');
+}
+function copyTemplate(){
+  const text=document.getElementById('promoTemplate').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copyTplBtn');
+    btn.textContent='✓ تم النسخ — الصق في واتساب';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 نسخ الصيغة كاملة';btn.classList.remove('copied');},2500);
+  }).catch(()=>{});
 }
 </script>
