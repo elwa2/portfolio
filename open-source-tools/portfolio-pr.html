@@ -10,7 +10,8 @@
 --acc:#e8734a;--acc2:#d4a843;--acc3:#6b9bd2;
 --glow:rgba(232,115,74,0.18);--glow2:rgba(212,168,67,0.15);
 }
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);direction:rtl;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);direction:rtl;min-height:100vh;padding:24px}
+.msg-card{margin:0 auto}
 .msg-card{width:100%;max-width:600px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04)}
 .header{background:linear-gradient(135deg,#1a1208 0%,#141410 50%,#0f1014 100%);padding:28px 28px 24px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
 .header::before{content:'';position:absolute;top:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(232,115,74,0.12) 0%,transparent 70%);pointer-events:none}
@@ -64,7 +65,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);dire
 .copied{background:rgba(74,222,128,0.15)!important;border-color:rgba(74,222,128,0.3)!important;color:#4ade80!important}
 .promo-images{display:flex;flex-direction:column;gap:12px}
 .promo-img-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--bg3)}
-.promo-img{width:100%;display:block;border-radius:14px;cursor:context-menu}
+.promo-img{width:100%;max-height:220px;object-fit:cover;object-position:top;display:block;border-radius:14px;cursor:context-menu}
 .img-copy-btn{width:100%;background:rgba(107,155,210,0.12);border:1px solid rgba(107,155,210,0.22);border-top:none;border-radius:0 0 14px 14px;padding:10px;font-size:12px;font-weight:700;color:var(--acc3);cursor:pointer;font-family:'Cairo',sans-serif;transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:6px}
 .img-copy-btn:hover{background:rgba(107,155,210,0.22)}
 .template-box{background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:14px;overflow:hidden}
@@ -148,6 +149,14 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);dire
         <div class="promo-img-wrap">
           <img src="../assets/images/12 (1).png" alt="صورة ترويجية" class="promo-img" id="promoImg2">
           <button class="img-copy-btn" onclick="copyImage('promoImg2',this)">📋 نسخ الصورة</button>
+        </div>
+        <div class="promo-img-wrap">
+          <img src="../assets/images/23334543 (2).png" alt="صورة ترويجية" class="promo-img" id="promoImg3">
+          <button class="img-copy-btn" onclick="copyImage('promoImg3',this)">📋 نسخ الصورة</button>
+        </div>
+        <div class="promo-img-wrap">
+          <img src="../assets/images/23334543 (1).png" alt="صورة ترويجية" class="promo-img" id="promoImg4">
+          <button class="img-copy-btn" onclick="copyImage('promoImg4',this)">📋 نسخ الصورة</button>
         </div>
       </div>
     </div>
