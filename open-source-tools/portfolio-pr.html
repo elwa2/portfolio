@@ -89,6 +89,18 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text1);dire
 .card-coupons .header::after{background:radial-gradient(circle,rgba(107,155,210,0.1) 0%,transparent 70%)}
 .cta-gold{background:var(--acc2)!important;box-shadow:0 4px 16px rgba(212,168,67,0.3)!important}
 .cta-gold:hover{box-shadow:0 6px 24px rgba(212,168,67,0.45)!important}
+.tpl-nav-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tpl-meta{display:flex;align-items:center;gap:8px}
+.tpl-dialect{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
+.tpl-dialect.egy{background:rgba(232,115,74,0.15);border:1px solid rgba(232,115,74,0.3);color:var(--acc)}
+.tpl-dialect.ksa{background:rgba(107,155,210,0.15);border:1px solid rgba(107,155,210,0.3);color:var(--acc3)}
+.tpl-dialect.gulf{background:rgba(212,168,67,0.15);border:1px solid rgba(212,168,67,0.3);color:var(--acc2)}
+.tpl-counter{font-size:11px;color:var(--text3);font-weight:600}
+.tpl-arrows{display:flex;gap:6px}
+.tpl-arrow-btn{width:30px;height:30px;background:var(--glass);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease;font-family:'Cairo',sans-serif}
+.tpl-arrow-btn:hover{background:var(--glass2);border-color:rgba(212,168,67,0.3);color:var(--acc2)}
+.tpl-arrow-btn:disabled{opacity:.3;cursor:not-allowed}
+.tpl-hook{font-size:12px;font-weight:700;color:var(--acc2);margin-bottom:6px;padding:0 2px}
 </style>
 
 <div class="cards-wrapper"><div class="msg-card">
@@ -262,18 +274,19 @@ F-HSB0U3YN
     <div class="divider"></div>
 
     <div class="section">
-      <div class="sec-label">الصيغة الترويجية — انسخها كاملة</div>
+      <div class="sec-label">15 صيغة ترويجية — اختر وانسخ</div>
+      <div class="tpl-nav-header">
+        <div class="tpl-meta">
+          <span class="tpl-dialect egy" id="tplDialect">مصري 🇪🇬</span>
+          <span class="tpl-counter" id="tplCounter">1 / 15</span>
+        </div>
+        <div class="tpl-arrows">
+          <button class="tpl-arrow-btn" onclick="prevTpl()" id="tplPrevBtn" disabled>→</button>
+          <button class="tpl-arrow-btn" onclick="nextTpl()" id="tplNextBtn">←</button>
+        </div>
+      </div>
       <div class="template-box">
-        <pre class="template-text" id="promoTemplate2">تبي تشتري ثيم، تشترك بتطبيق، أو حتى "تجدد" اشتراكك الحالي وتبي خصم؟
-لا تدفع السعر الكامل! وفرنا لك كوبونات خصم (تصل إلى 50%) تشمل:
-1. شراء الثيمات الجديدة.
-2. الاشتراك في تطبيقات سلة.
-3. تجديد اشتراكاتك الحالية لضمان استمرار عمل أدواتك بأقل تكلفة.
-
-🔗 احصل على كود الخصم من هنا:
-https://elwa2.github.io/portfolio/index.html#salla-discounts
-
-💰 وفر الآن!</pre>
+        <pre class="template-text" id="promoTemplate2"></pre>
         <button class="copy-template-btn" id="copyTplBtn2" onclick="copyTemplate2()">📋 نسخ الصيغة كاملة</button>
       </div>
     </div>
@@ -331,4 +344,232 @@ function copyTemplate2(){
     setTimeout(()=>{btn.textContent='📋 نسخ الصيغة كاملة';btn.classList.remove('copied');},2500);
   }).catch(()=>{});
 }
+
+/* ===== 15 TEMPLATES ===== */
+const promoTemplates=[
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`😱 بتدفع فلوس كتير على سلة وانت ممكن توفر؟!
+
+يا عم جمع نفسك! عندنا كوبونات خصم بتوصل لـ 50% على:
+🛍️ شراء الثيمات الجديدة
+📱 الاشتراك في أي تطبيق سلة
+🔄 تجديد باقتك الحالية (برو / بلس)
+
+يعني بدل ما تدفع السعر كامل، هتوفر بالراحة 🙌
+🔗 دوس هنا واجيب كودك دلوقتي:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+💰 وفر دلوقتي قبل ما الكود ينتهي!`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`قصدي إيه الكلام ده؟ 🤔
+
+صاحبي كان بيجدد باقة سلة بالسعر الكامل كل شهر...
+أنا قولتله: إيه رأيك توفر من 25% لـ 50% من الفلوس دي؟
+
+استغرب! وقالي: ازاي؟
+
+قولتله: في كوبونات خصم حصرية بتشمل:
+✅ الثيمات
+✅ تطبيقات سلة
+✅ التجديد والاشتراك
+
+خد الكود من هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+هو وفر... وانت؟ 😉`},
+  {dialect:'سعودي 🇸🇦',cls:'ksa',text:`تبي تعرف السر اللي كل أصحاب متاجر سلة الناجحين يعرفونه؟ 🤫
+
+ما يدفعون السعر الكامل أبداً!
+
+عندهم كوبونات خصم تغطي:
+🔹 شراء الثيمات الاحترافية
+🔹 الاشتراك في تطبيقات المتجر
+🔹 تجديد الباقات الحالية
+
+والخصم يوصل لـ 50% 🔥
+احصل على كودك من هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+وفر ووسّع ميزانية متجرك! 💰`},
+  {dialect:'سعودي 🇸🇦',cls:'ksa',text:`صاحب متجر في سلة؟ الرسالة هذي لك ⬇️
+
+قبل ما تجدد أي اشتراك أو تشتري ثيم أو تنزل تطبيق —
+تأكد إنك وصلت لهذا الرابط أول!
+
+عندنا كوبونات خصم حصرية تصل لـ 50% على كل شيء في سلة 💎
+
+🔗 اضغط هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+لا تدفع زيادة وأنت ما تحتاج! 🚫💸`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`⚠️ بلاش تغمض عينك على الفرصة دي!
+
+لو عندك متجر على سلة وبتدفع على:
+— ثيم جديد
+— تطبيق
+— تجديد الباقة
+
+إيه رأيك توفر من 25% لـ 50%؟ 👀
+
+مش كلام فاضي، في كوبونات خصم حصرية جاهزة دلوقتي ✔️
+👇 اجيب كودك من هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+🔥 وفر دلوقتي!`},
+  {dialect:'خليجي 🌙',cls:'gulf',text:`هلا 👋
+
+عندي خبر كويس لأصحاب متاجر سلة
+
+لو تبي ثيم، تطبيق، أو تجديد اشتراك —
+ما لازم تدفع كامل!
+
+عندنا كوبونات توفرلك من الفاتورة بشكل كبير 🎯
+الخصم يوصل لـ 50% 🔥
+
+رابط الكوبونات:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+جرب ولا تندم! 💪`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`فرق بين شخصين:
+
+❌ الأول: دفع السعر الكامل على سلة زي ما هو
+✅ الثاني: وفر 50% باستخدام كوبون خصم
+
+الفرق؟ إن الثاني يعرف الرابط ده 👇
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+تنفع للثيمات، التطبيقات، والتجديد!
+
+انت مع مين؟ 😉`},
+  {dialect:'سعودي 🇸🇦',cls:'ksa',text:`مشكلة كثير من أصحاب المتاجر:
+يدفعون على سلة أكثر مما يلزم 😅
+
+الحل:
+كوبونات خصم حصرية تشمل —
+✔️ الثيمات الجديدة
+✔️ تطبيقات سلة
+✔️ تجديد الاشتراكات
+
+الخصم يوصل لـ 50% 💎
+
+👇 احصل على كودك الآن:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+ادفع أقل، وفر أكثر! 🏆`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`هي دي الحاجة اللي كنت بدور عليها 😂
+
+ساعات بتلاقي نفسك بتدفع على سلة وبتقول "ياريت"
+— ثيم بالسعر ده؟
+— تطبيق بالسعر ده؟
+— تجديد بالسعر ده؟
+
+خليني أقولك: فيه طريقة أحسن بكتير 😏
+كوبونات خصم حصرية بتوصل لـ 50% ✅
+
+👇 من هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+جرب وشكرني بعدين 😄`},
+  {dialect:'سعودي 🇸🇦',cls:'ksa',text:`50% خصم على سلة؟ صح! 🔥
+
+مو مبالغة — دي كوبونات خصم حصرية تشمل:
+🎨 الثيمات
+📲 التطبيقات
+♻️ التجديد
+
+وتوفر لك نص الفاتورة أو أكثر 💰
+
+الرابط:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+وفّر واستثمر الباقي في متجرك 💡`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`آخر مرة اشتريت حاجة من سلة كانت بكام؟ 🤔
+
+وعارف إنك كنت ممكن تاخدها بنص السعر؟
+
+مش بقولك كده عشان تزعل 😅
+بقولك عشان المرة الجاية توفر!
+
+في كوبونات خصم بتوصل لـ 50% على:
+• الثيمات الجديدة
+• تطبيقات سلة
+• تجديد الباقة
+
+من هنا:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+💸 ابدأ توفر من دلوقتي!`},
+  {dialect:'سعودي 🇸🇦',cls:'ksa',text:`وفرت على متجري في سلة هكذا ⬇️
+
+بدل ما أدفع السعر الكامل للثيمات والتطبيقات —
+استخدمت كوبون خصم ووفرت أكثر من 40%!
+
+وهذا الرابط هو اللي خلاني أوفر:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+يشمل:
+🟡 شراء الثيمات
+🔵 اشتراك التطبيقات
+🟠 تجديد الباقات
+
+جرب وشوف بعينك 👀`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`شير الكلام ده لكل أصحاب متاجر سلة 📢
+
+📌 نقطة مهمة جداً:
+مفيش سبب تدفع فلوس زيادة على سلة وانت ممكن توفر!
+
+في كوبونات خصم حصرية تغطي:
+1️⃣ الثيمات الجديدة
+2️⃣ تطبيقات سلة
+3️⃣ تجديد الاشتراكات الحالية
+
+الخصم بيوصل لـ 50% 🔥🔥
+الرابط ده يكون محفوظ عندك:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+شير مع أي حد عنده متجر سلة 🤝`},
+  {dialect:'خليجي 🌙',cls:'gulf',text:`الكوبونات دي مو موجودة دايم! ⏳
+
+لو عندك متجر على سلة —
+قبل ما تدفع أي فاتورة جديدة، تأكد إنك تشوف هذا:
+
+خصومات تصل لـ 50% على:
+• الثيمات الاحترافية لمتجرك
+• التطبيقات اللي تحتاجها
+• تجديد اشتراكك الحالي
+
+احصل عليها الآن:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+⚡ لا تفوّت الفرصة!`},
+  {dialect:'مصري 🇪🇬',cls:'egy',text:`كلمتك كلمة وخلاص 🗣️
+
+لو بتشتغل على سلة وما بتستخدمش كوبونات خصم —
+بكل بساطة بتحرق فلوسك! 🔥
+
+في كوبونات جاهزة دلوقتي بتوفرلك لـ 50% على:
+✅ أي ثيم تيجي تشتريه
+✅ أي تطبيق تيجي تشترك فيه
+✅ أي باقة هتيجي تجددها
+
+الرابط ده مش هيكون موجود دايماً:
+https://elwa2.github.io/portfolio/index.html#salla-discounts
+
+الذكي بيوفر قبل ما يدفع 😎`}
+];
+let currentTpl=0;
+function renderTpl(){
+  const t=promoTemplates[currentTpl];
+  document.getElementById('promoTemplate2').textContent=t.text;
+  const d=document.getElementById('tplDialect');
+  d.textContent=t.dialect;
+  d.className='tpl-dialect '+t.cls;
+  document.getElementById('tplCounter').textContent=(currentTpl+1)+' / '+promoTemplates.length;
+  document.getElementById('tplPrevBtn').disabled=currentTpl===0;
+  document.getElementById('tplNextBtn').disabled=currentTpl===promoTemplates.length-1;
+  const btn=document.getElementById('copyTplBtn2');
+  btn.textContent='📋 نسخ الصيغة كاملة';
+  btn.classList.remove('copied');
+}
+function nextTpl(){if(currentTpl<promoTemplates.length-1){currentTpl++;renderTpl();}}
+function prevTpl(){if(currentTpl>0){currentTpl--;renderTpl();}}
+renderTpl();
 </script>
