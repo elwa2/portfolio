@@ -53,8 +53,8 @@
     },
     {
       theme: "باقة سلة",
-      code: "F-AFN5N48K",
-      link: "https://mtjr.at/LfOztodFwz",
+      code: "F-HSB0U3YN",
+      link: "https://mtjr.at/YdyjfHefF9",
       color: "#3b82f6",
     },
   ];
