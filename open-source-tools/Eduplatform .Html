@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة نُور التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS — Nocturnal Glass + Aqua Pulse
+       ═══════════════════════════════════════════ */
+    :root {
+      /* Canvas Layers */
+      --canvas-base:     #080f14;
+      --canvas-raised:   #0d1820;
+      --canvas-elevated: #111f2c;
+      --canvas-overlay:  #162534;
+
+      /* Glass */
+      --glass-subtle:   rgba(255,255,255,0.03);
+      --glass-moderate: rgba(255,255,255,0.06);
+      --glass-strong:   rgba(255,255,255,0.10);
+      --glass-border:   rgba(255,255,255,0.08);
+
+      /* Text Hierarchy */
+      --text-primary:   #e8f4f0;
+      --text-secondary: #8aabb8;
+      --text-tertiary:  #4a6878;
+      --text-disabled:  #2a404f;
+
+      /* Accent System — Green + Blue */
+      --accent-green:       #2dd4bf;
+      --accent-green-dark:  #0f9e8e;
+      --accent-green-glow:  rgba(45,212,191,0.18);
+      --accent-blue:        #38bdf8;
+      --accent-blue-dark:   #0284c7;
+      --accent-blue-glow:   rgba(56,189,248,0.18);
+      --accent-mid:         #22d3a0;
+
+      /* Gradient */
+      --gradient-primary: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+      --gradient-card:    linear-gradient(160deg, rgba(45,212,191,0.08), rgba(56,189,248,0.04));
+
+      /* Borders */
+      --border-subtle:  rgba(45,212,191,0.06);
+      --border-default: rgba(45,212,191,0.12);
+      --border-strong:  rgba(45,212,191,0.22);
+      --border-accent:  rgba(45,212,191,0.40);
+
+      /* Shadows */
+      --shadow-sm:  0 2px 8px rgba(0,0,0,0.5);
+      --shadow-md:  0 4px 20px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
+      --shadow-lg:  0 8px 40px rgba(0,0,0,0.65), 0 4px 12px rgba(0,0,0,0.45);
+      --glow-green: 0 0 28px rgba(45,212,191,0.28), 0 0 8px rgba(45,212,191,0.15);
+      --glow-blue:  0 0 28px rgba(56,189,248,0.22), 0 0 8px rgba(56,189,248,0.12);
+
+      /* Typography */
+      --text-xs:   0.64rem;
+      --text-sm:   0.82rem;
+      --text-base: 1rem;
+      --text-lg:   1.25rem;
+      --text-xl:   1.563rem;
+      --text-2xl:  1.953rem;
+      --text-3xl:  2.441rem;
+
+      /* Spacing (8px grid) */
+      --sp1:  4px;  --sp2:  8px;  --sp3:  12px; --sp4:  16px;
+      --sp5:  24px; --sp6:  32px; --sp7:  48px; --sp8:  64px;
+
+      /* Radius */
+      --r-sm:   8px;   --r-md:  14px;
+      --r-lg:   20px;  --r-xl:  28px;
+      --r-full: 9999px;
+
+      /* Transition */
+      --ease-ui:     cubic-bezier(0.4,0,0.2,1);
+      --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ═══ RESET & BASE ═══ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--canvas-base);
+      color: var(--text-primary);
+      direction: rtl;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ═══ SCROLLBAR ═══ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--canvas-raised); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--r-full); }
+
+    /* ═══ ANIMATIONS ═══ */
+    @keyframes fadeSlideUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0);    }
+    }
+    @keyframes fadeSlideIn {
+      from { opacity:0; transform:translateX(12px); }
+      to   { opacity:1; transform:translateX(0);    }
+    }
+    @keyframes scaleIn {
+      from { opacity:0; transform:scale(0.92); }
+      to   { opacity:1; transform:scale(1);    }
+    }
+    @keyframes pulseGlow {
+      0%,100% { box-shadow: var(--glow-green); }
+      50%      { box-shadow: 0 0 40px rgba(45,212,191,0.45), 0 0 16px rgba(45,212,191,0.25); }
+    }
+    @keyframes shimmer {
+      0%   { background-position:-200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes heartBeat {
+      0%   { transform:scale(1);    }
+      30%  { transform:scale(1.35); }
+      60%  { transform:scale(0.9);  }
+      100% { transform:scale(1);    }
+    }
+    @keyframes orbitFloat {
+      0%,100% { transform:translateY(0px) rotate(0deg);    }
+      50%      { transform:translateY(-18px) rotate(4deg); }
+    }
+    @keyframes bgPulse {
+      0%,100% { opacity:0.35; }
+      50%      { opacity:0.55; }
+    }
+
+    /* ═══════════════════════════════════════
+       LAYOUT SHELL
+       ═══════════════════════════════════════ */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: 70px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ═══ TOPBAR ═══ */
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp6);
+      background: var(--canvas-raised);
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp3);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: var(--gradient-primary);
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--glow-green);
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: var(--text-lg);
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    .logo-sub {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      font-weight: 400;
+      margin-top: -4px;
+      -webkit-text-fill-color: var(--text-tertiary);
+    }
+
+    .topbar-center {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 var(--sp6);
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--sp3);
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-full);
+      padding: var(--sp2) var(--sp4);
+      transition: all 0.2s var(--ease-ui);
+    }
+    .search-bar:focus-within {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px var(--accent-green-glow);
+    }
+    .search-icon { font-size: 18px; color: var(--text-tertiary); flex-shrink:0; }
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'Cairo', sans-serif;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      direction: rtl;
+    }
+    .search-bar input::placeholder { color: var(--text-tertiary); }
+
+    .topbar-actions { display: flex; align-items: center; gap: var(--sp3); }
+    .icon-btn {
+      width: 42px; height: 42px;
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-ui);
+      position: relative;
+    }
+    .icon-btn:hover {
+      background: var(--glass-moderate);
+      border-color: var(--border-default);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    .badge {
+      position: absolute;
+      top: 6px; left: 6px;
+      width: 8px; height: 8px;
+      background: var(--accent-green);
+      border-radius: var(--r-full);
+      border: 2px solid var(--canvas-raised);
+    }
+    .avatar {
+      width: 42px; height: 42px;
+      background: var(--gradient-primary);
+      border-radius: var(--r-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-ui);
+      box-shadow: var(--glow-green);
+    }
+    .avatar:hover { transform:scale(1.05); }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar {
+      background: var(--canvas-raised);
+      border-left: 1px solid var(--border-subtle);
+      padding: var(--sp5) var(--sp4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp2);
+      overflow-y: auto;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+    }
+    .sidebar-section-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: var(--sp3) var(--sp3) var(--sp1);
+      margin-top: var(--sp2);
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--sp3);
+      padding: var(--sp3) var(--sp4);
+      border-radius: var(--r-md);
+      color: var(--text-secondary);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s var(--ease-ui);
+      text-decoration: none;
+      position: relative;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover {
+      background: var(--glass-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+    .nav-item.active {
+      background: rgba(45,212,191,0.08);
+      color: var(--accent-green);
+      border-color: var(--border-default);
+    }
+    .nav-item.active::after {
+      content:'';
+      position:absolute;
+      left:0; top:20%; height:60%;
+      width:3px;
+      background: var(--accent-green);
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--r-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      background: var(--canvas-elevated);
+      transition: all 0.18s var(--ease-ui);
+    }
+    .nav-item.active .nav-icon {
+      background: rgba(45,212,191,0.12);
+    }
+    .nav-item:hover .nav-icon {
+      background: var(--glass-moderate);
+    }
+    .nav-count {
+      margin-inline-start: auto;
+      font-size: var(--text-xs);
+      background: rgba(45,212,191,0.15);
+      color: var(--accent-green);
+      padding: 2px 8px;
+      border-radius: var(--r-full);
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: var(--sp4);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .progress-card {
+      background: var(--gradient-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-lg);
+      padding: var(--sp4);
+    }
+    .progress-card h4 {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--sp2);
+    }
+    .progress-card p {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-bottom: var(--sp3);
+    }
+    .progress-bar-wrap {
+      background: var(--canvas-base);
+      border-radius: var(--r-full);
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: var(--r-full);
+      width: 65%;
+      position: relative;
+      box-shadow: var(--glow-green);
+    }
+
+    /* ═══ MAIN CONTENT ═══ */
+    main {
+      padding: var(--sp6);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp6);
+    }
+
+    /* ═══ HERO STRIP ═══ */
+    .hero-strip {
+      background: var(--canvas-raised);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-xl);
+      padding: var(--sp7) var(--sp7);
+      position: relative;
+      overflow: hidden;
+      animation: fadeSlideUp 0.5s var(--ease-ui) both;
+    }
+    .hero-strip::before {
+      content:'';
+      position:absolute;
+      top:-80px; left:-80px;
+      width:350px; height:350px;
+      background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%);
+      border-radius:50%;
+      pointer-events:none;
+      animation: bgPulse 4s ease-in-out infinite;
+    }
+    .hero-strip::after {
+      content:'';
+      position:absolute;
+      bottom:-60px; right:-60px;
+      width:300px; height:300px;
+      background: radial-gradient(circle, rgba(56,189,248,0.14) 0%, transparent 70%);
+      border-radius:50%;
+      pointer-events:none;
+    }
+    .hero-content { position:relative; z-index:1; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp2);
+      background: rgba(45,212,191,0.12);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--r-full);
+      padding: var(--sp1) var(--sp4);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--accent-green);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--sp4);
+    }
+    .hero-strip h1 {
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: var(--sp3);
+    }
+    .hero-strip h1 span {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-strip p {
+      color: var(--text-secondary);
+      font-size: var(--text-base);
+      max-width: 480px;
+      margin-bottom: var(--sp5);
+    }
+    .hero-actions { display:flex; gap: var(--sp3); flex-wrap:wrap; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp2);
+      background: var(--gradient-primary);
+      color: var(--canvas-base);
+      padding: var(--sp3) var(--sp5);
+      border-radius: var(--r-full);
+      font-family: 'Cairo', sans-serif;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.22s var(--ease-ui);
+      box-shadow: var(--glow-green);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(45,212,191,0.4), 0 0 16px rgba(45,212,191,0.2);
+      filter: brightness(1.1);
+    }
+    .btn-primary:active { transform:translateY(0) scale(0.97); }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp2);
+      background: transparent;
+      color: var(--text-secondary);
+      padding: var(--sp3) var(--sp5);
+      border-radius: var(--r-full);
+      font-family: 'Cairo', sans-serif;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      border: 1px solid var(--border-default);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-ui);
+    }
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: var(--glass-subtle);
+      transform: translateY(-1px);
+    }
+    .hero-floater {
+      position: absolute;
+      top: var(--sp5); left: var(--sp8);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp3);
+      animation: orbitFloat 6s ease-in-out infinite;
+    }
+    .stat-pill {
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-lg);
+      padding: var(--sp3) var(--sp4);
+      display: flex;
+      align-items: center;
+      gap: var(--sp3);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-md);
+    }
+    .stat-pill-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--r-full);
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink:0;
+    }
+    .stat-pill-val {
+      font-size: var(--text-lg);
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .stat-pill-lbl {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* ═══ STATS ROW ═══ */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--sp4);
+      animation: fadeSlideUp 0.5s 0.1s var(--ease-ui) both;
+    }
+    .stat-card {
+      background: var(--canvas-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      padding: var(--sp5);
+      display: flex;
+      align-items: center;
+      gap: var(--sp4);
+      transition: all 0.22s var(--ease-ui);
+      cursor: default;
+    }
+    .stat-card:hover {
+      border-color: var(--border-default);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      background: var(--canvas-elevated);
+    }
+    .stat-card-icon {
+      width: 52px; height: 52px;
+      border-radius: var(--r-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .stat-card-icon.green { background: rgba(45,212,191,0.12); box-shadow: var(--glow-green); }
+    .stat-card-icon.blue  { background: rgba(56,189,248,0.12); box-shadow: var(--glow-blue);  }
+    .stat-card-icon.teal  { background: rgba(34,211,160,0.12); }
+    .stat-card-icon.sky   { background: rgba(14,165,233,0.12); }
+    .stat-val {
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+    }
+    .stat-lbl {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* ═══ SECTION HEADER ═══ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--sp5);
+    }
+    .section-title {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .section-sub {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .view-all {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp2);
+      color: var(--accent-green);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-ui);
+      text-decoration: none;
+      background: none;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+    }
+    .view-all:hover { color: var(--accent-blue); gap: var(--sp3); }
+
+    /* ═══ CATEGORY CHIPS ═══ */
+    .category-strip {
+      display: flex;
+      gap: var(--sp2);
+      flex-wrap: wrap;
+      margin-bottom: var(--sp5);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp2);
+      padding: var(--sp2) var(--sp4);
+      border-radius: var(--r-full);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-ui);
+      border: 1px solid var(--border-default);
+      background: var(--canvas-elevated);
+      color: var(--text-secondary);
+      font-family: 'Cairo', sans-serif;
+    }
+    .chip:hover {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(45,212,191,0.05);
+    }
+    .chip.active {
+      background: rgba(45,212,191,0.12);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+    .chip-icon { font-size: 18px; }
+
+    /* ═══ COURSE GRID ═══ */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp5);
+    }
+    .course-card {
+      background: var(--canvas-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      transition: all 0.28s var(--ease-ui);
+      cursor: pointer;
+      animation: scaleIn 0.4s var(--ease-ui) both;
+      position: relative;
+    }
+    .course-card:nth-child(1) { animation-delay: 0ms; }
+    .course-card:nth-child(2) { animation-delay: 60ms; }
+    .course-card:nth-child(3) { animation-delay: 120ms; }
+    .course-card:nth-child(4) { animation-delay: 180ms; }
+    .course-card:nth-child(5) { animation-delay: 240ms; }
+    .course-card:nth-child(6) { animation-delay: 300ms; }
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-default);
+    }
+    .course-card:hover .course-thumb-overlay { opacity: 1; }
+
+    .course-thumb {
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+    .course-thumb-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+      position: relative;
+    }
+    .course-thumb-overlay {
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,0.35);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0;
+      transition: opacity 0.25s var(--ease-ui);
+    }
+    .play-btn {
+      width:52px; height:52px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter:blur(8px);
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius: var(--r-full);
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px;
+    }
+    .fav-btn {
+      position:absolute;
+      top: var(--sp3); left: var(--sp3);
+      width:36px; height:36px;
+      background: rgba(8,15,20,0.7);
+      backdrop-filter:blur(8px);
+      border:1px solid var(--glass-border);
+      border-radius: var(--r-full);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px;
+      cursor:pointer;
+      transition: all 0.2s var(--ease-ui);
+      z-index:2;
+    }
+    .fav-btn:hover { transform:scale(1.15); background:rgba(8,15,20,0.9); }
+    .fav-btn.active { animation: heartBeat 0.4s var(--ease-spring); }
+
+    .level-tag {
+      position:absolute;
+      bottom: var(--sp3); right: var(--sp3);
+      padding: 3px var(--sp3);
+      border-radius: var(--r-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      backdrop-filter:blur(8px);
+    }
+    .level-tag.beginner { background:rgba(45,212,191,0.25); color:var(--accent-green); }
+    .level-tag.inter    { background:rgba(56,189,248,0.25); color:var(--accent-blue); }
+    .level-tag.adv      { background:rgba(251,146,60,0.25); color:#fb923c; }
+
+    .course-body {
+      padding: var(--sp4) var(--sp5);
+    }
+    .course-cat {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--accent-green);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--sp2);
+      display:flex; align-items:center; gap:var(--sp1);
+    }
+    .course-title {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: var(--sp2);
+    }
+    .course-meta {
+      display:flex;
+      align-items:center;
+      gap: var(--sp3);
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-bottom: var(--sp4);
+    }
+    .course-meta span { display:flex; align-items:center; gap: var(--sp1); }
+
+    .course-progress-wrap {
+      margin-bottom: var(--sp3);
+    }
+    .course-progress-top {
+      display:flex; justify-content:space-between;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-bottom: var(--sp1);
+    }
+    .course-progress-bar {
+      height: 4px;
+      background: var(--canvas-base);
+      border-radius: var(--r-full);
+      overflow:hidden;
+    }
+    .course-progress-fill {
+      height:100%;
+      background: var(--gradient-primary);
+      border-radius: var(--r-full);
+      transition: width 0.5s var(--ease-ui);
+    }
+
+    .course-footer {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding-top: var(--sp3);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .instructor {
+      display:flex; align-items:center; gap: var(--sp2);
+    }
+    .instructor-avatar {
+      width:28px; height:28px;
+      border-radius: var(--r-full);
+      background: var(--gradient-primary);
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; font-weight:700;
+      color: var(--canvas-base);
+    }
+    .instructor-name { font-size: var(--text-xs); color: var(--text-secondary); }
+    .course-rating {
+      display:flex; align-items:center; gap: var(--sp1);
+      font-size: var(--text-xs);
+      color: #fbbf24;
+      font-weight:600;
+    }
+
+    /* ═══ FEATURED COURSE (wide) ═══ */
+    .featured-course {
+      grid-column: 1 / -1;
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      background: var(--canvas-raised);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-xl);
+      overflow:hidden;
+      transition: all 0.28s var(--ease-ui);
+    }
+    .featured-course:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-lg);
+      transform:translateY(-3px);
+    }
+    .featured-thumb {
+      background: linear-gradient(160deg, rgba(45,212,191,0.15), rgba(56,189,248,0.1));
+      display:flex; align-items:center; justify-content:center;
+      font-size:90px;
+      position:relative;
+    }
+    .featured-badge {
+      position:absolute;
+      top: var(--sp4); right: var(--sp4);
+      background: var(--gradient-primary);
+      color: var(--canvas-base);
+      padding: 4px var(--sp3);
+      border-radius: var(--r-full);
+      font-size: var(--text-xs);
+      font-weight: 700;
+    }
+    .featured-body {
+      padding: var(--sp6);
+      display:flex; flex-direction:column; justify-content:center;
+    }
+    .featured-body .course-title { font-size: var(--text-xl); margin-bottom: var(--sp3); }
+    .featured-body p { color: var(--text-secondary); font-size: var(--text-sm); line-height:1.7; margin-bottom: var(--sp4); }
+
+    /* ═══ FAVORITES PANEL ═══ */
+    .fav-empty {
+      text-align:center;
+      padding: var(--sp7) var(--sp5);
+      color: var(--text-tertiary);
+    }
+    .fav-empty .fav-empty-icon {
+      font-size:56px;
+      margin-bottom: var(--sp3);
+      opacity:0.4;
+    }
+    .fav-empty p { font-size: var(--text-sm); }
+    .fav-list { display:flex; flex-direction:column; gap: var(--sp3); }
+    .fav-item {
+      display:flex; align-items:center; gap: var(--sp3);
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-md);
+      padding: var(--sp3) var(--sp4);
+      cursor:pointer;
+      transition: all 0.2s var(--ease-ui);
+    }
+    .fav-item:hover { border-color:var(--border-default); transform:translateX(-2px); }
+    .fav-item-icon {
+      width:40px; height:40px;
+      border-radius: var(--r-full);
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+      flex-shrink:0;
+    }
+    .fav-item-title { font-size: var(--text-sm); font-weight:600; color:var(--text-primary); }
+    .fav-item-sub { font-size: var(--text-xs); color:var(--text-secondary); }
+    .fav-remove {
+      margin-inline-start:auto;
+      background:none; border:none;
+      color:var(--text-tertiary);
+      font-size:18px; cursor:pointer;
+      transition: all 0.2s var(--ease-ui);
+      padding: var(--sp1);
+      border-radius: var(--r-sm);
+      font-family:'Cairo',sans-serif;
+    }
+    .fav-remove:hover { color:var(--semantic-danger); background:rgba(248,113,113,0.1); }
+
+    /* ═══ TOAST ═══ */
+    .toast-wrap {
+      position:fixed;
+      bottom: var(--sp5);
+      right: var(--sp5);
+      display:flex;
+      flex-direction:column;
+      gap: var(--sp2);
+      z-index:999;
+    }
+    .toast {
+      display:flex; align-items:center; gap: var(--sp3);
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-md);
+      padding: var(--sp3) var(--sp4);
+      box-shadow: var(--shadow-lg);
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      animation: fadeSlideIn 0.3s var(--ease-spring) both;
+      backdrop-filter:blur(16px);
+      min-width:260px;
+    }
+    .toast-icon {
+      width:32px; height:32px;
+      border-radius:var(--r-full);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px;
+      flex-shrink:0;
+    }
+    .toast.success .toast-icon { background:rgba(45,212,191,0.15); }
+    .toast.info    .toast-icon { background:rgba(56,189,248,0.15); }
+
+    /* ═══ MODAL ═══ */
+    .modal-backdrop {
+      position:fixed; inset:0;
+      background:rgba(8,15,20,0.8);
+      backdrop-filter:blur(8px);
+      z-index:200;
+      display:flex; align-items:center; justify-content:center;
+      padding: var(--sp5);
+      opacity:0; pointer-events:none;
+      transition: opacity 0.25s var(--ease-ui);
+    }
+    .modal-backdrop.open { opacity:1; pointer-events:all; }
+    .modal {
+      background: var(--canvas-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-xl);
+      padding: var(--sp7);
+      max-width:520px;
+      width:100%;
+      box-shadow: var(--shadow-xl);
+      transform:scale(0.94) translateY(12px);
+      transition: transform 0.3s var(--ease-spring);
+    }
+    .modal-backdrop.open .modal { transform:scale(1) translateY(0); }
+    .modal-header {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom: var(--sp5);
+    }
+    .modal-title { font-size: var(--text-xl); font-weight:700; color:var(--text-primary); }
+    .modal-close {
+      background:var(--canvas-overlay); border:1px solid var(--border-subtle);
+      border-radius:var(--r-full);
+      width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      font-size:18px; color:var(--text-secondary);
+      transition: all 0.2s var(--ease-ui);
+      font-family:'Cairo',sans-serif;
+    }
+    .modal-close:hover { color:var(--text-primary); background:var(--glass-moderate); }
+    .modal-thumb {
+      height:140px;
+      border-radius: var(--r-lg);
+      margin-bottom: var(--sp5);
+      display:flex; align-items:center; justify-content:center;
+      font-size:72px;
+      overflow:hidden;
+    }
+    .modal p { color:var(--text-secondary); font-size:var(--text-sm); line-height:1.7; margin-bottom: var(--sp4); }
+    .modal-tags { display:flex; gap:var(--sp2); flex-wrap:wrap; margin-bottom: var(--sp5); }
+    .modal-tag {
+      background:var(--canvas-base); border:1px solid var(--border-default);
+      border-radius:var(--r-full);
+      padding: 3px var(--sp3);
+      font-size:var(--text-xs); color:var(--text-secondary);
+    }
+    .modal-actions { display:flex; gap:var(--sp3); }
+
+    /* ═══ PAGE VIEWS ═══ */
+    .page { display:none; }
+    .page.active { display:flex; flex-direction:column; gap: var(--sp6); }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width:1100px) {
+      .courses-grid { grid-template-columns:repeat(2,1fr); }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+      .hero-floater { display:none; }
+    }
+    @media (max-width:768px) {
+      .app-shell { grid-template-columns:1fr; }
+      .sidebar { display:none; }
+      .courses-grid { grid-template-columns:1fr; }
+      .featured-course { grid-template-columns:1fr; }
+      .topbar-center { display:none; }
+    }
+
+    /* DB-READY helpers (data attributes for SQLite bridge) */
+    [data-id]       {} /* course primary key */
+    [data-fav]      {} /* favorites flag     */
+    [data-progress] {} /* progress percentage */
+    [data-cat]      {} /* category FK        */
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ APP SHELL ════════════════════ -->
+<div class="app-shell">
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <a class="logo" href="#" onclick="navigate('home'); return false;">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <div class="logo-text">نُـور</div>
+        <div class="logo-sub">منصة تعليمية</div>
+      </div>
+    </a>
+
+    <div class="topbar-center">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="ابحث عن كورس، مدرّس..." id="searchInput" oninput="filterCourses()" />
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="icon-btn" title="الإشعارات" onclick="showToast('لا توجد إشعارات جديدة','ℹ️','info')">
+        🔔
+        <span class="badge"></span>
+      </div>
+      <div class="icon-btn" title="المفضلة" onclick="navigate('favorites')">❤️</div>
+      <div class="avatar" title="حسابي" onclick="navigate('profile')">أح</div>
+    </div>
+  </header>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <span class="sidebar-section-label">القائمة</span>
+
+    <a class="nav-item active" id="nav-home" href="#" onclick="navigate('home'); return false;">
+      <div class="nav-icon">🏠</div>
+      الرئيسية
+    </a>
+    <a class="nav-item" id="nav-explore" href="#" onclick="navigate('explore'); return false;">
+      <div class="nav-icon">🧭</div>
+      استكشاف
+    </a>
+    <a class="nav-item" id="nav-my-courses" href="#" onclick="navigate('my-courses'); return false;">
+      <div class="nav-icon">📚</div>
+      كورساتي
+      <span class="nav-count">4</span>
+    </a>
+    <a class="nav-item" id="nav-favorites" href="#" onclick="navigate('favorites'); return false;">
+      <div class="nav-icon">❤️</div>
+      المفضلة
+      <span class="nav-count" id="fav-count">0</span>
+    </a>
+
+    <span class="sidebar-section-label">الفئات</span>
+
+    <a class="nav-item" href="#" onclick="filterByCategory('برمجة'); navigate('explore'); return false;">
+      <div class="nav-icon">💻</div>
+      برمجة وتطوير
+    </a>
+    <a class="nav-item" href="#" onclick="filterByCategory('تصميم'); navigate('explore'); return false;">
+      <div class="nav-icon">🎨</div>
+      تصميم وإبداع
+    </a>
+    <a class="nav-item" href="#" onclick="filterByCategory('أعمال'); navigate('explore'); return false;">
+      <div class="nav-icon">💼</div>
+      أعمال وريادة
+    </a>
+    <a class="nav-item" href="#" onclick="filterByCategory('ذكاء'); navigate('explore'); return false;">
+      <div class="nav-icon">🤖</div>
+      ذكاء اصطناعي
+    </a>
+    <a class="nav-item" href="#" onclick="filterByCategory('لغات'); navigate('explore'); return false;">
+      <div class="nav-icon">🌐</div>
+      لغات
+    </a>
+
+    <span class="sidebar-section-label">حسابي</span>
+    <a class="nav-item" id="nav-profile" href="#" onclick="navigate('profile'); return false;">
+      <div class="nav-icon">👤</div>
+      الملف الشخصي
+    </a>
+    <a class="nav-item" href="#" onclick="showToast('قريباً — قيد التطوير','⚙️','info')">
+      <div class="nav-icon">⚙️</div>
+      الإعدادات
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="progress-card">
+        <h4>🎯 هدف الأسبوع</h4>
+        <p>٦٥٪ من هدفك الأسبوعي اكتمل</p>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main id="main-content">
+
+    <!-- ═══ PAGE: HOME ═══ -->
+    <div class="page active" id="page-home">
+
+      <!-- Hero -->
+      <section class="hero-strip">
+        <div class="hero-content">
+          <div class="hero-tag">✨ منصة تعليمية #١ في العالم العربي</div>
+          <h1>تعلّم بلا حدود<br /><span>ابدأ رحلتك اليوم</span></h1>
+          <p>آلاف الكورسات باللغة العربية في مجالات البرمجة، التصميم، الأعمال، والمزيد — بأسعار تناسب الجميع.</p>
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="navigate('explore')">🚀 استكشف الكورسات</button>
+            <button class="btn-ghost" onclick="navigate('my-courses')">📚 متابعة التعلم</button>
+          </div>
+        </div>
+        <div class="hero-floater">
+          <div class="stat-pill">
+            <div class="stat-pill-icon">👥</div>
+            <div>
+              <div class="stat-pill-val">٢٤٠ ألف</div>
+              <div class="stat-pill-lbl">طالب نشط</div>
+            </div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-icon">⭐</div>
+            <div>
+              <div class="stat-pill-val">٤.٩</div>
+              <div class="stat-pill-lbl">تقييم المنصة</div>
+            </div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-icon">🏆</div>
+            <div>
+              <div class="stat-pill-val">١٢ شهادة</div>
+              <div class="stat-pill-lbl">صادرة اليوم</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-icon green">📖</div>
+          <div>
+            <div class="stat-val">٨٢٠+</div>
+            <div class="stat-lbl">كورس متاح</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon blue">👨‍🏫</div>
+          <div>
+            <div class="stat-val">١٥٠+</div>
+            <div class="stat-lbl">مدرّس خبير</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon teal">🎓</div>
+          <div>
+            <div class="stat-val">٩٨ ألف</div>
+            <div class="stat-lbl">شهادة أُصدرت</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon sky">⭐</div>
+          <div>
+            <div class="stat-val">٤.٩</div>
+            <div class="stat-lbl">متوسط التقييم</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Learning -->
+      <section>
+        <div class="section-header">
+          <div>
+            <div class="section-title">▶️ متابعة التعلم</div>
+            <div class="section-sub">الكورسات التي بدأتها مؤخراً</div>
+          </div>
+          <button class="view-all" onclick="navigate('my-courses')">عرض الكل ←</button>
+        </div>
+        <div class="courses-grid" id="continue-grid"></div>
+      </section>
+
+      <!-- Popular -->
+      <section>
+        <div class="section-header">
+          <div>
+            <div class="section-title">🔥 الأكثر شعبية</div>
+            <div class="section-sub">الكورسات التي يتحدث عنها الجميع</div>
+          </div>
+          <button class="view-all" onclick="navigate('explore')">استكشف المزيد ←</button>
+        </div>
+        <div class="courses-grid" id="popular-grid"></div>
+      </section>
+
+    </div><!-- /page-home -->
+
+
+    <!-- ═══ PAGE: EXPLORE ═══ -->
+    <div class="page" id="page-explore">
+      <section>
+        <div class="section-header">
+          <div>
+            <div class="section-title">🧭 استكشاف الكورسات</div>
+            <div class="section-sub">تصفح حسب الفئة أو البحث</div>
+          </div>
+        </div>
+
+        <div class="category-strip" id="cat-strip">
+          <button class="chip active" data-cat="الكل" onclick="filterByCategory('الكل')"><span class="chip-icon">✨</span>الكل</button>
+          <button class="chip" data-cat="برمجة" onclick="filterByCategory('برمجة')"><span class="chip-icon">💻</span>برمجة</button>
+          <button class="chip" data-cat="تصميم" onclick="filterByCategory('تصميم')"><span class="chip-icon">🎨</span>تصميم</button>
+          <button class="chip" data-cat="أعمال" onclick="filterByCategory('أعمال')"><span class="chip-icon">💼</span>أعمال</button>
+          <button class="chip" data-cat="ذكاء" onclick="filterByCategory('ذكاء')"><span class="chip-icon">🤖</span>ذكاء اصطناعي</button>
+          <button class="chip" data-cat="لغات" onclick="filterByCategory('لغات')"><span class="chip-icon">🌐</span>لغات</button>
+          <button class="chip" data-cat="رياضيات" onclick="filterByCategory('رياضيات')"><span class="chip-icon">🔢</span>رياضيات</button>
+        </div>
+
+        <div class="courses-grid" id="explore-grid"></div>
+      </section>
+    </div>
+
+
+    <!-- ═══ PAGE: MY COURSES ═══ -->
+    <div class="page" id="page-my-courses">
+      <div class="section-header">
+        <div>
+          <div class="section-title">📚 كورساتي</div>
+          <div class="section-sub">الكورسات المسجّل فيها</div>
+        </div>
+      </div>
+      <div class="courses-grid" id="my-courses-grid"></div>
+    </div>
+
+
+    <!-- ═══ PAGE: FAVORITES ═══ -->
+    <div class="page" id="page-favorites">
+      <div class="section-header">
+        <div>
+          <div class="section-title">❤️ المفضلة</div>
+          <div class="section-sub">الكورسات التي احتفظت بها للعودة لاحقاً</div>
+        </div>
+      </div>
+      <div id="fav-panel"></div>
+    </div>
+
+
+    <!-- ═══ PAGE: PROFILE ═══ -->
+    <div class="page" id="page-profile">
+      <div class="section-header">
+        <div>
+          <div class="section-title">👤 الملف الشخصي</div>
+          <div class="section-sub">معلوماتك الشخصية وإحصائياتك</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-icon green">📖</div>
+          <div><div class="stat-val">٤</div><div class="stat-lbl">كورسات منتسب</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon blue">✅</div>
+          <div><div class="stat-val">٢</div><div class="stat-lbl">كورسات مكتملة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon teal">⏱️</div>
+          <div><div class="stat-val">٤٨ س</div><div class="stat-lbl">وقت التعلم</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon sky">🏆</div>
+          <div><div class="stat-val">٣</div><div class="stat-lbl">شهادات</div></div>
+        </div>
+      </div>
+      <section>
+        <div class="section-header"><div class="section-title">📊 آخر النشاطات</div></div>
+        <div class="fav-list">
+          <div class="fav-item">
+            <div class="fav-item-icon" style="background:rgba(45,212,191,0.1)">💻</div>
+            <div><div class="fav-item-title">أكملت درس: مقدمة في Python</div><div class="fav-item-sub">منذ ساعتين</div></div>
+          </div>
+          <div class="fav-item">
+            <div class="fav-item-icon" style="background:rgba(56,189,248,0.1)">🎨</div>
+            <div><div class="fav-item-title">بدأت كورس: تصميم UI/UX</div><div class="fav-item-sub">أمس</div></div>
+          </div>
+          <div class="fav-item">
+            <div class="fav-item-icon" style="background:rgba(251,191,36,0.1)">🏆</div>
+            <div><div class="fav-item-title">حصلت على شهادة: HTML & CSS</div><div class="fav-item-sub">منذ أسبوع</div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-thumb" id="modal-thumb"></div>
+    <p id="modal-desc"></p>
+    <div class="modal-tags" id="modal-tags"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+
+<script>
+/* ══════════════════════════════════════════
+   DATA LAYER — قابل للربط بـ SQLite لاحقاً
+   ══════════════════════════════════════════
+   جدول: courses (id, title, category, emoji, description,
+                  instructor, duration, lessons, level, rating,
+                  progress, enrolled, featured)
+   جدول: favorites (user_id, course_id, saved_at)
+*/
+const COURSES = [
+  { id:1,  title:'Python من الصفر إلى الاحتراف', category:'برمجة', emoji:'🐍',
+    desc:'تعلّم Python خطوة بخطوة من المبادئ الأساسية حتى المشاريع الاحترافية، مع تطبيقات عملية في كل درس.',
+    instructor:'أ. محمد حسن', initials:'مح', duration:'٢٢ ساعة', lessons:٦٤, level:'beginner', levelTxt:'مبتدئ',
+    rating:'٤.٩', progress:65, enrolled:true, featured:true,
+    tags:['Python','برمجة','مبتدئ','مشاريع'] },
+
+  { id:2,  title:'تصميم واجهات UI/UX احترافية', category:'تصميم', emoji:'🎨',
+    desc:'أتقن أساسيات تصميم تجربة المستخدم وتصميم الواجهات باستخدام أدوات Figma الحديثة.',
+    instructor:'أ. سارة أحمد', initials:'سأ', duration:'١٨ ساعة', lessons:٥٢, level:'inter', levelTxt:'متوسط',
+    rating:'٤.٨', progress:30, enrolled:true, featured:false,
+    tags:['UI/UX','Figma','تصميم','احترافي'] },
+
+  { id:3,  title:'الذكاء الاصطناعي وتعلم الآلة', category:'ذكاء', emoji:'🤖',
+    desc:'ادخل عالم الذكاء الاصطناعي وتعلّم بناء نماذج التعلم الآلي باستخدام Python وأبرز المكتبات الحديثة.',
+    instructor:'أ. يوسف خالد', initials:'يخ', duration:'٣٠ ساعة', lessons:٨٨, level:'adv', levelTxt:'متقدم',
+    rating:'٥.٠', progress:0, enrolled:false, featured:false,
+    tags:['AI','ML','Python','بيانات'] },
+
+  { id:4,  title:'تطوير تطبيقات React', category:'برمجة', emoji:'⚛️',
+    desc:'كورس شامل في React.js يغطي المكونات، الحالة، التوجيه، وإدارة البيانات مع تطبيقات حقيقية.',
+    instructor:'أ. كريم فاروق', initials:'كف', duration:'٢٥ ساعة', lessons:٧٢, level:'inter', levelTxt:'متوسط',
+    rating:'٤.٧', progress:88, enrolled:true, featured:false,
+    tags:['React','JavaScript','Frontend','تطبيقات'] },
+
+  { id:5,  title:'ريادة الأعمال والشركات الناشئة', category:'أعمال', emoji:'🚀',
+    desc:'تعلّم كيف تحوّل فكرتك إلى مشروع ناجح، من التخطيط والتمويل إلى التسويق وإدارة الفريق.',
+    instructor:'أ. نورا سليم', initials:'نس', duration:'١٢ ساعة', lessons:٣٦, level:'beginner', levelTxt:'مبتدئ',
+    rating:'٤.٦', progress:0, enrolled:false, featured:false,
+    tags:['ريادة','أعمال','تسويق','إدارة'] },
+
+  { id:6,  title:'اللغة الإنجليزية للمحترفين', category:'لغات', emoji:'🌐',
+    desc:'ارتقِ بمستواك في الإنجليزية المهنية والتواصل الاحترافي مع مدرّبين ذوي خبرة دولية.',
+    instructor:'أ. ليلى منصور', initials:'لم', duration:'١٦ ساعة', lessons:٤٨, level:'inter', levelTxt:'متوسط',
+    rating:'٤.٨', progress:0, enrolled:false, featured:false,
+    tags:['إنجليزي','لغة','مهارات','تواصل'] },
+
+  { id:7,  title:'قواعد البيانات SQL وNoSQL', category:'برمجة', emoji:'🗄️',
+    desc:'تعلّم تصميم وإدارة قواعد البيانات من صفر مع تطبيقات عملية على MySQL وMongoDB وSQLite.',
+    instructor:'أ. طارق إبراهيم', initials:'طإ', duration:'٢٠ ساعة', lessons:٥٨, level:'inter', levelTxt:'متوسط',
+    rating:'٤.٧', progress:0, enrolled:false, featured:false,
+    tags:['SQL','قواعد بيانات','MySQL','SQLite'] },
+
+  { id:8,  title:'الرياضيات للمبرمجين', category:'رياضيات', emoji:'🔢',
+    desc:'كورس مخصص لتعليم الرياضيات الأساسية والمتقدمة التي يحتاجها كل مبرمج ومهتم بالبيانات.',
+    instructor:'أ. هدى الزهراني', initials:'هز', duration:'١٤ ساعة', lessons:٤٢, level:'beginner', levelTxt:'مبتدئ',
+    rating:'٤.٥', progress:100, enrolled:true, featured:false,
+    tags:['رياضيات','جبر','إحصاء','برمجة'] },
+];
+
+/* ═══ STATE ═══ */
+let favorites = new Set(); // DB-ready: يُحمَّل من جدول favorites
+let currentPage = 'home';
+let activeCat = 'الكل';
+
+/* ═══ NAVIGATION ═══ */
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + page);
+  const navEl  = document.getElementById('nav-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  if (navEl)  navEl.classList.add('active');
+  currentPage = page;
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ═══ RENDER ENGINE ═══ */
+function renderAll() {
+  switch (currentPage) {
+    case 'home':
+      renderGrid('continue-grid', COURSES.filter(c => c.enrolled && c.progress > 0 && c.progress < 100).slice(0,3));
+      renderGrid('popular-grid', COURSES.filter(c => !c.enrolled).slice(0,3));
+      break;
+    case 'explore':
+      const filtered = activeCat === 'الكل'
+        ? COURSES
+        : COURSES.filter(c => c.category.includes(activeCat));
+      renderGrid('explore-grid', filtered);
+      break;
+    case 'my-courses':
+      renderGrid('my-courses-grid', COURSES.filter(c => c.enrolled));
+      break;
+    case 'favorites':
+      renderFavorites();
+      break;
+  }
+  updateFavCount();
+}
+
+function renderGrid(containerId, courses) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!courses.length) {
+    el.innerHTML = `<div class="fav-empty" style="grid-column:1/-1">
+      <div class="fav-empty-icon">📭</div>
+      <p>لا توجد كورسات هنا بعد</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = courses.map(c => courseCard(c)).join('');
+}
+
+function courseCard(c) {
+  const prog = c.progress || 0;
+  const isFav = favorites.has(c.id);
+  const thumbBg = {
+    'برمجة':  'linear-gradient(135deg,rgba(45,212,191,0.18),rgba(56,189,248,0.12))',
+    'تصميم':  'linear-gradient(135deg,rgba(168,85,247,0.18),rgba(236,72,153,0.12))',
+    'ذكاء':   'linear-gradient(135deg,rgba(251,191,36,0.18),rgba(245,158,11,0.12))',
+    'أعمال':  'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(16,185,129,0.12))',
+    'لغات':   'linear-gradient(135deg,rgba(56,189,248,0.18),rgba(99,102,241,0.12))',
+    'رياضيات':'linear-gradient(135deg,rgba(239,68,68,0.15),rgba(251,191,36,0.12))',
+  }[c.category] || 'linear-gradient(135deg,rgba(45,212,191,0.12),rgba(56,189,248,0.08))';
+
+  return `
+  <div class="course-card" data-id="${c.id}" data-cat="${c.category}" data-fav="${isFav}" onclick="openModal(${c.id})">
+    <div class="course-thumb">
+      <div class="course-thumb-bg" style="background:${thumbBg}">${c.emoji}</div>
+      <div class="course-thumb-overlay"><div class="play-btn">▶</div></div>
+      <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event,${c.id})" title="${isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">
+        ${isFav ? '❤️' : '🤍'}
+      </button>
+      <span class="level-tag ${c.level}">${c.levelTxt}</span>
+    </div>
+    <div class="course-body">
+      <div class="course-cat">📂 ${c.category}</div>
+      <div class="course-title">${c.title}</div>
+      <div class="course-meta">
+        <span>⏱️ ${c.duration}</span>
+        <span>📝 ${c.lessons} درس</span>
+      </div>
+      ${prog > 0 ? `
+      <div class="course-progress-wrap">
+        <div class="course-progress-top">
+          <span>التقدم</span><span>${prog}%</span>
+        </div>
+        <div class="course-progress-bar">
+          <div class="course-progress-fill" data-progress="${prog}" style="width:${prog}%"></div>
+        </div>
+      </div>` : ''}
+      <div class="course-footer">
+        <div class="instructor">
+          <div class="instructor-avatar">${c.initials}</div>
+          <div class="instructor-name">${c.instructor}</div>
+        </div>
+        <div class="course-rating">⭐ ${c.rating}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══ FAVORITES ═══ */
+function toggleFav(event, id) {
+  event.stopPropagation();
+  const course = COURSES.find(c => c.id === id);
+  if (!course) return;
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    showToast(`تمت الإزالة من المفضلة: ${course.title}`, '🤍', 'info');
+  } else {
+    favorites.add(id);
+    showToast(`تمت الإضافة للمفضلة: ${course.title}`, '❤️', 'success');
+  }
+  /* DB-READY: هنا يُرسَل طلب INSERT/DELETE لجدول favorites */
+  renderAll();
+}
+
+function renderFavorites() {
+  const panel = document.getElementById('fav-panel');
+  if (!panel) return;
+  const favCourses = COURSES.filter(c => favorites.has(c.id));
+  if (!favCourses.length) {
+    panel.innerHTML = `<div class="fav-empty">
+      <div class="fav-empty-icon">💔</div>
+      <p>لم تُضف أي كورس للمفضلة بعد<br>ابحث عن كورس يعجبك واضغط ❤️</p>
+    </div>`;
+    return;
+  }
+  panel.innerHTML = `<div class="fav-list">
+    ${favCourses.map(c => `
+    <div class="fav-item" onclick="openModal(${c.id})">
+      <div class="fav-item-icon" style="background:rgba(45,212,191,0.1)">${c.emoji}</div>
+      <div>
+        <div class="fav-item-title">${c.title}</div>
+        <div class="fav-item-sub">${c.instructor} • ${c.duration}</div>
+      </div>
+      <button class="fav-remove" onclick="toggleFav(event,${c.id})" title="إزالة من المفضلة">✕</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function updateFavCount() {
+  const el = document.getElementById('fav-count');
+  if (el) el.textContent = favorites.size;
+}
+
+/* ═══ CATEGORY FILTER ═══ */
+function filterByCategory(cat) {
+  activeCat = cat;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.cat === cat);
+  });
+  if (currentPage === 'explore') renderAll();
+}
+
+/* ═══ SEARCH ═══ */
+function filterCourses() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) { renderAll(); return; }
+  const found = COURSES.filter(c =>
+    c.title.includes(q) || c.category.includes(q) ||
+    c.instructor.includes(q) || c.tags.some(t => t.includes(q))
+  );
+  navigate('explore');
+  setTimeout(() => renderGrid('explore-grid', found), 50);
+}
+
+/* ═══ MODAL ═══ */
+function openModal(id) {
+  const c = COURSES.find(x => x.id === id);
+  if (!c) return;
+  const isFav = favorites.has(id);
+  document.getElementById('modal-title').textContent = c.title;
+  document.getElementById('modal-desc').textContent  = c.desc;
+  const thumbBg = {
+    'برمجة': 'linear-gradient(135deg,rgba(45,212,191,0.25),rgba(56,189,248,0.15))',
+    'تصميم': 'linear-gradient(135deg,rgba(168,85,247,0.25),rgba(236,72,153,0.15))',
+    'ذكاء':  'linear-gradient(135deg,rgba(251,191,36,0.25),rgba(245,158,11,0.15))',
+    'أعمال': 'linear-gradient(135deg,rgba(34,197,94,0.25),rgba(16,185,129,0.15))',
+  }[c.category] || 'linear-gradient(135deg,rgba(45,212,191,0.2),rgba(56,189,248,0.1))';
+  document.getElementById('modal-thumb').style.background = thumbBg;
+  document.getElementById('modal-thumb').innerHTML = c.emoji;
+  document.getElementById('modal-tags').innerHTML =
+    c.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = `
+    <button class="btn-primary" onclick="enrollCourse(${id})">${c.enrolled ? '▶ متابعة الكورس' : '🎓 التسجيل الآن'}</button>
+    <button class="btn-ghost" onclick="toggleFav(event,${id})">${isFav ? '💔 إزالة من المفضلة' : '❤️ حفظ في المفضلة'}</button>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-backdrop')) return;
+  document.getElementById('modal-backdrop').classList.remove('open');
+}
+
+function enrollCourse(id) {
+  const c = COURSES.find(x => x.id === id);
+  if (!c) return;
+  c.enrolled = true;
+  if (!c.progress) c.progress = 0;
+  closeModal();
+  showToast(`تم التسجيل في: ${c.title}`, '🎉', 'success');
+  navigate('my-courses');
+}
+
+/* ═══ TOAST ═══ */
+function showToast(msg, icon='ℹ️', type='info') {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<div class="toast-icon">${icon}</div><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(20px)';
+    t.style.transition='all .3s ease'; setTimeout(() => t.remove(), 300); }, 2800);
+}
+
+/* ═══ KEYBOARD ═══ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ═══ INIT ═══ */
+renderAll();
+</script>
+</body>
+</html>
