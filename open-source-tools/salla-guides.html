@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>دليل منصة سلة الاحترافي | شروحات خطوة بخطوة | Ali Ahmed</title>
+    <meta name="description" content="دليل شامل لمنصة سلة — شروحات احترافية خطوة بخطوة لتحسين متجرك الإلكتروني. مسح الكاش، تحسين الأداء، وأكثر." />
+    <meta name="keywords" content="دليل سلة, شرح منصة سلة, مسح الكاش سلة, تحسين متجر سلة, سلة شروحات" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+
+    <!-- Direction: Nocturnal Glass + Warm Obsidian | DFII: 22/25 -->
+    <style>
+      /* =========================================
+         SALLA GUIDES — Design System Overrides
+         ========================================= */
+
+      :root {
+        --sg-accent: var(--primary-color);
+        --sg-accent-glow: rgba(94, 59, 238, 0.18);
+        --sg-glass-bg: rgba(255, 255, 255, 0.06);
+        --sg-glass-border: rgba(255, 255, 255, 0.10);
+        --sg-radius-card: 20px;
+        --sg-radius-sm: 12px;
+        --sg-shadow-card: 0 8px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+        --sg-shadow-glow: 0 0 32px rgba(94, 59, 238, 0.18);
+        --sg-transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      [data-theme="dark"] {
+        --sg-glass-bg: rgba(255, 255, 255, 0.04);
+        --sg-glass-border: rgba(255, 255, 255, 0.08);
+      }
+
+      /* =========================================
+         HERO SECTION
+         ========================================= */
+      .salla-hero {
+        position: relative;
+        padding: 120px 0 80px;
+        overflow: hidden;
+        text-align: center;
+      }
+
+      .salla-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(var(--primary-rgb), 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .salla-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(var(--primary-rgb), 0.12);
+        border: 1px solid rgba(var(--primary-rgb), 0.25);
+        border-radius: 50px;
+        padding: 6px 18px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 28px;
+        letter-spacing: 0.04em;
+        animation: fadeSlideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      .salla-badge .badge-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        animation: pulseDot 2s ease-in-out infinite;
+      }
+
+      .salla-hero h1 {
+        font-size: clamp(2.2rem, 5vw, 3.8rem);
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 20px;
+        color: var(--text-color);
+        animation: fadeSlideUp 0.7s 0.1s cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      .salla-hero h1 .highlight {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .salla-hero p.subtitle {
+        font-size: 1.1rem;
+        color: var(--text-color-light);
+        max-width: 560px;
+        margin: 0 auto 48px;
+        line-height: 1.75;
+        font-weight: 400;
+        animation: fadeSlideUp 0.7s 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        animation: fadeSlideUp 0.7s 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      .hero-stat-item {
+        text-align: center;
+      }
+
+      .hero-stat-item .stat-num {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        display: block;
+        line-height: 1;
+      }
+
+      .hero-stat-item .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-color-light);
+        margin-top: 4px;
+        font-weight: 500;
+      }
+
+      .hero-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(var(--primary-rgb), 0.2);
+        align-self: center;
+      }
+
+      /* =========================================
+         ROADMAP SECTION
+         ========================================= */
+      .roadmap-section {
+        padding: 80px 0 40px;
+        position: relative;
+      }
+
+      .section-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-label span {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--primary-color);
+      }
+
+      .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to left, transparent, rgba(var(--primary-rgb), 0.2));
+      }
+
+      .section-title {
+        font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 48px;
+        line-height: 1.3;
+      }
+
+      /* Roadmap Grid */
+      .roadmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        position: relative;
+      }
+
+      .roadmap-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        border-radius: var(--sg-radius-card);
+        padding: 32px 28px;
+        position: relative;
+        overflow: hidden;
+        transition: var(--sg-transition);
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .roadmap-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--sg-shadow-card);
+        border-color: rgba(var(--primary-rgb), 0.35);
+      }
+
+      .roadmap-card.active {
+        border-color: var(--primary-color);
+        box-shadow: var(--sg-shadow-glow);
+      }
+
+      .roadmap-card.active::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 100% 60% at 50% 0%,
+          rgba(var(--primary-rgb), 0.07) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .roadmap-card.coming-soon {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      .roadmap-card.coming-soon:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      .card-step-num {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .step-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .step-badge.active-badge {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.35);
+      }
+
+      .step-badge.soon-badge {
+        background: rgba(var(--primary-rgb), 0.08);
+        color: var(--text-color-muted);
+        border: 1px dashed rgba(var(--primary-rgb), 0.2);
+      }
+
+      .card-status-pill {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 4px 12px;
+        border-radius: 50px;
+      }
+
+      .pill-live {
+        background: rgba(74, 222, 128, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(74, 222, 128, 0.25);
+      }
+
+      .pill-soon {
+        background: rgba(var(--primary-rgb), 0.06);
+        color: var(--text-color-muted);
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
+      }
+
+      .roadmap-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .roadmap-card p {
+        font-size: 0.88rem;
+        color: var(--text-color-light);
+        margin: 0;
+        line-height: 1.65;
+        flex-grow: 1;
+      }
+
+      .card-footer-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-top: 4px;
+      }
+
+      .card-footer-link i {
+        font-size: 0.75rem;
+        transition: transform 0.2s ease;
+      }
+
+      .roadmap-card:hover .card-footer-link i {
+        transform: translateX(-4px);
+      }
+
+      /* =========================================
+         GUIDE DETAIL SECTION
+         ========================================= */
+      .guide-detail-section {
+        padding: 40px 0 100px;
+      }
+
+      .guide-detail-wrapper {
+        background: var(--card-bg);
+        border: 1px solid rgba(var(--primary-rgb), 0.15);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: var(--sg-shadow-card);
+        position: relative;
+      }
+
+      .guide-detail-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        inset-inline-start: 0;
+        inset-inline-end: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-purple));
+      }
+
+      /* Guide Header */
+      .guide-header {
+        padding: 44px 48px 32px;
+        border-bottom: 1px solid rgba(var(--primary-rgb), 0.08);
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+
+      .guide-header-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 6px 24px rgba(var(--primary-rgb), 0.35);
+      }
+
+      .guide-header-text {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .guide-header-text .guide-cat {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .guide-header-text h2 {
+        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-weight: 800;
+        color: var(--text-color);
+        margin: 0 0 10px;
+        line-height: 1.3;
+      }
+
+      .guide-header-text p {
+        font-size: 0.95rem;
+        color: var(--text-color-light);
+        margin: 0;
+        line-height: 1.7;
+        max-width: 640px;
+      }
+
+      .guide-meta-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .meta-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: rgba(var(--primary-rgb), 0.07);
+        color: var(--text-color-light);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+      }
+
+      .meta-chip i {
+        color: var(--primary-color);
+        font-size: 0.72rem;
+      }
+
+      /* Guide Content Layout */
+      .guide-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      @media (max-width: 900px) {
+        .guide-content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Steps Panel (Left) */
+      .steps-panel {
+        padding: 40px 48px;
+        border-inline-end: 1px solid rgba(var(--primary-rgb), 0.08);
+      }
+
+      @media (max-width: 900px) {
+        .steps-panel {
+          border-inline-end: none;
+          border-bottom: 1px solid rgba(var(--primary-rgb), 0.08);
+          padding: 32px 24px;
+        }
+        .guide-header {
+          padding: 32px 24px 24px;
+        }
+      }
+
+      .steps-panel h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .steps-panel h3 i {
+        color: var(--primary-color);
+      }
+
+      /* Step Item */
+      .step-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+      }
+
+      .step-list::before {
+        content: '';
+        position: absolute;
+        inset-inline-start: 19px;
+        top: 44px;
+        bottom: 44px;
+        width: 2px;
+        background: linear-gradient(
+          to bottom,
+          rgba(var(--primary-rgb), 0.3),
+          rgba(var(--primary-rgb), 0.05)
+        );
+      }
+
+      .step-item {
+        display: flex;
+        gap: 20px;
+        padding: 16px 0;
+        position: relative;
+        animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+      }
+
+      .step-item:nth-child(1) { animation-delay: 0ms; }
+      .step-item:nth-child(2) { animation-delay: 80ms; }
+      .step-item:nth-child(3) { animation-delay: 160ms; }
+      .step-item:nth-child(4) { animation-delay: 240ms; }
+      .step-item:nth-child(5) { animation-delay: 320ms; }
+      .step-item:nth-child(6) { animation-delay: 400ms; }
+
+      .step-icon-wrap {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: #fff;
+        box-shadow: 0 3px 12px rgba(var(--primary-rgb), 0.25);
+        position: relative;
+        z-index: 1;
+      }
+
+      .step-body {
+        flex: 1;
+        padding-top: 8px;
+      }
+
+      .step-body h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin: 0 0 6px;
+        line-height: 1.4;
+      }
+
+      .step-body p {
+        font-size: 0.85rem;
+        color: var(--text-color-light);
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .step-body .step-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #fb923c;
+        background: rgba(251, 146, 60, 0.1);
+        border: 1px solid rgba(251, 146, 60, 0.2);
+        border-radius: 8px;
+        padding: 4px 10px;
+        margin-top: 10px;
+      }
+
+      .step-body .step-tip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #4ade80;
+        background: rgba(74, 222, 128, 0.08);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        border-radius: 8px;
+        padding: 4px 10px;
+        margin-top: 10px;
+      }
+
+      /* Video Panel (Right) */
+      .video-panel {
+        padding: 40px 36px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+      }
+
+      @media (max-width: 900px) {
+        .video-panel {
+          padding: 32px 24px;
+        }
+      }
+
+      .video-panel-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .video-panel-label::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        animation: pulseDot 2s infinite;
+      }
+
+      .video-container {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #000;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(var(--primary-rgb), 0.15);
+      }
+
+      .video-container video {
+        width: 100%;
+        display: block;
+        max-height: 100%;
+        min-height: 320px;
+        object-fit: contain;
+        background: #000;
+      }
+
+      .video-caption {
+        font-size: 0.82rem;
+        color: var(--text-color-light);
+        text-align: center;
+        line-height: 1.6;
+        padding: 4px 8px;
+      }
+
+      /* Info card in video panel */
+      .guide-info-card {
+        background: rgba(var(--primary-rgb), 0.05);
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .guide-info-card .info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.82rem;
+      }
+
+      .guide-info-card .info-row .label {
+        color: var(--text-color-light);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .guide-info-card .info-row .label i {
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        width: 16px;
+        text-align: center;
+      }
+
+      .guide-info-card .info-row .value {
+        font-weight: 700;
+        color: var(--text-color);
+      }
+
+      .guide-info-card .info-divider {
+        height: 1px;
+        background: rgba(var(--primary-rgb), 0.1);
+      }
+
+      /* Warning box */
+      .guide-warning {
+        background: rgba(251, 146, 60, 0.07);
+        border: 1px solid rgba(251, 146, 60, 0.22);
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+      }
+
+      .guide-warning i {
+        color: #fb923c;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .guide-warning p {
+        font-size: 0.84rem;
+        color: var(--text-color-light);
+        margin: 0;
+        line-height: 1.65;
+      }
+
+      .guide-warning p strong {
+        color: #fb923c;
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 700;
+      }
+
+      /* =========================================
+         SHARED ANIMATIONS
+         ========================================= */
+      @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeSlideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateX(10px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+
+      @keyframes pulseDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.55; transform: scale(0.85); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+
+      /* Scroll reveal */
+      .reveal {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Page wrapper */
+      .salla-guides-page {
+        padding-bottom: 60px;
+      }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+  </head>
+
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="salla-guides-page">
+
+      <!-- ===== HERO ===== -->
+      <section class="salla-hero">
+        <div class="container">
+          <div class="salla-badge">
+            <span class="badge-dot"></span>
+            دليل منصة سلة الاحترافي
+          </div>
+          <h1>
+            طريقك نحو متجر
+            <span class="highlight">سلة</span>
+            احترافي
+          </h1>
+          <p class="subtitle">
+            شروحات مفصّلة خطوة بخطوة تساعدك على إدارة متجرك على منصة سلة بشكل
+            صحيح — من الإعدادات الأساسية حتى تحسين الأداء.
+          </p>
+          <div class="hero-stats">
+            <div class="hero-stat-item">
+              <span class="stat-num">١</span>
+              <span class="stat-label">شرح متاح</span>
+            </div>
+            <div class="hero-divider"></div>
+            <div class="hero-stat-item">
+              <span class="stat-num">٥+</span>
+              <span class="stat-label">شرح قادم</span>
+            </div>
+            <div class="hero-divider"></div>
+            <div class="hero-stat-item">
+              <span class="stat-num">١٠٠٪</span>
+              <span class="stat-label">مجاناً</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ROADMAP ===== -->
+      <section class="roadmap-section reveal">
+        <div class="container">
+          <div class="section-label">
+            <span>خارطة الطريق</span>
+          </div>
+          <h2 class="section-title">الشروحات المتاحة والقادمة</h2>
+
+          <div class="roadmap-grid">
+
+            <!-- Guide 1: Clear Cache — ACTIVE -->
+            <a href="#guide-cache" class="roadmap-card active">
+              <div class="card-step-num">
+                <div class="step-badge active-badge">١</div>
+                <span class="card-status-pill pill-live">✓ متاح الآن</span>
+              </div>
+              <h3>مسح ذاكرة التخزين المؤقت</h3>
+              <p>
+                امسح الكاش لضمان تحميل متجرك بشكل صحيح وظهور آخر التحديثات
+                فوراً للزوار.
+              </p>
+              <div class="card-footer-link">
+                <span>اقرأ الشرح</span>
+                <i class="fas fa-arrow-left"></i>
+              </div>
+            </a>
+
+            <!-- Guide 2: Coming Soon -->
+            <div class="roadmap-card coming-soon">
+              <div class="card-step-num">
+                <div class="step-badge soon-badge">٢</div>
+                <span class="card-status-pill pill-soon">قادم قريباً</span>
+              </div>
+              <h3>تحسين سرعة تحميل المتجر</h3>
+              <p>
+                خطوات عملية لتسريع متجرك وتحسين تجربة الزوار ورفع تقييم
+                Core Web Vitals.
+              </p>
+            </div>
+
+            <!-- Guide 3: Coming Soon -->
+            <div class="roadmap-card coming-soon">
+              <div class="card-step-num">
+                <div class="step-badge soon-badge">٣</div>
+                <span class="card-status-pill pill-soon">قادم قريباً</span>
+              </div>
+              <h3>إعداد الدومين المخصص</h3>
+              <p>
+                ربط نطاق احترافي بمتجرك على سلة وضبط إعدادات DNS بشكل
+                صحيح.
+              </p>
+            </div>
+
+            <!-- Guide 4: Coming Soon -->
+            <div class="roadmap-card coming-soon">
+              <div class="card-step-num">
+                <div class="step-badge soon-badge">٤</div>
+                <span class="card-status-pill pill-soon">قادم قريباً</span>
+              </div>
+              <h3>تفعيل بوابات الدفع</h3>
+              <p>
+                كيفية تفعيل وضبط بوابات الدفع المختلفة في سلة لتحقيق
+                أعلى معدلات التحويل.
+              </p>
+            </div>
+
+            <!-- Guide 5: Coming Soon -->
+            <div class="roadmap-card coming-soon">
+              <div class="card-step-num">
+                <div class="step-badge soon-badge">٥</div>
+                <span class="card-status-pill pill-soon">قادم قريباً</span>
+              </div>
+              <h3>إعداد الشحن والتوصيل</h3>
+              <p>
+                ضبط خيارات الشحن ومزودي التوصيل وأسعارها لتحسين تجربة
+                العميل.
+              </p>
+            </div>
+
+            <!-- Guide 6: Coming Soon -->
+            <div class="roadmap-card coming-soon">
+              <div class="card-step-num">
+                <div class="step-badge soon-badge">٦</div>
+                <span class="card-status-pill pill-soon">قادم قريباً</span>
+              </div>
+              <h3>تحسين SEO متجرك</h3>
+              <p>
+                خطوات تهيئة محركات البحث لمتجرك على سلة وزيادة ظهوره
+                في نتائج جوجل.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== GUIDE DETAIL: Clear Cache ===== -->
+      <section class="guide-detail-section reveal" id="guide-cache">
+        <div class="container">
+
+          <div class="guide-detail-wrapper">
+
+            <!-- Guide Header -->
+            <div class="guide-header">
+              <div class="guide-header-icon">
+                <i class="fas fa-broom"></i>
+              </div>
+              <div class="guide-header-text">
+                <span class="guide-cat">الدرس الأول · إدارة المتجر</span>
+                <h2>مسح ذاكرة التخزين المؤقت (الكاش)</h2>
+                <p>
+                  امسح ذاكرة التخزين المؤقت لضمان تحميل متجرك بشكل صحيح وظهور
+                  آخر التحديثات فوراً — خطوة أساسية يحتاجها كل صاحب متجر بعد
+                  أي تعديل في التصميم أو الإعدادات.
+                </p>
+                <div class="guide-meta-chips">
+                  <span class="meta-chip">
+                    <i class="fas fa-clock"></i>
+                    أقل من دقيقتين
+                  </span>
+                  <span class="meta-chip">
+                    <i class="fas fa-signal"></i>
+                    مستوى: مبتدئ
+                  </span>
+                  <span class="meta-chip">
+                    <i class="fas fa-store"></i>
+                    منصة سلة
+                  </span>
+                  <span class="meta-chip">
+                    <i class="fas fa-sync-alt"></i>
+                    يُنصح بتطبيقه دورياً
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="guide-content-grid">
+
+              <!-- Steps Panel -->
+              <div class="steps-panel">
+                <h3><i class="fas fa-list-ol"></i> خطوات المسح</h3>
+
+                <div class="step-list">
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">١</div>
+                    <div class="step-body">
+                      <h4>افتح لوحة تحكم متجرك</h4>
+                      <p>
+                        سجّل الدخول إلى حساب سلة الخاص بك، ثم توجّه إلى
+                        لوحة التحكم الرئيسية لمتجرك.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">٢</div>
+                    <div class="step-body">
+                      <h4>انتقل إلى إعدادات المتجر</h4>
+                      <p>
+                        من القائمة الجانبية اختر <strong>الإعدادات</strong>،
+                        ثم انقر على <strong>المتجر</strong> أو
+                        <strong>إعدادات عامة</strong>.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">٣</div>
+                    <div class="step-body">
+                      <h4>ابحث عن خيار مسح الكاش</h4>
+                      <p>
+                        مرر للأسفل حتى تجد قسم
+                        <strong>ذاكرة التخزين المؤقت</strong> أو
+                        <strong>Cache</strong>. الخيار موجود في نهاية
+                        صفحة الإعدادات عادةً.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">٤</div>
+                    <div class="step-body">
+                      <h4>اضغط على "مسح الكاش"</h4>
+                      <p>
+                        انقر زر <strong>مسح ذاكرة التخزين المؤقت</strong>
+                        أو <strong>Clear Cache</strong>. ستظهر رسالة
+                        تأكيد نجاح العملية خلال ثوانٍ.
+                      </p>
+                      <span class="step-tip">
+                        <i class="fas fa-check-circle"></i>
+                        ستظهر رسالة: "تم مسح الكاش بنجاح"
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">٥</div>
+                    <div class="step-body">
+                      <h4>تحقق من ظهور التحديثات</h4>
+                      <p>
+                        افتح متجرك في تبويب جديد بالوضع المتخفي
+                        (Incognito) للتأكد من ظهور آخر التغييرات
+                        بشكل صحيح.
+                      </p>
+                      <span class="step-note">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        استخدم وضع التصفح المتخفي لتجنب كاش المتصفح
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="step-item">
+                    <div class="step-icon-wrap">
+                      <i class="fas fa-check" style="font-size:0.85rem;font-weight:normal;"></i>
+                    </div>
+                    <div class="step-body">
+                      <h4>متى تمسح الكاش مجدداً؟</h4>
+                      <p>
+                        يُنصح بمسح الكاش بعد كل تعديل جوهري: تغيير
+                        ألوان القالب، رفع منتجات جديدة، تحديث الصفحات
+                        الثابتة، أو تثبيت تطبيق جديد.
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Video Panel -->
+              <div class="video-panel">
+                <div class="video-panel-label">فيديو شرح تفاعلي</div>
+
+                <div class="video-container">
+                  <video
+                    controls
+                    preload="metadata"
+                    poster=""
+                    aria-label="شرح طريقة مسح ذاكرة التخزين المؤقت على منصة سلة"
+                  >
+                    <source src="../assets/video/firefox_Wld2G7HQpG.mp4" type="video/mp4" />
+                    <p>متصفحك لا يدعم تشغيل الفيديو.</p>
+                  </video>
+                </div>
+
+                <!-- Info Card -->
+                <div class="guide-info-card">
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-clock"></i> مدة التطبيق</span>
+                    <span class="value">أقل من دقيقتين</span>
+                  </div>
+                  <div class="info-divider"></div>
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-redo"></i> تكرار التطبيق</span>
+                    <span class="value">بعد كل تعديل</span>
+                  </div>
+                  <div class="info-divider"></div>
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-mobile-alt"></i> يعمل على</span>
+                    <span class="value">موبايل وكمبيوتر</span>
+                  </div>
+                  <div class="info-divider"></div>
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-tools"></i> يتطلب</span>
+                    <span class="value">صلاحية المالك</span>
+                  </div>
+                </div>
+
+                <!-- Warning -->
+                <div class="guide-warning">
+                  <i class="fas fa-lightbulb"></i>
+                  <p>
+                    <strong>نصيحة مهمة</strong>
+                    إذا لم تظهر التحديثات بعد مسح الكاش من سلة، امسح كاش
+                    متصفحك أيضاً عبر الضغط على
+                    <strong>Ctrl + Shift + Delete</strong>
+                    ثم اختر مسح البيانات المؤقتة.
+                  </p>
+                </div>
+
+              </div>
+              <!-- /video panel -->
+
+            </div>
+            <!-- /content grid -->
+
+          </div>
+          <!-- /guide detail wrapper -->
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ===================== FOOTER MINI ===================== -->
+    <footer style="text-align:center; padding: 32px 0 48px; border-top: 1px solid rgba(var(--primary-rgb),0.08);">
+      <div class="container">
+        <p style="color: var(--text-color-light); font-size: 0.85rem; margin:0;">
+          © 2026 Ali Ahmed — جميع الحقوق محفوظة ·
+          <a href="index.html" style="color: var(--primary-color); text-decoration: none; font-weight:600;">العودة للأدوات</a>
+        </p>
+      </div>
+    </footer>
+
+    <!-- ===================== SCRIPT ===================== -->
+    <script>
+      // Scroll reveal
+      const revealEls = document.querySelectorAll('.reveal');
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08 }
+      );
+      revealEls.forEach((el) => io.observe(el));
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          const target = document.querySelector(link.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
