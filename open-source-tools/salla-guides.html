@@ -631,9 +631,9 @@
       .video-container video {
         width: 100%;
         display: block;
-        max-height: 100%;
-        min-height: 320px;
-        object-fit: contain;
+        height: 100%;
+        min-height: 520px;
+        object-fit: cover;
         background: #000;
       }
 
@@ -1083,16 +1083,32 @@
 
               <!-- Video Panel -->
               <div class="video-panel">
-                <div class="video-panel-label">فيديو شرح تفاعلي</div>
+                <div class="video-panel-label">الطريقة الأولى</div>
 
                 <div class="video-container">
                   <video
                     controls
                     preload="metadata"
-                    poster=""
                     aria-label="شرح طريقة مسح ذاكرة التخزين المؤقت على منصة سلة"
                   >
                     <source src="../assets/video/firefox_Wld2G7HQpG.mp4" type="video/mp4" />
+                    <p>متصفحك لا يدعم تشغيل الفيديو.</p>
+                  </video>
+                </div>
+
+                <!-- Second Video -->
+                <div class="video-panel-label" style="margin-top: 12px;">
+                  الطريقة الثانية من خلال لوحة تحكم سلة القديمة
+                  <span style="display:inline-flex;align-items:center;gap:5px;margin-inline-start:8px;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);color:#4ade80;border-radius:50px;padding:2px 10px;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;">الأفضل ⭐</span>
+                </div>
+
+                <div class="video-container">
+                  <video
+                    controls
+                    preload="metadata"
+                    aria-label="شرح طريقة مسح الكاش من لوحة تحكم سلة القديمة"
+                  >
+                    <source src="../assets/video/firefox_KacucaurF6.mp4" type="video/mp4" />
                     <p>متصفحك لا يدعم تشغيل الفيديو.</p>
                   </video>
                 </div>
