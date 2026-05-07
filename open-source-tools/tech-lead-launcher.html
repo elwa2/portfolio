@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Lead Protocol — Launcher</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas-base:     #0d0d0f;
+    --canvas-raised:   #141416;
+    --canvas-elevated: #1a1a1e;
+    --canvas-overlay:  #202024;
+    --glass-subtle:    rgba(255,255,255,0.03);
+    --glass-moderate:  rgba(255,255,255,0.06);
+    --glass-strong:    rgba(255,255,255,0.10);
+    --glass-border:    rgba(255,255,255,0.08);
+    --text-primary:    #f0ede8;
+    --text-secondary:  #9b9693;
+    --text-tertiary:   #5c5855;
+    --text-disabled:   #3a3835;
+    --accent:          #e8734a;
+    --accent-warm:     #d4a843;
+    --accent-glow:     rgba(232,115,74,0.18);
+    --accent-border:   rgba(232,115,74,0.35);
+    --border-subtle:   rgba(255,255,255,0.06);
+    --border-default:  rgba(255,255,255,0.10);
+    --border-strong:   rgba(255,255,255,0.18);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.35);
+    --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--canvas-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* ── Layout ── */
+  .app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+  }
+
+  .header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .header-title span { color: var(--accent); }
+  .header-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  /* ── Mode Selector ── */
+  .modes { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+  .mode-card {
+    background: var(--canvas-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.25s ease;
+  }
+  .mode-card:hover { border-color: var(--border-default); background: var(--canvas-elevated); }
+  .mode-card.active {
+    border-color: var(--accent-border);
+    background: var(--canvas-elevated);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-border);
+  }
+  .mode-card.active::before { transform: scaleX(1); }
+
+  .mode-icon {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 0.8;
+  }
+  .mode-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .mode-sub { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ── Form Panel ── */
+  .form-panel {
+    background: var(--canvas-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+  .panel-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+
+  .field + .field { margin-top: 14px; }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  textarea, input[type="text"], select {
+    width: 100%;
+    background: var(--canvas-base);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-sm);
+    padding: 10px 13px;
+    font-size: 0.82rem;
+    font-family: 'Cairo', sans-serif;
+    color: var(--text-primary);
+    direction: rtl;
+    transition: border-color 0.15s;
+    resize: vertical;
+    line-height: 1.6;
+  }
+  textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  textarea::placeholder, input::placeholder { color: var(--text-tertiary); }
+
+  select option { background: var(--canvas-elevated); }
+
+  .divider { height: 1px; background: var(--border-subtle); margin: 18px 0; }
+
+  .checks { display: flex; flex-direction: column; gap: 9px; }
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+    transition: background 0.15s;
+  }
+  .check-row:hover { background: var(--glass-subtle); }
+
+  .check-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-row span { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+  /* ── Output Panel ── */
+  .output-panel {
+    background: var(--canvas-raised);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .char-count {
+    font-size: 0.68rem;
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    transition: color 0.2s;
+  }
+  .char-count.active { color: var(--accent-warm); }
+
+  .prompt-output {
+    flex: 1;
+    background: var(--canvas-base);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-sm);
+    padding: 14px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    min-height: 280px;
+    max-height: 380px;
+    direction: rtl;
+    transition: border-color 0.2s;
+  }
+  .prompt-output.has-content {
+    color: var(--text-primary);
+    border-color: var(--border-default);
+  }
+  .prompt-output::-webkit-scrollbar { width: 4px; }
+  .prompt-output::-webkit-scrollbar-track { background: transparent; }
+  .prompt-output::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 4px; }
+
+  .btn-group { display: flex; gap: 10px; margin-top: 14px; }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 18px;
+    border-radius: var(--r-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border-default);
+    background: var(--canvas-elevated);
+    color: var(--text-primary);
+    transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+    flex: 1;
+    justify-content: center;
+  }
+  .btn:hover { border-color: var(--border-strong); background: var(--canvas-overlay); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 14px rgba(232,115,74,0.3);
+  }
+  .btn-accent:hover { filter: brightness(1.1); background: var(--accent); box-shadow: 0 4px 22px rgba(232,115,74,0.45); }
+
+  .btn-success { background: rgba(74, 222, 128, 0.12); border-color: rgba(74,222,128,0.3); color: #4ade80; }
+
+  /* ── Tip ── */
+  .tip {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--glass-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-md);
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+  }
+  .tip-icon { font-size: 1rem; opacity: 0.6; flex-shrink: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .app { grid-template-columns: 1fr; padding: 20px 16px 60px; gap: 14px; }
+    .modes { grid-template-columns: 1fr; }
+    .mode-card { display: flex; align-items: center; gap: 16px; padding: 14px 16px; }
+    .mode-icon { margin-bottom: 0; font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header-title">Tech Lead <span>Protocol</span> Launcher</h1>
+    <span class="header-badge">Staff Engineer Mode</span>
+  </header>
+
+  <!-- Mode Cards -->
+  <div class="modes">
+    <div class="mode-card active" data-mode="planning" onclick="setMode('planning')">
+      <span class="mode-icon">🗺️</span>
+      <div class="mode-title">التخطيط</div>
+      <div class="mode-sub">معمارية + PROJECT_MAP.md + Milestones</div>
+    </div>
+    <div class="mode-card" data-mode="execution" onclick="setMode('execution')">
+      <span class="mode-icon">🚀</span>
+      <div class="mode-title">التنفيذ</div>
+      <div class="mode-sub">كود production-ready بدون توقف</div>
+    </div>
+    <div class="mode-card" data-mode="editing" onclick="setMode('editing')">
+      <span class="mode-icon">🔬</span>
+      <div class="mode-title">التعديل الجراحي</div>
+      <div class="mode-sub">تعديل دقيق بدون تخريب الميزات</div>
+    </div>
+  </div>
+
+  <!-- Form Panel -->
+  <div class="form-panel" id="form-panel">
+    <!-- Injected by JS -->
+  </div>
+
+  <!-- Output Panel -->
+  <div class="output-panel">
+    <div class="output-header">
+      <div class="panel-title" style="margin-bottom:0">البرومبت الجاهز</div>
+      <span class="char-count" id="char-count">0 حرف</span>
+    </div>
+
+    <div class="prompt-output" id="prompt-output">اختر بروتوكول وأدخل التفاصيل لتوليد البرومبت...</div>
+
+    <div class="btn-group">
+      <button class="btn" onclick="copyPrompt()" id="btn-copy">
+        <span>📋</span> نسخ البرومبت
+      </button>
+      <button class="btn btn-accent" onclick="openClaude()" id="btn-open">
+        <span>⚡</span> فتح في Claude
+      </button>
+    </div>
+  </div>
+
+  <!-- Tip -->
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <span>الترتيب الصحيح دايماً: <strong style="color:var(--text-secondary)">التخطيط أول</strong> ← انتظر الموافقة ← <strong style="color:var(--text-secondary)">التنفيذ</strong> ← عند الحاجة ← <strong style="color:var(--text-secondary)">التعديل الجراحي</strong></span>
+  </div>
+
+</div>
+
+<script>
+let currentMode = 'planning';
+
+const formDefs = {
+  planning: {
+    title: 'تفاصيل المشروع',
+    fields: `
+      <div class="field">
+        <label>وصف المشروع <span style="color:#e8734a">*</span></label>
+        <textarea id="f-desc" rows="4" placeholder="مثال: تطبيق ويب لإدارة المهام مع نظام تنبيهات وصلاحيات متعددة..." oninput="generate()"></textarea>
+      </div>
+      <div class="field">
+        <label>التقنية المفضّلة (اختياري)</label>
+        <input type="text" id="f-stack" placeholder="مثال: React + Node.js + PostgreSQL" oninput="generate()">
+      </div>
+      <div class="divider"></div>
+      <div class="panel-title">بروتوكولات إضافية</div>
+      <div class="checks">
+        <label class="check-row"><input type="checkbox" id="p-versions" checked onchange="generate()"><span>① البحث عن أحدث إصدارات stable في npm/GitHub</span></label>
+        <label class="check-row"><input type="checkbox" id="p-flow" checked onchange="generate()"><span>② رسم رحلة المستخدم / تدفق البيانات كأهداف قابلة للتحقق</span></label>
+        <label class="check-row"><input type="checkbox" id="p-arch" checked onchange="generate()"><span>③ المعمارية الذكية — Simplicity First + Domain-Driven</span></label>
+        <label class="check-row"><input type="checkbox" id="p-logging" checked onchange="generate()"><span>④ نظام Logging غير حظري (debug | info | warn | error)</span></label>
+        <label class="check-row"><input type="checkbox" id="p-map" checked onchange="generate()"><span>⑤ إنشاء PROJECT_MAP.md كامل مع [ORPHANS & PENDING]</span></label>
+      </div>
+    `
+  },
+  execution: {
+    title: 'المهمة المطلوبة',
+    fields: `
+      <div class="field">
+        <label>الميزة / المهمة المطلوبة <span style="color:#e8734a">*</span></label>
+        <textarea id="f-task" rows="4" placeholder="مثال: تنفيذ نظام المصادقة مع JWT والـ refresh tokens..." oninput="generate()"></textarea>
+      </div>
+      <div class="field">
+        <label>هل يوجد PROJECT_MAP.md؟</label>
+        <select id="f-hasmap" onchange="generate()">
+          <option value="yes">نعم — سيقرأه Claude ويلتزم به</option>
+          <option value="no">لا — سيُنشئه Claude أولاً</option>
+        </select>
+      </div>
+      <div class="divider"></div>
+      <div class="panel-title">معايير الجودة</div>
+      <div class="checks">
+        <label class="check-row"><input type="checkbox" id="e-notodo" checked onchange="generate()"><span>يُمنع منعاً باتاً: TODO / Placeholders / كود ناقص</span></label>
+        <label class="check-row"><input type="checkbox" id="e-tests" checked onchange="generate()"><span>كتابة اختبارات تلقائية أو محاكاة التدفق</span></label>
+        <label class="check-row"><input type="checkbox" id="e-regression" checked onchange="generate()"><span>التحقق من عدم كسر الميزات السابقة (No Regression)</span></label>
+        <label class="check-row"><input type="checkbox" id="e-sync" checked onchange="generate()"><span>مزامنة PROJECT_MAP.md بعد كل خطوة تلقائياً</span></label>
+      </div>
+    `
+  },
+  editing: {
+    title: 'التعديل الجراحي',
+    fields: `
+      <div class="field">
+        <label>وصف التعديل / الميزة <span style="color:#e8734a">*</span></label>
+        <textarea id="f-change" rows="4" placeholder="مثال: تعديل نظام الـ notifications ليدعم القنوات المتعددة (email, push, SMS)..." oninput="generate()"></textarea>
+      </div>
+      <div class="field">
+        <label>الملفات المتأثرة المحتملة (اختياري)</label>
+        <input type="text" id="f-files" placeholder="مثال: auth.service.ts، user.controller.ts، notifications.module.ts" oninput="generate()">
+      </div>
+      <div class="divider"></div>
+      <div class="panel-title">قواعد الجراحة البرمجية</div>
+      <div class="checks">
+        <label class="check-row"><input type="checkbox" id="s-impact" checked onchange="generate()"><span>تحليل التأثير (Impact Analysis) قبل أي تعديل</span></label>
+        <label class="check-row"><input type="checkbox" id="s-surgical" checked onchange="generate()"><span>المس فقط ما يجب — لا Refactoring بدون طلب</span></label>
+        <label class="check-row"><input type="checkbox" id="s-style" checked onchange="generate()"><span>مطابقة أسلوب الكود الحالي تماماً</span></label>
+        <label class="check-row"><input type="checkbox" id="s-tdd" checked onchange="generate()"><span>TDD: اختبار يفشل أولاً ← ثم ينجح</span></label>
+      </div>
+    `
+  }
+};
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-card').forEach(c =>
+    c.classList.toggle('active', c.dataset.mode === mode)
+  );
+  const def = formDefs[mode];
+  document.getElementById('form-panel').innerHTML = `
+    <div class="panel-title">${def.title}</div>
+    ${def.fields}
+  `;
+  generate();
+}
+
+function v(id) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return el.type === 'checkbox' ? el.checked : el.value.trim();
+}
+
+function generate() {
+  let prompt = '';
+
+  if (currentMode === 'planning') {
+    const desc = v('f-desc');
+    if (!desc) { setOutput('', 'أدخل وصف المشروع لتوليد البرومبت...'); return; }
+    const stack = v('f-stack');
+    prompt = `أنت الآن تعمل بصفة Staff Software Engineer و Tech Lead.
+
+━━━ المهمة ━━━
+التخطيط المعماري الصارم للمشروع التالي:
+${desc}${stack ? `\n\nالتقنية المفضلة: ${stack}` : ''}
+
+━━━ قواعد ما قبل التخطيط — Think Before Coding ━━━
+1. حدد افتراضاتك حول المتطلبات بوضوح.
+2. إذا وجد غموض، توقف واسأل فوراً — لا تختار مساراً بصمت.
+3. اقترح الحل الأبسط (Simplicity First) وارفض أي تعقيدات غير ضرورية.
+
+━━━ البروتوكولات الإلزامية ━━━`;
+
+    if (v('p-versions')) prompt += `\n\n① الوعي الزمني وموثوقية التبعيات
+- حدد التاريخ الحالي من النظام عبر shell.
+- ابحث في المستودعات الرسمية (npm, PyPI, GitHub) عن أحدث الإصدارات المستقرة.
+- وثّق الإصدارات وتجنب الـ deprecated تماماً.`;
+
+    if (v('p-flow')) prompt += `\n\n② منع زحف الميزات (No Feature Creep)
+- التزم بالنطاق المطلوب فقط — لا ميزات إضافية.
+- ارسم رحلة المستخدم (GUI) أو تدفق البيانات (API) كـ "أهداف قابلة للتحقق".`;
+
+    if (v('p-arch')) prompt += `\n\n③ المعمارية الذكية (Surgical Architecture)
+- أقل قدر من الكود يحل المشكلة.
+- أنشئ طبقة Shared/Core فقط للمنطق المتكرر فعلياً، لا تجرد كوداً سيُستخدم مرة واحدة.
+- التزم بالتقسيم Domain-Driven مع منع تفتيت الملفات (No Micro-files).`;
+
+    if (v('p-logging')) prompt += `\n\n④ استراتيجية التتبع (Safe Logging)
+- صمم نظام Logging غير حظري (Asynchronous) يدعم المستويات الأساسية فقط: debug | info | warn | error.`;
+
+    if (v('p-map')) prompt += `\n\n⑤ تأسيس الذاكرة الخارجية (PROJECT_MAP.md)
+أنشئ الملف متضمناً الأقسام التالية:
+  [TECH_STACK]     — التقنيات والإصدارات الموثقة
+  [SYSTEM_FLOW]    — رحلة المستخدم / تدفق البيانات
+  [ARCHITECTURE]   — هيكل الملفات والمسؤوليات
+  [MILESTONES]     — خطة العمل بأهداف قابلة للتحقق
+  [ORPHANS & PENDING] — تتبع النواقص والميزات غير المكتملة`;
+
+    prompt += `\n\n━━━ الموجز المطلوب ━━━
+قدم الخطة بلغة تقنية مكثفة ودقيقة مع Milestones تعتمد "نجاح الأهداف" (Verifiable Goals).
+
+⏸ انتظر الموافقة قبل البدء بالتنفيذ.`;
+
+  } else if (currentMode === 'execution') {
+    const task = v('f-task');
+    if (!task) { setOutput('', 'أدخل المهمة المطلوبة لتوليد البرومبت...'); return; }
+    const hasMap = v('f-hasmap') === 'yes';
+
+    prompt = `أنت Tech Lead المسؤول عن تحويل الخطة إلى منتج نهائي. لديك صلاحية التنفيذ الكامل بدون توقف.
+
+━━━ المهمة المطلوبة ━━━
+${task}
+
+${hasMap
+  ? '📋 ابدأ بقراءة PROJECT_MAP.md والالتزام الكامل بما فيه.'
+  : '📋 أنشئ PROJECT_MAP.md أولاً إذا لم يكن موجوداً.'}
+
+━━━ معايير التنفيذ ━━━
+1. بساطة التنفيذ: إذا كان يمكن كتابة 50 سطراً بدلاً من 200، افعل ذلك. لا برمجيات تخمينية.
+2. التنفيذ الموجه بالأهداف: لكل ميزة حدد معيار النجاح قبل كتابة كودها، ولا تنتقل لما بعدها حتى يتحقق المعيار.`;
+
+    if (v('e-notodo')) prompt += `\n\n━━━ جودة الكود — Production-Ready ━━━
+🚫 يُمنع منعاً باتاً: Placeholders، // TODO، كود ناقص.
+✅ كل كود يجب أن يكون: كاملاً + معالجاً للأخطاء + مربوطاً بالـ Logging.`;
+
+    if (v('e-tests')) {
+      prompt += `\n\n━━━ التحقق الذاتي (Loop Until Verified) ━━━
+- اكتب اختبارات تلقائية أو محاكاة التدفق لكل جزء.`;
+      if (v('e-regression')) prompt += `\n- تأكد من عدم وجود Regression (تدمير للميزات السابقة).`;
+      prompt += `\n- نظّف الأكواد اليتيمة التي تسببت فيها أنت فقط.`;
+    }
+
+    if (v('e-sync')) prompt += `\n\n━━━ المزامنة الحية (State Sync) ━━━
+- حدّث PROJECT_MAP.md بعد كل خطوة.
+- أي ميزة لم تُربط بعد → سجلها في [ORPHANS & PENDING] فوراً.
+- احذفها من القسم عند الاكتمال.`;
+
+    prompt += `\n\n━━━ أمر الانطلاق ━━━
+حلقة التنفيذ الإلزامية لكل خطوة:
+  (١. نفذ) → (٢. تحقق) → (٣. حدّث PROJECT_MAP.md)
+
+🎯 لا تتوقف حتى يصبح [ORPHANS & PENDING] فارغاً والمنتج كاملاً.`;
+
+  } else {
+    const change = v('f-change');
+    if (!change) { setOutput('', 'أدخل وصف التعديل لتوليد البرومبت...'); return; }
+    const files = v('f-files');
+
+    prompt = `أنت Staff Software Engineer. المطلوب جراحة برمجية دقيقة (دون تخريب الميزات الأخرى).
+
+━━━ التعديل المطلوب ━━━
+${change}${files ? `\n\nالملفات المتأثرة المحتملة: ${files}` : ''}`;
+
+    if (v('s-impact')) prompt += `\n\n━━━ البروتوكول الأول: تحليل التأثير ━━━
+- اقرأ PROJECT_MAP.md.
+- حدد الملفات المتأثرة بدقة.
+- ابحث عن أحدث التقنيات إذا استلزم الأمر.
+- أعلن افتراضاتك (Think Before Coding) قبل البدء.`;
+
+    if (v('s-surgical')) {
+      prompt += `\n\n━━━ البروتوكول الثاني: قواعد الجراحة البرمجية ━━━`;
+      prompt += `\n- 🔪 المس فقط ما يجب لمسه — لا تحسن تنسيق كود مجاور، لا Refactoring بدون طلب.`;
+      if (v('s-style')) prompt += `\n- 🎨 مطابقة أسلوب الكود الحالي تماماً حتى لو كنت تراه غير مثالي.`;
+      prompt += `\n- 🧹 تنظيف مخلفاتك فقط: إذا تسبب تعديلك في جعل دالة أو Import "يتيماً"، أزله.`;
+    }
+
+    if (v('s-tdd')) prompt += `\n\n━━━ البروتوكول الثالث: التحقق — TDD ━━━
+- حوّل التعديل إلى "هدف قابل للتحقق".
+- اكتب الاختبار → تأكد من فشله → اجعله ينجح.
+- تأكد من نجاح اختبارات الميزات القديمة (No Regression).`;
+
+    prompt += `\n\n━━━ البروتوكول الرابع: مزامنة الحالة ━━━
+- حدّث PROJECT_MAP.md فوراً عند الانتهاء.
+- أي كود أصبح Deprecated بسبب تعديلك → عالجه أو سجله في [ORPHANS & PENDING].
+
+━━━ أمر التنفيذ ━━━
+Think Before Coding → Impact Analysis → التنفيذ الجراحي → التحقق → State Sync`;
+  }
+
+  setOutput(prompt);
+}
+
+function setOutput(text, placeholder) {
+  const el = document.getElementById('prompt-output');
+  const cc = document.getElementById('char-count');
+  if (!text) {
+    el.textContent = placeholder || '';
+    el.classList.remove('has-content');
+    cc.textContent = '0 حرف';
+    cc.classList.remove('active');
+  } else {
+    el.textContent = text;
+    el.classList.add('has-content');
+    const len = text.length.toLocaleString('ar');
+    cc.textContent = `${len} حرف`;
+    cc.classList.add('active');
+  }
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-output').textContent;
+  if (!text || !document.getElementById('prompt-output').classList.contains('has-content')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.innerHTML = '<span>✅</span> تم النسخ!';
+    btn.classList.add('btn-success');
+    setTimeout(() => {
+      btn.innerHTML = '<span>📋</span> نسخ البرومبت';
+      btn.classList.remove('btn-success');
+    }, 2200);
+  });
+}
+
+function openClaude() {
+  const text = document.getElementById('prompt-output').textContent;
+  if (!text || !document.getElementById('prompt-output').classList.contains('has-content')) return;
+  const encoded = encodeURIComponent(text);
+  window.open(`https://claude.ai/new?q=${encoded}`, '_blank');
+}
+
+setMode('planning');
+</script>
+
+</body>
+</html>
