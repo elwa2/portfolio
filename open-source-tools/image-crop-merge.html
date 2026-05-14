@@ -711,6 +711,40 @@
         display: flex;
         justify-content: flex-end;
       }
+
+      /* =============================================
+         STRAIGHTEN MODE
+      ============================================= */
+      .straighten-hint {
+        display: none;
+        font-size: 0.72rem;
+        color: var(--primary-color);
+        font-weight: 700;
+        animation: strPulse 1.3s ease-in-out infinite;
+        white-space: nowrap;
+      }
+      @keyframes strPulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.35; }
+      }
+      .btn-sm.btn-active {
+        background: var(--secondary-purple) !important;
+        color: white !important;
+        border-color: var(--secondary-purple) !important;
+      }
+
+      /* =============================================
+         PREVIEW ZOOM BAR
+      ============================================= */
+      .preview-zoom-bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        justify-content: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .result-section:not(.visible) .preview-zoom-bar { display: none !important; }
     </style>
   </head>
 
@@ -824,6 +858,23 @@
                     <span class="range-val" id="rotVal0">0°</span>
                   </div>
                 </div>
+                <!-- Quick Rotation -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label">تدوير سريع</span>
+                  <div class="toggle-btn-group">
+                    <button class="btn-sm btn-outline" onclick="rotateBy(0,-90)" title="90° يساراً">⟲ ‑90°</button>
+                    <button class="btn-sm btn-outline" onclick="rotateBy(0,180)" title="قلب 180°">↕ 180°</button>
+                    <button class="btn-sm btn-outline" onclick="rotateBy(0,90)" title="90° يميناً">⟳ +90°</button>
+                  </div>
+                </div>
+                <!-- Straighten Mode -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label"><i class="fas fa-ruler"></i> تسوية</span>
+                  <button class="btn-sm btn-outline" id="straightenBtn0" onclick="toggleStraighten(0)">
+                    <i class="fas fa-crosshairs"></i> حدد خطاً مرجعياً
+                  </button>
+                  <span class="straighten-hint" id="straightenHint0">انقر نقطة ← ثم نقطة أخرى</span>
+                </div>
                 <!-- Shape -->
                 <div class="ctrl-row">
                   <span class="ctrl-label">التحديد</span>
@@ -872,6 +923,23 @@
                     <input type="range" id="rotation1" min="0" max="360" value="0" oninput="updateRotation(1, this.value)">
                     <span class="range-val" id="rotVal1">0°</span>
                   </div>
+                </div>
+                <!-- Quick Rotation -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label">تدوير سريع</span>
+                  <div class="toggle-btn-group">
+                    <button class="btn-sm btn-outline" onclick="rotateBy(1,-90)" title="90° يساراً">⟲ ‑90°</button>
+                    <button class="btn-sm btn-outline" onclick="rotateBy(1,180)" title="قلب 180°">↕ 180°</button>
+                    <button class="btn-sm btn-outline" onclick="rotateBy(1,90)" title="90° يميناً">⟳ +90°</button>
+                  </div>
+                </div>
+                <!-- Straighten Mode -->
+                <div class="ctrl-row">
+                  <span class="ctrl-label"><i class="fas fa-ruler"></i> تسوية</span>
+                  <button class="btn-sm btn-outline" id="straightenBtn1" onclick="toggleStraighten(1)">
+                    <i class="fas fa-crosshairs"></i> حدد خطاً مرجعياً
+                  </button>
+                  <span class="straighten-hint" id="straightenHint1">انقر نقطة ← ثم نقطة أخرى</span>
                 </div>
                 <div class="ctrl-row">
                   <span class="ctrl-label">التحديد</span>
@@ -953,6 +1021,15 @@
                     <button class="toggle-btn" id="alignStart" onclick="setAlignment('start')">بداية</button>
                     <button class="toggle-btn" id="alignEnd" onclick="setAlignment('end')">نهاية</button>
                   </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">قد بعض</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="normalizeSizeToggle" onchange="toggleNormalize()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span style="font-size:0.78rem;color:var(--text-color-light);">توحيد حجم الصورتين</span>
                 </div>
 
                 <div class="setting-row">
@@ -1190,6 +1267,12 @@
               <canvas id="resultCanvas"></canvas>
             </div>
             <div class="result-info" id="resultInfo"></div>
+            <div class="preview-zoom-bar">
+              <span style="font-size:0.78rem;color:var(--text-color-light);font-weight:700;">حجم المعاينة:</span>
+              <button class="btn-sm btn-outline" id="pz50btn" onclick="setPreviewZoom(0.5)">50%</button>
+              <button class="btn-sm btn-outline" id="pz75btn" onclick="setPreviewZoom(0.75)">75%</button>
+              <button class="btn-sm btn-primary" id="pz100btn" onclick="setPreviewZoom(1)">ملاءمة</button>
+            </div>
             <div class="export-grid">
               <button class="btn-export btn-primary" onclick="downloadResult('png')">
                 <i class="fas fa-download"></i> تحميل PNG
@@ -1306,8 +1389,8 @@
       // ============================================================
       // dragHandle: which handle is being dragged ('tl','tr','bl','br','tm','bm','ml','mr','move')
       const panels = [
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null },
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null }
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [] },
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [] }
       ];
 
       var HANDLE_HIT = 14; // px hit radius for handles
@@ -1386,10 +1469,14 @@
       let a4Scale       = 80;
 
       // Tile mode
-      let tileMode    = false;
-      let tileCols    = 2;
-      let tileRows    = 1;
-      let tileSpacing = 10;
+      let tileMode     = false;
+      let tileCols     = 2;
+      let tileRows     = 1;
+      let tileSpacing  = 10;
+
+      // New features
+      let normalizeSize = false;  // "قد بعض" — equalize both crop sizes
+      let previewZoom   = 1;      // multiplier for preview display (0.5 / 0.75 / 1)
 
       // ============================================================
       // INIT
@@ -1492,24 +1579,46 @@
       };
 
       function loadImgFile(idx, file) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var img = new Image();
-          img.onload = function () {
-            panels[idx].img       = img;
-            panels[idx].sel       = null;
-            panels[idx].rotation  = 0;
-            panels[idx].useFullImg = false;
-            document.getElementById('rotation' + idx).value = 0;
-            document.getElementById('rotVal'   + idx).textContent = '0°';
-            document.getElementById('emptyMsg' + idx).style.display = 'none';
-            document.getElementById('cropInfo' + idx).innerHTML = 'اسحب لتحديد منطقة القص';
-            renderPanel(idx);
-            scheduleAutoMerge();
-          };
-          img.src = e.target.result;
+        // Read as data URL for image display
+        var urlReader = new FileReader();
+        urlReader.onload = function (e) {
+          var dataUrl = e.target.result;
+          // For JPEG: read as ArrayBuffer too to detect EXIF orientation
+          if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+            var abReader = new FileReader();
+            abReader.onload = function (ev) {
+              var orient  = getExifOrientation(ev.target.result);
+              var initRot = exifOrientationToRotation(orient);
+              _applyImageLoad(idx, dataUrl, initRot);
+            };
+            abReader.readAsArrayBuffer(file);
+          } else {
+            _applyImageLoad(idx, dataUrl, 0);
+          }
         };
-        reader.readAsDataURL(file);
+        urlReader.readAsDataURL(file);
+      }
+
+      function _applyImageLoad(idx, dataUrl, initRot) {
+        var img = new Image();
+        img.onload = function () {
+          panels[idx].img           = img;
+          panels[idx].sel           = null;
+          panels[idx].rotation      = initRot;
+          panels[idx].useFullImg    = false;
+          panels[idx].straightenMode = false;
+          panels[idx].strPts        = [];
+          document.getElementById('rotation' + idx).value = initRot;
+          document.getElementById('rotVal'   + idx).textContent = initRot + '°';
+          document.getElementById('emptyMsg' + idx).style.display = 'none';
+          document.getElementById('cropInfo' + idx).innerHTML = 'اسحب لتحديد منطقة القص';
+          if (initRot !== 0) {
+            showToast('تم تصحيح اتجاه الصورة تلقائياً (' + initRot + '°)', 'success');
+          }
+          renderPanel(idx);
+          scheduleAutoMerge();
+        };
+        img.src = dataUrl;
       }
 
       // ============================================================
@@ -1676,6 +1785,24 @@
           ctx.lineWidth = 2;
           ctx.strokeRect(m.offX, m.offY, m.rw * m.scale, m.rh * m.scale);
         }
+
+        // ── Draw straighten-mode UI (waiting for 2nd point) ──
+        if (p.straightenMode && p.strPts.length > 0) {
+          p.strPts.forEach(function (pt, i) {
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = i === 0 ? '#10b981' : '#f59e0b';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(i + 1, pt.x, pt.y);
+          });
+        }
       }
 
       // ============================================================
@@ -1685,6 +1812,33 @@
         var p      = panels[idx];
         var canvas = document.getElementById('canvas' + idx);
         var pos    = getCanvasPos(e, canvas);
+
+        // ── Straighten mode: collect two points then compute rotation ──
+        if (p.straightenMode) {
+          p.strPts.push({ x: pos.x, y: pos.y });
+          if (p.strPts.length >= 2) {
+            var dx      = p.strPts[1].x - p.strPts[0].x;
+            var dy      = p.strPts[1].y - p.strPts[0].y;
+            var alphaDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+            var newRot  = ((p.rotation - alphaDeg) % 360 + 360) % 360;
+            p.rotation  = newRot;
+            p.strPts    = [];
+            p.straightenMode = false;
+            var btn  = document.getElementById('straightenBtn' + idx);
+            var hint = document.getElementById('straightenHint' + idx);
+            if (btn)  { btn.className = 'btn-sm btn-outline'; }
+            if (hint) { hint.style.display = 'none'; }
+            document.getElementById('rotation' + idx).value = Math.round(newRot);
+            document.getElementById('rotVal'   + idx).textContent = Math.round(newRot) + '°';
+            canvas.style.cursor = 'crosshair';
+            showToast('تم تطبيق التسوية (' + Math.round(alphaDeg * 10) / 10 + '°)', 'success');
+            renderPanel(idx);
+            scheduleAutoMerge();
+          } else {
+            renderPanel(idx); // show first point
+          }
+          return;
+        }
 
         // Check if clicking on an existing handle
         if (p.sel && p.sel.w > 5 && p.sel.h > 5) {
@@ -1931,6 +2085,13 @@
 
         var c1 = (!singleMode) ? cropPanel(1) : null;
 
+        // ── "قد بعض": normalize both crops to the same width ──
+        if (normalizeSize && c1) {
+          var normW = Math.max(c0.width, c1.width);
+          c0 = scaleCanvas(c0, normW, Math.round(normW * c0.height / c0.width));
+          c1 = scaleCanvas(c1, normW, Math.round(normW * c1.height / c1.width));
+        }
+
         var sm   = outputScale;
         var gap  = Number(document.getElementById('gapSlider').value);
         var cr   = Number(document.getElementById('cornerRadius').value);
@@ -2118,10 +2279,11 @@
 
         filteredCanvas = wC;
 
-        // Display on result canvas (scaled to fit)
+        // Display on result canvas (scaled to fit, with previewZoom)
         var resCanvas = document.getElementById('resultCanvas');
         var maxW      = resCanvas.parentElement.clientWidth - 40;
-        var dispScale = Math.min(1, maxW / wC.width);
+        var fitScale  = Math.min(1, maxW / wC.width);
+        var dispScale = fitScale * previewZoom;
         resCanvas.width  = wC.width;
         resCanvas.height = wC.height;
         resCanvas.style.width  = Math.round(wC.width  * dispScale) + 'px';
@@ -2158,6 +2320,108 @@
           }
         }
         ctx.putImageData(src, 0, 0);
+      }
+
+      // ============================================================
+      // QUICK ROTATION
+      // ============================================================
+      window.rotateBy = function (idx, deg) {
+        var newVal = ((panels[idx].rotation + deg) % 360 + 360) % 360;
+        panels[idx].rotation = newVal;
+        document.getElementById('rotation' + idx).value = Math.round(newVal);
+        document.getElementById('rotVal'   + idx).textContent = Math.round(newVal) + '°';
+        renderPanel(idx);
+        scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // STRAIGHTEN MODE (2-point deskew)
+      // ============================================================
+      window.toggleStraighten = function (idx) {
+        var p = panels[idx];
+        if (!p.img) { showToast('ارفع صورة أولاً', 'error'); return; }
+        p.straightenMode = !p.straightenMode;
+        p.strPts = [];
+        var btn    = document.getElementById('straightenBtn' + idx);
+        var hint   = document.getElementById('straightenHint' + idx);
+        var canvas = document.getElementById('canvas' + idx);
+        if (p.straightenMode) {
+          btn.className      = 'btn-sm btn-active';
+          hint.style.display = 'inline';
+          canvas.style.cursor = 'crosshair';
+          showToast('انقر على نقطتين تمثلان خطاً أفقياً (مثل حافة البطاقة)', '');
+        } else {
+          btn.className      = 'btn-sm btn-outline';
+          hint.style.display = 'none';
+          canvas.style.cursor = 'crosshair';
+          renderPanel(idx);
+        }
+      };
+
+      // ============================================================
+      // NORMALIZE SIZES ("قد بعض")
+      // ============================================================
+      window.toggleNormalize = function () {
+        normalizeSize = document.getElementById('normalizeSizeToggle').checked;
+        scheduleAutoMerge();
+      };
+
+      function scaleCanvas(src, w, h) {
+        var c = document.createElement('canvas');
+        c.width  = Math.max(1, w);
+        c.height = Math.max(1, h);
+        c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+        return c;
+      }
+
+      // ============================================================
+      // PREVIEW ZOOM
+      // ============================================================
+      window.setPreviewZoom = function (val) {
+        previewZoom = val;
+        [['50', 0.5], ['75', 0.75], ['100', 1]].forEach(function (pair) {
+          var el = document.getElementById('pz' + pair[0] + 'btn');
+          if (!el) return;
+          el.className = (val === pair[1]) ? 'btn-sm btn-primary' : 'btn-sm btn-outline';
+        });
+        if (filteredCanvas) applyFiltersAndShow();
+      };
+
+      // ============================================================
+      // EXIF ORIENTATION
+      // ============================================================
+      function getExifOrientation(buffer) {
+        try {
+          var view   = new DataView(buffer);
+          if (view.getUint16(0, false) !== 0xFFD8) return 1; // not JPEG
+          var len    = view.byteLength;
+          var offset = 2;
+          while (offset < len) {
+            var marker = view.getUint16(offset, false);
+            offset += 2;
+            if (marker === 0xFFE1) {
+              if (view.getUint32(offset + 2, false) !== 0x45786966) return 1;
+              var little = view.getUint16(offset + 8, false) === 0x4949;
+              offset += 10;
+              var tags = view.getUint16(offset, little);
+              offset += 2;
+              for (var i = 0; i < tags; i++) {
+                if (view.getUint16(offset + i * 12, little) === 0x0112) {
+                  return view.getUint16(offset + i * 12 + 8, little);
+                }
+              }
+            } else if ((marker & 0xFF00) !== 0xFF00) { break; }
+            else { offset += view.getUint16(offset, false); }
+          }
+        } catch (ex) { /* ignore */ }
+        return 1;
+      }
+
+      function exifOrientationToRotation(o) {
+        if (o === 3) return 180;
+        if (o === 6) return 90;
+        if (o === 8) return 270;
+        return 0;
       }
 
       // ============================================================
@@ -2226,10 +2490,16 @@
 
       window.resetAll = function () {
         panels.forEach(function (p, idx) {
-          p.img        = null;
-          p.sel        = null;
-          p.rotation   = 0;
-          p.useFullImg = false;
+          p.img            = null;
+          p.sel            = null;
+          p.rotation       = 0;
+          p.useFullImg     = false;
+          p.straightenMode = false;
+          p.strPts         = [];
+          var btn  = document.getElementById('straightenBtn' + idx);
+          var hint = document.getElementById('straightenHint' + idx);
+          if (btn)  btn.className      = 'btn-sm btn-outline';
+          if (hint) hint.style.display = 'none';
           document.getElementById('rotation' + idx).value = 0;
           document.getElementById('rotVal'   + idx).textContent = '0°';
           document.getElementById('emptyMsg' + idx).style.display = '';
@@ -2240,6 +2510,8 @@
         mergedRaw      = null;
         filteredCanvas = null;
         outputRaw      = null;
+        normalizeSize  = false;
+        document.getElementById('normalizeSizeToggle').checked = false;
         document.getElementById('resultSection').classList.remove('visible');
         resetFilters();
         showToast('تم إعادة التعيين الكامل');
