@@ -149,6 +149,39 @@
         align-items: center;
         gap: 10px;
       }
+      .paste-target-btn {
+        margin-right: auto;
+        background: rgba(var(--primary-rgb), 0.06);
+        border: 1.5px dashed rgba(var(--primary-rgb), 0.28);
+        border-radius: 8px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        padding: 4px 11px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }
+      .paste-target-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.13);
+      }
+      .paste-target-btn.active {
+        border-style: solid;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.16);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.18);
+      }
+      .paste-target-btn.active i { animation: pulse-dot 1.5s infinite; }
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.45; }
+      }
       .panel-num {
         width: 30px;
         height: 30px;
@@ -1157,6 +1190,9 @@
               <div class="panel-title">
                 <span class="panel-num">١</span>
                 الصورة الأولى <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الأمامي)</small>
+                <button class="paste-target-btn active" id="pasteTargetBtn0" onclick="setPasteTarget(0)" title="Ctrl+V يلصق هنا">
+                  <i class="fas fa-paste"></i> لصق هنا
+                </button>
               </div>
 
               <div class="upload-zone" id="uploadZone0">
@@ -1225,6 +1261,9 @@
               <div class="panel-title">
                 <span class="panel-num">٢</span>
                 الصورة الثانية <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الخلفي)</small>
+                <button class="paste-target-btn" id="pasteTargetBtn1" onclick="setPasteTarget(1)" title="Ctrl+V يلصق هنا">
+                  <i class="fas fa-paste"></i> لصق هنا
+                </button>
               </div>
 
               <div class="upload-zone" id="uploadZone1">
@@ -1902,11 +1941,21 @@
       // ============================================================
       // dragHandle: which handle is being dragged ('tl','tr','bl','br','tm','bm','ml','mr','move')
       const panels = [
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [] },
-        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [] }
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [], strPreview: null },
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [], strPreview: null }
       ];
 
       var HANDLE_HIT = 14; // px hit radius for handles
+      var activePastePanel = 0; // which panel Ctrl+V targets
+
+      window.setPasteTarget = function (idx) {
+        activePastePanel = idx;
+        [0, 1].forEach(function (i) {
+          var btn = document.getElementById('pasteTargetBtn' + i);
+          if (btn) btn.classList.toggle('active', i === idx);
+        });
+        showToast('Ctrl+V سيلصق في اللوحة ' + (idx + 1));
+      };
 
       function getHandleAt(sel, px, py) {
         if (!sel || sel.w < 5 || sel.h < 5) return null;
@@ -1999,16 +2048,15 @@
       document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // Clipboard paste → load into next empty panel (Ctrl+V)
+        // Clipboard paste → load into the active paste-target panel (Ctrl+V)
         document.addEventListener('paste', function (e) {
           var items = (e.clipboardData || {}).items || [];
           for (var i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
               var file = items[i].getAsFile();
               if (!file) continue;
-              var targetIdx = (!panels[0].img) ? 0 : ((!panels[1].img && !singleMode) ? 1 : 0);
-              loadImgFile(targetIdx, file);
-              showToast('تم لصق الصورة في اللوحة ' + (targetIdx + 1), 'success');
+              loadImgFile(activePastePanel, file);
+              showToast('تم لصق الصورة في اللوحة ' + (activePastePanel + 1), 'success');
               break;
             }
           }
@@ -2123,6 +2171,7 @@
           panels[idx].useFullImg    = false;
           panels[idx].straightenMode = false;
           panels[idx].strPts        = [];
+          panels[idx].strPreview    = null;
           document.getElementById('rotation' + idx).value = initRot;
           document.getElementById('rotVal'   + idx).textContent = initRot + '°';
           document.getElementById('emptyMsg' + idx).style.display = 'none';
@@ -2406,6 +2455,21 @@
 
         // ── Draw straighten-mode UI (waiting for 2nd point) ──
         if (p.straightenMode && p.strPts.length > 0) {
+          // Draw dashed reference line (to cursor preview or to 2nd point)
+          var endPt = p.strPts[1] || p.strPreview;
+          if (endPt) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(p.strPts[0].x, p.strPts[0].y);
+            ctx.lineTo(endPt.x, endPt.y);
+            ctx.strokeStyle = 'rgba(255, 220, 60, 0.9)';
+            ctx.lineWidth   = 2;
+            ctx.setLineDash([7, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+          }
+          // Draw numbered dots
           p.strPts.forEach(function (pt, i) {
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, 11, 0, Math.PI * 2);
@@ -2437,10 +2501,13 @@
           if (p.strPts.length >= 2) {
             var dx      = p.strPts[1].x - p.strPts[0].x;
             var dy      = p.strPts[1].y - p.strPts[0].y;
+            // Normalise direction so atan2 always measures angle from left→right
+            if (dx < 0) { dx = -dx; dy = -dy; }
             var alphaDeg = Math.atan2(dy, dx) * 180 / Math.PI;
             var newRot  = ((p.rotation - alphaDeg) % 360 + 360) % 360;
             p.rotation  = newRot;
             p.strPts    = [];
+            p.strPreview = null;
             p.straightenMode = false;
             var btn  = document.getElementById('straightenBtn' + idx);
             var hint = document.getElementById('straightenHint' + idx);
@@ -2484,6 +2551,13 @@
         var p      = panels[idx];
         var canvas = document.getElementById('canvas' + idx);
         var pos    = getCanvasPos(e, canvas);
+
+        // Live preview line while waiting for 2nd straighten point
+        if (p.straightenMode && p.strPts.length === 1) {
+          p.strPreview = pos;
+          renderPanel(idx);
+          return;
+        }
 
         // Handle drag (resize / move)
         if (p.dragHandle) {
@@ -2989,6 +3063,7 @@
         if (!p.img) { showToast('ارفع صورة أولاً', 'error'); return; }
         p.straightenMode = !p.straightenMode;
         p.strPts = [];
+        p.strPreview = null;
         var btn    = document.getElementById('straightenBtn' + idx);
         var hint   = document.getElementById('straightenHint' + idx);
         var canvas = document.getElementById('canvas' + idx);
@@ -3602,6 +3677,7 @@
           p.useFullImg     = false;
           p.straightenMode = false;
           p.strPts         = [];
+          p.strPreview     = null;
           var btn  = document.getElementById('straightenBtn' + idx);
           var hint = document.getElementById('straightenHint' + idx);
           if (btn)  btn.className      = 'btn-sm btn-outline';
