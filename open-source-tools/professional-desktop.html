@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Desktop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d1f4e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Desktop Container */
+        .desktop {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-details span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            padding: 20px 15px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 0 3px 3px 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-icon.purple { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+        .nav-icon.pink { background: rgba(245, 87, 108, 0.2); color: #f5576c; }
+        .nav-icon.green { background: rgba(0, 255, 135, 0.15); color: #00ff87; }
+        .nav-icon.orange { background: rgba(255, 165, 48, 0.2); color: #ffa530; }
+        .nav-icon.blue { background: rgba(96, 239, 255, 0.15); color: #60efff; }
+        .nav-icon.red { background: rgba(255, 87, 87, 0.2); color: #ff5757; }
+
+        .nav-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-item:hover .nav-text,
+        .nav-item.active .nav-text {
+            color: #fff;
+        }
+
+        .nav-badge {
+            margin-right: auto;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.45);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color) 0%, transparent 100%);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-trend.up { color: #00ff87; }
+        .stat-trend.down { color: #ff5757; }
+
+        /* Professional List - Tasks */
+        .list-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .list-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .list-title-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .list-title h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .list-title span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 8px 15px;
+            gap: 10px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 13px;
+            width: 180px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .search-box span {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        /* List Items */
+        .list-items {
+            padding: 15px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .list-item:not(:last-child) {
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 0;
+            padding-bottom: 18px;
+            margin-bottom: 12px;
+        }
+
+        .item-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+
+        .item-checkbox:hover {
+            border-color: #667eea;
+        }
+
+        .item-checkbox.checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .item-checkbox.checked::after {
+            content: '✓';
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .item-checkbox.checked + .item-content .item-title {
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .item-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-tag {
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .tag-purple { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+        .tag-pink { background: rgba(245, 87, 108, 0.2); color: #f5576c; }
+        .tag-green { background: rgba(0, 255, 135, 0.15); color: #00ff87; }
+        .tag-orange { background: rgba(255, 165, 48, 0.2); color: #ffa530; }
+
+        .item-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .item-priority {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 15px;
+        }
+
+        .priority-high { background: #ff5757; box-shadow: 0 0 12px rgba(255, 87, 87, 0.5); }
+        .priority-medium { background: #ffa530; box-shadow: 0 0 12px rgba(255, 165, 48, 0.4); }
+        .priority-low { background: #00ff87; box-shadow: 0 0 12px rgba(0, 255, 135, 0.4); }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .list-item:hover .item-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        /* Team Members List */
+        .team-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            transition: all 0.3s ease;
+            border-radius: 16px;
+        }
+
+        .team-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .team-item:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .team-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            margin-left: 18px;
+        }
+
+        .team-info {
+            flex: 1;
+        }
+
+        .team-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .team-info span {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .team-role {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .role-badge {
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .team-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #1a1a3e;
+        }
+
+        .status-online { background: #00ff87; }
+        .status-away { background: #ffa530; }
+        .status-offline { background: #ff5757; }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .project-menu {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .project-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-progress {
+            margin-bottom: 15px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .progress-header span:first-child {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .progress-header span:last-child {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.purple { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
+        .progress-fill.pink { background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); }
+        .progress-fill.green { background: linear-gradient(90deg, #11998e 0%, #00ff87 100%); }
+        .progress-fill.orange { background: linear-gradient(90deg, #ff9a44 0%, #ffa530 100%); }
+
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-team {
+            display: flex;
+        }
+
+        .team-avatars {
+            display: flex;
+        }
+
+        .mini-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: -8px;
+            border: 2px solid #1a1a3e;
+        }
+
+        .mini-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .project-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <span class="logo-text">ProDesk</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">أ</div>
+                    <div class="user-details">
+                        <h4>أحمد محمد</h4>
+                        <span>مدير المشروع</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <div class="nav-icon purple">📋</div>
+                    <span class="nav-text">لوحة التحكم</span>
+                    <span class="nav-badge">5</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon pink">📁</div>
+                    <span class="nav-text">المشاريع</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon green">✅</div>
+                    <span class="nav-text">المهام</span>
+                    <span class="nav-badge">12</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon orange">👥</div>
+                    <span class="nav-text">الفريق</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon blue">📅</div>
+                    <span class="nav-text">المواعيد</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon red">📊</div>
+                    <span class="nav-text">التقارير</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="page-title">لوحة التحكم</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">📤 تصدير</button>
+                    <button class="btn btn-primary">➕ مشروع جديد</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card" style="--card-color: #667eea">
+                    <div class="stat-icon" style="background: rgba(102, 126, 234, 0.2); color: #667eea;">📁</div>
+                    <div class="stat-value">48</div>
+                    <div class="stat-label">المشاريع النشطة</div>
+                    <div class="stat-trend up">↑ 12% هذا الشهر</div>
+                </div>
+                <div class="stat-card" style="--card-color: #f5576c">
+                    <div class="stat-icon" style="background: rgba(245, 87, 108, 0.2); color: #f5576c;">✅</div>
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">المهام المكتملة</div>
+                    <div class="stat-trend up">↑ 24% هذا الأسبوع</div>
+                </div>
+                <div class="stat-card" style="--card-color: #00ff87">
+                    <div class="stat-icon" style="background: rgba(0, 255, 135, 0.15); color: #00ff87;">👥</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">أعضاء الفريق</div>
+                    <div class="stat-trend up">↑ 3% جديد</div>
+                </div>
+                <div class="stat-card" style="--card-color: #ffa530">
+                    <div class="stat-icon" style="background: rgba(255, 165, 48, 0.2); color: #ffa530;">⏱️</div>
+                    <div class="stat-value">89%</div>
+                    <div class="stat-label">معدل الإنجاز</div>
+                    <div class="stat-trend down">↓ 5% هذا الأسبوع</div>
+                </div>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="list-container animate-in">
+                <div class="list-header">
+                    <div class="list-title">
+                        <div class="list-title-icon" style="background: rgba(102, 126, 234, 0.2); color: #667eea;">✅</div>
+                        <div>
+                            <h3>المهام العاجلة</h3>
+                            <span>8 مهام需要在本周完成</span>
+                        </div>
+                    </div>
+                    <div class="list-actions">
+                        <div class="search-box">
+                            <span>🔍</span>
+                            <input type="text" placeholder="搜索任务...">
+                        </div>
+                        <button class="btn btn-secondary">عرض الكل</button>
+                    </div>
+                </div>
+                <div class="list-items">
+                    <div class="list-item">
+                        <div class="item-checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">تصميم واجهة المستخدم للتطبيق الجديد</div>
+                            <div class="item-meta">
+                                <span class="item-tag tag-purple">UI/UX</span>
+                                <span class="item-tag tag-pink">عالي الأولوية</span>
+                                <span class="item-date">15 مايو 2026</span>
+                            </div>
+                        </div>
+                        <div class="item-priority priority-high"></div>
+                        <div class="item-actions">
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-checkbox checked" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">مراجعة الكود وتنظيف الملفات القديمة</div>
+                            <div class="item-meta">
+                                <span class="item-tag tag-green">تطوير</span>
+                                <span class="item-tag tag-orange">متوسط الأولوية</span>
+                                <span class="item-date">18 مايو 2026</span>
+                            </div>
+                        </div>
+                        <div class="item-priority priority-medium"></div>
+                        <div class="item-actions">
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">كتابة تقارير المشروع الأسبوعية</div>
+                            <div class="item-meta">
+                                <span class="item-tag tag-purple">تقارير</span>
+                                <span class="item-tag tag-green">منخفض الأولوية</span>
+                                <span class="item-date">20 مايو 2026</span>
+                            </div>
+                        </div>
+                        <div class="item-priority priority-low"></div>
+                        <div class="item-actions">
+                            <button class="action-btn">✏️</button>
+                            <button class="action-btn">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Members -->
+            <div class="list-container animate-in" style="animation-delay: 0.1s">
+                <div class="list-header">
+                    <div class="list-title">
+                        <div class="list-title-icon" style="background: rgba(0, 255, 135, 0.15); color: #00ff87;">👥</div>
+                        <div>
+                            <h3>أعضاء الفريق</h3>
+                            <span>12 عضو نشط</span>
+                        </div>
+                    </div>
+                    <div class="list-actions">
+                        <button class="btn btn-primary">➕ إضافة عضو</button>
+                    </div>
+                </div>
+                <div class="list-items">
+                    <div class="team-item">
+                        <div class="team-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">س</div>
+                        <div class="team-info">
+                            <h4>سارة أحمد</h4>
+                            <span>sara.ahmed@company.com</span>
+                        </div>
+                        <div class="team-role">
+                            <span class="role-badge">مديرة التصميم</span>
+                            <div class="team-status status-online"></div>
+                        </div>
+                    </div>
+                    <div class="team-item">
+                        <div class="team-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">م</div>
+                        <div class="team-info">
+                            <h4>محمد علي</h4>
+                            <span>mohammed.ali@company.com</span>
+                        </div>
+                        <div class="team-role">
+                            <span class="role-badge">مطور أول</span>
+                            <div class="team-status status-online"></div>
+                        </div>
+                    </div>
+                    <div class="team-item">
+                        <div class="team-avatar" style="background: linear-gradient(135deg, #11998e 0%, #00ff87 100%);">ن</div>
+                        <div class="team-info">
+                            <h4>نورة سعيد</h4>
+                            <span>noora.saeed@company.com</span>
+                        </div>
+                        <div class="team-role">
+                            <span class="role-badge">محللة بيانات</span>
+                            <div class="team-status status-away"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="projects-grid">
+                <div class="project-card animate-in" style="animation-delay: 0.2s">
+                    <div class="project-header">
+                        <div class="project-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🚀</div>
+                        <button class="project-menu">⋮</button>
+                    </div>
+                    <h3 class="project-title">تطبيق الهاتف الذكي</h3>
+                    <p class="project-desc">تطوير تطبيق موبايل شامل للمستخدمين مع واجهة حديثة وميزات متقدمة</p>
+                    <div class="project-progress">
+                        <div class="progress-header">
+                            <span>التقدم</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill purple" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="project-footer">
+                        <div class="team-avatars">
+                            <div class="mini-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">س</div>
+                            <div class="mini-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">م</div>
+                            <div class="mini-avatar" style="background: linear-gradient(135deg, #11998e 0%, #00ff87 100%);">ن</div>
+                        </div>
+                        <span class="project-date">ينتهي 30 يونيو</span>
+                    </div>
+                </div>
+                <div class="project-card animate-in" style="animation-delay: 0.3s">
+                    <div class="project-header">
+                        <div class="project-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎨</div>
+                        <button class="project-menu">⋮</button>
+                    </div>
+                    <h3 class="project-title">منصة التجارة الإلكترونية</h3>
+                    <p class="project-desc">بناء منصة تسوق متكاملة مع نظام دفع آمن وإدارة مخزون متقدمة</p>
+                    <div class="project-progress">
+                        <div class="progress-header">
+                            <span>التقدم</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill pink" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="project-footer">
+                        <div class="team-avatars">
+                            <div class="mini-avatar" style="background: linear-gradient(135deg, #ffa530 0%, #ff9a44 100%);">أ</div>
+                            <div class="mini-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">ع</div>
+                        </div>
+                        <span class="project-date">ينتهي 15 يوليو</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleCheck(el) {
+            el.classList.toggle('checked');
+        }
+    </script>
+</body>
+</html>
