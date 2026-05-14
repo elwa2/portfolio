@@ -22,6 +22,12 @@
     <link rel="stylesheet" href="../assets/css/animations.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- jsPDF: images → PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- PDF-lib: merge PDFs -->
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <!-- PDF.js: PDF → images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="../assets/js/three-bg.js" defer></script>
     <script src="../assets/js/main.js" defer></script>
     <script src="../assets/js/svg-icons.js" defer></script>
@@ -774,6 +780,286 @@
         color: #fff;
         border-color: var(--primary-color);
       }
+
+      /* ============================================
+         TOOL TABS
+      ============================================ */
+      .tool-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 28px;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 8px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        flex-wrap: wrap;
+      }
+      .tool-tab {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 11px;
+        background: transparent;
+        color: var(--text-color-light);
+        font-family: "Cairo", sans-serif;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 110px;
+      }
+      .tool-tab:hover { background: rgba(var(--primary-rgb), 0.08); color: var(--primary-color); }
+      .tool-tab.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: white;
+        box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
+      }
+
+      /* PDF Sub-tabs (pills inside the PDF tools tab) */
+      .pdf-sub-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+      }
+      .pdf-sub-btn {
+        padding: 9px 22px;
+        border: 1.5px solid rgba(var(--primary-rgb), 0.25);
+        border-radius: 50px;
+        background: transparent;
+        color: var(--text-color-light);
+        font-family: "Cairo", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.22s ease;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .pdf-sub-btn:hover { border-color: var(--primary-color); color: var(--primary-color); background: rgba(var(--primary-rgb), 0.07); }
+      .pdf-sub-btn.active {
+        background: rgba(var(--primary-rgb), 0.15);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      /* Converter mode toggle (img2pdf / pdf2img) */
+      .converter-mode-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .conv-mode-btn {
+        flex: 1;
+        padding: 8px 14px;
+        border: 1.5px solid rgba(var(--primary-rgb), 0.2);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-color-light);
+        font-family: "Cairo", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .conv-mode-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+      .conv-mode-btn.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.3);
+      }
+
+      /* ============================================
+         PDF PANELS
+      ============================================ */
+      .pdf-mode-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(var(--primary-rgb), 0.1);
+        border: 1px solid rgba(var(--primary-rgb), 0.28);
+        border-radius: 11px;
+        padding: 9px 15px;
+        margin-bottom: 14px;
+        font-size: 0.84rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        gap: 10px;
+      }
+      .pdf-mode-bar i { margin-left: 6px; }
+      .pdf-mode-reset {
+        background: none;
+        border: 1px solid rgba(var(--primary-rgb), 0.25);
+        border-radius: 7px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .pdf-mode-reset:hover {
+        background: rgba(220, 50, 50, 0.12);
+        border-color: #e55;
+        color: #e55;
+      }
+      .pdf-panel-wrap {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .pdf-upload-section { flex: 1 1 0; min-width: 0; }
+      .pdf-settings-section {
+        flex: 0 0 300px;
+        min-width: 260px;
+        background: var(--card-bg);
+        border-radius: 18px;
+        padding: 22px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 6px 22px rgba(0,0,0,0.06);
+        position: sticky;
+        top: 85px;
+      }
+      @media (max-width: 900px) {
+        .pdf-panel-wrap { flex-direction: column; }
+        .pdf-settings-section { flex: 1 1 0; position: static; min-width: 0; width: 100%; }
+      }
+      .pdf-dropzone {
+        border: 2.5px dashed rgba(var(--primary-rgb), 0.35);
+        border-radius: 16px;
+        padding: 40px 24px;
+        text-align: center;
+        cursor: pointer;
+        background: rgba(var(--primary-rgb), 0.03);
+        transition: all 0.25s;
+        color: var(--text-color-light);
+        margin-bottom: 18px;
+      }
+      .pdf-dropzone:hover, .pdf-dropzone.drag-over {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.07);
+        color: var(--primary-color);
+      }
+      .pdf-dropzone i { font-size: 2.5rem; opacity: 0.45; margin-bottom: 10px; display: block; }
+      .pdf-dropzone p { font-size: 0.95rem; font-weight: 700; margin: 4px 0; }
+      .pdf-dropzone small { font-size: 0.78rem; opacity: 0.7; }
+      .pdf-file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 480px;
+        overflow-y: auto;
+      }
+      .pdf-file-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 9px 13px;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+      .pdf-file-item .p-thumb {
+        width: 52px; height: 52px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid rgba(var(--primary-rgb), 0.15);
+      }
+      .pdf-file-item .p-icon {
+        width: 52px; height: 52px;
+        border-radius: 8px;
+        flex-shrink: 0;
+        background: rgba(239,68,68,0.12);
+        color: #ef4444;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+      }
+      .pdf-file-item .p-name { flex: 1; font-size: 0.82rem; font-weight: 700; color: var(--text-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .pdf-file-item .p-meta { font-size: 0.72rem; color: var(--text-color-light); margin-top: 2px; }
+      .pdf-order-btns { display: flex; flex-direction: column; gap: 3px; }
+      .pdf-order-btns button {
+        width: 24px; height: 24px;
+        border: 1.5px solid rgba(var(--primary-rgb), 0.25);
+        background: transparent; border-radius: 5px; cursor: pointer;
+        font-size: 0.75rem; display: flex; align-items: center; justify-content: center;
+        color: var(--text-color-light); transition: all 0.18s; padding: 0;
+      }
+      .pdf-order-btns button:hover { border-color: var(--primary-color); color: var(--primary-color); background: rgba(var(--primary-rgb), 0.08); }
+      .pdf-del-btn {
+        width: 28px; height: 28px;
+        border: 1.5px solid rgba(239,68,68,0.3); background: transparent;
+        border-radius: 7px; cursor: pointer; color: #ef4444;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem; transition: all 0.18s; flex-shrink: 0; padding: 0;
+      }
+      .pdf-del-btn:hover { background: rgba(239,68,68,0.1); }
+      .pdf-merge-info { font-size: 0.83rem; color: var(--text-color-light); line-height: 1.9; }
+      .pdf-merge-info p { margin-bottom: 10px; font-weight: 700; color: var(--text-color); }
+      .pdf-merge-info ul { padding-right: 18px; }
+      .pdf-merge-info ul li { margin-bottom: 6px; }
+
+      /* PDF page thumbnail cards */
+      .pdf-page-card {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        background: rgba(var(--primary-rgb), 0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        padding: 8px;
+        transition: border-color 0.2s;
+      }
+      .pdf-page-card:hover { border-color: rgba(var(--primary-rgb), 0.35); }
+      .pdf-page-card canvas { border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+      .pdf-page-label { font-size: 0.7rem; color: var(--text-color-light); }
+      .pdf-page-actions { display: flex; gap: 5px; width: 100%; }
+      .pdf-page-btn {
+        flex: 1;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 6px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        padding: 4px 6px;
+        font-size: 0.72rem;
+        transition: all 0.18s;
+        white-space: nowrap;
+        display: flex; align-items: center; justify-content: center; gap: 3px;
+      }
+      .pdf-page-btn:hover {
+        background: rgba(var(--primary-rgb), 0.15);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+      .pdf-page-btn-crop:hover {
+        background: rgba(90, 210, 140, 0.14);
+        border-color: #5dba8a;
+        color: #5dba8a;
+      }
+
+      .s-select {
+        background: var(--card-bg); color: var(--text-color);
+        border: 1.5px solid rgba(var(--primary-rgb), 0.22);
+        border-radius: 9px; padding: 8px 12px;
+        font-size: 0.88rem; font-family: "Cairo", sans-serif;
+        font-weight: 700; cursor: pointer; outline: none; flex: 1;
+      }
+      .s-select:focus { border-color: var(--primary-color); }
     </style>
   </head>
 
@@ -840,6 +1126,18 @@
         </div>
 
         <div class="tool-main-container">
+
+          <!-- ═══ Tool Tabs ═══ -->
+          <div class="tool-tabs">
+            <button class="tool-tab active" id="tabBtn-cropmerge" onclick="switchTab('cropmerge')">
+              <i class="fas fa-crop-alt"></i> قص ودمج
+            </button>
+            <button class="tool-tab" id="tabBtn-pdftools" onclick="switchTab('pdftools')">
+              <i class="fas fa-file-pdf"></i> أدوات PDF
+            </button>
+          </div>
+
+          <div id="tab-cropmerge" class="tab-panel">
 
           <!-- Single Image Mode Toggle -->
           <div class="single-mode-bar">
@@ -915,6 +1213,7 @@
                 <!-- Crop info + clear -->
                 <div class="crop-row">
                   <div class="crop-info-badge" id="cropInfo0">لم يتم التحديد بعد</div>
+                  <button class="btn-sm btn-outline" onclick="autoTrim(0)" title="قص المساحات الفارغة تلقائياً"><i class="fas fa-magic"></i> قص تلقائي</button>
                   <button class="btn-sm btn-outline" onclick="clearSelection(0)"><i class="fas fa-times"></i> مسح</button>
                   <button class="btn-sm btn-primary" onclick="useFullImage(0)"><i class="fas fa-expand"></i> كل الصورة</button>
                 </div>
@@ -979,6 +1278,7 @@
                 </div>
                 <div class="crop-row">
                   <div class="crop-info-badge" id="cropInfo1">لم يتم التحديد بعد</div>
+                  <button class="btn-sm btn-outline" onclick="autoTrim(1)" title="قص المساحات الفارغة تلقائياً"><i class="fas fa-magic"></i> قص تلقائي</button>
                   <button class="btn-sm btn-outline" onclick="clearSelection(1)"><i class="fas fa-times"></i> مسح</button>
                   <button class="btn-sm btn-primary" onclick="useFullImage(1)"><i class="fas fa-expand"></i> كل الصورة</button>
                 </div>
@@ -1348,6 +1648,166 @@
 
           </div><!-- /bottom-layout -->
 
+          </div><!-- /tab-cropmerge -->
+
+          <!-- ═══════════════════════════════════════════
+               TAB: أدوات PDF
+          ═══════════════════════════════════════════ -->
+          <div id="tab-pdftools" class="tab-panel" style="display:none">
+            <div class="pdf-panel-wrap">
+
+              <!-- Upload + content (right in RTL) -->
+              <div class="pdf-upload-section" style="flex:1;min-width:0">
+
+                <!-- Mode indicator bar -->
+                <div id="pdfModeBar" class="pdf-mode-bar" style="display:none">
+                  <span id="pdfModeLabel"></span>
+                  <button onclick="resetPdfTool()" class="pdf-mode-reset"><i class="fas fa-undo"></i> بدء من جديد</button>
+                </div>
+
+                <!-- Unified drop zone -->
+                <div class="pdf-dropzone" id="pdfUnifiedDrop" onclick="document.getElementById('pdfUnifiedInput').click()">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p id="pdfUnifiedDropText">اضغط أو اسحب صوراً أو ملفات PDF</p>
+                  <small id="pdfUnifiedDropSub">JPG، PNG، WebP، PDF — الأداة تكتشف النوع تلقائياً</small>
+                </div>
+                <input type="file" id="pdfUnifiedInput" accept="image/*,application/pdf" multiple style="display:none" onchange="handleUnifiedFiles(this.files)">
+
+                <!-- img2pdf: image list -->
+                <div id="pdfContent-img2pdf" style="display:none">
+                  <div id="img2pdfList" class="pdf-file-list"></div>
+                </div>
+
+                <!-- pdf2img: page thumbnails -->
+                <div id="pdfContent-pdf2img" style="display:none">
+                  <div id="pdf2imgPages" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;align-items:flex-start;"></div>
+                </div>
+
+                <!-- pdfmerge: PDF file list -->
+                <div id="pdfContent-pdfmerge" style="display:none">
+                  <div id="pdfmergeList" class="pdf-file-list"></div>
+                </div>
+
+              </div>
+
+              <!-- Adaptive settings panel (left in RTL) -->
+              <div class="pdf-settings-section">
+
+                <!-- Empty state -->
+                <div id="pdfSettings-empty">
+                  <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-magic"></i> أداة PDF الذكية</div>
+                  <div class="pdf-merge-info">
+                    <p>ارفع ملفات وستكتشف الأداة تلقائياً:</p>
+                    <ul>
+                      <li><strong>صور JPG/PNG/WebP</strong> → تحويل إلى PDF</li>
+                      <li><strong>ملف PDF واحد</strong> → تحويل إلى صور</li>
+                      <li><strong>ملفات PDF متعددة</strong> → دمج في ملف واحد</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- img2pdf settings -->
+                <div id="pdfSettings-img2pdf" style="display:none">
+                  <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-sliders-h"></i> إعدادات PDF</div>
+                  <div class="setting-row">
+                    <label class="s-label">حجم الصفحة</label>
+                    <select id="pdfPageSize" class="s-select">
+                      <option value="a4">A4</option>
+                      <option value="a3">A3</option>
+                      <option value="letter">Letter</option>
+                      <option value="a5">A5</option>
+                    </select>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">الاتجاه</label>
+                    <div class="toggle-btn-group">
+                      <button class="toggle-btn active" id="pdfOrientPort" onclick="setPdfOrientation('portrait')"><i class="fas fa-mobile-alt"></i> عمودي</button>
+                      <button class="toggle-btn" id="pdfOrientLand" onclick="setPdfOrientation('landscape')"><i class="fas fa-tablet-alt"></i> أفقي</button>
+                    </div>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">الهامش</label>
+                    <div class="range-wrap">
+                      <input type="range" id="pdfMargin" min="0" max="30" value="5" oninput="document.getElementById('pdfMarginVal').textContent=this.value+'mm'">
+                      <span class="range-val" id="pdfMarginVal">5mm</span>
+                    </div>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">ملاءمة الصورة</label>
+                    <select id="pdfFitMode" class="s-select">
+                      <option value="fit">ملاءمة (Fit)</option>
+                      <option value="fill">تعبئة (Fill)</option>
+                      <option value="stretch">تمديد كامل</option>
+                    </select>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">جودة الصور</label>
+                    <div class="range-wrap">
+                      <input type="range" id="pdfQuality" min="0.3" max="1" step="0.1" value="0.9" oninput="document.getElementById('pdfQualityVal').textContent=Math.round(+this.value*100)+'%'">
+                      <span class="range-val" id="pdfQualityVal">90%</span>
+                    </div>
+                  </div>
+                  <div id="img2pdfCount" style="text-align:center;font-size:0.82rem;color:var(--text-color-light);margin:10px 0;"></div>
+                  <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="generateImagesPDF()" id="img2pdfBtn">
+                    <i class="fas fa-file-pdf"></i> إنشاء PDF وتحميله
+                  </button>
+                </div>
+
+                <!-- pdf2img settings -->
+                <div id="pdfSettings-pdf2img" style="display:none">
+                  <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-sliders-h"></i> إعدادات التحويل</div>
+                  <div class="setting-row">
+                    <label class="s-label">تنسيق الصورة</label>
+                    <select class="s-select" id="pdf2imgFormat">
+                      <option value="image/jpeg" selected>JPG</option>
+                      <option value="image/png">PNG</option>
+                      <option value="image/webp">WebP</option>
+                    </select>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">الجودة</label>
+                    <div class="range-wrap">
+                      <input type="range" id="pdf2imgQuality" min="50" max="100" value="92"
+                        oninput="document.getElementById('pdf2imgQVal').textContent=this.value+'%'">
+                      <span class="range-val" id="pdf2imgQVal">92%</span>
+                    </div>
+                  </div>
+                  <div class="setting-row">
+                    <label class="s-label">الدقة</label>
+                    <select class="s-select" id="pdf2imgScale">
+                      <option value="1.5">متوسط (1.5x)</option>
+                      <option value="2" selected>عالي (2x)</option>
+                      <option value="3">فائق (3x)</option>
+                    </select>
+                  </div>
+                  <div id="pdf2imgInfo" style="font-size:0.82rem;color:var(--text-color-light);margin:14px 0;text-align:center;"></div>
+                  <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="downloadAllPdf2Img()" id="pdf2imgDownloadBtn">
+                    <i class="fas fa-download"></i> تحميل كل الصفحات
+                  </button>
+                </div>
+
+                <!-- pdfmerge settings -->
+                <div id="pdfSettings-pdfmerge" style="display:none">
+                  <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-info-circle"></i> معلومات الدمج</div>
+                  <div class="pdf-merge-info">
+                    <p>ارفع ملفين PDF أو أكثر ثم اضغط دمج وتحميل</p>
+                    <ul>
+                      <li>الملفات تُدمج بالترتيب المعروض</li>
+                      <li>استخدم ↑ ↓ لإعادة الترتيب</li>
+                      <li>الدمج يتم كاملاً في المتصفح بدون رفع لأي خادم</li>
+                      <li>تُحفظ جودة الصور والنصوص الأصلية</li>
+                    </ul>
+                  </div>
+                  <div id="pdfmergeCount" style="text-align:center;font-size:0.82rem;color:var(--text-color-light);margin:14px 0;"></div>
+                  <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="mergePDFFiles()" id="pdfmergeBtn">
+                    <i class="fas fa-object-group"></i> دمج وتحميل PDF
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div><!-- /tab-pdftools -->
+
         </div><!-- /tool-main-container -->
       </div><!-- /container -->
     </div><!-- /tool-page-wrapper -->
@@ -1676,6 +2136,34 @@
         img.src = dataUrl;
       }
 
+      // Load a dataUrl into a crop panel and switch to the crop tab
+      window.loadImageInCropPanel = function (dataUrl, panelIdx) {
+        _applyImageLoad(panelIdx, dataUrl, 0);
+        switchTab('cropmerge');
+        showToast('تم فتح الصفحة في اللوح ' + (panelIdx + 1));
+      };
+
+      // Render a PDF page at full quality and open it in the crop canvas
+      window.openPageInCrop = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        try {
+          var page = await pdf2imgDoc.getPage(pageNum);
+          var vp   = page.getViewport({ scale: scale });
+          var cv   = document.createElement('canvas');
+          cv.width = vp.width; cv.height = vp.height;
+          await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+          var dataUrl   = cv.toDataURL(fmt, quality);
+          // Auto-select: use first empty panel, fallback to panel 0
+          var panelIdx  = (!panels[0].img) ? 0 : (!panels[1].img ? 1 : 0);
+          window.loadImageInCropPanel(dataUrl, panelIdx);
+        } catch (e) {
+          showToast('خطأ في فتح الصفحة: ' + e.message);
+        }
+      };
+
       // ============================================================
       // ROTATION
       // ============================================================
@@ -1710,6 +2198,81 @@
         document.getElementById('cropInfo' + idx).innerHTML = '<span>كل الصورة</span>';
         renderPanel(idx);
         scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // AUTO TRIM — crop away white / transparent borders
+      // ============================================================
+      window.autoTrim = function (idx) {
+        var p = panels[idx];
+        if (!p.img) { showToast('ارفع صورة أولاً'); return; }
+
+        var m  = getDisplayMapping(idx);
+        var rw = Math.ceil(m.rw);
+        var rh = Math.ceil(m.rh);
+
+        // Render the (possibly rotated) image at native resolution into a temp canvas
+        var tmp    = document.createElement('canvas');
+        tmp.width  = rw;
+        tmp.height = rh;
+        var tc = tmp.getContext('2d');
+        tc.save();
+        tc.translate(rw / 2, rh / 2);
+        tc.rotate(p.rotation * Math.PI / 180);
+        tc.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
+        tc.restore();
+
+        var data   = tc.getImageData(0, 0, rw, rh).data;
+        var thresh = 238;
+        var minX = rw, minY = rh, maxX = 0, maxY = 0;
+        var found  = false;
+
+        for (var y = 0; y < rh; y++) {
+          for (var x = 0; x < rw; x++) {
+            var i = (y * rw + x) * 4;
+            if (data[i + 3] < 15) continue;                      // transparent
+            if (data[i] > thresh && data[i+1] > thresh && data[i+2] > thresh) continue; // white
+            found = true;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+
+        if (!found || maxX <= minX || maxY <= minY) {
+          showToast('لم يُعثر على محتوى للقص');
+          return;
+        }
+
+        // Small padding so edges aren't clipped
+        var pad = 3;
+        minX = Math.max(0,      minX - pad);
+        minY = Math.max(0,      minY - pad);
+        maxX = Math.min(rw - 1, maxX + pad);
+        maxY = Math.min(rh - 1, maxY + pad);
+
+        // Map temp-canvas coords → panel canvas display coords
+        var cv   = document.getElementById('canvas' + idx);
+        var selX = m.offX + minX * m.scale;
+        var selY = m.offY + minY * m.scale;
+        var selW = (maxX - minX) * m.scale;
+        var selH = (maxY - minY) * m.scale;
+
+        selX = Math.max(0, selX);
+        selY = Math.max(0, selY);
+        selW = Math.min(selW, cv.width  - selX);
+        selH = Math.min(selH, cv.height - selY);
+
+        p.sel        = { x: selX, y: selY, w: selW, h: selH };
+        p.useFullImg = false;
+        renderPanel(idx);
+        scheduleAutoMerge();
+
+        var pw = maxX - minX, ph = maxY - minY;
+        document.getElementById('cropInfo' + idx).innerHTML =
+          '<i class="fas fa-magic"></i> ' + pw + ' \xd7 ' + ph + ' px';
+        showToast('\u2702 تم قص الفراغات: ' + pw + '\xd7' + ph);
       };
 
       // ============================================================
@@ -2486,8 +3049,453 @@
       };
 
       // ============================================================
-      // EXIF ORIENTATION
+      // TAB SWITCHING
       // ============================================================
+      window.switchTab = function (tabName) {
+        ['cropmerge', 'pdftools'].forEach(function (t) {
+          document.getElementById('tab-'    + t).style.display = (t === tabName) ? '' : 'none';
+          document.getElementById('tabBtn-' + t).classList.toggle('active', t === tabName);
+        });
+      };
+
+      // Unified PDF mode state
+      var _pdfMode = 'empty'; // 'empty' | 'img2pdf' | 'pdf2img' | 'pdfmerge'
+
+      function setUnifiedMode(mode) {
+        _pdfMode = mode;
+        var allModes = ['img2pdf', 'pdf2img', 'pdfmerge'];
+        allModes.forEach(function (m) {
+          document.getElementById('pdfContent-'  + m).style.display = (m === mode) ? '' : 'none';
+          document.getElementById('pdfSettings-' + m).style.display = (m === mode) ? '' : 'none';
+        });
+        var emptyEl  = document.getElementById('pdfSettings-empty');
+        var modeBar  = document.getElementById('pdfModeBar');
+        var dropText = document.getElementById('pdfUnifiedDropText');
+        var dropSub  = document.getElementById('pdfUnifiedDropSub');
+        var inp      = document.getElementById('pdfUnifiedInput');
+        if (mode === 'empty') {
+          emptyEl.style.display = '';
+          modeBar.style.display = 'none';
+          dropText.textContent  = 'اضغط أو اسحب صوراً أو ملفات PDF';
+          dropSub.textContent   = 'JPG، PNG، WebP، PDF — الأداة تكتشف النوع تلقائياً';
+          inp.accept   = 'image/*,application/pdf';
+          inp.multiple = true;
+        } else {
+          emptyEl.style.display = 'none';
+          modeBar.style.display = '';
+          var lbl = document.getElementById('pdfModeLabel');
+          if (mode === 'img2pdf') {
+            lbl.innerHTML        = '<i class="fas fa-file-image"></i> صور → PDF';
+            dropText.textContent = 'اضغط أو اسحب لإضافة صور';
+            dropSub.textContent  = 'JPG، PNG، WebP — عدد غير محدود';
+            inp.accept   = 'image/*';
+            inp.multiple = true;
+          } else if (mode === 'pdf2img') {
+            lbl.innerHTML        = '<i class="fas fa-images"></i> PDF → صور';
+            dropText.textContent = 'اضغط أو اسحب لاستبدال الملف';
+            dropSub.textContent  = 'ملف PDF — كل صفحة تتحول لصورة';
+            inp.accept   = 'application/pdf';
+            inp.multiple = false;
+          } else if (mode === 'pdfmerge') {
+            lbl.innerHTML        = '<i class="fas fa-object-group"></i> دمج ملفات PDF';
+            dropText.textContent = 'اضغط أو اسحب لإضافة ملفات PDF';
+            dropSub.textContent  = 'ملفات PDF فقط — ستُدمج بالترتيب المعروض';
+            inp.accept   = 'application/pdf';
+            inp.multiple = true;
+          }
+        }
+      }
+
+      window.handleUnifiedFiles = function (files) {
+        var arr = Array.from(files);
+        if (!arr.length) return;
+        var pdfs = arr.filter(function (f) { return f.type === 'application/pdf'; });
+        var imgs = arr.filter(function (f) { return f.type.startsWith('image/'); });
+
+        if (_pdfMode !== 'empty') {
+          // Already in a mode — add to existing
+          if (_pdfMode === 'img2pdf' && imgs.length) {
+            addImg2PdfFiles(imgs);
+          } else if (_pdfMode === 'pdf2img') {
+            var pdf = pdfs[0] || arr[0];
+            if (pdf && pdf.type === 'application/pdf') loadPdf2Img(pdf);
+          } else if (_pdfMode === 'pdfmerge' && pdfs.length) {
+            addPdfMergeFiles(pdfs);
+          }
+          document.getElementById('pdfUnifiedInput').value = '';
+          return;
+        }
+
+        // Auto-detect mode from uploaded files
+        if (imgs.length && !pdfs.length) {
+          setUnifiedMode('img2pdf');
+          addImg2PdfFiles(imgs);
+        } else if (pdfs.length === 1 && !imgs.length) {
+          setUnifiedMode('pdf2img');
+          loadPdf2Img(pdfs[0]);
+        } else if (pdfs.length >= 2 && !imgs.length) {
+          setUnifiedMode('pdfmerge');
+          addPdfMergeFiles(pdfs);
+        } else if (imgs.length && pdfs.length) {
+          setUnifiedMode('img2pdf');
+          addImg2PdfFiles(imgs);
+          showToast('تم تحميل الصور — لدمج PDF ارفع ملفات PDF فقط');
+        } else {
+          showToast('نوع الملف غير مدعوم');
+        }
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      window.resetPdfTool = function () {
+        img2pdfFiles  = [];
+        pdfmergeFiles = [];
+        pdf2imgDoc    = null;
+        renderImg2PdfList();
+        renderPdfMergeList();
+        var pages = document.getElementById('pdf2imgPages');
+        if (pages) pages.innerHTML = '';
+        var info = document.getElementById('pdf2imgInfo');
+        if (info) info.textContent = '';
+        setUnifiedMode('empty');
+      };
+
+      // Legacy stubs (kept so any old inline refs don't throw)
+      window.switchPdfSub    = function () {};
+      window.setConverterMode = function () {};
+      window.handleConverterFiles = window.handleUnifiedFiles;
+
+      // ============================================================
+      // IMAGES → PDF
+      // ============================================================
+      var img2pdfFiles   = [];   // { dataUrl, name, width, height }
+      var pdfOrientation = 'portrait';
+
+      window.addImg2PdfFiles = function (files) {
+        var arr = Array.from(files);
+        arr.forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+              img2pdfFiles.push({ dataUrl: e.target.result, name: file.name, width: img.width, height: img.height });
+              renderImg2PdfList();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      function renderImg2PdfList() {
+        var list = document.getElementById('img2pdfList');
+        var cnt  = document.getElementById('img2pdfCount');
+        if (!list) return;
+        if (img2pdfFiles.length === 0) { list.innerHTML = ''; if (cnt) cnt.textContent = ''; return; }
+        if (cnt) cnt.textContent = img2pdfFiles.length + ' صورة محملة';
+        list.innerHTML = img2pdfFiles.map(function (f, i) {
+          return '<div class="pdf-file-item">' +
+            '<img class="p-thumb" src="' + f.dataUrl + '" alt="">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="p-name">' + f.name + '</div>' +
+              '<div class="p-meta">' + f.width + ' × ' + f.height + 'px</div>' +
+            '</div>' +
+            '<div class="pdf-order-btns">' +
+              '<button onclick="moveImg2Pdf(' + i + ',-1)" title="أعلى">↑</button>' +
+              '<button onclick="moveImg2Pdf(' + i + ',1)"  title="أسفل">↓</button>' +
+            '</div>' +
+            '<button class="pdf-del-btn" onclick="removeImg2Pdf(' + i + ')" title="حذف"><i class="fas fa-times"></i></button>' +
+          '</div>';
+        }).join('');
+      }
+
+      window.moveImg2Pdf = function (i, dir) {
+        var j = i + dir;
+        if (j < 0 || j >= img2pdfFiles.length) return;
+        var tmp = img2pdfFiles[i]; img2pdfFiles[i] = img2pdfFiles[j]; img2pdfFiles[j] = tmp;
+        renderImg2PdfList();
+      };
+
+      window.removeImg2Pdf = function (i) {
+        img2pdfFiles.splice(i, 1);
+        renderImg2PdfList();
+      };
+
+      window.setPdfOrientation = function (o) {
+        pdfOrientation = o;
+        document.getElementById('pdfOrientPort').classList.toggle('active', o === 'portrait');
+        document.getElementById('pdfOrientLand').classList.toggle('active', o === 'landscape');
+      };
+
+      window.generateImagesPDF = function () {
+        if (img2pdfFiles.length === 0) { showToast('ارفع صوراً أولاً', 'error'); return; }
+        if (!window.jspdf || !window.jspdf.jsPDF) { showToast('جاري تحميل مكتبة jsPDF…', ''); return; }
+        var btn = document.getElementById('img2pdfBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإنشاء…';
+        setTimeout(function () {
+          try {
+            var pageSize = document.getElementById('pdfPageSize').value;
+            var margin   = +document.getElementById('pdfMargin').value;
+            var fitMode  = document.getElementById('pdfFitMode').value;
+            var quality  = +document.getElementById('pdfQuality').value;
+            var doc = new window.jspdf.jsPDF({ orientation: pdfOrientation, unit: 'mm', format: pageSize });
+            var pageW = doc.internal.pageSize.getWidth();
+            var pageH = doc.internal.pageSize.getHeight();
+            var areaW = pageW - margin * 2;
+            var areaH = pageH - margin * 2;
+            img2pdfFiles.forEach(function (f, idx) {
+              if (idx > 0) doc.addPage();
+              var aspect = f.width / f.height;
+              var areaAspect = areaW / areaH;
+              var drawW, drawH, drawX, drawY;
+              if (fitMode === 'fit') {
+                if (aspect > areaAspect) {
+                  drawW = areaW; drawH = areaW / aspect;
+                  drawX = margin; drawY = margin + (areaH - drawH) / 2;
+                } else {
+                  drawH = areaH; drawW = areaH * aspect;
+                  drawY = margin; drawX = margin + (areaW - drawW) / 2;
+                }
+              } else {
+                drawW = areaW; drawH = areaH; drawX = margin; drawY = margin;
+              }
+              var fmt = /\.png$/i.test(f.name) ? 'PNG' : 'JPEG';
+              doc.addImage(f.dataUrl, fmt, drawX, drawY, drawW, drawH, undefined, 'FAST');
+            });
+            doc.save('images_merged.pdf');
+            showToast('تم إنشاء PDF (' + img2pdfFiles.length + ' صورة)!', 'success');
+          } catch (e) {
+            showToast('خطأ: ' + e.message, 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-file-pdf"></i> إنشاء PDF وتحميله';
+          }
+        }, 60);
+      };
+
+      // ============================================================
+      // PDF MERGE
+      // ============================================================
+      var pdfmergeFiles = [];   // { bytes: ArrayBuffer, name: string }
+
+      window.addPdfMergeFiles = function (files) {
+        var remaining = files.length;
+        if (!remaining) return;
+        Array.from(files).forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            pdfmergeFiles.push({ bytes: e.target.result, name: file.name });
+            remaining--;
+            if (remaining === 0) renderPdfMergeList();
+          };
+          reader.readAsArrayBuffer(file);
+        });
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      function renderPdfMergeList() {
+        var list = document.getElementById('pdfmergeList');
+        var cnt  = document.getElementById('pdfmergeCount');
+        if (!list) return;
+        if (pdfmergeFiles.length === 0) { list.innerHTML = ''; if (cnt) cnt.textContent = ''; return; }
+        if (cnt) cnt.textContent = pdfmergeFiles.length + ' ملف محمل';
+        list.innerHTML = pdfmergeFiles.map(function (f, i) {
+          return '<div class="pdf-file-item">' +
+            '<div class="p-icon"><i class="fas fa-file-pdf"></i></div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="p-name">' + f.name + '</div>' +
+              '<div class="p-meta">' + (f.bytes.byteLength / 1024).toFixed(1) + ' KB</div>' +
+            '</div>' +
+            '<div class="pdf-order-btns">' +
+              '<button onclick="movePdfMerge(' + i + ',-1)">↑</button>' +
+              '<button onclick="movePdfMerge(' + i + ',1)">↓</button>' +
+            '</div>' +
+            '<button class="pdf-del-btn" onclick="removePdfMerge(' + i + ')"><i class="fas fa-times"></i></button>' +
+          '</div>';
+        }).join('');
+      }
+
+      window.movePdfMerge = function (i, dir) {
+        var j = i + dir;
+        if (j < 0 || j >= pdfmergeFiles.length) return;
+        var tmp = pdfmergeFiles[i]; pdfmergeFiles[i] = pdfmergeFiles[j]; pdfmergeFiles[j] = tmp;
+        renderPdfMergeList();
+      };
+
+      window.removePdfMerge = function (i) {
+        pdfmergeFiles.splice(i, 1);
+        renderPdfMergeList();
+      };
+
+      window.mergePDFFiles = async function () {
+        if (pdfmergeFiles.length < 2) { showToast('ارفع ملفين PDF على الأقل', 'error'); return; }
+        if (!window.PDFLib) { showToast('جاري تحميل مكتبة PDF-lib…', ''); return; }
+        var btn = document.getElementById('pdfmergeBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدمج…';
+        try {
+          var mergedPdf = await window.PDFLib.PDFDocument.create();
+          for (var fi = 0; fi < pdfmergeFiles.length; fi++) {
+            var pdfDoc = await window.PDFLib.PDFDocument.load(pdfmergeFiles[fi].bytes);
+            var pages  = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+            pages.forEach(function (page) { mergedPdf.addPage(page); });
+          }
+          var mergedBytes = await mergedPdf.save();
+          var blob = new Blob([mergedBytes], { type: 'application/pdf' });
+          var url  = URL.createObjectURL(blob);
+          var a    = document.createElement('a');
+          a.href = url; a.download = 'merged.pdf'; a.click();
+          URL.revokeObjectURL(url);
+          showToast('تم دمج ' + pdfmergeFiles.length + ' ملف PDF بنجاح!', 'success');
+        } catch (e) {
+          showToast('خطأ في الدمج: ' + e.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-object-group"></i> دمج وتحميل PDF';
+        }
+      };
+
+      // ============================================================
+      // PDF → IMAGES
+      // ============================================================
+      (function () {
+        // init PDF.js worker (CDN)
+        if (window.pdfjsLib) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+      })();
+
+      var pdf2imgDoc = null;
+
+      window.loadPdf2Img = async function (file) {
+        if (!file) return;
+        if (!window.pdfjsLib) { showToast('مكتبة PDF.js لم تُحمَّل بعد، حاول مجدداً'); return; }
+        var pages = document.getElementById('pdf2imgPages');
+        pages.innerHTML = '<div style="color:var(--text-color-light);font-size:0.85rem;padding:10px"><i class="fas fa-spinner fa-spin"></i> جاري قراءة الملف…</div>';
+        document.getElementById('pdf2imgInfo').textContent = '';
+        try {
+          var ab = await file.arrayBuffer();
+          pdf2imgDoc = await window.pdfjsLib.getDocument({ data: ab }).promise;
+          var total = pdf2imgDoc.numPages;
+          document.getElementById('pdf2imgInfo').textContent = 'إجمالي الصفحات: ' + total;
+          document.getElementById('pdf2imgDownloadBtn').innerHTML =
+            '<i class="fas fa-download"></i> تحميل كل الصفحات (' + total + ')';
+          pages.innerHTML = '';
+          for (var i = 1; i <= total; i++) {
+            var wrap = document.createElement('div');
+            wrap.className = 'pdf-page-card';
+
+            var cv = document.createElement('canvas');
+            var page = await pdf2imgDoc.getPage(i);
+            var vp = page.getViewport({ scale: 0.35 });
+            cv.width = vp.width; cv.height = vp.height;
+            await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+
+            var lbl = document.createElement('div');
+            lbl.className = 'pdf-page-label';
+            lbl.textContent = 'صفحة ' + i;
+
+            var actions = document.createElement('div');
+            actions.className = 'pdf-page-actions';
+
+            var dlBtn = document.createElement('button');
+            dlBtn.className = 'pdf-page-btn';
+            dlBtn.title = 'تحميل صفحة ' + i;
+            dlBtn.innerHTML = '<i class="fas fa-download"></i> تحميل';
+
+            var cropBtn = document.createElement('button');
+            cropBtn.className = 'pdf-page-btn pdf-page-btn-crop';
+            cropBtn.title = 'فتح في لوح القص';
+            cropBtn.innerHTML = '<i class="fas fa-crop-alt"></i> قص';
+
+            (function (n, dlB, crB) {
+              dlB.addEventListener('click', function () { downloadPdf2ImgPage(n); });
+              crB.addEventListener('click', function () { openPageInCrop(n); });
+            })(i, dlBtn, cropBtn);
+
+            actions.appendChild(dlBtn);
+            actions.appendChild(cropBtn);
+            wrap.appendChild(cv);
+            wrap.appendChild(lbl);
+            wrap.appendChild(actions);
+            pages.appendChild(wrap);
+          }
+          showToast('تم تحميل الملف — ' + total + ' صفحة');
+        } catch (e) {
+          pages.innerHTML = '';
+          showToast('خطأ في قراءة الملف: ' + e.message);
+        }
+      };
+
+      window.downloadPdf2ImgPage = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        var ext     = fmt === 'image/png' ? 'png' : fmt === 'image/webp' ? 'webp' : 'jpg';
+        var page = await pdf2imgDoc.getPage(pageNum);
+        var vp   = page.getViewport({ scale: scale });
+        var cv   = document.createElement('canvas');
+        cv.width = vp.width; cv.height = vp.height;
+        await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+        var a = document.createElement('a');
+        a.href = cv.toDataURL(fmt, quality);
+        a.download = 'page_' + pageNum + '.' + ext;
+        a.click();
+        showToast('تم تحميل صفحة ' + pageNum);
+      };
+
+      window.downloadAllPdf2Img = async function () {
+        if (!pdf2imgDoc) { showToast('ارفع ملف PDF أولاً'); return; }
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        var ext     = fmt === 'image/png' ? 'png' : fmt === 'image/webp' ? 'webp' : 'jpg';
+        var total   = pdf2imgDoc.numPages;
+        var btn     = document.getElementById('pdf2imgDownloadBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل…';
+        try {
+          for (var i = 1; i <= total; i++) {
+            var page = await pdf2imgDoc.getPage(i);
+            var vp   = page.getViewport({ scale: scale });
+            var cv   = document.createElement('canvas');
+            cv.width = vp.width; cv.height = vp.height;
+            await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+            var a = document.createElement('a');
+            a.href = cv.toDataURL(fmt, quality);
+            a.download = 'page_' + String(i).padStart(3, '0') + '.' + ext;
+            a.click();
+            await new Promise(function (r) { setTimeout(r, 350); });
+          }
+          showToast('تم تحميل كل الصفحات (' + total + ')!');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-download"></i> تحميل كل الصفحات (' + total + ')';
+        }
+      };
+
+      // drag-over visual feedback on dropzones
+      document.addEventListener('DOMContentLoaded', function () {
+        ['pdfUnifiedDrop'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('dragover',  function (e) { e.preventDefault(); el.classList.add('drag-over'); });
+          el.addEventListener('dragleave', function ()  { el.classList.remove('drag-over'); });
+          el.addEventListener('drop', function (e) {
+            e.preventDefault(); el.classList.remove('drag-over');
+            handleUnifiedFiles(e.dataTransfer.files);
+          });
+        });
+
+        // init PDF.js worker after DOM ready (ensures script loaded)
+        if (window.pdfjsLib) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+      });
       function getExifOrientation(buffer) {
         try {
           var view   = new DataView(buffer);
