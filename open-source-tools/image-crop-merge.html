@@ -745,6 +745,35 @@
         flex-wrap: wrap;
       }
       .result-section:not(.visible) .preview-zoom-bar { display: none !important; }
+      /* ---- Page Position Grid ---- */
+      .pos-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 30px);
+        gap: 4px;
+      }
+      .pos-btn {
+        width: 30px; height: 30px;
+        border: 1.5px solid rgba(var(--primary-rgb, 99,102,241), 0.35);
+        background: transparent;
+        color: var(--text-color);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.18s, border-color 0.18s, color 0.18s;
+        padding: 0;
+        line-height: 1;
+      }
+      .pos-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-rgb, 99,102,241), 0.1);
+      }
+      .pos-btn.pos-active {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+      }
     </style>
   </head>
 
@@ -1037,6 +1066,30 @@
                   <div class="range-wrap">
                     <input type="range" id="cornerRadius" min="0" max="60" value="0" oninput="document.getElementById('cornerRadiusVal').textContent=this.value+'px'">
                     <span class="range-val" id="cornerRadiusVal">0px</span>
+                  </div>
+                </div>
+
+                <div class="setting-row">
+                  <label class="s-label">حجم الصورة في الورقة</label>
+                  <div class="range-wrap">
+                    <input type="range" id="pageScaleSlider" min="20" max="100" value="100"
+                      oninput="onPageScaleChange(+this.value)">
+                    <span class="range-val" id="pageScaleVal">100%</span>
+                  </div>
+                </div>
+
+                <div class="setting-row" style="align-items:flex-start;">
+                  <label class="s-label" style="padding-top:4px;">موضع الصورة</label>
+                  <div class="pos-grid" id="posGrid">
+                    <button id="pos_tl" class="pos-btn" onclick="setPageAlign('tl')" title="أعلى يسار">↖</button>
+                    <button id="pos_tc" class="pos-btn" onclick="setPageAlign('tc')" title="أعلى وسط">↑</button>
+                    <button id="pos_tr" class="pos-btn" onclick="setPageAlign('tr')" title="أعلى يمين">↗</button>
+                    <button id="pos_ml" class="pos-btn" onclick="setPageAlign('ml')" title="وسط يسار">←</button>
+                    <button id="pos_mc" class="pos-btn pos-active" onclick="setPageAlign('mc')" title="المنتصف">⊙</button>
+                    <button id="pos_mr" class="pos-btn" onclick="setPageAlign('mr')" title="وسط يمين">→</button>
+                    <button id="pos_bl" class="pos-btn" onclick="setPageAlign('bl')" title="أسفل يسار">↙</button>
+                    <button id="pos_bc" class="pos-btn" onclick="setPageAlign('bc')" title="أسفل وسط">↓</button>
+                    <button id="pos_br" class="pos-btn" onclick="setPageAlign('br')" title="أسفل يمين">↘</button>
                   </div>
                 </div>
               </div>
@@ -1477,6 +1530,8 @@
       // New features
       let normalizeSize = false;  // "قد بعض" — equalize both crop sizes
       let previewZoom   = 1;      // multiplier for preview display (0.5 / 0.75 / 1)
+      let pageScale     = 100;    // image size as % of background canvas (20-100)
+      let pageAlign     = 'mc';   // position: tl tc tr ml mc mr bl bc br
 
       // ============================================================
       // INIT
@@ -2000,7 +2055,36 @@
           src = tC;
         }
 
-        // Step 2: A4
+        // Step 2: Page Layout (scale + position) — only when A4 mode is off
+        if (!a4Mode && (pageScale < 100 || pageAlign !== 'mc')) {
+          var psBg = document.createElement('canvas');
+          var psW  = Math.round(src.width  / (pageScale / 100));
+          var psH  = Math.round(src.height / (pageScale / 100));
+          psBg.width  = psW;
+          psBg.height = psH;
+          var psBgCtx = psBg.getContext('2d');
+          var isTrans = document.getElementById('transparentBg').checked;
+          if (!isTrans) {
+            psBgCtx.fillStyle = document.getElementById('bgColor').value;
+            psBgCtx.fillRect(0, 0, psW, psH);
+          }
+          var alignMap = {
+            tl: [0,              0             ],
+            tc: [(psW-src.width)/2, 0          ],
+            tr: [psW-src.width,  0             ],
+            ml: [0,              (psH-src.height)/2],
+            mc: [(psW-src.width)/2, (psH-src.height)/2],
+            mr: [psW-src.width,  (psH-src.height)/2],
+            bl: [0,              psH-src.height],
+            bc: [(psW-src.width)/2, psH-src.height],
+            br: [psW-src.width,  psH-src.height]
+          };
+          var pa = alignMap[pageAlign] || alignMap.mc;
+          psBgCtx.drawImage(src, Math.round(pa[0]), Math.round(pa[1]));
+          src = psBg;
+        }
+
+        // Step 3: A4
         if (a4Mode) {
           var a4dim  = getA4Px();
           var a4W    = a4dim[0];
@@ -2387,6 +2471,20 @@
         if (filteredCanvas) applyFiltersAndShow();
       };
 
+      window.setPageAlign = function (pos) {
+        pageAlign = pos;
+        document.querySelectorAll('.pos-btn').forEach(function(b){ b.classList.remove('pos-active'); });
+        var btn = document.getElementById('pos_' + pos);
+        if (btn) btn.classList.add('pos-active');
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.onPageScaleChange = function (val) {
+        pageScale = val;
+        document.getElementById('pageScaleVal').textContent = val + '%';
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
       // ============================================================
       // EXIF ORIENTATION
       // ============================================================
@@ -2511,7 +2609,14 @@
         filteredCanvas = null;
         outputRaw      = null;
         normalizeSize  = false;
+        pageScale      = 100;
+        pageAlign      = 'mc';
         document.getElementById('normalizeSizeToggle').checked = false;
+        document.getElementById('pageScaleSlider').value = 100;
+        document.getElementById('pageScaleVal').textContent = '100%';
+        document.querySelectorAll('.pos-btn').forEach(function(b){b.classList.remove('pos-active');});
+        var mcBtn = document.getElementById('pos_mc');
+        if (mcBtn) mcBtn.classList.add('pos-active');
         document.getElementById('resultSection').classList.remove('visible');
         resetFilters();
         showToast('تم إعادة التعيين الكامل');
