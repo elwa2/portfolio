@@ -1084,6 +1084,62 @@
         border-color: #5dba8a;
         color: #5dba8a;
       }
+      .pdf-page-card canvas { cursor: zoom-in; }
+
+      /* ── Full-page preview lightbox ── */
+      #pdfPreviewModal {
+        display: none;
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,0.82);
+        align-items: center; justify-content: center;
+        backdrop-filter: blur(6px);
+      }
+      #pdfPreviewModal.open { display: flex; }
+      .pdf-preview-box {
+        position: relative;
+        background: var(--card-bg);
+        border: 1.5px solid rgba(var(--primary-rgb),0.3);
+        border-radius: 14px;
+        padding: 12px;
+        max-width: 92vw;
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+      }
+      .pdf-preview-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; gap: 10px;
+      }
+      .pdf-preview-title {
+        font-size: 0.92rem; font-weight: 700;
+        color: var(--text-color);
+      }
+      .pdf-preview-close {
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 8px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        padding: 5px 10px;
+        font-size: 1rem;
+        line-height: 1;
+        transition: all 0.18s;
+      }
+      .pdf-preview-close:hover { background: rgba(220,50,50,0.25); border-color: #e05050; color: #e05050; }
+      .pdf-preview-scroll {
+        overflow: auto;
+        max-width: calc(92vw - 24px);
+        max-height: calc(92vh - 90px);
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      #pdfPreviewCanvas { display: block; border-radius: 8px; }
+      .pdf-preview-actions {
+        display: flex; gap: 8px; width: 100%;
+      }
 
       .s-select {
         background: var(--card-bg); color: var(--text-color);
@@ -3467,6 +3523,7 @@
             var vp = page.getViewport({ scale: 0.35 });
             cv.width = vp.width; cv.height = vp.height;
             await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+            (function(n){ cv.addEventListener('click', function(){ previewPdf2ImgPage(n); }); })(i);
 
             var lbl = document.createElement('div');
             lbl.className = 'pdf-page-label';
@@ -3503,6 +3560,40 @@
           showToast('خطأ في قراءة الملف: ' + e.message);
         }
       };
+
+      window._previewPageNum = 1;
+
+      window.previewPdf2ImgPage = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        window._previewPageNum = pageNum;
+        var modal = document.getElementById('pdfPreviewModal');
+        var cv    = document.getElementById('pdfPreviewCanvas');
+        var title = document.getElementById('pdfPreviewTitle');
+        title.textContent = 'معاينة — صفحة ' + pageNum;
+        // Render at screen-friendly scale (fit to ~85vw / ~80vh)
+        var page   = await pdf2imgDoc.getPage(pageNum);
+        var rawVp  = page.getViewport({ scale: 1 });
+        var maxW   = Math.round(window.innerWidth  * 0.82);
+        var maxH   = Math.round(window.innerHeight * 0.74);
+        var scale  = Math.min(maxW / rawVp.width, maxH / rawVp.height, 3);
+        var vp     = page.getViewport({ scale: scale });
+        cv.width   = vp.width;
+        cv.height  = vp.height;
+        cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      };
+
+      window.closePdfPreview = function () {
+        document.getElementById('pdfPreviewModal').classList.remove('open');
+        document.body.style.overflow = '';
+      };
+
+      // Close on Escape
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closePdfPreview();
+      });
 
       window.downloadPdf2ImgPage = async function (pageNum) {
         if (!pdf2imgDoc) return;
@@ -3762,5 +3853,26 @@
 
     })(); // end IIFE
     </script>
+  <!-- PDF full-page preview lightbox -->
+  <div id="pdfPreviewModal" onclick="if(event.target===this)closePdfPreview()">
+    <div class="pdf-preview-box">
+      <div class="pdf-preview-bar">
+        <span class="pdf-preview-title" id="pdfPreviewTitle">معاينة الصفحة</span>
+        <button class="pdf-preview-close" onclick="closePdfPreview()" title="إغلاق">✕</button>
+      </div>
+      <div class="pdf-preview-scroll">
+        <canvas id="pdfPreviewCanvas"></canvas>
+      </div>
+      <div class="pdf-preview-actions">
+        <button class="pdf-page-btn" id="pdfPreviewDlBtn" onclick="downloadPdf2ImgPage(window._previewPageNum)" style="flex:1">
+          <i class="fas fa-download"></i> تحميل الصفحة
+        </button>
+        <button class="pdf-page-btn pdf-page-btn-crop" id="pdfPreviewCropBtn" onclick="openPageInCrop(window._previewPageNum);closePdfPreview()" style="flex:1">
+          <i class="fas fa-crop-alt"></i> فتح في لوح القص
+        </button>
+      </div>
+    </div>
+  </div>
+
   </body>
 </html>
