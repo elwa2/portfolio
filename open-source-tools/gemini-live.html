@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini Live | محول العملات والذهب الذكي</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      :root {
+        --gemini-main: #1a73e8;
+        --gemini-bg: #ffffff;
+        --gemini-card: #f8f9fa;
+        --gemini-border: #e0e0e0;
+        --gemini-text: #202124;
+        --gemini-glow: rgba(26, 115, 232, 0.1);
+        --gemini-green: #34a853;
+      }
+
+      [data-theme="dark"] {
+        --gemini-main: #8ab4f8;
+        --gemini-bg: #1e1e1e;
+        --gemini-card: #2d2d2d;
+        --gemini-border: #444;
+        --gemini-text: #e8eaed;
+        --gemini-glow: rgba(138, 180, 248, 0.1);
+      }
+
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      .gemini-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--gemini-bg);
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--gemini-border);
+        font-family: 'Cairo', sans-serif;
+      }
+
+      .gemini-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .gemini-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--gemini-text);
+      }
+
+      .gemini-logo i {
+        background: linear-gradient(45deg, #1a73e8, #9334e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 15px;
+        color: #5f6368;
+      }
+
+      .tabs-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: var(--gemini-card);
+        padding: 6px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+      }
+
+      .tab-btn {
+        padding: 10px;
+        border: none;
+        background: transparent;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #5f6368;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+
+      .tab-btn.active {
+        background: white;
+        color: var(--gemini-text);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+
+      .offline-status {
+        font-size: 0.85rem;
+        color: #70757a;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .currency-entry {
+        background: var(--gemini-card);
+        border-radius: 20px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        border: 1px solid var(--gemini-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s;
+      }
+
+      .currency-entry:focus-within {
+        border-color: var(--gemini-main);
+        box-shadow: 0 0 0 3px var(--gemini-glow);
+        background: var(--gemini-bg);
+      }
+
+      .currency-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .currency-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #5f6368;
+        text-transform: uppercase;
+      }
+
+      .currency-code-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .flag {
+        width: 32px;
+        height: 32px;
+        background: #eee;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        border: 1px solid #ddd;
+      }
+
+      .currency-input {
+        border: none;
+        background: transparent;
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-align: left;
+        width: 150px;
+        color: var(--gemini-text);
+        outline: none;
+      }
+
+      .currency-shortcut {
+        color: #70757a;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .conversion-pill {
+        display: inline-flex;
+        background: rgba(52, 168, 83, 0.1);
+        color: var(--gemini-green);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 15px auto;
+        display: table;
+      }
+
+      .trend-card {
+        margin-top: 20px;
+        border: 1px solid var(--gemini-border);
+        border-radius: 20px;
+        padding: 16px;
+      }
+
+      .trend-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      .trend-title {
+        font-weight: 700;
+        color: var(--gemini-text);
+      }
+
+      .trend-pair {
+        font-size: 0.8rem;
+        background: #f1f3f4;
+        padding: 2px 8px;
+        border-radius: 6px;
+        color: #5f6368;
+      }
+
+      .chart-container {
+        height: 180px;
+        width: 100%;
+      }
+
+      .verification-list {
+        margin-top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .verification-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #5f6368;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+      }
+
+      .verification-item {
+        background: var(--gemini-card);
+        padding: 14px 20px;
+        border-radius: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        color: var(--gemini-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid var(--gemini-border);
+        transition: background 0.2s;
+      }
+
+      .verification-item:hover {
+        background: #f1f3f4;
+      }
+
+      .verification-item i {
+        font-size: 0.8rem;
+        color: #70757a;
+      }
+
+      /* Fix for 3D Background Overlap */
+      #three-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* Gold Tab View */
+      .gold-view {
+        display: none;
+      }
+
+      .gold-card {
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        border: 1px solid #d4af37;
+        color: #444;
+      }
+      
+      [data-theme="dark"] .gold-card {
+        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+      }
+
+      .gold-price-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px border var(--gemini-border);
+      }
+      .gold-price-item:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">💱</div>
+      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">💰</div>
+      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">📈</div>
+      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">🪙</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">💎</div>
+      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div class="gemini-container">
+          <div class="gemini-header">
+            <div class="gemini-logo">
+              <i class="fas fa-chart-line"></i>
+              <span>Gemini Live</span>
+            </div>
+            <div class="header-actions">
+              <i class="fas fa-globe"></i>
+              <i class="fas fa-sync-alt"></i>
+            </div>
+          </div>
+          
+          <div class="smart-matrix-label" style="font-size: 0.9rem; color: #5f6368; margin-top: -15px; margin-bottom: 20px;">
+            Smart Currency Matrix
+          </div>
+
+          <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('currencies')">
+              <i class="fas fa-coins"></i> Currencies
+            </button>
+            <button class="tab-btn" onclick="switchTab('gold')">
+              <i class="fas fa-ring"></i> Gold Prices
+            </button>
+          </div>
+
+          <div class="offline-status">
+            <i class="far fa-calendar-alt"></i>
+            <span>Offline Mode (Cached) • May 17, 2026, 09:58 AM UTC</span>
+          </div>
+
+          <!-- Currencies View -->
+          <div id="currencies-view">
+            <div class="currency-entry">
+              <div class="currency-info">
+                <div class="currency-label">US DOLLAR</div>
+                <div class="currency-code-box">
+                  <div class="flag">US</div>
+                  <input type="number" class="currency-input" value="1" id="usd-input" oninput="convert('usd')" onclick="this.value=''">
+                </div>
+              </div>
+              <div class="currency-shortcut">USD</div>
+            </div>
+
+            <div class="currency-entry">
+              <div class="currency-info">
+                <div class="currency-label">SAUDI RIYAL</div>
+                <div class="currency-code-box">
+                  <div class="flag">SA</div>
+                  <input type="number" class="currency-input" value="3.75" id="sar-input" oninput="convert('sar')" onclick="this.value=''">
+                </div>
+              </div>
+              <div class="currency-shortcut">SAR</div>
+            </div>
+
+            <div class="currency-entry">
+              <div class="currency-info">
+                <div class="currency-label">EGYPTIAN POUND</div>
+                <div class="currency-code-box">
+                  <div class="flag">EG</div>
+                  <input type="number" class="currency-input" value="52.90" id="egp-input" oninput="convert('egp')" onclick="this.value=''">
+                </div>
+              </div>
+              <div class="currency-shortcut">EGP</div>
+            </div>
+
+            <div class="conversion-pill">
+              1 USD ≈ <span id="conversion-rate">52.90</span> EGP
+            </div>
+
+            <div class="trend-card">
+              <div class="trend-header">
+                <span class="trend-title">7-Day Trend</span>
+                <span class="trend-pair">USD to EGP</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gold View -->
+          <div id="gold-view" class="gold-view" style="display:none;">
+            <div class="currency-entry gold-card">
+              <div class="currency-info" style="width:100%">
+                <div class="currency-label">EGYPT GOLD PRICES (24K)</div>
+                <div class="currency-price" style="font-size: 1.8rem; font-weight: 700; margin-top: 5px;">
+                  3,950 <span style="font-size: 1rem;">EGP/g</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="trend-card">
+              <div class="gold-price-item">
+                <span>عيار 24</span>
+                <strong>3,950 EGP</strong>
+              </div>
+              <div class="gold-price-item">
+                <span>عيار 21</span>
+                <strong>3,456 EGP</strong>
+              </div>
+              <div class="gold-price-item">
+                <span>عيار 18</span>
+                <strong>2,962 EGP</strong>
+              </div>
+              <div class="gold-price-item">
+                <span>جنيه ذهب</span>
+                <strong>27,648 EGP</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="verification-list">
+            <div class="verification-title">GOOGLE VERIFICATION</div>
+            <a href="https://www.google.com/search?q=sar+to+usd" target="_blank" class="verification-item">
+              <span>Saudi Riyal to USD</span>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="https://www.google.com/search?q=egp+to+sar" target="_blank" class="verification-item">
+              <span>EGP to Saudi Riyal</span>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="https://www.google.com/search?q=egp+to+usd" target="_blank" class="verification-item">
+              <span>EGP to USD</span>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="https://www.google.com/search?q=gold+price+egypt" target="_blank" class="verification-item">
+              <span>Gold Price in Egypt</span>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      let rates = {
+        USD: 1,
+        SAR: 3.75,
+        EGP: 50.00
+      };
+
+      async function fetchLiveRates() {
+        try {
+          // Use a free API with no key required for basic rates
+          const response = await fetch('https://open.er-api.com/v6/latest/USD');
+          const data = await response.json();
+          
+          if (data && data.rates) {
+            rates.SAR = data.rates.SAR;
+            rates.EGP = data.rates.EGP;
+            
+            // Update UI
+            document.getElementById('conversion-rate').textContent = rates.EGP.toFixed(2);
+            document.querySelector('.offline-status span').textContent = 
+              `Live Mode • Updated: ${new Date(data.time_last_update_utc).toLocaleString('ar-EG')}`;
+            
+            // Re-convert current values with new rates
+            convert('usd');
+          }
+        } catch (error) {
+          console.error('Failed to fetch live rates:', error);
+          document.querySelector('.offline-status span').textContent = 'Offline Mode (Using Cached Rates)';
+        }
+      }
+
+      function switchTab(tab) {
+        const currenciesView = document.getElementById('currencies-view');
+        const goldView = document.getElementById('gold-view');
+        const btns = document.querySelectorAll('.tab-btn');
+
+        btns.forEach(btn => btn.classList.remove('active'));
+
+        if (tab === 'currencies') {
+          currenciesView.style.display = 'block';
+          goldView.style.display = 'none';
+          btns[0].classList.add('active');
+        } else {
+          currenciesView.style.display = 'none';
+          goldView.style.display = 'block';
+          btns[1].classList.add('active');
+        }
+      }
+
+      function convert(from) {
+        const usdInput = document.getElementById('usd-input');
+        const sarInput = document.getElementById('sar-input');
+        const egpInput = document.getElementById('egp-input');
+        
+        let usdVal;
+
+        if (from === 'usd') {
+          usdVal = parseFloat(usdInput.value) || 0;
+        } else if (from === 'sar') {
+          usdVal = (parseFloat(sarInput.value) || 0) / rates.SAR;
+        } else if (from === 'egp') {
+          usdVal = (parseFloat(egpInput.value) || 0) / rates.EGP;
+        }
+
+        if (from !== 'usd') usdInput.value = usdVal.toFixed(2);
+        if (from !== 'sar') sarInput.value = (usdVal * rates.SAR).toFixed(2);
+        if (from !== 'egp') egpInput.value = (usdVal * rates.EGP).toFixed(2);
+      }
+
+      window.onload = function() {
+        fetchLiveRates();
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+        gradient.addColorStop(0, 'rgba(52, 168, 83, 0.2)');
+        gradient.addColorStop(1, 'rgba(52, 168, 83, 0)');
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['5/10', '5/11', '5/12', '5/13', '5/14', '5/15', '5/16'],
+            datasets: [{
+              data: [52.8, 52.6, 52.8, 53.0, 52.9, 52.8, 52.9],
+              borderColor: '#34a853',
+              borderWidth: 3,
+              fill: true,
+              backgroundColor: gradient,
+              tension: 0.4,
+              pointRadius: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                display: true,
+                grid: { display: false },
+                ticks: { font: { size: 10 } }
+              },
+              x: {
+                display: true,
+                grid: { display: false },
+                ticks: { font: { size: 10 } }
+              }
+            }
+          }
+        });
+      };
+    </script>
+  </body>
+</html>
