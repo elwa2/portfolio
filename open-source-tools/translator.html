@@ -298,40 +298,20 @@
             <i class="fas fa-bolt"></i>
             <span>محرك الترجمة نشط</span>
           </div>
+          <span id="detectedLang" style="display:none; margin-right:10px; font-size:0.85rem; color:var(--primary-color); font-weight:700;"></span>
 
           <div class="translation-grid">
             <!-- Input Side -->
             <div class="input-group">
               <label><i class="fas fa-language"></i> لغة المصدر</label>
-              <select id="sourceLang" class="lang-select">
-                <option value="auto">كشف تلقائي</option>
-                <option value="ar">العربية</option>
-                <option value="en" selected>الإنجليزية</option>
-                <option value="fr">الفرنسية</option>
-                <option value="es">الإسبانية</option>
-                <option value="de">الألمانية</option>
-                <option value="tr">التركية</option>
-                <option value="zh">الصينية</option>
-                <option value="ja">اليابانية</option>
-                <option value="ru">الروسية</option>
-              </select>
+              <select id="sourceLang" class="lang-select"></select>
               <textarea id="sourceText" placeholder="اكتب النص هنا للترجمة..."></textarea>
             </div>
 
             <!-- Output Side -->
             <div class="input-group output-area">
               <label><i class="fas fa-globe"></i> لغة الهدف</label>
-              <select id="targetLang" class="lang-select">
-                <option value="ar" selected>العربية</option>
-                <option value="en">الإنجليزية</option>
-                <option value="fr">الفرنسية</option>
-                <option value="es">الإسبانية</option>
-                <option value="de">الألمانية</option>
-                <option value="tr">التركية</option>
-                <option value="zh">الصينية</option>
-                <option value="ja">اليابانية</option>
-                <option value="ru">الروسية</option>
-              </select>
+              <select id="targetLang" class="lang-select"></select>
               <div id="outputArea" style="position: relative;">
                 <textarea id="targetText" readonly placeholder="الترجمة ستظهر هنا..."></textarea>
                 <button class="copy-btn" onclick="copyTranslation()" title="نسخ الترجمة">
@@ -369,30 +349,102 @@
     </footer>
 
     <script>
+      const LANGUAGES = {
+        "af": "الأفريكانية", "sq": "الألبانية", "am": "الأمهرية",
+        "ar": "العربية", "hy": "الأرمينية", "az": "الأذربيجانية",
+        "eu": "الباسكية", "be": "البيلاروسية", "bn": "البنغالية",
+        "bs": "البوسنية", "bg": "البلغارية", "ca": "الكاتالانية",
+        "ceb": "السيبوانية", "ny": "الشيشيوا", "zh-CN": "الصينية المبسطة",
+        "zh-TW": "الصينية التقليدية", "co": "الكورسيكية", "hr": "الكرواتية",
+        "cs": "التشيكية", "da": "الدنماركية", "nl": "الهولندية",
+        "en": "الإنجليزية", "eo": "الإسبرانتو", "et": "الإستونية",
+        "tl": "الفلبينية", "fi": "الفنلندية", "fr": "الفرنسية",
+        "fy": "الفريزية", "gl": "الجاليكية", "ka": "الجورجية",
+        "de": "الألمانية", "el": "اليونانية", "gu": "الغوجاراتية",
+        "ht": "الكريولية الهايتية", "ha": "الهوسا", "haw": "الهاوايية",
+        "iw": "العبرية", "hi": "الهندية", "hmn": "الهمونغ",
+        "hu": "الهنغارية", "is": "الآيسلندية", "ig": "الإيبو",
+        "id": "الإندونيسية", "ga": "الإيرلندية", "it": "الإيطالية",
+        "ja": "اليابانية", "jw": "الجاوية", "kn": "الكانادا",
+        "kk": "الكازاخستانية", "km": "الخميرية", "ko": "الكورية",
+        "ku": "الكردية", "ky": "القرغيزية", "lo": "اللاوية",
+        "la": "اللاتينية", "lv": "اللاتفية", "lt": "الليتوانية",
+        "lb": "اللوكسمبورغية", "mk": "المقدونية", "mg": "المالاغاسية",
+        "ms": "الملايوية", "ml": "المالايالامية", "mt": "المالطية",
+        "mi": "الماورية", "mr": "الماراثية", "mn": "المنغولية",
+        "my": "البورمية", "ne": "النيبالية", "no": "النرويجية",
+        "ps": "الباشتو", "fa": "الفارسية", "pl": "البولندية",
+        "pt": "البرتغالية", "pa": "البنجابية", "ro": "الرومانية",
+        "ru": "الروسية", "sm": "الساموية", "gd": "الغيلية الاسكتلندية",
+        "sr": "الصربية", "st": "الإنجليزية الجنوبية", "sn": "الشونا",
+        "sd": "السندية", "si": "السنهالية", "sk": "السلوفاكية",
+        "sl": "السلوفينية", "so": "الصومالية", "es": "الإسبانية",
+        "su": "السوندانية", "sw": "السواحيلية", "sv": "السويدية",
+        "tg": "الطاجيكية", "ta": "التاميلية", "te": "التيلوغو",
+        "th": "التايلاندية", "tr": "التركية", "uk": "الأوكرانية",
+        "ur": "الأردية", "uz": "الأوزبكية", "vi": "الفيتنامية",
+        "cy": "الويلزية", "xh": "الخوسا", "yi": "اليديشية",
+        "yo": "اليوروبا", "zu": "الزولو"
+      };
+
+      function buildSelects() {
+        const sourceSel = document.getElementById('sourceLang');
+        const targetSel = document.getElementById('targetLang');
+
+        // Add auto-detect to source only
+        sourceSel.innerHTML = `<option value="auto" selected>كشف تلقائي 🔍</option>`;
+        targetSel.innerHTML = '';
+
+        Object.entries(LANGUAGES).forEach(([code, name]) => {
+          sourceSel.innerHTML += `<option value="${code}">${name}</option>`;
+          const selected = code === 'en' ? ' selected' : '';
+          targetSel.innerHTML += `<option value="${code}"${selected}>${name}</option>`;
+        });
+      }
+
+      buildSelects();
+
       async function translateText() {
         const text = document.getElementById('sourceText').value.trim();
         const source = document.getElementById('sourceLang').value;
         const target = document.getElementById('targetLang').value;
         const output = document.getElementById('targetText');
         const loading = document.getElementById('loading');
+        const detectedBadge = document.getElementById('detectedLang');
 
         if (!text) return;
 
         loading.style.display = 'flex';
+        output.value = '';
 
         try {
-          // Using a reliable free translation API concept (MyMemory or similar open-source friendly approach)
-          const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`);
-          const data = await response.json();
-          
-          if (data.responseData) {
-             output.value = data.responseData.translatedText;
-          } else {
-             output.value = "حدث خطأ أثناء الترجمة. حاول مرة أخرى.";
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&dt=bd&dj=1&q=${encodeURIComponent(text)}`;
+          const res = await fetch(url);
+
+          if (!res.ok) throw new Error('Network error');
+
+          const data = await res.json();
+
+          // Extract translated text from sentences array
+          let translated = '';
+          if (data.sentences && data.sentences.length) {
+            translated = data.sentences.map(s => s.trans || '').join('');
           }
+
+          output.value = translated || 'لم يتم الحصول على ترجمة.';
+
+          // Show detected language if auto was selected
+          if (source === 'auto' && data.src) {
+            const detectedName = LANGUAGES[data.src] || data.src;
+            detectedBadge.textContent = `✅ تم الكشف: ${detectedName}`;
+            detectedBadge.style.display = 'inline-block';
+          } else {
+            detectedBadge.style.display = 'none';
+          }
+
         } catch (error) {
           console.error(error);
-          output.value = "فشل الاتصال بمحرك الترجمة.";
+          output.value = 'حدث خطأ في الترجمة. تأكد من اتصال الإنترنت وحاول مجدداً.';
         } finally {
           loading.style.display = 'none';
         }
@@ -401,9 +453,9 @@
       function swapLanguages() {
         const source = document.getElementById('sourceLang');
         const target = document.getElementById('targetLang');
-        
+
         if (source.value === 'auto') return;
-        
+
         const temp = source.value;
         source.value = target.value;
         target.value = temp;
@@ -418,21 +470,23 @@
       function clearText() {
         document.getElementById('sourceText').value = '';
         document.getElementById('targetText').value = '';
+        document.getElementById('detectedLang').style.display = 'none';
       }
 
       function copyTranslation() {
         const text = document.getElementById('targetText').value;
         if (!text) return;
         navigator.clipboard.writeText(text).then(() => {
-          alert('تم نسخ الترجمة بنجاح!');
+          const btn = document.querySelector('.copy-btn');
+          btn.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 1500);
         });
       }
 
-      // Auto-translate on typing (optional enhancement)
       let timeout = null;
       document.getElementById('sourceText').addEventListener('input', () => {
         clearTimeout(timeout);
-        timeout = setTimeout(translateText, 1000);
+        timeout = setTimeout(translateText, 900);
       });
     </script>
   </body>
