@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مزيل التعليقات</title>
-    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+    <link rel="icon" href="../assets/images/logo%20ico.svg" type="image/svg+xml" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -301,7 +301,7 @@ let y = 2;"></textarea>
     if (['js','ts','php'].includes(det) || lang === 'auto') r = r.replace(/(?<!:)\/\/.*$/gm, '');
     if (det === 'html') r = r.replace(/<!--[\s\S]*?-->/g, '');
     if (det === 'python') { r = r.replace(/#.*$/gm,''); r = r.replace(/"""[\s\S]*?"""/g,''); r = r.replace(/'''[\s\S]*?'''/g,''); }
-    r = r.replace(/\n{3,}/g,'\n\n');
+    r = r.replace(/\n{2,}/g,'\n');
     r = r.split('\n').map(l=>l.trimEnd()).join('\n').trim();
     return r;
   }
