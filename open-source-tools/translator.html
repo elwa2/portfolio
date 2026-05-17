@@ -112,6 +112,39 @@
         box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.05);
       }
 
+      /* تنسيق أزرار الوصول السريع */
+      .quick-langs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .quick-lang-btn {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .quick-lang-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .quick-lang-btn.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
       .output-area {
         position: relative;
       }
@@ -328,7 +361,14 @@
             <!-- Output Side -->
             <div class="input-group output-area">
               <label><i class="fas fa-globe"></i> لغة الهدف</label>
-              <select id="targetLang" class="lang-select"></select>
+              <div class="quick-langs">
+                <button class="quick-lang-btn" onclick="setTargetLang('ar')">العربية</button>
+                <button class="quick-lang-btn" onclick="setTargetLang('en')">English</button>
+                <button id="lastLangBtn" class="quick-lang-btn" style="display: none;" onclick="setTargetLang(this.dataset.lang)">
+                  <i class="fas fa-history"></i> <span id="lastLangName"></span>
+                </button>
+              </div>
+              <select id="targetLang" class="lang-select" onchange="updateLastLang(this.value)"></select>
               <div id="outputArea" style="position: relative;">
                 <textarea id="targetText" readonly placeholder="الترجمة ستظهر هنا..."></textarea>
                 <button class="copy-btn" onclick="copyTranslation()" title="نسخ الترجمة">
@@ -503,6 +543,36 @@
       }
 
       buildSelects();
+      loadLastLang();
+
+      function setTargetLang(code) {
+        if (!code) return;
+        const targetSel = document.getElementById('targetLang');
+        targetSel.value = code;
+        updateLastLang(code);
+        translateText();
+      }
+
+      function updateLastLang(code) {
+        if (code === 'ar' || code === 'en') return;
+        localStorage.setItem('lastTranslationLang', code);
+        showLastLangBtn(code);
+      }
+
+      function showLastLangBtn(code) {
+        const btn = document.getElementById('lastLangBtn');
+        const span = document.getElementById('lastLangName');
+        if (code && LANGUAGES[code]) {
+          btn.dataset.lang = code;
+          span.textContent = LANGUAGES[code];
+          btn.style.display = 'flex';
+        }
+      }
+
+      function loadLastLang() {
+        const last = localStorage.getItem('lastTranslationLang');
+        if (last) showLastLangBtn(last);
+      }
 
       async function translateText() {
         const text = document.getElementById('sourceText').value.trim();
