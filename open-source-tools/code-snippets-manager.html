@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مدير أكواد CSS | Ali Ahmed</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+
+    <style>
+      :root {
+        --snippet-card-bg: rgba(255, 255, 255, 0.05);
+        --snippet-border: rgba(var(--primary-rgb), 0.2);
+        --code-bg: #1e1e1e;
+        --code-text: #d4d4d4;
+      }
+
+      [data-theme="dark"] {
+        --snippet-card-bg: rgba(0, 0, 0, 0.2);
+      }
+
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      .search-container {
+        max-width: 800px;
+        margin: 0 auto 40px;
+        position: sticky;
+        top: 100px;
+        z-index: 10;
+      }
+
+      .search-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      #snippetSearch {
+        width: 100%;
+        padding: 15px 50px 15px 20px;
+        border-radius: 30px;
+        border: 2px solid var(--snippet-border);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-size: 1.1rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      #snippetSearch:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 20px;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+      }
+
+      .snippets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+      }
+
+      .snippet-card {
+        background: var(--card-bg);
+        border: 1px solid var(--snippet-border);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease backwards;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .snippet-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        border-color: var(--primary-color);
+      }
+
+      .snippet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .snippet-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--primary-color);
+      }
+
+      .snippet-code-wrapper {
+        position: relative;
+        background: var(--code-bg);
+        border-radius: 12px;
+        padding: 15px;
+        overflow: hidden;
+      }
+
+      .snippet-code {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.9rem;
+        color: var(--code-text);
+        white-space: pre-wrap;
+        direction: ltr;
+        unicode-bidi: embed;
+        text-align: left;
+        max-height: 200px;
+        overflow-y: auto;
+        display: block;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(var(--primary-rgb), 0.8);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .snippet-code-wrapper:hover .copy-btn {
+        opacity: 1;
+      }
+
+      .copy-btn:hover {
+        background: var(--primary-color);
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .no-results {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 50px;
+        color: var(--text-color);
+        font-size: 1.2rem;
+      }
+
+      #three-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
+      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">⭐</div>
+      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">🔥</div>
+      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">💎</div>
+      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">🎯</div>
+      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div class="search-container">
+          <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="snippetSearch" placeholder="ابحث عن كود (مثل: grid, animation, logo...)" />
+          </div>
+        </div>
+
+        <div id="snippetsGrid" class="snippets-grid">
+          <!-- Snippets will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      const snippets = [
+        {
+          title: "تصفير الهوامش - General Reset",
+          code: `*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}`,
+          tags: ["reset", "base"]
+        },
+        {
+          title: "لغة المحتوى - Language Selector",
+          code: `:lang(en) {
+  /* English styles */
+}
+
+:lang(ar) {
+  /* Arabic styles */
+}`,
+          tags: ["i18n", "lang"]
+        },
+        {
+          title: "تغيير اللوجو - Custom Logo",
+          code: `:root {
+  --logo: url("");
+}
+
+.navbar-brand img,
+.store-footer .footer-container .logo-footer .foo {
+  max-height: 3rem !important;
+  content: var(--logo) !important;
+}`,
+          tags: ["logo", "brand", "salla"]
+        },
+        {
+          title: "نقاط الاستجابة - Media Queries",
+          code: `@media (min-width:767px) { }
+@media (max-width:767px) { }
+/* ايفون 14 */
+@media (max-width: 500px) {}
+/* ايفون 12 */
+@media (max-width: 420px) {}
+/* جلاكسي */
+@media (max-width: 370px) { }`,
+          tags: ["responsive", "media"]
+        },
+        {
+          title: "المحددات المتقدمة - Advanced Selectors",
+          code: `div:first-child :last-child
+:nth-child(1)
+:nth-of-type(3)
+:nth-last-child(2)
+:has(div[class*="discount"])
+.section[data-type=banner]:has(img[src*="TRxKqJx71t8Tz6y82wUR.png"]) { }
+img[src*=""] { content: url(); }
+.product-single div[data-option-id="1380911137"] label + p
+.feature-item:not(:last-child)
+body[data-template="home"], body:not([data-template="home"])
+.card:where(width > 300px) h3 { }
+.sicon-whatsapp2:hover::after { }`,
+          tags: ["selectors", "css"]
+        },
+        {
+          title: "تبديل محتوى الصورة - Image Content Replace",
+          code: `img[src*=""] {
+  content: '';
+  display: block;
+  object-fit: contain;
+  transform: scale(0.7);
+  filter: brightness(18.5);
+}`,
+          tags: ["image", "filter", "content"]
+        },
+        {
+          title: "إضافة بانر قبل المنتج - Product Form Banner",
+          code: `.product-single .main-content .product-form:before {
+  display: block;
+  content: '';
+  width: 100%;
+  height: 56px;
+  background: url(https://cdn.salla.sa/form-builder/jbVL9G9qdeP3ZNFa8OXQR1OnN2rQpZaMym5aYgQP.png) no-repeat center center / contain;
+}`,
+          tags: ["product", "salla", "banner"]
+        },
+        {
+          title: "إضافة بانر للفوتر - Footer After Banner",
+          code: `footer:after {
+  background: url(https://cdn.salla.sa/form-builder/QZfG9HyXCwK5Lgh6t6tzT2XfBegWe85S0wXanwAi.png);
+  content: '';
+  width: 50%;
+  height: 56px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: block;
+  position: relative;
+  right: 33px;
+  top: 15px;
+}`,
+          tags: ["footer", "salla", "banner"]
+        },
+        {
+          title: "CSS Grid - شبكة متكاملة",
+          code: `.container {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  /* أو */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* أو */
+  grid-template-columns: repeat(auto-fill, 200px);
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}`,
+          tags: ["layout", "grid"]
+        },
+        {
+          title: "Grid - ترتيب وتحديد الخلايا",
+          code: `div:nth-child(1) {
+  grid-column: 1/1;
+  grid-row: 1/3;
+  order: 1;
+}
+div:nth-child(2) {
+  grid-column: 1/1;
+  grid-row: 2/3;
+  order: 2;
+}
+div:nth-child(3) {
+  grid-column: 1/1;
+  grid-row: 1/3;
+  order: 3;
+}`,
+          tags: ["layout", "grid", "order"]
+        },
+        {
+          title: "إضافة نص بـ ::after",
+          code: `::after {
+  content: 'العروض والبكجات ';
+  color: #000;
+  font-size: 9.5pt;
+}`,
+          tags: ["pseudo", "content", "after"]
+        },
+        {
+          title: "بانر تفاصيل المقال - Article Banner",
+          code: `.article--product-details:before {
+  background: url(https://cdn.salla.sa/form-builder/QzCJDG24H0kkHioCxiiYVL5H4S0RP7rkPIRCkz4j.png);
+  content: '';
+  width: 100%;
+  height: 43px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: block;
+}`,
+          tags: ["article", "salla", "banner"]
+        },
+        {
+          title: "تغيير نص زر الكارت - Cart Button Text",
+          code: `#cart-submit > button {
+  font-size: 0;
+}
+
+body.cart #cart-submit > button:before {
+  content: 'Checkout  ';
+  color: #fff;
+  font-size: 1rem;
+}`,
+          tags: ["cart", "button", "salla"]
+        },
+        {
+          title: "تحديد الحجم - Clamp & Min",
+          code: `/* min(preferred, max) */
+width: min(800px, 90%);
+
+/* min  preferred  max */
+width: clamp(400px, 50vw, 800px);
+
+/* fluid font */
+font-size: calc(1.3rem + .6vw);`,
+          tags: ["responsive", "layout", "size"]
+        },
+        {
+          title: "خصائص مفيدة - Useful Properties",
+          code: `backdrop-filter: blur(10px);
+text-indent: -9999px;
+clip-path: inset(0 0 0 46.5%) !important;
+z-index: 1;
+zoom: 70%;
+mask-image: linear-gradient(0deg,transparent,#000 200%,#000 100%,transparent);
+border-image: linear-gradient(to top,rgba(6,70,99,0),var(--f-color)) 5%;
+aspect-ratio: 16/9;
+border-color: #610fe1 #be6811 #610fe1 #be6811;`,
+          tags: ["misc", "layout", "filter"]
+        },
+        {
+          title: "خلفية متدرجة مع صورة - Gradient Background",
+          code: `background: linear-gradient(
+  134deg,
+  transparent -183%,
+  var(--1) 83%,
+  #fff 200%
+),
+url(IMAGE_URL) 0rem 0rem/545% no-repeat !important;`,
+          tags: ["background", "gradient", "salla"]
+        },
+        {
+          title: "تلوين النص - Simple Gradient Text",
+          code: `h1 {
+  background: linear-gradient(to right, red, blue);
+  background-clip: text;
+  color: transparent;
+}`,
+          tags: ["typography", "gradient"]
+        },
+        {
+          title: "نص بريق متحرك - Text Shine Animation",
+          code: `.text-primary {
+  background: linear-gradient(
+    to right,
+    #87cef8 20%, #ffffff 30%, #87cef8 70%, #ffffff 80%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
+  background-size: 500% auto;
+  animation: textShine 5s ease-in-out infinite alternate;
+}
+
+@keyframes textShine {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}`,
+          tags: ["animation", "typography", "gradient"]
+        },
+        {
+          title: "تدريج النص المتحرك - Text Clip Animation",
+          code: `.da-cp {
+  background-image: linear-gradient(
+    -225deg,
+    var(--1) 0%, var(--3) 29%, var(--2) 67%, var(--1) 100%
+  );
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: 4s linear infinite textclip;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@keyframes textclip {
+  100% { background-position: 200% center; }
+}`,
+          tags: ["animation", "typography", "gradient"]
+        },
+        {
+          title: "تجاوز زر سلة - Salla Button Override",
+          code: `button.s-button-element.s-button-btn.s-button-outline.s-button-wide {
+  font-size: 1rem;
+  background-color: var(--1);
+  color: var(--3);
+  display: block;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: rgb(0 0 0/15%) 0px 2px 4px,
+    rgb(0 0 0/0%) 0px 7px 13px -3px,
+    rgb(255 255 255/66%) 0px -3px 0px inset;
+  animation: signal 1200ms infinite;
+}
+
+@keyframes signal {
+  0%   { box-shadow: 0 0 0 0 var(--1); }
+  100% { box-shadow: 0 0 0 6px #ffffff21; }
+}`,
+          tags: ["button", "animation", "salla"]
+        },
+        {
+          title: "Dropdown عند الفوكس - Focus Dropdown",
+          code: `.dropdown {
+  display: none;
+}
+.my-button:focus .dropdown {
+  display: flex;
+}`,
+          tags: ["dropdown", "focus", "ux"]
+        },
+        {
+          title: "Mask Image بالمتغير - CSS Mask",
+          code: `:root {
+  --cam: url("رابط_SVG_أو_صورة");
+}
+
+.masked-element {
+  -webkit-mask-image: var(--cam);
+  mask-image: var(--cam);
+  mask-size: contain;
+  background-repeat: no-repeat;
+  width: auto;
+  height: 292px;
+  display: block;
+}`,
+          tags: ["mask", "clip", "css"]
+        },
+        {
+          title: "Box Shadow - ظلال متنوعة",
+          code: `/* ناعمة */
+box-shadow: 0 0 transparent, 0 0 transparent, 0 3px 16px rgba(47, 83, 109, .12157);
+
+/* عميقة */
+box-shadow: rgba(0,0,0,0.4) 0px 2px 4px,
+  rgba(0,0,0,0.3) 0px 7px 13px -3px,
+  rgba(0,0,0,0.2) 0px -3px 0px inset;
+
+/* نيومورفيك */
+box-shadow: 12px 12px 12px rgba(0,0,0,0.1),
+  -10px -10px 10px #f8f1ff;
+
+/* نص */
+text-shadow: 0px 4px 4px #000;`,
+          tags: ["shadow", "box-shadow", "visual"]
+        },
+        {
+          title: "Input - تنسيق الإدخال",
+          code: `input:focus {
+  outline: 1px solid red;
+}
+
+input::placeholder {
+  color: red;
+}`,
+          tags: ["input", "form", "ux"]
+        },
+        {
+          title: "متغيرات سلة الشاملة - Salla Root Variables",
+          code: `:root {
+  --color-primary: var(--1);
+  --color-primary-dark: var(--2);
+  --color-primary-light: #e1c478;
+  --color-primary-reverse: #edf5ff;
+  --gr: linear-gradient(45deg, var(--1) 0, var(--1) 39%, var(--2) 100%);
+  --gr2: linear-gradient(45deg, var(--1) 0, var(--2) 100%);
+  --1: #ba813b;
+  --2: #270d34;
+  --2-2: #9865266e;
+  --3: #edf5ff;
+  --4: #3b3b39;
+  --4-4-4: #20201f;
+  --4-4: #3131309c;
+  --bg: #F2F2F2;
+  --ff: #ededed;
+  --00: #2d2d2d;
+  --sh: -8px 10px 15px -3px rgba(0,0,0,0.1);
+  --bg-g: linear-gradient(134deg, transparent -183%, #fff 83%, #fff 200%), url("");
+  --tr: linear-gradient(134deg, transparent 0%, var(--2-2) 100%);
+  --logo: url("");
+}`,
+          tags: ["variables", "salla", "root"]
+        },
+        {
+          title: "متغيرات زد الشاملة - Zid Root Variables",
+          code: `/* zid */
+:root {
+  --1: #2d2d2d;
+  --1-h: #cdcdcd9e;
+  --2: #171401;
+  --bg: #F2F2F2;
+  --3: #441818;
+  --ff: #ededed;
+  --00: #2d2d2d;
+  --primary-color: #2d2d2d !important;
+  --text-color-primary-bg: #ededed !important;
+  --sub-primary-color: #282323 !important;
+  --header-primary-color: #fff !important;
+  --footer-primary-color: #fff !important;
+  --sh: 0 0 transparent, 0 0 transparent, 0 3px 16px rgba(47, 83, 109, .12157);
+  --gr: linear-gradient(45deg, var(--1) 0, var(--2) 39%, var(--2) 100%);
+  --logo: url("");
+  --con: "الحقوق محفوظة © متجــر ";
+}`,
+          tags: ["variables", "zid", "root"]
+        },
+        {
+          title: "متغيرات RGB - RGB Variables",
+          code: `:root {
+  --main: 238, 201, 201;
+  --secondary: 167, 141, 141;
+  --secondary-dark: 137, 111, 111;
+  --light: 255, 245, 245;
+  --bg: #f3f4f6;
+  --1-1: 36 36 36;
+}
+
+/* الاستخدام */
+background: rgba(var(--1-1), 0.95);
+background: rgba(var(--light), 0.95);`,
+          tags: ["variables", "colors", "rgb"]
+        },
+        {
+          title: "تنسيق بطاقات المنتج - Salla Product Cards",
+          code: `.s-product-card-entry,
+body.products-has-border .product-card {
+  --normal-box-shadow: -8px 10px 15px -3px rgba(0,0,0,0.1);
+  border-radius: 15px !important;
+  overflow: hidden;
+  box-shadow: var(--normal-box-shadow);
+  padding: 20px 0;
+}`,
+          tags: ["product", "card", "salla"]
+        },
+        {
+          title: "خط Font Awesome - FA Icon Font",
+          code: `.icon-element {
+  font-family: var(--fa-style-family, "Font Awesome 6 Free");
+  font-weight: var(--fa-style, 900);
+}`,
+          tags: ["fonts", "icons", "fontawesome"]
+        },
+        {
+          title: "الخط العربي PortadaARA - Custom Arabic Font",
+          code: `@font-face {
+  font-family: PortadaARA;
+  src: url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA_var-Upright.ttf);
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: PortadaARA-bold;
+  src: url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA-Bold.otf);
+  font-weight: 800;
+}
+
+*:not(i), html, body, div, h1, h2, h3, h4 {
+  font-family: PortadaARA;
+}
+
+h5, h6, p, a, span, li, label {
+  font-family: PortadaARA-bold;
+}`,
+          tags: ["fonts", "arabic", "portada"]
+        },
+        {
+          title: "استيراد CSS خارجي - Import CSS",
+          code: `/* develope By Package +201002241591 */
+@import url(https://raw.githack.com/elwa2/cssres/main/chord33.css);`,
+          tags: ["import", "css", "ali"]
+        }
+      ];
+
+      const grid = document.getElementById('snippetsGrid');
+      const searchInput = document.getElementById('snippetSearch');
+
+      function renderSnippets(filter = '') {
+        const filtered = snippets.filter(s => 
+          s.title.toLowerCase().includes(filter.toLowerCase()) || 
+          s.code.toLowerCase().includes(filter.toLowerCase()) ||
+          s.tags.some(t => t.toLowerCase().includes(filter.toLowerCase()))
+        );
+
+        grid.innerHTML = filtered.length > 0 ? '' : '<div class="no-results">لم يتم العثور على نتائج للبحث</div>';
+
+        filtered.forEach((s, index) => {
+          const card = document.createElement('div');
+          card.className = 'snippet-card';
+          card.style.animationDelay = `${index * 0.05}s`;
+          
+          card.innerHTML = `
+            <div class="snippet-header">
+              <span class="snippet-title">${s.title}</span>
+              <div class="tags">
+                ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+              </div>
+            </div>
+            <div class="snippet-code-wrapper">
+              <button class="copy-btn" onclick="copyCode(this)">نسخ الكود <i class="far fa-copy"></i></button>
+              <pre class="snippet-code">${escapeHtml(s.code)}</pre>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      window.copyCode = async function(btn) {
+        const code = btn.nextElementSibling.textContent;
+        try {
+          await navigator.clipboard.writeText(code);
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'تم النسخ! <i class="fas fa-check"></i>';
+          btn.style.background = '#4CAF50';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy!', err);
+        }
+      };
+
+      searchInput.addEventListener('input', (e) => {
+        renderSnippets(e.target.value);
+      });
+
+      // Initial render
+      renderSnippets();
+      
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
