@@ -466,7 +466,7 @@
             مجموعة أدوات المطورين
           </h1>
           <p style="color: var(--text-color-light)">
-            مجموعة كاملة من الأدوات: ضغط CSS، تعمية JS، وتشفير SVG
+            مجموعة كاملة من الأدوات: ضغط CSS وJS، تعمية JS، وتشفير SVG
           </p>
         </div>
 
@@ -474,6 +474,9 @@
           <div class="tab-navigation">
             <button class="tab-button active" data-tab="css-minifier-tool">
               <i class="fab fa-css3-alt"></i> <span>ضاغط CSS</span>
+            </button>
+            <button class="tab-button" data-tab="js-minifier-tool">
+              <i class="fab fa-js-square"></i> <span>ضاغط JS</span>
             </button>
             <button class="tab-button" data-tab="js-encoder-tool">
               <i class="fab fa-js-square"></i> <span>تعمية JS</span>
@@ -583,6 +586,99 @@
                   spellcheck="false"
                   readonly
                   onclick="copyToClipboard('cssOutput')"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- JavaScript Minifier Tool Content -->
+            <div class="tool-section tool-hidden-state" id="js-minifier-tool">
+              <h2>ضاغط ومحسن أكواد JavaScript</h2>
+              <p>
+                قم بلصق كود JavaScript الخاص بك لتقليل حجمه مع خيارات إضافية
+                للتحسين.
+              </p>
+              <div id="jsminifier">
+                <h4>الصق كود JavaScript هنا:</h4>
+                <textarea
+                  id="jsMinifyInput"
+                  placeholder="// مثال\nfunction greet(name) {\n  console.log('Hello ' + name);\n}\ngreet('Ali');"
+                  spellcheck="false"
+                ></textarea>
+
+                <div class="options-area">
+                  <div class="options-container">
+                    <div class="option-item">
+                      <input
+                        class="option-input"
+                        id="jsKeepComments"
+                        type="checkbox" checked
+                      />
+                      <label for="jsKeepComments">الحفاظ على التعليقات</label>
+                    </div>
+                    <div class="option-item">
+                      <input
+                        class="option-input"
+                        id="jsDropConsole"
+                        type="checkbox"
+                        checked
+                      />
+                      <label for="jsDropConsole">إزالة console.log</label>
+                    </div>
+                    <div class="option-item">
+                      <input
+                        class="option-input"
+                        id="jsDropDebugger"
+                        type="checkbox"
+                        checked
+                      />
+                      <label for="jsDropDebugger">إزالة debugger</label>
+                    </div>
+                    <div class="option-item">
+                      <input
+                        class="option-input"
+                        id="jsMangleNames"
+                        type="checkbox"
+                        checked
+                      />
+                      <label for="jsMangleNames">اختصار أسماء المتغيرات</label>
+                    </div>
+                    <div class="option-item">
+                      <input
+                        class="option-input"
+                        id="jsSuperCompact"
+                        type="checkbox"
+                        checked
+                      />
+                      <label for="jsSuperCompact">ضغط إضافي (passes)</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tool-buttons">
+                  <button class="btn-tool btn-primary" onclick="minifyJS()">
+                    <i class="fas fa-compress-alt"></i> ضغط JS
+                  </button>
+                  <button
+                    class="btn-tool btn-secondary"
+                    onclick="clearField('jsMinifyInput')"
+                  >
+                    <i class="fas fa-eraser"></i> مسح
+                  </button>
+                  <button
+                    class="btn-tool btn-secondary"
+                    onclick="copyToClipboard('jsMinifyOutput')"
+                  >
+                    <i class="fas fa-copy"></i> نسخ النتيجة
+                  </button>
+                </div>
+
+                <h4>كود JavaScript المضغوط:</h4>
+                <textarea
+                  id="jsMinifyOutput"
+                  placeholder="النتيجة المضغوطة ستظهر هنا..."
+                  spellcheck="false"
+                  readonly
+                  onclick="copyToClipboard('jsMinifyOutput')"
                 ></textarea>
               </div>
             </div>
@@ -905,6 +1001,7 @@
           field.value = "";
           // Also clear output if mapped
           if (elementId === "cssInput") get("cssOutput").value = "";
+          if (elementId === "jsMinifyInput") get("jsMinifyOutput").value = "";
           if (elementId === "jsEncodeInput") get("jsEncodeOutput").value = "";
           if (elementId === "jsDecodeInput") get("jsDecodeOutput").value = "";
         }
@@ -981,6 +1078,62 @@
           .replace(/\s+\!important/gi, "!important")
           .replace(/(^\n+|\n+$)/, "");
         cssOutput.value = n;
+      }
+
+      // --- JavaScript Minifier ---
+      async function minifyJS() {
+        const input = get("jsMinifyInput");
+        const output = get("jsMinifyOutput");
+
+        if (!input || !output || !input.value.trim()) return;
+
+        const keepComments = get("jsKeepComments")?.checked;
+        const dropConsole = get("jsDropConsole")?.checked;
+        const dropDebugger = get("jsDropDebugger")?.checked;
+        const mangleNames = get("jsMangleNames")?.checked;
+        const superCompact = get("jsSuperCompact")?.checked;
+
+        const minifyOptions = {
+          compress: {
+            drop_console: !!dropConsole,
+            drop_debugger: !!dropDebugger,
+            passes: superCompact ? 2 : 1,
+          },
+          mangle: !!mangleNames,
+          format: {
+            comments: keepComments ? "some" : false,
+          },
+        };
+
+        try {
+          if (window.Terser && typeof window.Terser.minify === "function") {
+            const result = await window.Terser.minify(input.value, minifyOptions);
+            if (result.error) throw result.error;
+            output.value = result.code || "";
+            return;
+          }
+
+          output.value = fallbackMinifyJS(input.value, !!keepComments);
+          alert("تم تنفيذ ضغط مبسط لأن مكتبة الضغط غير متاحة حالياً.");
+        } catch (error) {
+          console.error("JS minify failed:", error);
+          alert("حدث خطأ أثناء ضغط JavaScript. تأكد من صحة الكود.");
+        }
+      }
+
+      function fallbackMinifyJS(code, keepComments) {
+        let minified = code;
+
+        if (!keepComments) {
+          minified = minified
+            .replace(/\/\*[\s\S]*?\*\//g, "")
+            .replace(/(^|[^:])\/\/.*$/gm, "$1");
+        }
+
+        return minified
+          .replace(/\s+/g, " ")
+          .replace(/\s*([{}();,:=<>+\-*\/])\s*/g, "$1")
+          .trim();
       }
 
       // --- JavaScript Encoder/Decoder Logic ---
@@ -1116,6 +1269,8 @@
         }
       })();
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
 
     <!-- Three.js (مكتبة الرسومات ثلاثية الأبعاد) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
