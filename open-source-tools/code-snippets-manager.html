@@ -28,181 +28,457 @@
     <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
 
     <style>
+      /* ===== ROOT ===== */
       :root {
-        --snippet-card-bg: rgba(255, 255, 255, 0.05);
-        --snippet-border: rgba(var(--primary-rgb), 0.2);
-        --code-bg: #1e1e1e;
-        --code-text: #d4d4d4;
+        --code-bg: #0d1117;
+        --code-hdr: #161b22;
+        --code-border: rgba(48, 54, 61, 0.9);
+        --code-line-hover: rgba(255,255,255,0.05);
+        --code-line-active: rgba(var(--primary-rgb), 0.18);
+        --ln-color: #484f58;
+        --ln-width: 38px;
+        --line-text: #e6edf3;
+        --snippet-border: rgba(var(--primary-rgb), 0.18);
+        --card-radius: 18px;
       }
 
-      [data-theme="dark"] {
-        --snippet-card-bg: rgba(0, 0, 0, 0.2);
-      }
-
+      /* ===== LAYOUT ===== */
       .tool-page-wrapper {
-        padding: 50px 0;
+        padding: 50px 0 80px;
         min-height: 80vh;
         position: relative;
         z-index: 2;
       }
 
-      .search-container {
-        max-width: 800px;
-        margin: 0 auto 40px;
-        position: sticky;
-        top: 100px;
-        z-index: 10;
+      /* ===== PAGE HEADER ===== */
+      .page-intro {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .page-intro h1 {
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+      }
+      .page-intro p {
+        opacity: 0.65;
+        font-size: 1rem;
+        color: var(--text-color);
+      }
+
+      /* ===== TOP CONTROLS ===== */
+      .top-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
       }
 
       .search-wrapper {
+        flex: 1;
+        min-width: 180px;
         position: relative;
-        display: flex;
-        align-items: center;
       }
 
       #snippetSearch {
         width: 100%;
-        padding: 15px 50px 15px 20px;
-        border-radius: 30px;
+        padding: 12px 46px 12px 18px;
+        border-radius: 26px;
         border: 2px solid var(--snippet-border);
         background: var(--card-bg);
         color: var(--text-color);
-        font-size: 1.1rem;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        font-size: 1rem;
+        font-family: inherit;
+        backdrop-filter: blur(12px);
         outline: none;
-        transition: all 0.3s ease;
+        transition: border-color 0.25s, box-shadow 0.25s;
       }
-
       #snippetSearch:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.12);
       }
-
       .search-icon {
         position: absolute;
-        right: 20px;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
         color: var(--primary-color);
-        font-size: 1.2rem;
+        pointer-events: none;
       }
 
-      .snippets-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 25px;
-        margin-top: 30px;
-      }
-
-      .snippet-card {
+      .count-badge {
+        white-space: nowrap;
+        font-size: 0.85rem;
+        color: var(--text-color);
         background: var(--card-bg);
         border: 1px solid var(--snippet-border);
         border-radius: 20px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        transition: all 0.3s ease;
-        animation: fadeIn 0.5s ease backwards;
+        padding: 8px 16px;
+        backdrop-filter: blur(10px);
+        opacity: 0.8;
       }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+      .pill-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--snippet-border);
+        color: var(--text-color);
+        border-radius: 20px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-family: inherit;
+        white-space: nowrap;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
       }
-
-      .snippet-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      .pill-btn:hover, .pill-btn.active {
+        background: rgba(var(--primary-rgb), 0.12);
         border-color: var(--primary-color);
-      }
-
-      .snippet-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .snippet-title {
-        font-weight: 700;
-        font-size: 1.1rem;
         color: var(--primary-color);
       }
-
-      .snippet-code-wrapper {
-        position: relative;
-        background: var(--code-bg);
-        border-radius: 12px;
-        padding: 15px;
-        overflow: hidden;
+      .pill-btn.fav-active {
+        background: rgba(245, 166, 35, 0.15);
+        border-color: #f5a623;
+        color: #f5a623;
       }
 
-      .snippet-code {
-        font-family: 'Consolas', 'Monaco', monospace;
-        font-size: 0.9rem;
-        color: var(--code-text);
-        white-space: pre-wrap;
-        direction: ltr;
-        unicode-bidi: embed;
-        text-align: left;
-        max-height: 200px;
-        overflow-y: auto;
-        display: block;
-      }
-
-      .copy-btn {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(var(--primary-rgb), 0.8);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 5px 10px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      .snippet-code-wrapper:hover .copy-btn {
-        opacity: 1;
-      }
-
-      .copy-btn:hover {
-        background: var(--primary-color);
-      }
-
-      .tags {
+      /* ===== FILTER BAR ===== */
+      .filter-bar {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 28px;
+        padding: 14px 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--snippet-border);
+        border-radius: var(--card-radius);
+        backdrop-filter: blur(12px);
       }
 
+      .filter-btn {
+        background: transparent;
+        border: 1px solid var(--snippet-border);
+        color: var(--text-color);
+        border-radius: 16px;
+        padding: 5px 14px;
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .filter-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+      .filter-btn.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      /* ===== SNIPPETS LIST ===== */
+      #snippetsList {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      /* ===== SNIPPET CARD ===== */
+      .snippet-card {
+        background: var(--card-bg);
+        border: 1px solid var(--snippet-border);
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        animation: slideUp 0.35s ease backwards;
+        backdrop-filter: blur(10px);
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .snippet-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 6px 28px rgba(var(--primary-rgb), 0.12);
+      }
+
+      /* ===== SNIPPET META ===== */
+      .snippet-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 18px;
+        gap: 10px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--snippet-border);
+      }
+      .snippet-left {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .fav-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.15rem;
+        line-height: 1;
+        color: #888;
+        padding: 3px;
+        transition: transform 0.2s, color 0.2s;
+        flex-shrink: 0;
+      }
+      .fav-btn:hover { transform: scale(1.25); }
+      .fav-btn.active { color: #f5a623; }
+      .snippet-title {
+        font-weight: 700;
+        font-size: 0.98rem;
+        color: var(--primary-color);
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
       .tag {
         background: rgba(var(--primary-rgb), 0.1);
         color: var(--primary-color);
-        padding: 4px 10px;
-        border-radius: 15px;
-        font-size: 0.8rem;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.73rem;
         font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s;
+      }
+      .tag:hover { background: rgba(var(--primary-rgb), 0.22); }
+
+      /* ===== CODE BLOCK ===== */
+      .code-block { background: var(--code-bg); }
+
+      .code-block-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 14px;
+        background: var(--code-hdr);
+        border-bottom: 1px solid var(--code-border);
+        direction: ltr;
+      }
+      .code-dots {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .code-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: block;
+      }
+      .code-dots span:nth-child(1) { background: #ff5f57; }
+      .code-dots span:nth-child(2) { background: #febc2e; }
+      .code-dots span:nth-child(3) { background: #28c840; }
+      .code-lang-label {
+        font-size: 0.72rem;
+        color: #8b949e;
+        font-family: 'Consolas', monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-right: 10px;
+      }
+      .copy-all-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #cdd6f4;
+        border-radius: 8px;
+        padding: 5px 13px;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .copy-all-btn:hover {
+        background: rgba(var(--primary-rgb), 0.3);
+        border-color: var(--primary-color);
+        color: #fff;
+      }
+      .copy-all-btn.copied {
+        background: rgba(40, 200, 100, 0.2) !important;
+        border-color: #28c864 !important;
+        color: #28c864 !important;
       }
 
+      /* ===== CODE LINES ===== */
+      .code-lines {
+        direction: ltr;
+        overflow: hidden;
+        position: relative;
+      }
+      .code-lines.collapsed {
+        max-height: calc(8 * 28px);
+      }
+      .code-lines.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 56px;
+        background: linear-gradient(transparent, var(--code-bg));
+        pointer-events: none;
+      }
+
+      .code-line {
+        display: flex;
+        align-items: stretch;
+        min-height: 28px;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.12s;
+      }
+      .code-line:hover { background: var(--code-line-hover); }
+      .code-line.flash {
+        background: var(--code-line-active) !important;
+        transition: none;
+      }
+
+      .line-num {
+        width: var(--ln-width);
+        min-width: var(--ln-width);
+        padding: 4px 10px 4px 0;
+        text-align: right;
+        color: var(--ln-color);
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.82rem;
+        line-height: 20px;
+        user-select: none;
+        flex-shrink: 0;
+        border-right: 1px solid var(--code-border);
+      }
+
+      .line-content {
+        flex: 1;
+        padding: 4px 44px 4px 14px;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.86rem;
+        color: var(--line-text);
+        line-height: 20px;
+        white-space: pre;
+        min-width: 0;
+        overflow-x: auto;
+        text-align: left;
+        direction: ltr;
+      }
+      .line-content::-webkit-scrollbar { height: 2px; }
+      .line-content::-webkit-scrollbar-track { background: transparent; }
+      .line-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+      .line-copy-btn {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 26px;
+        height: 22px;
+        background: rgba(var(--primary-rgb), 0.75);
+        border: none;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.72rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.15s, background 0.15s;
+      }
+      .code-line:hover .line-copy-btn { opacity: 1; }
+      .line-copy-btn:hover { background: var(--primary-color); }
+
+      /* Syntax highlighting */
+      .hl-comment  { color: #6a9955; }
+      .hl-atrule   { color: #c586c0; }
+      .hl-prop     { color: #9cdcfe; }
+      .hl-value    { color: #ce9178; }
+      .hl-var      { color: #4ec9b0; }
+      .hl-num      { color: #b5cea8; }
+      .hl-url      { color: #ce9178; }
+      .hl-important{ color: #f44747; font-weight: bold; }
+
+      /* ===== EXPAND BTN ===== */
+      .expand-btn {
+        width: 100%;
+        padding: 8px 14px;
+        background: rgba(255,255,255,0.03);
+        border: none;
+        border-top: 1px solid var(--code-border);
+        color: #8b949e;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-family: inherit;
+        direction: ltr;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .expand-btn:hover {
+        background: rgba(255,255,255,0.07);
+        color: #cdd6f4;
+      }
+
+      /* ===== TOAST ===== */
+      #toast {
+        position: fixed;
+        bottom: 36px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: var(--primary-color);
+        color: #fff;
+        padding: 10px 26px;
+        border-radius: 24px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        white-space: nowrap;
+        transition: opacity 0.22s, transform 0.22s;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ===== NO RESULTS ===== */
       .no-results {
-        grid-column: 1 / -1;
         text-align: center;
-        padding: 50px;
+        padding: 70px 20px;
         color: var(--text-color);
-        font-size: 1.2rem;
+        opacity: 0.5;
       }
+      .no-results i { font-size: 2.8rem; display: block; margin-bottom: 12px; }
 
+      /* ===== MISC ===== */
       #three-canvas-container {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
         z-index: -1;
         pointer-events: none;
+      }
+
+      @media (max-width: 600px) {
+        .snippet-meta { flex-direction: column; align-items: flex-start; }
+        .line-content  { font-size: 0.8rem; }
       }
     </style>
   </head>
@@ -252,16 +528,30 @@
 
     <div class="tool-page-wrapper">
       <div class="container">
-        <div class="search-container">
-          <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="snippetSearch" placeholder="ابحث عن كود (مثل: grid, animation, logo...)" />
-          </div>
+
+        <!-- Page intro -->
+        <div class="page-intro">
+          <h1>🗂 مدير الأكواد</h1>
+          <p>انقر على أي سطر لنسخه — أكواد CSS جاهزة للاستخدام في ثوانٍ</p>
         </div>
 
-        <div id="snippetsGrid" class="snippets-grid">
-          <!-- Snippets will be injected here -->
+        <!-- Top controls -->
+        <div class="top-bar">
+          <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="snippetSearch" placeholder="ابحث عن كود... (Ctrl+F)" autocomplete="off" />
+          </div>
+          <span class="count-badge" id="resultCount">0 كود</span>
+          <button class="pill-btn" id="favToggle">⭐ المفضلة</button>
         </div>
+
+        <!-- Filter tag bar -->
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" data-tag="all">الكل</button>
+        </div>
+
+        <!-- Snippets list -->
+        <div id="snippetsList"></div>
       </div>
     </div>
 
@@ -356,6 +646,9 @@
         <use href="../assets/images/icons.svg#icon-whatsapp"></use>
       </svg>
     </a>
+
+    <!-- Toast notification -->
+    <div id="toast"></div>
 
     <script>
       const snippets = [
@@ -809,68 +1102,300 @@ h5, h6, p, a, span, li, label {
         }
       ];
 
-      const grid = document.getElementById('snippetsGrid');
-      const searchInput = document.getElementById('snippetSearch');
+      /* ============================================================
+         STATE
+      ============================================================ */
+      let activeTag   = 'all';
+      let showFavOnly = false;
+      let searchQuery = '';
+      let favorites   = [];
+      try { favorites = JSON.parse(localStorage.getItem('csm_favs') || '[]'); } catch(e) {}
 
-      function renderSnippets(filter = '') {
-        const filtered = snippets.filter(s => 
-          s.title.toLowerCase().includes(filter.toLowerCase()) || 
-          s.code.toLowerCase().includes(filter.toLowerCase()) ||
-          s.tags.some(t => t.toLowerCase().includes(filter.toLowerCase()))
-        );
+      /* ============================================================
+         SYNTAX HIGHLIGHTING (basic CSS)
+      ============================================================ */
+      function highlightLine(raw) {
+        if (!raw.trim()) return '\u00a0';
+        let esc = escHtml(raw);
 
-        grid.innerHTML = filtered.length > 0 ? '' : '<div class="no-results">لم يتم العثور على نتائج للبحث</div>';
+        // Comment
+        if (/^\s*\/\*/.test(raw) || /^\s*\*/.test(raw)) {
+          return `<span class="hl-comment">${esc}</span>`;
+        }
+        // @-rules
+        if (/^\s*@/.test(raw)) {
+          return esc.replace(/(@[\w-]+)/, '<span class="hl-atrule">$1</span>');
+        }
+        // !important
+        esc = esc.replace(/(!important)/g, '<span class="hl-important">$1</span>');
+        // CSS variable declaration
+        if (/^\s*--[\w-]+\s*:/.test(raw)) {
+          return esc.replace(/(--[\w-]+)(\s*:\s*)(.+)/, '<span class="hl-var">$1</span>$2<span class="hl-value">$3</span>');
+        }
+        // Property: value
+        if (/^\s+[\w-]+\s*:/.test(raw)) {
+          return esc.replace(/^(\s+)([\w-]+)(\s*:\s*)(.+)/, '$1<span class="hl-prop">$2</span>$3<span class="hl-value">$4</span>');
+        }
+        // Hex colors
+        esc = esc.replace(/(#[0-9a-fA-F]{3,8})\b/g, '<span class="hl-num">$1</span>');
+        return esc;
+      }
 
-        filtered.forEach((s, index) => {
-          const card = document.createElement('div');
-          card.className = 'snippet-card';
-          card.style.animationDelay = `${index * 0.05}s`;
-          
-          card.innerHTML = `
-            <div class="snippet-header">
-              <span class="snippet-title">${s.title}</span>
-              <div class="tags">
-                ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-              </div>
-            </div>
-            <div class="snippet-code-wrapper">
-              <button class="copy-btn" onclick="copyCode(this)">نسخ الكود <i class="far fa-copy"></i></button>
-              <pre class="snippet-code">${escapeHtml(s.code)}</pre>
-            </div>
-          `;
-          grid.appendChild(card);
+      /* ============================================================
+         BUILD FILTER BAR
+      ============================================================ */
+      function buildFilters() {
+        const tags = new Set();
+        snippets.forEach(s => s.tags.forEach(t => tags.add(t)));
+        const bar = document.getElementById('filterBar');
+        bar.innerHTML = '<button class="filter-btn active" data-tag="all">الكل</button>';
+        [...tags].sort().forEach(tag => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn';
+          btn.dataset.tag = tag;
+          btn.textContent = tag;
+          bar.appendChild(btn);
+        });
+        bar.addEventListener('click', e => {
+          const btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          activeTag = btn.dataset.tag;
+          bar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === activeTag));
+          render();
         });
       }
 
-      function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+      /* ============================================================
+         RENDER LINES
+      ============================================================ */
+      function renderLines(code, snippetIdx) {
+        return code.split('\n').map((line, i) => {
+          const num = i + 1;
+          return `<div class="code-line" data-sidx="${snippetIdx}" data-lidx="${i}">` +
+            `<span class="line-num">${num}</span>` +
+            `<span class="line-content">${highlightLine(line)}</span>` +
+            `<button class="line-copy-btn" title="نسخ السطر ${num}"><i class="far fa-copy"></i></button>` +
+          `</div>`;
+        }).join('');
       }
 
-      window.copyCode = async function(btn) {
-        const code = btn.nextElementSibling.textContent;
-        try {
-          await navigator.clipboard.writeText(code);
-          const originalText = btn.innerHTML;
-          btn.innerHTML = 'تم النسخ! <i class="fas fa-check"></i>';
-          btn.style.background = '#4CAF50';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-          }, 2000);
-        } catch (err) {
-          console.error('Failed to copy!', err);
-        }
-      };
+      /* ============================================================
+         RENDER SNIPPET CARD
+      ============================================================ */
+      function renderCard(s, cardIdx, snippetIdx) {
+        const isFav  = favorites.includes(s.title);
+        const lines  = s.code.split('\n');
+        const isLong = lines.length > 8;
+        const remaining = lines.length - 8;
 
-      searchInput.addEventListener('input', (e) => {
-        renderSnippets(e.target.value);
+        return `<div class="snippet-card" style="animation-delay:${cardIdx * 0.04}s">
+          <div class="snippet-meta">
+            <div class="snippet-left">
+              <button class="fav-btn${isFav ? ' active' : ''}" data-title="${escAttr(s.title)}" title="${isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">${isFav ? '★' : '☆'}</button>
+              <span class="snippet-title">${escHtml(s.title)}</span>
+            </div>
+            <div class="tags">
+              ${s.tags.map(t => `<span class="tag" data-tag="${escAttr(t)}">${escHtml(t)}</span>`).join('')}
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-lang-label">CSS</span>
+              </div>
+              <button class="copy-all-btn" data-sidx="${snippetIdx}"><i class="far fa-copy"></i> نسخ الكل</button>
+            </div>
+            <div class="code-lines${isLong ? ' collapsed' : ''}" id="cl-${cardIdx}">
+              ${renderLines(s.code, snippetIdx)}
+            </div>
+            ${isLong ? `<button class="expand-btn" data-target="cl-${cardIdx}" data-remaining="${remaining}"><i class="fas fa-chevron-down"></i> عرض ${remaining} سطر إضافي</button>` : ''}
+          </div>
+        </div>`;
+      }
+
+      /* ============================================================
+         MAIN RENDER
+      ============================================================ */
+      function render() {
+        const q = searchQuery.toLowerCase();
+        const filtered = [];
+        snippets.forEach((s, origIdx) => {
+          if (showFavOnly && !favorites.includes(s.title)) return;
+          if (activeTag !== 'all' && !s.tags.includes(activeTag)) return;
+          if (q && !s.title.toLowerCase().includes(q) &&
+                   !s.code.toLowerCase().includes(q) &&
+                   !s.tags.some(t => t.toLowerCase().includes(q))) return;
+          filtered.push({ s, origIdx });
+        });
+
+        document.getElementById('resultCount').textContent = `${filtered.length} كود`;
+
+        const list = document.getElementById('snippetsList');
+        if (!filtered.length) {
+          list.innerHTML = `<div class="no-results"><i class="fas fa-search"></i><p>لا توجد نتائج مطابقة</p></div>`;
+          return;
+        }
+
+        list.innerHTML = filtered.map(({ s, origIdx }, cardIdx) => renderCard(s, cardIdx, origIdx)).join('');
+        attachEvents();
+      }
+
+      /* ============================================================
+         ATTACH EVENTS (after render)
+      ============================================================ */
+      function attachEvents() {
+        const list = document.getElementById('snippetsList');
+
+        list.querySelectorAll('.code-line').forEach(lineEl => {
+          lineEl.addEventListener('click', e => {
+            if (e.target.closest('.line-copy-btn')) return;
+            copyLine(lineEl);
+          });
+        });
+
+        list.querySelectorAll('.line-copy-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            copyLine(btn.closest('.code-line'));
+          });
+        });
+
+        list.querySelectorAll('.copy-all-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const code = snippets[+btn.dataset.sidx].code;
+            copyText(code, '✓ تم نسخ الكود كاملاً');
+            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+            btn.classList.add('copied');
+            setTimeout(() => {
+              btn.innerHTML = '<i class="far fa-copy"></i> نسخ الكل';
+              btn.classList.remove('copied');
+            }, 2000);
+          });
+        });
+
+        list.querySelectorAll('.expand-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = document.getElementById(btn.dataset.target);
+            const collapsed = target.classList.contains('collapsed');
+            if (collapsed) {
+              target.classList.remove('collapsed');
+              btn.innerHTML = '<i class="fas fa-chevron-up"></i> طي الكود';
+            } else {
+              target.classList.add('collapsed');
+              btn.innerHTML = `<i class="fas fa-chevron-down"></i> عرض ${btn.dataset.remaining} سطر إضافي`;
+            }
+          });
+        });
+
+        list.querySelectorAll('.fav-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const title = btn.dataset.title;
+            if (favorites.includes(title)) {
+              favorites = favorites.filter(f => f !== title);
+              btn.textContent = '☆';
+              btn.classList.remove('active');
+            } else {
+              favorites.push(title);
+              btn.textContent = '★';
+              btn.classList.add('active');
+            }
+            try { localStorage.setItem('csm_favs', JSON.stringify(favorites)); } catch(e) {}
+            if (showFavOnly) render();
+          });
+        });
+
+        list.querySelectorAll('.tags .tag').forEach(tag => {
+          tag.addEventListener('click', e => {
+            e.stopPropagation();
+            activeTag = tag.dataset.tag;
+            document.querySelectorAll('#filterBar .filter-btn').forEach(b => {
+              b.classList.toggle('active', b.dataset.tag === activeTag);
+            });
+            render();
+          });
+        });
+      }
+
+      /* ============================================================
+         COPY HELPERS
+      ============================================================ */
+      function copyLine(lineEl) {
+        const text = lineEl.querySelector('.line-content').textContent.replace(/\u00a0/g, '');
+        if (!text.trim()) return;
+        copyText(text, '✓ تم نسخ السطر');
+        lineEl.classList.add('flash');
+        setTimeout(() => lineEl.classList.remove('flash'), 380);
+      }
+
+      async function copyText(text, msg) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        showToast(msg);
+      }
+
+      /* ============================================================
+         TOAST
+      ============================================================ */
+      let _toastTimer;
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(_toastTimer);
+        _toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+      }
+
+      /* ============================================================
+         ESCAPE UTILS
+      ============================================================ */
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+      function escAttr(str) {
+        return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      /* ============================================================
+         CONTROLS
+      ============================================================ */
+      document.getElementById('snippetSearch').addEventListener('input', e => {
+        searchQuery = e.target.value;
+        render();
       });
 
-      // Initial render
-      renderSnippets();
-      
+      document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+          e.preventDefault();
+          document.getElementById('snippetSearch').focus();
+        }
+      });
+
+      document.getElementById('favToggle').addEventListener('click', function() {
+        showFavOnly = !showFavOnly;
+        this.classList.toggle('fav-active', showFavOnly);
+        render();
+      });
+
+      /* ============================================================
+         INIT
+      ============================================================ */
+      buildFilters();
+      render();
       document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
   </body>
