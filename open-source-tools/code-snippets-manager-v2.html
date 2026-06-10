@@ -281,6 +281,16 @@
   .var-input[type="color"] { width: 36px; height: 30px; padding: 2px; cursor: pointer; flex: none; }
   .var-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
   .var-input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border-def); border-radius: 3px; }
+  .var-input[type="range"] { -webkit-appearance: none; appearance: none; flex: 1; height: 4px; border-radius: 2px; background: var(--border-def); outline: none; padding: 0; border: none; cursor: pointer; }
+  .var-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-raised); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .var-input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-raised); cursor: pointer; }
+  .var-val { font-size: 11px; color: var(--text-2); min-width: 32px; text-align: center; font-family: 'JetBrains Mono', monospace; direction: ltr; }
+  .color-swatch { display: inline-block; width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border-def); flex-shrink: 0; transition: background 0.15s; }
+
+  .base-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-sub); margin-bottom: 8px; }
+  .color-swatch-lg { display: inline-block; width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--border-def); flex-shrink: 0; }
+  .picker-lg { width: 44px !important; height: 36px !important; flex: none !important; }
+  .base-hex { font-size: 13px; font-weight: 600; color: var(--text-1); font-family: 'JetBrains Mono', monospace; direction: ltr; min-width: 80px; }
 
   /* ===== EMPTY STATE ===== */
   .empty-state {
@@ -643,9 +653,9 @@
     const seen = new Set();
     let urlIdx = 0, textIdx = 0, pctIdx = 0;
 
-    const defRe = /(--\d+)\s*:\s*([^;{]+);/g;
+    const allDefRe = /(--[\w-]+)\s*:\s*([^;{]+);/g;
     let m;
-    while ((m = defRe.exec(code)) !== null) {
+    while ((m = allDefRe.exec(code)) !== null) {
       const key = m[1], val = m[2].trim();
       seen.add(key);
       const cmRe = /color-mix\(in\s+srgb,\s*var\((--\d+)\),\s*([^,)]+?)\s+(\d+)%\s*\)/;
@@ -653,8 +663,9 @@
       if (cm) {
         pctIdx++;
         const pctKey = '__pct_' + pctIdx;
-        vars.push({ key: pctKey, label: 'نسبة ' + pctIdx + ' (' + cm[2].trim() + ')', value: cm[3], type: 'range', baseVar: cm[1], secondColor: cm[2].trim() });
-      } else {
+        const short = key.replace(/^--color-|^--/, '');
+        vars.push({ key: pctKey, label: short + ' (' + cm[2].trim() + ' ' + cm[3] + '%)', value: cm[3], type: 'range', baseVar: cm[1], secondColor: cm[2].trim(), varName: key });
+      } else if (/^--\d+$/.test(key)) {
         vars.push({ key, label: key, value: val, type: /^#[0-9a-fA-F]{3,8}$/.test(val) ? 'color' : 'text' });
       }
     }
@@ -678,7 +689,6 @@
     }
 
     const txtRe = /(:\s*)["']([^"']{2,})["']/g;
-    let textIdx = 0;
     while ((m = txtRe.exec(code)) !== null) {
       const pre = m[1], val = m[2].trim();
       if (val && !/^(https?:\/\/|#|var\(|data:)/.test(val)) {
@@ -693,6 +703,15 @@
   function getLiveCode(code, values){
     if (!values) return code;
     let r = code;
+    const pctKeys = Object.keys(values).filter(k => k.startsWith('__pct_'));
+    if (pctKeys.length) {
+      let pi = 0;
+      r = r.replace(/color-mix\(in\s+srgb,\s*var\((--\d+)\),\s*([^,)]+?)\s+(\d+)%\s*\)/g, (_m, baseVar, secondColor, pct) => {
+        const val = pctKeys[pi] !== undefined ? values[pctKeys[pi]] : pct;
+        pi++;
+        return 'color-mix(in srgb, var(' + baseVar + '), ' + secondColor.trim() + ' ' + val + '%)';
+      });
+    }
     const urlKeys = Object.keys(values).filter(k => k.startsWith('__url_'));
     const textKeys = Object.keys(values).filter(k => k.startsWith('__txt_'));
     let ui = 0, ti = 0;
@@ -745,6 +764,32 @@
           btn.setAttribute('onclick', "copyCode(this,'" + enc + "')");
         }
       }
+    });
+    updateColorPreview(sectionId);
+  }
+
+  function updateColorPreview(sectionId) {
+    const values = varValues.get(sectionId) || {};
+    const section = DATA.find(s => s.id === sectionId);
+    if (!section) return;
+    const vars = detectVars(section.codes.map(c => c.code).join('\n'));
+    const baseDef = vars.find(x => x.key === '--1');
+    const baseColor = values['--1'] || (baseDef ? baseDef.value : null);
+
+    const baseSwatch = document.getElementById('swatch_' + sectionId + '_base');
+    if (baseSwatch && baseColor) baseSwatch.style.background = baseColor;
+
+    const baseHex = baseSwatch && baseSwatch.parentElement ? baseSwatch.parentElement.querySelector('.base-hex') : null;
+    if (baseHex && baseColor) baseHex.textContent = baseColor;
+
+    vars.forEach(v => {
+      if (v.type !== 'range') return;
+      const swatch = document.getElementById('swatch_' + sectionId + '_' + v.key);
+      if (!swatch) return;
+      const pct = values[v.key] !== undefined ? values[v.key] : v.value;
+      const c1 = baseColor || v.secondColor;
+      const mixed = mixColors(c1, v.secondColor, pct);
+      swatch.style.background = mixed || 'var(--bg-elevated)';
     });
   }
 
@@ -887,16 +932,42 @@
 
         let varPanelHtml = '';
         if (vars.length) {
+          const baseVarDef = vars.find(x => x.key === '--1');
+          const baseVal = values['--1'] !== undefined ? values['--1'] : (baseVarDef ? baseVarDef.value : '');
+
           varPanelHtml = `<div class="var-panel">
             <div class="var-title"><i class="ti ti-adjustments" aria-hidden="true"></i> تعديل المتغيرات</div>`;
-          vars.forEach(v => {
-            const val = values[v.key] !== undefined ? values[v.key] : v.value;
-            varPanelHtml += `<div class="var-row">
-              <span class="var-label">${escHtml(v.label)}</span>
-              <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
-                placeholder="${v.type === 'url' ? 'https://...' : ''}"
-                oninput="updateVar('${s.id}','${v.key}',this.value)" ${v.type === 'url' ? 'dir="ltr"' : ''}>
+
+          if (baseVarDef) {
+            varPanelHtml += `<div class="base-row">
+              <span class="color-swatch-lg" id="swatch_${s.id}_base" style="background:${escHtml(baseVal)}"></span>
+              <input class="var-input picker-lg" type="color" value="${escHtml(baseVal)}"
+                oninput="updateVar('${s.id}','--1',this.value)">
+              <span class="base-hex">${escHtml(baseVal)}</span>
             </div>`;
+          }
+
+          vars.forEach(v => {
+            if (v.key === '--1') return;
+            const val = values[v.key] !== undefined ? values[v.key] : v.value;
+            if (v.type === 'range') {
+              const baseSrc = baseVal || v.secondColor;
+              const initMixed = mixColors(baseSrc, v.secondColor, val);
+              varPanelHtml += `<div class="var-row">
+                <span class="var-label" title="${escHtml(v.varName||'')}">${escHtml(v.label)}</span>
+                <input type="range" min="0" max="100" value="${escHtml(val)}"
+                  oninput="updateVar('${s.id}','${v.key}',this.value); document.getElementById('pctVal_${s.id}_${v.key}').textContent=this.value+'%'">
+                <span class="var-val" id="pctVal_${s.id}_${v.key}">${val}%</span>
+                <span class="color-swatch" id="swatch_${s.id}_${v.key}" style="background:${initMixed||'var(--bg-elevated)'}"></span>
+              </div>`;
+            } else {
+              varPanelHtml += `<div class="var-row">
+                <span class="var-label">${escHtml(v.label)}</span>
+                <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
+                  placeholder="${v.type === 'url' ? 'https://...' : ''}"
+                  oninput="updateVar('${s.id}','${v.key}',this.value)" ${v.type === 'url' ? 'dir="ltr"' : ''}>
+              </div>`;
+            }
           });
           varPanelHtml += `</div>`;
         }
