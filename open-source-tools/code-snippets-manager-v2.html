@@ -147,8 +147,8 @@
   .section:hover { border-color: var(--border-def); }
 
   .section-head {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px; cursor: pointer; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; cursor: pointer; user-select: none;
     transition: background 0.15s;
   }
   .section-head:hover { background: var(--glass-sub); }
@@ -210,10 +210,11 @@
 
   /* ===== CODE BLOCK ===== */
   .code-block {
-    border-radius: var(--radius-sm); border: 1px solid var(--border-sub);
-    background: var(--bg-elevated); overflow: hidden; margin-bottom: 10px;
+    border-radius: 0; border: 1px solid var(--border-sub);
+    background: var(--bg-elevated); overflow: hidden; margin-bottom: 0; border-bottom: none;
   }
-  .code-block:last-child { margin-bottom: 0; }
+  .code-block:last-child { border-bottom: 1px solid var(--border-sub); border-radius: 0 0 var(--radius-sm) var(--radius-sm); }
+  .code-block:first-child { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
 
   .code-header {
     display: flex; align-items: center; gap: 8px; padding: 8px 14px;
@@ -242,9 +243,9 @@
   .topbar-btn.active { background: var(--accent-glow); color: var(--accent); border-color: var(--border-acc); }
 
   .code-pre {
-    padding: 16px 18px; overflow-x: auto; margin: 0;
+    padding: 12px 14px; overflow-x: auto; margin: 0;
     font-size: 12.5px; font-family: 'JetBrains Mono', monospace;
-    line-height: 1.75; color: var(--text-2);
+    line-height: 1.6; color: var(--text-2);
     direction: ltr; text-align: left;
     white-space: pre;
   }
@@ -261,6 +262,25 @@
 
   /* ===== HIGHLIGHT MATCH ===== */
   .hl { background: rgba(212,168,67,0.22); border-radius: 3px; color: var(--text-1); }
+
+  /* ===== VAR PANEL ===== */
+  .var-panel {
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 10px;
+  }
+  .var-title { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .var-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .var-row:last-child { margin-bottom: 0; }
+  .var-label { font-size: 11px; color: var(--text-3); min-width: 60px; direction: ltr; font-family: 'JetBrains Mono', monospace; }
+  .var-input {
+    flex: 1; padding: 5px 8px; border-radius: 5px; border: 1px solid var(--border-sub);
+    background: var(--bg-elevated); color: var(--text-1); font-size: 12px;
+    font-family: 'Cairo', sans-serif; outline: none; transition: border-color 0.15s; direction: rtl;
+  }
+  .var-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .var-input[type="color"] { width: 36px; height: 30px; padding: 2px; cursor: pointer; flex: none; }
+  .var-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .var-input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border-def); border-radius: 3px; }
 
   /* ===== EMPTY STATE ===== */
   .empty-state {
@@ -565,8 +585,10 @@
   let openIds  = new Set();
   let starredIds = new Set();
   let activeTag = 'all';
-  let wrapMode = false;
+  let wrapMode = true;
   let _deleteTargetId = null;
+  let _initDone = false;
+  let varValues = new Map();
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -583,6 +605,147 @@
     if(!q) return escHtml(text);
     const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
     return escHtml(text).replace(re, '<span class="hl">$1</span>');
+  }
+
+  // ── COLOR HELPERS ──
+  const colorNames = {
+    black:'#000000', silver:'#c0c0c0', gray:'#808080', white:'#ffffff',
+    maroon:'#800000', red:'#ff0000', purple:'#800080', fuchsia:'#ff00ff',
+    green:'#008000', lime:'#00ff00', olive:'#808000', yellow:'#ffff00',
+    navy:'#000080', blue:'#0000ff', teal:'#008080', aqua:'#00ffff',
+    orange:'#ffa500', cyan:'#00ffff', pink:'#ffc0cb', brown:'#a52a2a'
+  };
+
+  function parseColor(str) {
+    if (!str) return null;
+    str = str.trim().toLowerCase();
+    if (colorNames[str]) str = colorNames[str];
+    const m = str.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/);
+    if (!m) return null;
+    let hex = m[1];
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    return { r: parseInt(hex.substring(0,2), 16), g: parseInt(hex.substring(2,4), 16), b: parseInt(hex.substring(4,6), 16) };
+  }
+
+  function mixColors(c1, c2, pct) {
+    const a = parseColor(c1), b = parseColor(c2);
+    if (!a || !b) return null;
+    const f = Math.min(100, Math.max(0, Number(pct))) / 100;
+    const r = Math.round(a.r + (b.r - a.r) * f);
+    const g = Math.round(a.g + (b.g - a.g) * f);
+    const b_ = Math.round(a.b + (b.b - a.b) * f);
+    return '#' + [r,g,b_].map(v => v.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ── VARIABLE DETECTION ──
+  function detectVars(code){
+    const vars = [];
+    const seen = new Set();
+    let urlIdx = 0, textIdx = 0, pctIdx = 0;
+
+    const defRe = /(--\d+)\s*:\s*([^;{]+);/g;
+    let m;
+    while ((m = defRe.exec(code)) !== null) {
+      const key = m[1], val = m[2].trim();
+      seen.add(key);
+      const cmRe = /color-mix\(in\s+srgb,\s*var\((--\d+)\),\s*([^,)]+?)\s+(\d+)%\s*\)/;
+      const cm = val.match(cmRe);
+      if (cm) {
+        pctIdx++;
+        const pctKey = '__pct_' + pctIdx;
+        vars.push({ key: pctKey, label: 'نسبة ' + pctIdx + ' (' + cm[2].trim() + ')', value: cm[3], type: 'range', baseVar: cm[1], secondColor: cm[2].trim() });
+      } else {
+        vars.push({ key, label: key, value: val, type: /^#[0-9a-fA-F]{3,8}$/.test(val) ? 'color' : 'text' });
+      }
+    }
+
+    const refRe = /var\(\s*(--[\w-]+)\s*\)/g;
+    while ((m = refRe.exec(code)) !== null) {
+      const key = m[1];
+      if (!seen.has(key)) { seen.add(key); vars.push({ key, label: key, value: '', type: 'text' }); }
+    }
+
+    const urlRe = /(url\s*\()\s*["']?([^)"']*)["']?\s*(\))/g;
+    while ((m = urlRe.exec(code)) !== null) {
+      let inner = m[2].trim();
+      const hasProto = /^https?:\/\//i.test(inner);
+      if (!inner || /^(IMAGE|BANNER|LOGO|NEW_|YOUR)/i.test(inner) || hasProto) {
+        urlIdx++;
+        if (hasProto) inner = inner.replace(/^https?:\/\//i, '');
+        const key = '__url_' + urlIdx;
+        vars.push({ key, label: 'رابط ' + urlIdx, value: inner, type: 'url' });
+      }
+    }
+
+    const txtRe = /(:\s*)["']([^"']{2,})["']/g;
+    let textIdx = 0;
+    while ((m = txtRe.exec(code)) !== null) {
+      const pre = m[1], val = m[2].trim();
+      if (val && !/^(https?:\/\/|#|var\(|data:)/.test(val)) {
+        textIdx++;
+        const key = '__txt_' + textIdx;
+        vars.push({ key, label: 'نص ' + textIdx, value: val, type: 'text' });
+      }
+    }
+    return vars;
+  }
+
+  function getLiveCode(code, values){
+    if (!values) return code;
+    let r = code;
+    const urlKeys = Object.keys(values).filter(k => k.startsWith('__url_'));
+    const textKeys = Object.keys(values).filter(k => k.startsWith('__txt_'));
+    let ui = 0, ti = 0;
+
+    r = r.replace(/(url\s*\()\s*["']?([^)"']*)["']?\s*(\))/g, (m, pre, inner, post) => {
+      const trimmed = inner.trim();
+      if (!trimmed || /^(IMAGE|BANNER|LOGO|NEW_|YOUR)/i.test(trimmed) || /^https?:\/\//i.test(trimmed)) {
+        const val = urlKeys[ui] !== undefined ? values[urlKeys[ui]] : '';
+        ui++;
+        return 'url("' + (val ? (trimmed.match(/^https?:\/\//i) && !val.match(/^https?:\/\//i) ? 'https://' + val : val) : '') + '")';
+      }
+      return m;
+    });
+
+    r = r.replace(/:\s*["']([^"']+)["']/g, (m, inner) => {
+      const trimmed = inner.trim();
+      if (trimmed && !/^(https?:\/\/|#|var\()/.test(trimmed)) {
+        const val = textKeys[ti] !== undefined ? values[textKeys[ti]] : trimmed;
+        ti++;
+        return ': "' + val + '"';
+      }
+      return m;
+    });
+
+    for (const [key, val] of Object.entries(values)) {
+      if (key.startsWith('__url_') || key.startsWith('__txt_')) continue;
+      const esc = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      r = r.replace(new RegExp('(' + esc + '\\s*:\\s*)[^;]+;', 'g'), (_, p) => p + val + ';');
+      r = r.replace(new RegExp('var\\(\\s*' + esc + '\\s*\\)', 'g'), val);
+    }
+    return r;
+  }
+
+  function updateVar(sectionId, key, value){
+    if (!varValues.has(sectionId)) varValues.set(sectionId, {});
+    varValues.get(sectionId)[key] = value;
+    const section = DATA.find(s => s.id === sectionId);
+    if (!section) return;
+    const values = varValues.get(sectionId) || {};
+    const card = document.querySelector(`.section[data-id="${sectionId}"]`);
+    if (!card) return;
+    card.querySelectorAll('.code-block').forEach((block, i) => {
+      const pre = block.querySelector('.code-pre');
+      const btn = block.querySelector('.copy-btn');
+      if (pre && i < section.codes.length) {
+        const liveCode = getLiveCode(section.codes[i].code, values);
+        pre.innerHTML = syntaxHL(liveCode);
+        if (btn) {
+          const enc = encodeURIComponent(liveCode).replace(/'/g,"\\'");
+          btn.setAttribute('onclick', "copyCode(this,'" + enc + "')");
+        }
+      }
+    });
   }
 
   function showToast(msg){
@@ -610,7 +773,10 @@
   function toggleSection(id){
     const s = DATA.find(d => d.id === id);
     if(s && s.codes.length) {
-      navigator.clipboard.writeText(s.codes[0].code).then(() => {
+      const values = varValues.get(id) || {};
+      const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+      const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
+      navigator.clipboard.writeText(liveCode).then(() => {
         showToast('تم نسخ الكود!');
       }).catch(() => {});
     }
@@ -716,8 +882,28 @@
 
       let bodyHtml = '';
       if(isOpen){
+        const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+        const values = varValues.get(s.id) || {};
+
+        let varPanelHtml = '';
+        if (vars.length) {
+          varPanelHtml = `<div class="var-panel">
+            <div class="var-title"><i class="ti ti-adjustments" aria-hidden="true"></i> تعديل المتغيرات</div>`;
+          vars.forEach(v => {
+            const val = values[v.key] !== undefined ? values[v.key] : v.value;
+            varPanelHtml += `<div class="var-row">
+              <span class="var-label">${escHtml(v.label)}</span>
+              <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
+                placeholder="${v.type === 'url' ? 'https://...' : ''}"
+                oninput="updateVar('${s.id}','${v.key}',this.value)" ${v.type === 'url' ? 'dir="ltr"' : ''}>
+            </div>`;
+          });
+          varPanelHtml += `</div>`;
+        }
+
         const codesHtml = s.codes.map((c,i)=>{
-          const enc = encodeURIComponent(c.code);
+          const liveCode = vars.length ? getLiveCode(c.code, values) : c.code;
+          const enc = encodeURIComponent(liveCode);
           return `<div class="code-block">
             <div class="code-header">
               <span class="lang-badge ${c.lang.toLowerCase()}">${escHtml(c.lang)}</span>
@@ -727,12 +913,13 @@
                 </button>
               </div>
             </div>
-            <pre class="code-pre${wrapMode?' wrap':''}">${syntaxHL(c.code)}</pre>
+            <pre class="code-pre${wrapMode?' wrap':''}">${syntaxHL(liveCode)}</pre>
           </div>`;
         }).join('');
 
         bodyHtml = `<div class="section-body open">
           <p class="section-desc">${escHtml(s.desc)}</p>
+          ${varPanelHtml}
           ${codesHtml}
         </div>`;
       }
@@ -783,8 +970,10 @@
     const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : ['css'];
 
     DATA.unshift({ id, title, desc: desc||'لا يوجد وصف', tags, starred:false, codes:[{ lang, code }] });
+    openIds.add(id);
     closeModal();
     renderAll();
+    if(wrapMode) document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
     showToast('تم إضافة الكود!');
   }
 
@@ -811,9 +1000,11 @@
         imported.forEach(item => {
           if(!item.id) item.id = 'imp_' + Date.now() + Math.random().toString(36).slice(2,6);
           if(item.starred) starredIds.add(item.id);
+          openIds.add(item.id);
         });
         DATA = imported;
         renderAll();
+        if(wrapMode) document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
         showToast('تم الاستيراد بنجاح!');
       } catch {
         showToast('ملف JSON غير صالح');
@@ -824,7 +1015,10 @@
   }
 
   // ── INIT ──
+  DATA.forEach(s => openIds.add(s.id));
   renderAll();
+  document.getElementById('wrapBtn').classList.add('active');
+  document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
 </script>
 </body>
 </html>
