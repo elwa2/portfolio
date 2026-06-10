@@ -8,7 +8,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
-<style>
+   <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    /><style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -385,6 +389,97 @@
     .logo-sub { display: none; }
   }
 
+  /* ===== HAS DASHBOARD ===== */
+  .has-dash {
+    grid-column: 1 / -1;
+  }
+
+  .has-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .has-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .has-builder-title i { color: var(--accent); font-size: 18px; }
+
+  .has-builder-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .has-builder-grid .form-group { margin-bottom: 0; }
+
+  .has-builder .form-label {
+    font-size: 11px; font-weight: 600; color: var(--text-2);
+    margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
+  }
+  .has-builder .form-label code {
+    font-size: 10px; background: var(--bg-overlay); padding: 1px 6px;
+    border-radius: 4px; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  }
+
+  .has-input {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm); background: var(--bg-elevated);
+    color: var(--text-1); font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; outline: none; direction: ltr; text-align: left;
+    transition: border-color 0.2s;
+  }
+  .has-input:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .has-preview-wrap {
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 12px 14px; margin: 10px 0 14px;
+    position: relative;
+  }
+  .has-preview-label {
+    font-size: 10px; font-weight: 600; color: var(--text-3);
+    letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  .has-preview {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    color: var(--accent); direction: ltr; text-align: left;
+    word-break: break-all; line-height: 1.7; white-space: pre-wrap;
+    min-height: 20px;
+  }
+  .has-preview .has-base-part { color: var(--text-2); }
+  .has-preview .has-has-part { color: var(--accent-cool); }
+
+  .has-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+  .has-section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-2);
+    margin: 20px 0 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .has-section-title span { color: var(--text-3); font-weight: 400; }
+
+  .has-empty {
+    text-align: center; padding: 32px 20px; color: var(--text-3);
+    border: 1px dashed var(--border-sub); border-radius: var(--radius-md);
+  }
+  .has-empty i { font-size: 28px; display: block; margin-bottom: 6px; color: var(--text-4); }
+  .has-empty p { font-size: 13px; }
+
+  .filter-tag.has-active {
+    background: var(--accent-cool); color: #fff; border-color: var(--accent-cool);
+    box-shadow: 0 2px 12px rgba(107,155,210,0.3);
+  }
+
+  @media (max-width: 820px) {
+    .has-builder-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .has-builder-grid { grid-template-columns: 1fr; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -448,9 +543,13 @@
   <button class="filter-tag" data-tag="responsive" onclick="setTag(this)">Responsive</button>
   <button class="filter-tag" data-tag="brand" onclick="setTag(this)">Brand</button>
   <button class="filter-tag" data-tag="salla" onclick="setTag(this)">Salla</button>
+  <button class="filter-tag" data-tag="has" onclick="setTag(this)">:has()</button>
   <button class="filter-tag" data-tag="javascript" onclick="setTag(this)">JavaScript</button>
   <button class="filter-tag starred-btn" data-tag="starred" onclick="setTag(this)">
     <i class="ti ti-star" aria-hidden="true"></i> محفوظ
+  </button>
+  <button class="filter-tag" id="hasDashBtn" onclick="toggleHasDash()" title="مُحددات :has()">
+    <i class="ti ti-code" aria-hidden="true"></i> :has()
   </button>
 </div>
 
@@ -574,14 +673,21 @@
     {t:"فوتر مخصص - Custom Footer Overlay",c:".footer-is-custom .store-footer{--footer-bg:#0e0f0f3d;background-color:var(--footer-bg);border-radius:20px 20px 0 0;background:linear-gradient(134deg,transparent -1041%,#180606 83%,#fff 200%),url(IMAGE_URL) 0 0/545% no-repeat!important}",g:["footer","gradient","salla","custom"]},
     {t:"منع التمرير الأفقي - Overflow Hidden",c:"body,body>section,head,html{overflow-x:hidden!important}",g:["base","responsive","layout"]},
     {t:"تجاوز زر المنتج - Product Card Cart Override",c:".product-card__normal-cart__btn .s-button-text{font-size:0}\n.product-card__normal-cart__btn .s-button-text:before{font-size:.875rem;content:'  '}",g:["button","product","salla"]},
-    {t:"سكرول بسيط - Simple Scrollbar",c:"::-webkit-scrollbar{width:10px;height:10px}\n::-webkit-scrollbar-track-piece{background-color:#0003}\n::-webkit-scrollbar-thumb:vertical{height:200px;background-color:#585858}",g:["scrollbar","ui"]}
+    {t:"سكرول بسيط - Simple Scrollbar",c:"::-webkit-scrollbar{width:10px;height:10px}\n::-webkit-scrollbar-track-piece{background-color:#0003}\n::-webkit-scrollbar-thumb:vertical{height:200px;background-color:#585858}",g:["scrollbar","ui"]},
+    {t:"منتجات نفذت من المخزون - Out of Stock :has()",c:"body.index custom-salla-product-card.s-product-card-entry.s-product-card-vertical.s-product-card-out-of-stock .s-product-card-content-footer.gap-2:has([product-status=\"out-and-notify\"]){display:none}",g:["has","salla","product","stock"]},
+    {t:"بطاقة منتج مع خصم - Product With Discount :has()",c:".s-product-card-entry:has(.s-product-card-discount,.product-card__discount,.s-discount-floating){border:2px solid #e8734a;border-radius:12px}",g:["has","salla","product","discount"]},
+    {t:"إخفاء القسم الفارغ - Empty Section :has()",c:".s-block:has(> .s-block-content:empty),.s-block:has(> :only-child:empty){display:none!important}",g:["has","layout","empty"]},
+    {t:"تنسيق الـ Nav عند وجود submenu - Nav :has()",c:".nav-item:has(.sub-menu,.dropdown-menu)>.nav-link:after{content:\"▾\";margin-inline-start:4px;font-size:10px}",g:["has","nav","dropdown"]},
+    {t:"إخفاء السعر بدون عروض - Price :has() no Discount",c:".s-product-card-price:has(.s-product-card-price-regular:only-child) .s-product-card-price-save{display:none}",g:["has","salla","price"]},
+    {t:"تحديد الكارد الذي يحتوي على صورة - Card :has() Image",c:".product-card:has(img[src*=\"discount\"]) .product-card__badge{background:#e8734a;color:#fff}",g:["has","card","image"]},
+    {t:"تغيير لون الفوتر عند وجود بانر - Footer :has() Banner",c:"footer.store-footer:has(> :last-child:nth-child(2)){padding-bottom:0}",g:["has","footer","salla"]}
   ];
 
   // ── HELPERS ──
   function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function genId(s){ return s.id || s.title.replace(/[^a-z0-9]/gi,'_').substring(0,30) + '_' + Date.now(); }
   function isJS(c){ return /function|const |let |var |fetch\(|allowedDomains|\.log\(|=>/.test(c); }
-  function detectTag(t){ if(isJS(t.c)) return 'javascript'; if(t.g.some(x=>['layout','responsive','media'].includes(x))) return 'responsive'; if(t.g.some(x=>['brand','logo'].includes(x))) return 'brand'; if(t.g.some(x=>['salla','zid','cart','product','footer','button'].includes(x))) return 'salla'; return 'css'; }
+  function detectTag(t){ if(isJS(t.c)) return 'javascript'; if(t.g.some(x=>['layout','responsive','media'].includes(x))) return 'responsive'; if(t.g.some(x=>['brand','logo'].includes(x))) return 'brand'; if(t.g.some(x=>['has'].includes(x))) return 'has'; if(t.g.some(x=>['salla','zid','cart','product','footer','button'].includes(x))) return 'salla'; return 'css'; }
 
   let DATA = SRC.map((s,i) => ({
     id: 's' + i,
@@ -599,6 +705,7 @@
   let _deleteTargetId = null;
   let _initDone = false;
   let varValues = new Map();
+  let showHasDash = false;
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -886,6 +993,10 @@
 
   // ── FILTER ──
   function setTag(el){
+    if(showHasDash){
+      showHasDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -905,8 +1016,171 @@
     });
   }
 
+  // ── HAS DASHBOARD ──
+  function toggleHasDash(){
+    showHasDash = !showHasDash;
+    document.getElementById('hasDashBtn').classList.toggle('has-active', showHasDash);
+    if(showHasDash) document.querySelectorAll('.filter-tag:not(#hasDashBtn)').forEach(b=>b.classList.remove('active'));
+    renderAll();
+  }
+
+  function saveHasSnippet(){
+    const name   = document.getElementById('hasName').value.trim();
+    const parent = document.getElementById('hasParent').value.trim();
+    const target = document.getElementById('hasTarget').value.trim();
+    const cond   = document.getElementById('hasCondition').value.trim();
+
+    if(!cond){ showToast('الرجاء إدخال شرط :has()'); return; }
+
+    let full = '';
+    if(parent) full += parent + ' ';
+    if(target) full += target + ' ';
+    full += ':has(' + cond + ')';
+
+    const id = 'has_' + Date.now();
+    DATA.unshift({
+      id, title: name || full.substring(0, 55) + '...',
+      tags: ['has', 'css'],
+      desc: ':has() selector' + (parent ? ' — ' + parent : ''),
+      starred: false, codes: [{ lang: 'CSS', code: full }]
+    });
+    openIds.add(id);
+    document.getElementById('hasName').value = '';
+    document.getElementById('hasParent').value = '';
+    document.getElementById('hasTarget').value = '';
+    document.getElementById('hasCondition').value = '';
+    renderHasDashboard();
+    showToast('تم حفظ المحدد!');
+  }
+
+  function copyHasPreview(){
+    const parent = document.getElementById('hasParent').value.trim();
+    const target = document.getElementById('hasTarget').value.trim();
+    const cond   = document.getElementById('hasCondition').value.trim();
+    if(!cond){ showToast('أدخل شرط :has() أولاً'); return; }
+    let full = '';
+    if(parent) full += parent + ' ';
+    if(target) full += target + ' ';
+    full += ':has(' + cond + ')';
+    navigator.clipboard.writeText(full).then(() => {
+      showToast('تم نسخ المحدد!');
+      const btn = document.getElementById('hasCopyPreviewBtn');
+      btn.innerHTML = '<i class="ti ti-check"></i> تم';
+      setTimeout(()=>{ btn.innerHTML = '<i class="ti ti-copy"></i> نسخ'; }, 1500);
+    }).catch(()=>showToast('تعذّر النسخ'));
+  }
+
+  function updateHasPreview(){
+    const parent = document.getElementById('hasParent').value.trim();
+    const target = document.getElementById('hasTarget').value.trim();
+    const cond   = document.getElementById('hasCondition').value.trim();
+    const preview = document.getElementById('hasPreview');
+
+    let html = '';
+    if(parent) html += '<span class="has-base-part">' + escHtml(parent) + '</span> ';
+    if(target) html += '<span class="has-base-part">' + escHtml(target) + '</span> ';
+    if(cond) html += '<span class="has-has-part">:has(' + escHtml(cond) + ')</span>';
+    preview.innerHTML = html || '<span style="color:var(--text-3)">... سيظهر المحدد هنا</span>';
+  }
+
+  function renderHasDashboard(){
+    const hasItems = DATA.filter(s => s.tags.includes('has'));
+    const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
+    document.getElementById('countBadge').textContent = hasItems.length + ' :has()';
+
+    const filtered = q ? hasItems.filter(s =>
+      s.title.toLowerCase().includes(q) || s.tags.some(t=>t.includes(q)) || s.codes.some(c=>c.code.toLowerCase().includes(q))
+    ) : hasItems;
+
+    const itemsHtml = filtered.length
+      ? filtered.map(s => {
+          const isOpen  = openIds.has(s.id);
+          const isStar  = starredIds.has(s.id);
+          const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
+          const values = varValues.get(s.id) || {};
+          const liveCode = s.codes[0].code;
+          const enc = encodeURIComponent(liveCode);
+          let bodyHtml = '';
+          if(isOpen){
+            bodyHtml = `<div class="section-body open">
+              <p class="section-desc" style="direction:ltr;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12px">${escHtml(liveCode)}</p>
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="lang-badge css">CSS</span>
+                  <div class="code-actions">
+                    <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
+                  </div>
+                </div>
+                <pre class="code-pre${wrapMode?' wrap':''}">${syntaxHL(liveCode)}</pre>
+              </div>
+            </div>`;
+          }
+          return `<div class="section" data-id="${s.id}">
+            <div class="section-head" onclick="toggleSection('${s.id}')">
+              <i class="ti ti-chevron-left chevron${isOpen?' open':''}"></i>
+              <span class="section-title">${hlQuery(s.title, q)}</span>
+              <div class="section-tags">${tagsHtml}</div>
+              <div class="section-actions">
+                <button class="star-btn${isStar?' starred':''}" onclick="toggleStar('${s.id}',this,event)"><i class="ti ti-star"></i></button>
+                <button class="delete-btn" onclick="confirmDelete('${s.id}',event)"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            ${bodyHtml}
+          </div>`;
+        }).join('')
+      : `<div class="has-empty"><i class="ti ti-mood-empty"></i><p>لا توجد محددات :has() محفوظة</p></div>`;
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="has-builder">
+        <div class="has-builder-title"><i class="ti ti-code"></i> بناء مُحدد :has()</div>
+        <div class="has-builder-grid">
+          <div class="form-group">
+            <label class="form-label" for="hasParent">العنصر الأب <code>.parent</code></label>
+            <input class="has-input" id="hasParent" type="text" placeholder="body.index .container" oninput="updateHasPreview()" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hasTarget">العنصر المستهدف <code>element</code></label>
+            <input class="has-input" id="hasTarget" type="text" placeholder=".s-product-card-content-footer" oninput="updateHasPreview()" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="hasCondition">شرط :has() <code style="color:var(--accent-cool)">:has()</code></label>
+            <input class="has-input" id="hasCondition" type="text" placeholder='[product-status="out-and-notify"]' oninput="updateHasPreview()" dir="ltr">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label" for="hasName">اسم المحدد (اختياري)</label>
+            <input class="has-input" id="hasName" type="text" placeholder="مثال: منتج غير متوفر" dir="rtl" style="direction:rtl;text-align:right;font-family:'Cairo',sans-serif">
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:6px">
+            <button class="btn-primary" onclick="saveHasSnippet()" style="flex:1;height:40px"><i class="ti ti-plus"></i> حفظ المحدد</button>
+
+          </div>
+        </div>
+        <div class="has-preview-wrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div class="has-preview-label" style="margin-bottom:0">معاينة المحدد</div>
+            <button class="copy-btn" onclick="copyHasPreview()" style="font-size:10px;padding:3px 10px" id="hasCopyPreviewBtn"><i class="ti ti-copy"></i> نسخ</button>
+          </div>
+          <div class="has-preview" id="hasPreview"><span style="color:var(--text-3)">... سيظهر المحدد هنا</span></div>
+        </div>
+      </div>
+
+      <div class="has-section-title">
+        <i class="ti ti-bookmark" style="color:var(--accent-cool)"></i>
+        المحددات المحفوظة
+        <span>(${hasItems.length})</span>
+      </div>
+
+      <div style="display:grid;gap:6px">${itemsHtml}</div>
+    </div>`;
+
+    document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
+  }
+
   // ── RENDER ──
   function renderAll(){
+    if(showHasDash) return renderHasDashboard();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
