@@ -1,2076 +1,848 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="light">
-  <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag("js", new Date());
-      gtag("config", "G-1B3TL3YJ0J");
-    </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>مدير أكواد CSS سمارت | Ali Ahmed</title>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>مدير الأكواد | Code Manager</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="../assets/css/fonts.css" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
-    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
-    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
-    <link rel="stylesheet" href="../assets/css/animations.css" />
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="../assets/js/three-bg.js" defer></script>
-    <script src="../assets/js/main.js" defer></script>
-    <script src="../assets/js/svg-icons.js" defer></script>
-    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 
-    <style>
-      :root {
-        --code-bg: #0d1117;
-        --code-hdr: #161b22;
-        --code-border: rgba(48, 54, 61, 0.9);
-        --code-line-hover: rgba(255,255,255,0.05);
-        --code-line-active: rgba(var(--primary-rgb), 0.18);
-        --ln-color: #484f58;
-        --ln-width: 38px;
-        --line-text: #e6edf3;
-        --snippet-border: rgba(var(--primary-rgb), 0.18);
-        --card-radius: 18px;
-        --smart-badge: #f5a623;
-        --smart-tray-bg: rgba(22, 27, 34, 0.92);
-      }
+  <!-- Prism.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
 
-      .tool-page-wrapper {
-        padding: 50px 0 80px;
-        min-height: 80vh;
-        position: relative;
-        z-index: 2;
-      }
+  <style>
+    /* ===== RESET ===== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Cairo',sans-serif;background:#0D0F1A;color:#E8EAED;min-height:100vh;overflow-x:hidden;direction:rtl}
+    a{text-decoration:none;color:inherit}
+    button{cursor:pointer;font-family:inherit}
+    input{font-family:inherit}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
 
-      .page-intro {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-      .page-intro h1 {
-        font-size: clamp(1.6rem, 4vw, 2.4rem);
-        font-weight: 800;
-        color: var(--primary-color);
-        margin-bottom: 8px;
-      }
-      .page-intro p {
-        opacity: 0.65;
-        font-size: 1rem;
-        color: var(--text-color);
-      }
+    /* ===== VARIABLES ===== */
+    :root{
+      --bg:#0D0F1A;
+      --bg-card:#161825;
+      --bg-elevated:#1C1F33;
+      --accent:#FF4B2B;
+      --accent-hover:#FF6347;
+      --accent-purple:#7B5EA7;
+      --accent-purple-hover:#8F6FBF;
+      --text:#E8EAED;
+      --text-dim:#6B7280;
+      --text-muted:rgba(232,234,237,0.5);
+      --border:rgba(255,255,255,0.07);
+      --border-hover:rgba(255,255,255,0.12);
+      --code-bg:#1A1C2E;
+      --shadow:0 4px 24px rgba(0,0,0,0.3);
+      --radius:10px;
+      --radius-sm:6px;
+      --radius-lg:16px;
+      --transition:0.25s cubic-bezier(.4,0,.2,1);
+    }
 
-      .top-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 18px;
-        flex-wrap: wrap;
-      }
+    /* ===== CANVAS BG ===== */
+    #constellationCanvas{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      z-index:0;pointer-events:none;opacity:0.5;
+    }
 
-      .search-wrapper {
-        flex: 1;
-        min-width: 180px;
-        position: relative;
-      }
+    /* ===== GRAIN ===== */
+    .grain-overlay{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      z-index:1;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+      background-repeat:repeat;background-size:256px;
+    }
 
-      #snippetSearch {
-        width: 100%;
-        padding: 12px 46px 12px 18px;
-        border-radius: 26px;
-        border: 2px solid var(--snippet-border);
-        background: var(--card-bg);
-        color: var(--text-color);
-        font-size: 1rem;
-        font-family: inherit;
-        backdrop-filter: blur(12px);
-        outline: none;
-        transition: border-color 0.25s, box-shadow 0.25s;
-      }
-      #snippetSearch:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.12);
-      }
-      .search-icon {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--primary-color);
-        pointer-events: none;
-      }
-      #searchSuggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--card-bg);
-        border: 1px solid var(--snippet-border);
-        border-radius: 14px;
-        margin-top: 6px;
-        padding: 6px 0;
-        display: none;
-        z-index: 50;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      }
-      #searchSuggestions.show {
-        display: block;
-      }
-      .suggestion-item {
-        padding: 8px 16px;
-        cursor: pointer;
-        font-size: 0.88rem;
-        color: var(--text-color);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: background 0.15s;
-      }
-      .suggestion-item:hover {
-        background: rgba(var(--primary-rgb), 0.1);
-      }
-      .suggestion-item .sug-tag {
-        font-size: 0.7rem;
-        background: rgba(var(--primary-rgb), 0.15);
-        color: var(--primary-color);
-        padding: 2px 8px;
-        border-radius: 8px;
-      }
+    /* ===== APP WRAPPER ===== */
+    .app-wrapper{
+      position:relative;z-index:2;display:flex;flex-direction:column;min-height:100vh;
+    }
 
-      .count-badge {
-        white-space: nowrap;
-        font-size: 0.85rem;
-        color: var(--text-color);
-        background: var(--card-bg);
-        border: 1px solid var(--snippet-border);
-        border-radius: 20px;
-        padding: 8px 16px;
-        backdrop-filter: blur(10px);
-        opacity: 0.8;
-      }
+    /* ===== HEADER ===== */
+    .header{
+      background:rgba(13,15,26,0.85);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      position:sticky;top:0;z-index:100;
+    }
+    .header-inner{
+      max-width:1200px;margin:0 auto;padding:0 24px;
+      display:flex;align-items:center;justify-content:space-between;height:64px;
+    }
+    .header-right{display:flex;align-items:center;gap:28px}
+    .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.15rem}
+    .logo-icon{font-size:1.5rem}
+    .logo span{background:linear-gradient(135deg,var(--accent),#FF8A65);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav{display:flex;gap:4px}
+    .nav a{
+      padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:500;
+      color:var(--text-dim);transition:var(--transition);position:relative;
+    }
+    .nav a:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+    .nav a.active{background:var(--accent);color:#fff;font-weight:700}
+    .header-left{display:flex;align-items:center;gap:16px}
+    .user-info{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-dim)}
+    .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#fff}
+    .icon-btn{
+      width:36px;height:36px;border-radius:8px;border:none;background:transparent;
+      color:var(--text-dim);font-size:1.15rem;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition);
+    }
+    .icon-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+    .mobile-toggle{display:none}
 
-      .pill-btn {
-        background: var(--card-bg);
-        border: 1px solid var(--snippet-border);
-        color: var(--text-color);
-        border-radius: 20px;
-        padding: 8px 16px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        font-family: inherit;
-        white-space: nowrap;
-        transition: all 0.2s;
-        backdrop-filter: blur(10px);
-      }
-      .pill-btn:hover, .pill-btn.active {
-        background: rgba(var(--primary-rgb), 0.12);
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-      }
-      .pill-btn.fav-active {
-        background: rgba(245, 166, 35, 0.15);
-        border-color: #f5a623;
-        color: #f5a623;
-      }
+    /* ===== MAIN ===== */
+    .main{
+      flex:1;max-width:1200px;margin:0 auto;padding:32px 24px 60px;width:100%;
+    }
 
-      .filter-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 28px;
-        padding: 14px 16px;
-        background: var(--card-bg);
-        border: 1px solid var(--snippet-border);
-        border-radius: var(--card-radius);
-        backdrop-filter: blur(12px);
-      }
+    /* ===== PAGE HEADER ===== */
+    .page-header{
+      display:flex;align-items:flex-start;gap:16px;margin-bottom:36px;
+    }
+    .page-header .icon{
+      font-size:2.8rem;line-height:1;flex-shrink:0;
+      filter:drop-shadow(0 0 20px rgba(255,75,43,0.3));
+      animation:pulseIcon 3s ease-in-out infinite;
+    }
+    @keyframes pulseIcon{
+      0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(255,75,43,0.3))}
+      50%{transform:scale(1.05);filter:drop-shadow(0 0 30px rgba(255,75,43,0.5))}
+    }
+    .page-header-text{}
+    .page-header h1{font-size:2rem;font-weight:800;margin:0;line-height:1.2}
+    .page-header h1 span{background:linear-gradient(135deg,var(--accent),#FF8A65);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .page-header p{color:var(--text-dim);font-size:0.9rem;margin-top:4px}
 
-      .filter-btn {
-        background: transparent;
-        border: 1px solid var(--snippet-border);
-        color: var(--text-color);
-        border-radius: 16px;
-        padding: 5px 14px;
-        cursor: pointer;
-        font-size: 0.82rem;
-        font-family: inherit;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .filter-btn:hover {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-      }
-      .filter-btn.active {
-        background: var(--primary-color);
-        border-color: var(--primary-color);
-        color: #fff;
-        font-weight: 700;
-      }
+    /* ===== TOOLBAR ===== */
+    .toolbar{
+      display:flex;align-items:center;gap:6px;padding:10px 16px;
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      margin-bottom:28px;flex-wrap:wrap;
+    }
+    .tb-btn{
+      width:34px;height:34px;border-radius:8px;border:none;background:transparent;
+      color:var(--text-dim);font-size:1rem;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition);
+    }
+    .tb-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+    .tb-btn.active{background:rgba(255,75,43,0.12);color:var(--accent)}
+    .tb-btn.fav-on{color:#FFD700}
+    .tb-divider{width:1px;height:24px;background:var(--border);margin:0 4px}
+    #searchWrap{display:none;flex:1;min-width:120px}
+    #searchWrap.open{display:block}
+    #snippetSearch{
+      width:100%;padding:7px 12px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);background:var(--bg);
+      color:var(--text);font-size:0.85rem;outline:none;transition:var(--transition);
+    }
+    #snippetSearch:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,75,43,0.1)}
+    #snippetSearch::placeholder{color:var(--text-muted)}
+    .tb-count{
+      font-size:0.8rem;color:var(--text-dim);direction:ltr;
+      background:rgba(255,255,255,0.04);padding:3px 10px;border-radius:12px;
+    }
 
-      #snippetsList {
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-      }
+    /* ===== FILTER BAR ===== */
+    #filterWrap{display:none;flex-wrap:wrap;gap:4px;width:100%;padding:6px 0 2px}
+    #filterWrap.open{display:flex}
+    .fl-btn{
+      font-size:0.75rem;padding:3px 10px;border:1px solid var(--border);background:transparent;
+      border-radius:12px;cursor:pointer;color:var(--text-dim);transition:var(--transition);
+    }
+    .fl-btn:hover{border-color:var(--accent-purple);color:var(--text)}
+    .fl-btn.active{background:var(--accent-purple);border-color:var(--accent-purple);color:#fff;font-weight:600}
 
-      .snippet-card {
-        background: var(--card-bg);
-        border: 1px solid var(--snippet-border);
-        border-radius: var(--card-radius);
-        overflow: hidden;
-        transition: border-color 0.25s, box-shadow 0.25s;
-        animation: slideUp 0.35s ease backwards;
-        backdrop-filter: blur(10px);
-      }
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      .snippet-card:hover {
-        border-color: var(--primary-color);
-        box-shadow: 0 6px 28px rgba(var(--primary-rgb), 0.12);
-      }
+    /* ===== SNIPPETS LIST ===== */
+    #snippetsList{display:flex;flex-direction:column;gap:8px}
 
-      .snippet-meta {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 13px 18px;
-        gap: 10px;
-        flex-wrap: wrap;
-        border-bottom: 1px solid var(--snippet-border);
-      }
-      .snippet-left {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-      }
-      .fav-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.15rem;
-        line-height: 1;
-        color: #888;
-        padding: 3px;
-        transition: transform 0.2s, color 0.2s;
-        flex-shrink: 0;
-      }
-      .fav-btn:hover { transform: scale(1.25); }
-      .fav-btn.active { color: #f5a623; }
-      .snippet-title {
-        font-weight: 700;
-        font-size: 0.98rem;
-        color: var(--primary-color);
-      }
-      .snippet-badge {
-        font-size: 0.6rem;
-        background: var(--smart-badge);
-        color: #000;
-        padding: 1px 7px;
-        border-radius: 8px;
-        font-weight: 700;
-        margin-right: 6px;
-        vertical-align: middle;
-      }
-      .tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-      }
-      .tag {
-        background: rgba(var(--primary-rgb), 0.1);
-        color: var(--primary-color);
-        padding: 3px 10px;
-        border-radius: 12px;
-        font-size: 0.73rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.18s;
-      }
-      .tag:hover { background: rgba(var(--primary-rgb), 0.22); }
+    /* ===== SNIPPET CARD (TOGGLE) ===== */
+    .snippet-card{
+      background:var(--bg-card);border:1px solid var(--border);
+      border-radius:var(--radius-lg);overflow:hidden;
+      transition:border-color var(--transition),box-shadow var(--transition);
+      position:relative;
+    }
+    .snippet-card:hover{border-color:var(--accent-purple);box-shadow:0 4px 20px rgba(123,94,167,0.08)}
+    .snippet-card.open{border-color:rgba(123,94,167,0.3)}
 
-      .code-block { background: var(--code-bg); }
+    .snippet-header{
+      display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;
+      user-select:none;transition:background var(--transition);position:relative;
+    }
+    .snippet-header:hover{background:rgba(255,255,255,0.02)}
 
-      .code-block-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 7px 14px;
-        background: var(--code-hdr);
-        border-bottom: 1px solid var(--code-border);
-        direction: ltr;
-      }
-      .code-dots {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-      }
-      .code-dots span {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: block;
-      }
-      .code-dots span:nth-child(1) { background: #ff5f57; }
-      .code-dots span:nth-child(2) { background: #febc2e; }
-      .code-dots span:nth-child(3) { background: #28c840; }
-      .code-lang-label {
-        font-size: 0.72rem;
-        color: #8b949e;
-        font-family: 'Consolas', monospace;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-right: 10px;
-      }
-      .copy-all-btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #cdd6f4;
-        border-radius: 8px;
-        padding: 5px 13px;
-        cursor: pointer;
-        font-size: 0.78rem;
-        font-family: inherit;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .copy-all-btn:hover {
-        background: rgba(var(--primary-rgb), 0.3);
-        border-color: var(--primary-color);
-        color: #fff;
-      }
-      .copy-all-btn.copied {
-        background: rgba(40, 200, 100, 0.2) !important;
-        border-color: #28c864 !important;
-        color: #28c864 !important;
-      }
-      .minify-btn {
-        background: none;
-        border: 1px solid rgba(255,255,255,0.08);
-        color: #8b949e;
-        border-radius: 6px;
-        padding: 4px 9px;
-        cursor: pointer;
-        font-size: 0.7rem;
-        font-family: inherit;
-        transition: all 0.2s;
-        margin-right: 5px;
-      }
-      .minify-btn:hover {
-        background: rgba(var(--primary-rgb), 0.2);
-        color: #cdd6f4;
-        border-color: var(--primary-color);
-      }
+    .toggle-arrow{
+      font-size:0.7rem;color:var(--text-dim);transition:transform 0.3s ease;
+      flex-shrink:0;width:20px;text-align:center;
+    }
+    .snippet-card.open .toggle-arrow{transform:rotate(90deg)}
 
-      .code-lines {
-        direction: ltr;
-        overflow: hidden;
-        position: relative;
-      }
-      .code-lines.collapsed {
-        max-height: calc(8 * 28px);
-      }
-      .code-lines.collapsed::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 56px;
-        background: linear-gradient(transparent, var(--code-bg));
-        pointer-events: none;
-      }
+    .snippet-title{font-weight:600;font-size:0.92rem;flex:1;color:var(--text)}
 
-      .code-line {
-        display: flex;
-        align-items: stretch;
-        min-height: 28px;
-        cursor: pointer;
-        position: relative;
-        transition: background 0.12s;
-      }
-      .code-line:hover { background: var(--code-line-hover); }
-      .code-line.flash {
-        background: var(--code-line-active) !important;
-        transition: none;
-      }
+    .snippet-tags{display:flex;gap:4px;flex-wrap:wrap}
+    .snp-tag{
+      font-size:0.65rem;padding:1px 8px;border-radius:8px;
+      background:rgba(123,94,167,0.12);color:var(--accent-purple);
+      cursor:pointer;transition:var(--transition);white-space:nowrap;
+    }
+    .snp-tag:hover{background:rgba(123,94,167,0.25)}
 
-      .line-num {
-        width: var(--ln-width);
-        min-width: var(--ln-width);
-        padding: 4px 10px 4px 0;
-        text-align: right;
-        color: var(--ln-color);
-        font-family: 'Consolas', 'Monaco', monospace;
-        font-size: 0.82rem;
-        line-height: 20px;
-        user-select: none;
-        flex-shrink: 0;
-        border-right: 1px solid var(--code-border);
-      }
+    .snippet-actions{
+      display:flex;align-items:center;gap:2px;opacity:0;transition:opacity var(--transition);
+    }
+    .snippet-card:hover .snippet-actions{opacity:1}
+    .sa-btn{
+      width:28px;height:28px;border:none;border-radius:6px;background:transparent;
+      color:var(--text-dim);font-size:0.8rem;display:flex;align-items:center;justify-content:center;
+      transition:var(--transition);
+    }
+    .sa-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+    .sa-btn.fav{font-size:0.9rem}
+    .sa-btn.fav.on{color:#FFD700}
+    .sa-btn.lock{font-size:0.75rem}
+    .sa-btn.lock.unlocked{color:#4CAF50}
 
-      .line-content {
-        flex: 1;
-        padding: 4px 44px 4px 14px;
-        font-family: 'Consolas', 'Monaco', monospace;
-        font-size: 0.86rem;
-        color: var(--line-text);
-        line-height: 20px;
-        white-space: pre;
-        min-width: 0;
-        overflow-x: auto;
-        text-align: left;
-        direction: ltr;
-      }
-      .line-content::-webkit-scrollbar { height: 2px; }
-      .line-content::-webkit-scrollbar-track { background: transparent; }
-      .line-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    /* ===== CODE BODY ===== */
+    .snippet-body{
+      max-height:0;overflow:hidden;transition:max-height 0.35s ease;
+    }
+    .snippet-card.open .snippet-body{max-height:2000px}
 
-      .line-content .hl-match {
-        background: rgba(245, 166, 35, 0.3);
-        border-radius: 2px;
-        color: #fff;
-      }
+    .code-wrapper{
+      margin:0 16px 14px;border-radius:var(--radius);overflow:hidden;
+      border:1px solid var(--border);background:var(--code-bg);
+    }
+    .code-wrapper.editable{border-color:#4CAF50;box-shadow:0 0 0 2px rgba(76,175,80,0.15)}
 
-      .line-copy-btn {
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 26px;
-        height: 22px;
-        background: rgba(var(--primary-rgb), 0.75);
-        border: none;
-        color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 0.72rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.15s, background 0.15s;
-      }
-      .code-line:hover .line-copy-btn { opacity: 1; }
-      .line-copy-btn:hover { background: var(--primary-color); }
+    .code-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:6px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);
+      direction:ltr;
+    }
+    .code-lang-badge{
+      font-size:0.65rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;
+      letter-spacing:0.05em;text-transform:uppercase;
+    }
+    .code-header-actions{display:flex;gap:4px}
+    .ch-btn{
+      padding:3px 10px;border:none;border-radius:4px;background:rgba(255,255,255,0.04);
+      color:var(--text-dim);font-size:0.72rem;font-family:inherit;transition:var(--transition);
+      display:flex;align-items:center;gap:4px;
+    }
+    .ch-btn:hover{background:rgba(255,75,43,0.15);color:var(--accent)}
+    .ch-btn.copied{background:rgba(76,175,80,0.15);color:#4CAF50}
 
-      .hl-comment  { color: #6a9955; }
-      .hl-atrule   { color: #c586c0; }
-      .hl-prop     { color: #9cdcfe; }
-      .hl-value    { color: #ce9178; }
-      .hl-var      { color: #4ec9b0; }
-      .hl-num      { color: #b5cea8; }
-      .hl-url      { color: #ce9178; }
-      .hl-important{ color: #f44747; font-weight: bold; }
-      .hl-selector { color: #d7ba7d; }
-      .hl-function { color: #dcdcaa; }
-      .hl-string   { color: #ce9178; }
-      .hl-keyword  { color: #569cd6; }
-      .hl-tag      { color: #569cd6; }
+    .code-body{
+      padding:14px 16px;overflow-x:auto;direction:ltr;text-align:left;
+      font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.65;
+      white-space:pre;tab-size:2;min-height:40px;
+    }
+    .code-body:focus{outline:none}
+    .code-body .token{background:transparent!important}
+    .code-body pre{margin:0;background:transparent!important}
+    .code-body code{background:none!important;padding:0!important}
+    .code-body .hl-match{background:rgba(255,75,43,0.2);border-radius:2px;padding:0 2px}
 
-      .expand-btn {
-        width: 100%;
-        padding: 8px 14px;
-        background: rgba(255,255,255,0.03);
-        border: none;
-        border-top: 1px solid var(--code-border);
-        color: #8b949e;
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-family: inherit;
-        direction: ltr;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        transition: background 0.2s, color 0.2s;
-      }
-      .expand-btn:hover {
-        background: rgba(255,255,255,0.07);
-        color: #cdd6f4;
-      }
+    .status-badge{
+      display:inline-flex;align-items:center;gap:3px;font-size:0.6rem;padding:1px 7px;
+      border-radius:6px;margin-right:6px;
+    }
+    .status-badge.locked{background:rgba(255,255,255,0.06);color:var(--text-dim)}
+    .status-badge.editing{background:rgba(76,175,80,0.12);color:#4CAF50}
 
-      #toast {
-        position: fixed;
-        bottom: 36px;
-        left: 50%;
-        transform: translateX(-50%) translateY(10px);
-        background: var(--primary-color);
-        color: #fff;
-        padding: 10px 26px;
-        border-radius: 24px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        box-shadow: 0 8px 28px rgba(0,0,0,0.28);
-        z-index: 9999;
-        opacity: 0;
-        pointer-events: none;
-        white-space: nowrap;
-        transition: opacity 0.22s, transform 0.22s;
-      }
-      #toast.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
+    /* ===== NO RESULTS ===== */
+    .no-results{text-align:center;padding:60px 20px;color:var(--text-dim)}
+    .no-results i{font-size:2.5rem;display:block;margin-bottom:10px}
 
-      .no-results {
-        text-align: center;
-        padding: 70px 20px;
-        color: var(--text-color);
-        opacity: 0.5;
-      }
-      .no-results i { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    /* ===== TOAST ===== */
+    #toast{
+      position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(12px);
+      background:var(--bg-elevated);color:var(--text);padding:10px 24px;
+      border-radius:var(--radius);font-size:0.85rem;font-weight:600;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:9999;
+      opacity:0;pointer-events:none;transition:all 0.25s ease;
+      border:1px solid var(--border);
+    }
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-      /* Recently copied tray */
-      #recentTray {
-        position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--smart-tray-bg);
-        border: 1px solid var(--snippet-border);
-        border-radius: 14px;
-        padding: 10px 16px;
-        backdrop-filter: blur(20px);
-        z-index: 9998;
-        display: none;
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 90vw;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-      }
-      #recentTray.show {
-        display: flex;
-      }
-      #recentTray .tray-label {
-        font-size: 0.7rem;
-        color: #8b949e;
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .recent-chip {
-        background: rgba(var(--primary-rgb), 0.15);
-        border: 1px solid rgba(var(--primary-rgb), 0.2);
-        color: var(--primary-color);
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        max-width: 140px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .recent-chip:hover {
-        background: rgba(var(--primary-rgb), 0.3);
-      }
-      .recent-chip .chip-close {
-        margin-right: 6px;
-        opacity: 0.5;
-      }
-      .recent-chip .chip-close:hover {
-        opacity: 1;
-      }
+    /* ===== BLOCK MENU ===== */
+    #blockMenu{
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);
+      background:var(--bg-elevated);border:1px solid var(--border);
+      border-radius:var(--radius-lg);padding:16px;width:320px;
+      z-index:9998;opacity:0;pointer-events:none;transition:all 0.2s ease;
+      box-shadow:0 16px 48px rgba(0,0,0,0.5);
+    }
+    #blockMenu.open{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1)}
+    #blockMenu h3{font-size:0.85rem;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .bm-item{
+      display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);
+      cursor:pointer;transition:var(--transition);
+    }
+    .bm-item:hover{background:rgba(255,255,255,0.04)}
+    .bm-item .bm-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(255,255,255,0.04)}
+    .bm-item .bm-info{flex:1}
+    .bm-item .bm-name{font-size:0.85rem;font-weight:500}
+    .bm-item .bm-shortcut{font-size:0.65rem;color:var(--text-dim);direction:ltr}
+    .bm-item .bm-desc{font-size:0.7rem;color:var(--text-muted)}
 
-      .preview-box {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        vertical-align: middle;
-        margin: 0 4px;
-        border: 1px solid rgba(255,255,255,0.1);
-      }
+    /* ===== OVERLAY ===== */
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9997;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.2s}
+    .overlay.show{opacity:1;pointer-events:all}
 
-      #three-canvas-container {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: -1;
-        pointer-events: none;
-      }
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:768px){
+      .nav{display:none}
+      .mobile-toggle{display:flex}
+      .user-info .user-name{display:none}
+      .header-inner{padding:0 16px}
+      .main{padding:24px 16px}
+      .page-header h1{font-size:1.5rem}
+      .page-header .icon{font-size:2rem}
+      .snippet-actions{opacity:1}
+      .snippet-header{padding:10px 12px}
+      .snippet-title{font-size:0.85rem}
+    }
+    @media(max-width:480px){
+      .toolbar{gap:4px;padding:8px 10px}
+      .header-left .icon-btn{width:30px;height:30px;font-size:1rem}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="constellationCanvas"></canvas>
+  <div class="grain-overlay"></div>
 
-      @media (max-width: 600px) {
-        .snippet-meta { flex-direction: column; align-items: flex-start; }
-        .line-content  { font-size: 0.8rem; }
-        #recentTray { bottom: 70px; padding: 8px 12px; }
-        .recent-chip { font-size: 0.7rem; padding: 3px 8px; max-width: 100px; }
-      }
-    </style>
-  </head>
-  <body class="theme-aware">
-    <div class="grain-overlay"></div>
-    <div id="three-canvas-container"></div>
-    <div class="floating-background">
-      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
-      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">⭐</div>
-      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">🔥</div>
-      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">💎</div>
-      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">🎯</div>
-      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
-    </div>
-
+  <div class="app-wrapper">
+    <!-- HEADER -->
     <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <div class="logo">
-            <a href="../index.html">
-              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
-            </a>
-          </div>
+      <div class="header-inner">
+        <div class="header-right">
+          <div class="logo"><span class="logo-icon">🌶️</span> <span>مدير الأكواد</span></div>
           <nav class="nav">
-            <ul class="nav-links">
-              <li><a href="../index.html#home">الرئيسية</a></li>
-              <li><a href="../works.html">أعمالنا</a></li>
-              <li><a href="index.html" class="active">أدواتنا</a></li>
-              <li><a href="../index.html#contact">تواصل معنا</a></li>
-            </ul>
+            <a href="../index.html">الرئيسية</a>
+            <a href="../works.html">أعمالنا</a>
+            <a href="index.html" class="active">أدواتنا</a>
+            <a href="../index.html#contact">تواصل معنا</a>
           </nav>
-          <div class="header-actions">
-            <div class="theme-toggle" onclick="toggleTheme()">
-              <svg class="svg-icon" viewBox="0 0 512 512">
-                <use href="../assets/images/icons.svg#icon-moon"></use>
-              </svg>
-            </div>
-            <div class="mobile-toggle">
-              <svg class="svg-icon" viewBox="0 0 448 512">
-                <use href="../assets/images/icons.svg#icon-bars"></use>
-              </svg>
-            </div>
+        </div>
+        <div class="header-left">
+          <div class="user-info">
+            <span class="user-avatar">ع</span>
+            <span class="user-name">Ali Ahmed</span>
           </div>
+          <button class="icon-btn" title="الإعدادات">⚙️</button>
+          <button class="icon-btn mobile-toggle">☰</button>
         </div>
       </div>
     </header>
 
-    <div class="tool-page-wrapper">
-      <div class="container">
-
-        <div class="page-intro">
-          <h1>🧠 مدير الأكواد الذكي</h1>
-          <p>كل أكواد CSS و JS في مكان واحد — بحث ذكي، نسخ فوري، وأكواد منظمة</p>
-        </div>
-
-        <div class="top-bar">
-          <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="snippetSearch" placeholder="ابحث عن كود... (Ctrl+F)" autocomplete="off" />
-            <div id="searchSuggestions"></div>
-          </div>
-          <span class="count-badge" id="resultCount">0 كود</span>
-          <button class="pill-btn" id="favToggle">⭐ المفضلة</button>
-          <button class="pill-btn" id="recentToggle">🕐 آخر المنسوخ</button>
-        </div>
-
-        <div class="filter-bar" id="filterBar">
-          <button class="filter-btn active" data-tag="all">الكل</button>
-        </div>
-
-        <div id="snippetsList"></div>
-      </div>
-    </div>
-
-    <footer class="footer" id="footer_aboutus">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-about">
-            <div class="footer-logo">
-              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
-            </div>
-            <p class="about-text">
-              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
-              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
-              وتجربة التسوق لزيادة المبيعات.
-            </p>
-            <div class="footer-certificate">
-              <a href="https://www.behance.net/3lwaaa1" target="_blank">
-                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
-                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
-              </a>
-            </div>
-            <p class="footer-cr">Custom Css Salla zid</p>
-          </div>
-
-          <div class="footer-links">
-            <h3>روابط سريعة</h3>
-            <ul>
-              <li><a href="../index.html">الرئيسية</a></li>
-              <li><a href="index.html">أدواتنا</a></li>
-              <li><a href="../index.html#contact">تواصل معنا</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-contact">
-            <h3>تواصل معنا</h3>
-            <ul>
-              <li>
-                <svg class="svg-icon" viewBox="0 0 384 512">
-                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
-                </svg>
-                <span>مصر</span>
-              </li>
-              <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-phone"></use>
-                </svg>
-                <span>+20 100 224 1591</span>
-              </li>
-              <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-envelope"></use>
-                </svg>
-                <span>salla1zid@gmail.com</span>
-              </li>
-            </ul>
-            <div class="footer-social">
-              <a href="https://wa.me/201002241591" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-                </svg>
-              </a>
-              <a href="https://www.instagram.com/salla1zid/" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-instagram"></use>
-                </svg>
-              </a>
-              <a href="https://twitter.com/salla1zid" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-twitter"></use>
-                </svg>
-              </a>
-              <a href="https://t.me/cssfree1" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 496 512">
-                  <use href="../assets/images/icons.svg#icon-telegram"></use>
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <p>
-            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
-            أدوات المطورين
-          </p>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="page-header">
+        <span class="icon">🌶️</span>
+        <div class="page-header-text">
+          <h1><span>مدير الأكواد</span></h1>
+          <p>57 مقطع كود — اضغط على العنوان لعرض الكود وانسخه بنقرة</p>
         </div>
       </div>
-    </footer>
 
-    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
-      <svg class="svg-icon" viewBox="0 0 448 512">
-        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-      </svg>
-    </a>
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <button class="tb-btn" id="searchToggle" title="بحث">🔍</button>
+        <div id="searchWrap"><input type="text" id="snippetSearch" placeholder="ابحث عن كود... (Ctrl+K)" autocomplete="off"/></div>
 
-    <div id="toast"></div>
-    <div id="recentTray"></div>
+        <button class="tb-btn" id="filterToggle" title="تصفية">🏷️</button>
+        <div id="filterWrap"></div>
 
-    <script>
-      const snippets = [
-        /* ===== 1 ===== */
-        {
-          title: "تصفير الهوامش - General Reset",
-          code: `*{
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}`,
-          tags: ["reset", "base"]
-        },
-        /* ===== 2 ===== */
-        {
-          title: "لغة المحتوى - Language Selector",
-          code: `:lang(en) {
-  /* English styles */
-}
+        <div class="tb-divider"></div>
+        <button class="tb-btn" id="favFilter" title="المفضلة">⭐</button>
+        <button class="tb-btn" id="expandAll" title="فتح الكل">⊞</button>
+        <button class="tb-btn" id="collapseAll" title="إغلاق الكل">⊟</button>
+        <button class="tb-btn" id="blockMenuBtn" title="إضافة بلوك">＋</button>
+        <div class="tb-divider"></div>
+        <span class="tb-count" id="resultCount">57</span>
+      </div>
 
-:lang(ar) {
-  /* Arabic styles */
-}`,
-          tags: ["i18n", "lang"]
-        },
-        /* ===== 3 ===== */
-        {
-          title: "تغيير اللوجو - Custom Logo",
-          code: `:root {
-  --logo: url("");
-}
+      <!-- SNIPPETS -->
+      <div id="snippetsList"></div>
+    </main>
+  </div>
 
-.navbar-brand img,
-.store-footer .footer-container .logo-footer .foo {
-  max-height: 3rem !important;
-  content: var(--logo) !important;
-}`,
-          tags: ["logo", "brand", "salla"]
-        },
-        /* ===== 4 ===== */
-        {
-          title: "نقاط الاستجابة - Media Queries",
-          code: `@media (min-width:767px) { }
-@media (max-width:767px) { }
-@media (max-width: 500px) { }
-@media (max-width: 420px) { }
-@media (max-width: 370px) { }`,
-          tags: ["responsive", "media"]
-        },
-        /* ===== 5 ===== */
-        {
-          title: "المحددات المتقدمة - Advanced Selectors",
-          code: `div:first-child :last-child
-:nth-child(1)
-:nth-of-type(3)
-:nth-last-child(2)
-:has(div[class*="discount"])
-.section[data-type=banner]:has(img[src*="TRxKqJx71t8Tz6y82wUR.png"]) { }
-img[src*=""] { content: url(); }
-.product-single div[data-option-id="1380911137"] label + p
-.feature-item:not(:last-child)
-body[data-template="home"], body:not([data-template="home"])
-.card:where(width > 300px) h3 { }
-.sicon-whatsapp2:hover::after { }`,
-          tags: ["selectors", "css"]
-        },
-        /* ===== 6 ===== */
-        {
-          title: "تبديل محتوى الصورة - Image Content Replace",
-          code: `img[src*=""] {
-  content: '';
-  display: block;
-  object-fit: contain;
-  transform: scale(0.7);
-  filter: brightness(18.5);
-}`,
-          tags: ["image", "filter", "content"]
-        },
-        /* ===== 7 ===== */
-        {
-          title: "إضافة بانر قبل المنتج - Product Form Banner",
-          code: `.product-single .main-content .product-form:before {
-  display: block;
-  content: '';
-  width: 100%;
-  height: 56px;
-  background: url(https://cdn.salla.sa/form-builder/jbVL9G9qdeP3ZNFa8OXQR1OnN2rQpZaMym5aYgQP.png) no-repeat center center / contain;
-}`,
-          tags: ["product", "salla", "banner"]
-        },
-        /* ===== 8 ===== */
-        {
-          title: "إضافة بانر للفوتر - Footer After Banner",
-          code: `footer:after {
-  background: url(https://cdn.salla.sa/form-builder/QZfG9HyXCwK5Lgh6t6tzT2XfBegWe85S0wXanwAi.png);
-  content: '';
-  width: 50%;
-  height: 56px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  display: block;
-  position: relative;
-  right: 33px;
-  top: 15px;
-}`,
-          tags: ["footer", "salla", "banner"]
-        },
-        /* ===== 9 ===== */
-        {
-          title: "CSS Grid - شبكة متكاملة",
-          code: `.container {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0,1fr));
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  grid-template-columns: repeat(auto-fill, 200px);
-  grid-template-rows: auto 1fr auto;
-  gap: 10px;
-}`,
-          tags: ["layout", "grid"]
-        },
-        /* ===== 10 ===== */
-        {
-          title: "Grid - ترتيب وتحديد الخلايا",
-          code: `div:nth-child(1) {
-  grid-column: 1/1;
-  grid-row: 1/3;
-  order: 1;
-}
-div:nth-child(2) {
-  grid-column: 1/1;
-  grid-row: 2/3;
-  order: 2;
-}
-div:nth-child(3) {
-  grid-column: 1/1;
-  grid-row: 1/3;
-  order: 3;
-}`,
-          tags: ["layout", "grid", "order"]
-        },
-        /* ===== 11 ===== */
-        {
-          title: "إضافة نص بـ ::after",
-          code: `::after {
-  content: 'العروض والبكجات ';
-  color: #000;
-  font-size: 9.5pt;
-}`,
-          tags: ["pseudo", "content", "after"]
-        },
-        /* ===== 12 ===== */
-        {
-          title: "بانر تفاصيل المقال - Article Banner",
-          code: `.article--product-details:before {
-  background: url(https://cdn.salla.sa/form-builder/QzCJDG24H0kkHioCxiiYVL5H4S0RP7rkPIRCkz4j.png);
-  content: '';
-  width: 100%;
-  height: 43px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  display: block;
-}`,
-          tags: ["article", "salla", "banner"]
-        },
-        /* ===== 13 ===== */
-        {
-          title: "تغيير نص زر الكارت - Cart Button Text",
-          code: `#cart-submit > button {
-  font-size: 0;
-}
+  <!-- BLOCK MENU -->
+  <div class="overlay" id="overlay"></div>
+  <div id="blockMenu">
+    <h3>إضافة بلوك</h3>
+    <div class="bm-item" data-type="text"><div class="bm-icon">📝</div><div class="bm-info"><div class="bm-name">نص</div><div class="bm-shortcut">⌨️</div></div></div>
+    <div class="bm-item" data-type="h1"><div class="bm-icon">🔠</div><div class="bm-info"><div class="bm-name">عنوان 1</div><div class="bm-shortcut">#</div></div></div>
+    <div class="bm-item" data-type="toggle"><div class="bm-icon">▶</div><div class="bm-info"><div class="bm-name">قائمة طي (Toggle)</div><div class="bm-desc">يمكنك إخفاء وعرض المحتوى بداخلها</div></div></div>
+    <div class="bm-item" data-type="bullet"><div class="bm-icon">•</div><div class="bm-info"><div class="bm-name">قائمة نقطية</div><div class="bm-shortcut">-</div></div></div>
+    <div class="bm-item" data-type="todo"><div class="bm-icon">☑</div><div class="bm-info"><div class="bm-name">قائمة مهام</div><div class="bm-shortcut">[ ]</div></div></div>
+    <div class="bm-item" data-type="code"><div class="bm-icon">💻</div><div class="bm-info"><div class="bm-name">مقطع كود</div><div class="bm-shortcut">```</div></div></div>
+  </div>
 
-body.cart #cart-submit > button:before {
-  content: 'Checkout  ';
-  color: #fff;
-  font-size: 1rem;
-}`,
-          tags: ["cart", "button", "salla"]
-        },
-        /* ===== 14 ===== */
-        {
-          title: "تحديد الحجم - Clamp & Min",
-          code: `width: min(800px, 90%);
+  <!-- TOAST -->
+  <div id="toast"></div>
 
-/* min  preferred  max */
-width: clamp(400px, 50vw, 800px);
-font-size: calc(1.3rem + .6vw);`,
-          tags: ["responsive", "layout", "size"]
-        },
-        /* ===== 15 ===== */
-        {
-          title: "خصائص مفيدة - Useful Properties",
-          code: `backdrop-filter: blur(10px);
-text-indent: -9999px;
-clip-path: inset(0 0 0 46.5%) !important;
-z-index: 1;
-zoom: 70%;
-mask-image: linear-gradient(0deg,transparent,#000 200%,#000 100%,transparent);
-border-image: linear-gradient(to top,rgba(6,70,99,0),var(--f-color)) 5%;
-aspect-ratio: 16/9;
-border-color: #610fe1 #be6811 #610fe1 #be6811;`,
-          tags: ["misc", "layout", "filter"]
-        },
-        /* ===== 16 ===== */
-        {
-          title: "خلفية متدرجة مع صورة - Gradient Background",
-          code: `background: linear-gradient(
-  134deg, transparent -183%, var(--1) 83%, #fff 200%
-),
-url(IMAGE_URL) 0rem 0rem/545% no-repeat !important;`,
-          tags: ["background", "gradient", "salla"]
-        },
-        /* ===== 17 ===== */
-        {
-          title: "تلوين النص - Simple Gradient Text",
-          code: `h1 {
-  background: linear-gradient(to right, red, blue);
-  background-clip: text;
-  color: transparent;
-}`,
-          tags: ["typography", "gradient"]
-        },
-        /* ===== 18 ===== */
-        {
-          title: "نص بريق متحرك - Text Shine Animation",
-          code: `.text-primary {
-  background: linear-gradient(to right, #87cef8 20%, #ffffff 30%, #87cef8 70%, #ffffff 80%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-fill-color: transparent;
-  background-size: 500% auto;
-  animation: textShine 5s ease-in-out infinite alternate;
-}
+  <script>
+    const SnippetsData = [
+      {t:"تصفير الهوامش - General Reset",c:`*{margin:0;padding:0;box-sizing:border-box}`,g:["reset","base"]},
+      {t:"لغة المحتوى - Language Selector",c:`:lang(en){}\n:lang(ar){}`,g:["i18n","lang"]},
+      {t:"تغيير اللوجو - Custom Logo",c:`:root{--logo:url("")}\n.navbar-brand img,.store-footer .footer-container .logo-footer .foo{max-height:3rem!important;content:var(--logo)!important}`,g:["logo","brand","salla"]},
+      {t:"نقاط الاستجابة - Media Queries",c:`@media(min-width:767px){}\n@media(max-width:767px){}\n@media(max-width:500px){}\n@media(max-width:420px){}\n@media(max-width:370px){}`,g:["responsive","media"]},
+      {t:"المحددات المتقدمة - Advanced Selectors",c:":nth-child(1)\n:nth-of-type(3)\n:nth-last-child(2)\n:has(div[class*=\"discount\"])\n.feature-item:not(:last-child)\nimg[src*=\"\"]{content:url()}\nbody[data-template=\"home\"]\n.card:where(width>300px)h3{}",g:["selectors","css"]},
+      {t:"تبديل محتوى الصورة - Image Content Replace",c:`img[src*=""]{content:'';display:block;object-fit:contain;transform:scale(.7);filter:brightness(18.5)}`,g:["image","filter","content"]},
+      {t:"إضافة بانر قبل المنتج - Product Banner",c:`.product-single .main-content .product-form:before{display:block;content:'';width:100%;height:56px;background:url(https://cdn.salla.sa/form-builder/jbVL9G9qdeP3ZNFa8OXQR1OnN2rQpZaMym5aYgQP.png) no-repeat center/contain}`,g:["product","salla","banner"]},
+      {t:"إضافة بانر للفوتر - Footer After Banner",c:`footer:after{background:url(https://cdn.salla.sa/form-builder/QZfG9HyXCwK5Lgh6t6tzT2XfBegWe85S0wXanwAi.png);content:'';width:50%;height:56px;background-size:contain;background-repeat:no-repeat;display:block;position:relative;right:33px;top:15px}`,g:["footer","salla","banner"]},
+      {t:"CSS Grid - شبكة متكاملة",c:`.container{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-columns:repeat(auto-fit,minmax(200px,1fr));grid-template-rows:auto 1fr auto;gap:10px}`,g:["layout","grid"]},
+      {t:"Grid - ترتيب وتحديد الخلايا",c:`div:nth-child(1){grid-column:1/1;grid-row:1/3;order:1}\ndiv:nth-child(2){grid-column:1/1;grid-row:2/3;order:2}\ndiv:nth-child(3){grid-column:1/1;grid-row:1/3;order:3}`,g:["layout","grid","order"]},
+      {t:"إضافة نص بـ ::after",c:`::after{content:'العروض والبكجات ';color:#000;font-size:9.5pt}`,g:["pseudo","content","after"]},
+      {t:"بانر تفاصيل المقال - Article Banner",c:`.article--product-details:before{background:url(https://cdn.salla.sa/form-builder/QzCJDG24H0kkHioCxiiYVL5H4S0RP7rkPIRCkz4j.png);content:'';width:100%;height:43px;background-size:contain;background-repeat:no-repeat;display:block}`,g:["article","salla","banner"]},
+      {t:"تغيير نص زر الكارت - Cart Button Text",c:`#cart-submit>button{font-size:0}\nbody.cart #cart-submit>button:before{content:'Checkout ';color:#fff;font-size:1rem}`,g:["cart","button","salla"]},
+      {t:"تحديد الحجم - Clamp & Min",c:`width:min(800px,90%)\nwidth:clamp(400px,50vw,800px)\nfont-size:calc(1.3rem + .6vw)`,g:["responsive","layout","size"]},
+      {t:"خصائص مفيدة - Useful Properties",c:`backdrop-filter:blur(10px)\ntext-indent:-9999px\nclip-path:inset(0 0 0 46.5%)!important\nzoom:70%\nmask-image:linear-gradient(0deg,transparent,#000 200%)\naspect-ratio:16/9`,g:["misc","layout","filter"]},
+      {t:"خلفية متدرجة مع صورة - Gradient Background",c:`background:linear-gradient(134deg,transparent -183%,var(--1) 83%,#fff 200%),url(IMAGE_URL) 0 0/545% no-repeat!important`,g:["background","gradient","salla"]},
+      {t:"تلوين النص - Simple Gradient Text",c:`h1{background:linear-gradient(to right,red,blue);background-clip:text;color:transparent}`,g:["typography","gradient"]},
+      {t:"نص بريق متحرك - Text Shine Animation",c:`.text-primary{background:linear-gradient(to right,#87cef8 20%,#fff 30%,#87cef8 70%,#fff 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:500% auto;animation:textShine 5s ease-in-out infinite alternate}\n@keyframes textShine{0%{background-position:0% 50%}100%{background-position:100% 50%}}`,g:["animation","typography","gradient"]},
+      {t:"تدريج النص المتحرك - Text Clip Animation",c:`.da-cp{background-image:linear-gradient(-225deg,var(--1) 0%,var(--3) 29%,var(--2) 67%,var(--1) 100%);background-size:200% auto;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:4s linear infinite textclip}\n@keyframes textclip{100%{background-position:200% center}}`,g:["animation","typography","gradient"]},
+      {t:"تجاوز زر سلة - Salla Button Override",c:`button.s-button-element.s-button-btn.s-button-outline.s-button-wide{font-size:1rem;background-color:var(--1);color:var(--3);border-radius:20px;font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,.15),0 7px 13px -3px rgba(0,0,0,0),inset 0 -3px 0 rgba(255,255,255,.66);animation:signal 1200ms infinite}\n@keyframes signal{0%{box-shadow:0 0 0 0 var(--1)}100%{box-shadow:0 0 0 6px rgba(255,255,255,.13)}}`,g:["button","animation","salla"]},
+      {t:"Dropdown عند الفوكس - Focus Dropdown",c:`.dropdown{display:none}\n.my-button:focus .dropdown{display:flex}`,g:["dropdown","focus","ux"]},
+      {t:"CSS Mask - قص الصور",c:`.masked-element{-webkit-mask-image:var(--cam);mask-image:var(--cam);mask-size:contain;width:auto;height:292px}`,g:["mask","clip","visual"]},
+      {t:"Box Shadow - ظلال متنوعة",c:`box-shadow:0 0 transparent,0 0 transparent,0 3px 16px rgba(47,83,109,.12157)\nbox-shadow:rgba(0,0,0,.4) 0 2px 4px,rgba(0,0,0,.3) 0 7px 13px -3px,rgba(0,0,0,.2) 0 -3px 0 inset\ntext-shadow:0 4px 4px #000`,g:["shadow","box-shadow","visual"]},
+      {t:"Input - تنسيق الإدخال",c:`input:focus{outline:1px solid red}\ninput::placeholder{color:red}`,g:["input","form","ux"]},
+      {t:"متغيرات سلة - Salla Root Variables",c:`:root{--1:#ba813b;--2:#270d34;--bg:#F2F2F2;--ff:#ededed;--color-primary:var(--1);--color-primary-dark:var(--2);--sh:-8px 10px 15px -3px rgba(0,0,0,.1);--gr:linear-gradient(45deg,var(--1) 0,var(--2) 39%,var(--2) 100%);--logo:url("")}`,g:["variables","salla","root"]},
+      {t:"متغيرات زد - Zid Root Variables",c:`:root{--1:#2d2d2d;--2:#171401;--bg:#F2F2F2;--ff:#ededed;--primary-color:#2d2d2d!important;--gr:linear-gradient(45deg,var(--1) 0,var(--2) 39%,var(--2) 100%);--logo:url("");--con:"الحقوق محفوظة © متجــر "}`,g:["variables","zid","root"]},
+      {t:"متغيرات RGB - RGB Variables",c:`:root{--main:238,201,201;--secondary:167,141,141;--light:255,245,245;--bg:#f3f4f6}\nbackground:rgba(var(--light),.95)`,g:["variables","colors","rgb"]},
+      {t:"تنسيق بطاقات المنتج - Salla Product Cards",c:`.s-product-card-entry,body.products-has-border .product-card{--normal-box-shadow:-8px 10px 15px -3px rgba(0,0,0,.1);border-radius:15px!important;overflow:hidden;box-shadow:var(--normal-box-shadow);padding:20px 0}`,g:["product","card","salla"]},
+      {t:"خط Font Awesome - FA Icon Font",c:`.icon-element{font-family:var(--fa-style-family,"Font Awesome 6 Free");font-weight:var(--fa-style,900)}`,g:["fonts","icons","fontawesome"]},
+      {t:"الخط العربي PortadaARA",c:`@font-face{font-family:PortadaARA;src:url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA_var-Upright.ttf);font-weight:400}\n@font-face{font-family:PortadaARA-bold;src:url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA-Bold.otf);font-weight:800}\n*:not(i),html,body,div,h1,h2,h3,h4{font-family:PortadaARA}\nh5,h6,p,a,span,li,label{font-family:PortadaARA-bold}`,g:["fonts","arabic","portada"]},
+      {t:"استيراد CSS خارجي",c:`@import url(https://raw.githack.com/elwa2/cssres/main/chord33.css)`,g:["import","css","external"]},
+      {t:"اخفاء شريط المعاينة - Hide Admin Bars",c:`div#s-theme_preview_bar,div#s-theme_edit_bar,salla-maintenance-alert.s-maintenance-alert-wrapper.hydrated{display:none!important}`,g:["admin","salla","hide"]},
+      {t:"لون خلفية المتجر - Body Background",c:`body,.s-comments-product,.banner--fixed img,.mm-spn.mm-spn--light,#mainnav,footer.store-footer{background:#faf7f2!important}`,g:["base","background","salla"]},
+      {t:"سكرول مخطط - Striped Scrollbar",c:`::-webkit-scrollbar{width:10px}\n::-webkit-scrollbar-track-piece{background-color:#0003}\n::-webkit-scrollbar-thumb:vertical{height:200px;background-color:#585858}\nbody::-webkit-scrollbar-thumb{background-color:#414042;background-image:linear-gradient(45deg,rgba(255,255,255,.2) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.2) 75%,transparent 75%)}`,g:["scrollbar","ui","striped"]},
+      {t:"فلتر اللوجو مع التمرير",c:`body.index div.app-inner>footer a{filter:brightness(17.5)}\n.main-nav-container.fixed-pinned.animated.fixed-header .navbar-brand{filter:none}`,g:["logo","filter","salla","scroll"]},
+      {t:"شبكة البانرات الذكية - Banner Grid :has()",c:`.s-block.s-block--banners>.grid:has(a:nth-child(5)){grid-template-columns:1fr 1fr 1fr 1fr 1fr}\n@media(max-width:991px){.s-block.s-block--banners>.grid:has(a){grid-template-columns:1fr 1fr!important}}`,g:["layout","grid","banner","salla"]},
+      {t:"خط Base64 - Embedded Font",c:`@font-face{font-family:"Ali-LIGHT";src:url(data:@file/x-font-ttf;base64,BASE64)}\n@font-face{font-family:"Ali-BOLD";src:url(data:@file/x-font-ttf;base64,BASE64)}\nbody,*:not(i){font-family:"Ali-LIGHT",sans-serif!important}\nh5,h6,p,a,span,strong{font-family:"Ali-BOLD",sans-serif!important}`,g:["fonts","base64","embed"]},
+      {t:"سكرول أرجواني/برتقالي",c:`*{scrollbar-color:#f59938 #6b22d1;scrollbar-width:thin}\n::-webkit-scrollbar{width:8px}\n::-webkit-scrollbar-track{background:#6b22d1}\n::-webkit-scrollbar-thumb{background:#f59938;border-radius:5px}\n::-webkit-scrollbar-thumb:hover{background:#f59938b4}`,g:["scrollbar","ui","purple","orange"]},
+      {t:"Color-Mix - خلط الألوان الحديث",c:`:root{--1:#ef8015;--color-primary:var(--1);--color-primary-dark:color-mix(in srgb,var(--1),black 30%);--color-primary-light:color-mix(in srgb,var(--1),white 40%);--2:color-mix(in srgb,var(--1),cyan 100%);--3:color-mix(in srgb,var(--1),#fff 94%)}`,g:["variables","colors","modern","color-mix"]},
+      {t:"أيقونة الكارت SVG",c:`.main-nav-container .sicon-cart{--mask-image:url("data:image/svg+xml,...");-webkit-mask-image:var(--mask-image);mask-image:var(--mask-image);mask-repeat:no-repeat;mask-size:contain;background-color:var(--1);width:30px;height:30px}`,g:["icon","cart","salla","svg"]},
+      {t:"سكرول نيون - Neon Teal Scrollbar",c:`:root{--infinte-color:#76e8cd}\n::-webkit-scrollbar{width:4px}\n::-webkit-scrollbar-track{background:hsla(0,0%,93%,.8)}\n::-webkit-scrollbar-thumb{background:#baf3e6}\n::selection{background-color:rgba(150,237,217,.05);color:#76e8cd}`,g:["scrollbar","ui","neon"]},
+      {t:"لون الكتابة في البحث",c:`.products-details-page #product-form .size-box .form-control::placeholder{color:#fff!important}`,g:["input","search","salla","placeholder"]},
+      {t:"توسيط الفوتر - Footer Center",c:`footer.store-footer,.s-product-card-content-title{justify-content:center;text-align:center;align-items:center;margin-left:auto!important;margin-right:auto!important}`,g:["footer","center","salla","layout"]},
+      {t:"نص مخصص لزر الشراء",c:`.s-product-card-entry salla-add-product-button.hydrated .s-button-text span{font-size:0;width:72px}\n.s-product-card-entry salla-add-product-button.hydrated .s-button-text span:before{font-size:.875rem;content:' اشتر الان';color:#000}`,g:["button","product","salla","text"]},
+      {t:"إظهار كل المحتوى - Remove Read More",c:`article#more-content{max-height:unset!important}\na#btn-show-more{display:none}`,g:["content","salla","product"]},
+      {t:"فوتر بتدرج - Footer Gradient",c:`footer.store-footer{border-radius:20px;margin:15px;background:linear-gradient(134deg,transparent -1041%,#292929 83%,#fff 200%),url(IMAGE_URL) 0 0/545% no-repeat!important}`,g:["footer","gradient","salla","background"]},
+      {t:"تبديل الصور حسب الجهاز",c:`@media(max-width:767px){img[src*="DESKTOP_IMAGE"]{content:url(MOBILE_IMAGE.png)}}`,g:["responsive","image","media"]},
+      {t:"حماية النطاق بقائمة ثابتة",c:`const allowedDomains=["rasinonline.com","salla.sa"];\nconst currentDomain=window.location.hostname;\nif(allowedDomains.includes(currentDomain)){\n  document.body.classList.add("show-content")\n}else{\n  document.body.classList.add("hide-content")\n}\nbody{display:none}\nbody.show-content{display:block}`,g:["security","domain","javascript"]},
+      {t:"حماية النطاق عبر API (lftah)",c:`fetch("https://script.google.com/macros/s/.../exec")\n.then(r=>r.json())\n.then(d=>{\n  if(d.includes(location.hostname.replace('www.',''))){\n    document.body.classList.add("show-content")\n  }else{\n    document.body.classList.add("hide-content")\n    alert("غير مصرح!")\n    setTimeout(()=>location.href="https://lftah.blogspot.com/p/contact-designer.html",1500)\n  }\n})`,g:["security","domain","javascript","api"]},
+      {t:"حماية النطاق عبر API (elwa2)",c:`fetch("https://script.google.com/macros/s/.../exec")\n.then(r=>r.json())\n.then(d=>{\n  if(d.includes(location.hostname.replace('www.',''))){\n    document.body.classList.add("show-content")\n  }else{\n    document.body.classList.add("hide-content")\n    alert("غير مصرح!")\n    setTimeout(()=>location.href="https://elwa2.github.io/portfolio/contact.html",1500)\n  }\n})`,g:["security","domain","javascript","api"]},
+      {t:"حماية النطاق بـ display",c:`const allowedDomains=["mygezor.com","salla.sa"];\nif(allowedDomains.includes(location.hostname)){\n  document.body.style.display='block'\n}else{\n  document.body.style.display='none'\n  document.body.innerHTML=''\n}\nbody{display:none}`,g:["security","domain","javascript"]},
+      {t:"حركة تدرج الخلفية",c:`section.s-block{background:var(--gr);background-size:200% 200%;animation:gradientAnimation 5s ease infinite}\n@keyframes gradientAnimation{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}`,g:["background","animation","gradient"]},
+      {t:"إيقاف المتجر - Disable Store Sliders",c:`.s-slider-wrapper,img.lazy.loaded{display:none!important}`,g:["hide","salla","store","slider"]},
+      {t:"فوتر مخصص - Custom Footer Overlay",c:`.footer-is-custom .store-footer{--footer-bg:#0e0f0f3d;background-color:var(--footer-bg);border-radius:20px 20px 0 0;background:linear-gradient(134deg,transparent -1041%,#180606 83%,#fff 200%),url(IMAGE_URL) 0 0/545% no-repeat!important}`,g:["footer","gradient","salla","custom"]},
+      {t:"منع التمرير الأفقي - Overflow Hidden",c:`body,body>section,head,html{overflow-x:hidden!important}`,g:["base","responsive","layout"]},
+      {t:"تجاوز زر المنتج - Product Card Cart Override",c:`.product-card__normal-cart__btn .s-button-text{font-size:0}\n.product-card__normal-cart__btn .s-button-text:before{font-size:.875rem;content:'  '}`,g:["button","product","salla"]},
+      {t:"سكرول بسيط - Simple Scrollbar",c:`::-webkit-scrollbar{width:10px;height:10px}\n::-webkit-scrollbar-track-piece{background-color:#0003}\n::-webkit-scrollbar-thumb:vertical{height:200px;background-color:#585858}`,g:["scrollbar","ui"]}
+    ];
 
-@keyframes textShine {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}`,
-          tags: ["animation", "typography", "gradient"]
-        },
-        /* ===== 19 ===== */
-        {
-          title: "تدريج النص المتحرك - Text Clip Animation",
-          code: `.da-cp {
-  background-image: linear-gradient(-225deg, var(--1) 0%, var(--3) 29%, var(--2) 67%, var(--1) 100%);
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: 4s linear infinite textclip;
-  font-weight: 600;
-  line-height: 1.5;
-}
+    /* ===== STATE ===== */
+    let activeTag = 'all';
+    let showFavOnly = false;
+    let searchQ = '';
+    let favorites = [];
+    let lockStates = {};
+    try { favorites = JSON.parse(localStorage.getItem('csm_favs') || '[]'); } catch(e) {}
+    try { lockStates = JSON.parse(localStorage.getItem('csm_locks') || '{}'); } catch(e) {}
 
-@keyframes textclip {
-  100% { background-position: 200% center; }
-}`,
-          tags: ["animation", "typography", "gradient"]
-        },
-        /* ===== 20 ===== */
-        {
-          title: "تجاوز زر سلة - Salla Button Override",
-          code: `button.s-button-element.s-button-btn.s-button-outline.s-button-wide {
-  font-size: 1rem;
-  background-color: var(--1);
-  color: var(--3);
-  border-radius: 20px;
-  font-weight: 700;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 7px 13px -3px rgba(0,0,0,0), inset 0 -3px 0 rgba(255,255,255,0.66);
-  animation: signal 1200ms infinite;
-}
-
-@keyframes signal {
-  0%   { box-shadow: 0 0 0 0 var(--1); }
-  100% { box-shadow: 0 0 0 6px rgba(255,255,255,0.13); }
-}`,
-          tags: ["button", "animation", "salla"]
-        },
-        /* ===== 21 ===== */
-        {
-          title: "Dropdown عند الفوكس - Focus Dropdown",
-          code: `.dropdown { display: none; }
-.my-button:focus .dropdown { display: flex; }`,
-          tags: ["dropdown", "focus", "ux"]
-        },
-        /* ===== 22 ===== */
-        {
-          title: "CSS Mask - قص الصور",
-          code: `:root { --cam: url("SVG_OR_IMAGE_URL"); }
-.masked-element {
-  -webkit-mask-image: var(--cam);
-  mask-image: var(--cam);
-  mask-size: contain;
-  width: auto; height: 292px;
-  background: var(--g);
-}`,
-          tags: ["mask", "clip", "visual"]
-        },
-        /* ===== 23 ===== */
-        {
-          title: "Box Shadow - ظلال متنوعة",
-          code: `/* ناعمة */
-box-shadow: 0 0 transparent, 0 0 transparent, 0 3px 16px rgba(47, 83, 109, .12157);
-/* عميقة */
-box-shadow: rgba(0,0,0,0.4) 0px 2px 4px, rgba(0,0,0,0.3) 0px 7px 13px -3px, rgba(0,0,0,0.2) 0px -3px 0px inset;
-/* نيومورفيك */
-box-shadow: 12px 12px 12px rgba(0,0,0,0.1), -10px -10px 10px #f8f1ff;
-/* ظل نص */
-text-shadow: 0px 4px 4px #000;`,
-          tags: ["shadow", "box-shadow", "visual"]
-        },
-        /* ===== 24 ===== */
-        {
-          title: "Input - تنسيق الإدخال",
-          code: `input:focus { outline: 1px solid red; }
-input::placeholder { color: red; }`,
-          tags: ["input", "form", "ux"]
-        },
-        /* ===== 25 ===== */
-        {
-          title: "متغيرات سلة الشاملة - Salla Root Variables",
-          code: `:root {
-  --1: #ba813b; --2: #270d34;
-  --2-2: #9865266e; --3: #edf5ff;
-  --4: #3b3b39; --bg: #F2F2F2;
-  --ff: #ededed; --00: #2d2d2d;
-  --color-primary: var(--1);
-  --color-primary-dark: var(--2);
-  --color-primary-light: #e1c478;
-  --sh: -8px 10px 15px -3px rgba(0,0,0,0.1);
-  --gr: linear-gradient(45deg, var(--1) 0, var(--2) 39%, var(--2) 100%);
-  --tr: linear-gradient(134deg, transparent 0%, var(--2-2) 100%);
-  --logo: url("");
-}`,
-          tags: ["variables", "salla", "root"]
-        },
-        /* ===== 26 ===== */
-        {
-          title: "متغيرات زد الشاملة - Zid Root Variables",
-          code: `:root {
-  --1: #2d2d2d; --2: #171401;
-  --bg: #F2F2F2; --ff: #ededed;
-  --00: #2d2d2d;
-  --primary-color: #2d2d2d !important;
-  --text-color-primary-bg: #ededed !important;
-  --header-primary-color: #fff !important;
-  --footer-primary-color: #fff !important;
-  --sh: 0 0 transparent, 0 0 transparent, 0 3px 16px rgba(47, 83, 109, .12157);
-  --gr: linear-gradient(45deg, var(--1) 0, var(--2) 39%, var(--2) 100%);
-  --logo: url("");
-  --con: "الحقوق محفوظة © متجــر ";
-}`,
-          tags: ["variables", "zid", "root"]
-        },
-        /* ===== 27 ===== */
-        {
-          title: "متغيرات RGB - RGB Variables",
-          code: `:root {
-  --main: 238, 201, 201;
-  --secondary: 167, 141, 141;
-  --light: 255, 245, 245;
-  --bg: #f3f4f6;
-  --1-1: 36 36 36;
-}
-background: rgba(var(--1-1), 0.95);
-background: rgba(var(--light), 0.95);`,
-          tags: ["variables", "colors", "rgb"]
-        },
-        /* ===== 28 ===== */
-        {
-          title: "تنسيق بطاقات المنتج - Salla Product Cards",
-          code: `.s-product-card-entry,
-body.products-has-border .product-card {
-  --normal-box-shadow: -8px 10px 15px -3px rgba(0,0,0,0.1);
-  border-radius: 15px !important;
-  overflow: hidden;
-  box-shadow: var(--normal-box-shadow);
-  padding: 20px 0;
-}`,
-          tags: ["product", "card", "salla"]
-        },
-        /* ===== 29 ===== */
-        {
-          title: "خط Font Awesome - FA Icon Font",
-          code: `.icon-element {
-  font-family: var(--fa-style-family, "Font Awesome 6 Free");
-  font-weight: var(--fa-style, 900);
-}`,
-          tags: ["fonts", "icons", "fontawesome"]
-        },
-        /* ===== 30 ===== */
-        {
-          title: "الخط العربي PortadaARA - Custom Arabic Font",
-          code: `@font-face {
-  font-family: PortadaARA;
-  src: url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA_var-Upright.ttf);
-  font-weight: 400;
-}
-@font-face {
-  font-family: PortadaARA-bold;
-  src: url(https://cdn.jsdelivr.net/gh/aliahmedaaa/font@main/PortadaARA-Bold.otf);
-  font-weight: 800;
-}
-*:not(i), html, body, div, h1, h2, h3, h4 { font-family: PortadaARA; }
-h5, h6, p, a, span, li, label { font-family: PortadaARA-bold; }`,
-          tags: ["fonts", "arabic", "portada"]
-        },
-        /* ===== 31 ===== */
-        {
-          title: "استيراد CSS خارجي - Import CSS",
-          code: `/* develope By Package +201002241591  3lwaaa@gmail.com - https://wa.me/201002241591 */
-@import url(https://raw.githack.com/elwa2/cssres/main/chord33.css);`,
-          tags: ["import", "css", "external"]
-        },
-
-        /* =====================================================================
-           الإضافات الجديدة من صفحة الاكواد - New snippets from Notion page
-           ===================================================================== */
-
-        /* ===== 32 ===== */
-        {
-          title: "اخفاء شريط المعاينة - Hide Admin Bars",
-          code: `div#s-theme_preview_bar,
-div#s-theme_edit_bar,
-salla-maintenance-alert.s-maintenance-alert-wrapper.hydrated {
-    display: none !important;
-}`,
-          tags: ["admin", "salla", "hide"]
-        },
-        /* ===== 33 ===== */
-        {
-          title: "لون خلفية المتجر - Body Background Override",
-          code: `body,
-.s-comments-product,
-.banner--fixed img,
-.banner-entry,
-.mm-spn.mm-spn--light,
-#mainnav,
-.footer-is-light .store-footer .store-footer__inner,
-footer.store-footer {
-    background: #faf7f2 !important;
-}`,
-          tags: ["base", "background", "salla"]
-        },
-        /* ===== 34 ===== */
-        {
-          title: "سكرول مخطط - Striped Scrollbar",
-          code: `::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track-piece { background-color: #00000033; }
-::-webkit-scrollbar-thumb:vertical {
-    height: 200px;
-    background-color: #585858;
-}
-body::-webkit-scrollbar { width: 10px; background-color: #f5f5f5 }
-body::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 4px rgba(0,0,0,.3);
-    background-color: #f5f5f5;
-}
-body::-webkit-scrollbar-thumb {
-    min-height: 120px;
-    background-color: #414042;
-    background-image: -webkit-linear-gradient(45deg,
-        rgba(255,255,255,0.2) 25%, transparent 25%,
-        transparent 50%, rgba(255,255,255,0.2) 50%,
-        rgba(255,255,255,0.2) 75%, transparent 75%);
-}`,
-          tags: ["scrollbar", "ui", "striped"]
-        },
-        /* ===== 35 ===== */
-        {
-          title: "فلتر اللوجو مع التمرير - Logo Scroll Brightness",
-          code: `body.index div.app-inner > footer a {
-    filter: brightness(17.5);
-}
-.main-nav-container.fixed-pinned.animated.fixed-header .navbar-brand {
-    filter: none;
-}
-.store-footer a.footer-logo img {
-    filter: none !important;
-}`,
-          tags: ["logo", "filter", "salla", "scroll"]
-        },
-        /* ===== 36 ===== */
-        {
-          title: "شبكة البانرات الذكية - Banner Grid :has()",
-          code: `.s-block.s-block--banners>.grid:has(a:nth-child(5)) {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-}
-@media(max-width: 991px) {
-    .s-block.s-block--banners>.grid:has(a) {
-        grid-template-columns: 1fr 1fr !important;
+    /* ===== BUILD FILTERS ===== */
+    function buildFilters() {
+      const tags = new Set();
+      SnippetsData.forEach(s => s.g.forEach(t => tags.add(t)));
+      const wrap = document.getElementById('filterWrap');
+      wrap.innerHTML = '<button class="fl-btn active" data-tag="all">الكل</button>';
+      [...tags].sort().forEach(tag => {
+        const b = document.createElement('button');
+        b.className = 'fl-btn'; b.dataset.tag = tag; b.textContent = tag;
+        wrap.appendChild(b);
+      });
+      wrap.addEventListener('click', e => {
+        const b = e.target.closest('.fl-btn');
+        if (!b) return;
+        activeTag = b.dataset.tag;
+        wrap.querySelectorAll('.fl-btn').forEach(x => x.classList.toggle('active', x.dataset.tag === activeTag));
+        render();
+      });
     }
-}`,
-          tags: ["layout", "grid", "banner", "salla", ":has()"]
-        },
-        /* ===== 37 ===== */
-        {
-          title: "خط Base64 - Embedded Font",
-          code: `@font-face {
-  font-family: "Ali-LIGHT";
-  src: url(data:@file/x-font-ttf;base64,BASE64_STRING);
-}
-@font-face {
-  font-family: "Ali-BOLD";
-  src: url(data:@file/x-font-ttf;base64,BASE64_STRING);
-}
-body, *:not(i) { font-family: "Ali-LIGHT", sans-serif !important; }
-h5, h6, p, a, span, strong { font-family: "Ali-BOLD", sans-serif !important; }`,
-          tags: ["fonts", "base64", "embed"]
-        },
-        /* ===== 38 ===== */
-        {
-          title: "سكرول أرجواني/برتقالي - Purple Orange Scroll",
-          code: `* {
-  scrollbar-color: #f59938 #6b22d1;
-  scrollbar-width: thin;
-}
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background-color: #6b22d1; }
-::-webkit-scrollbar-thumb {
-  background-color: #f59938;
-  border-radius: 5px;
-}
-::-webkit-scrollbar-thumb:hover { background: #f59938b4; }
-@keyframes hvv {
-  0% { box-shadow: 0 0 0 0 #f59938; }
-  100% { box-shadow: 0 0 0 12px rgba(0,0,0,0); }
-}`,
-          tags: ["scrollbar", "ui", "purple", "orange"]
-        },
-        /* ===== 39 ===== */
-        {
-          title: "Color-Mix - خلط الألوان الحديث",
-          code: `:root {
-    --1: #ef8015;
-    --color-primary: var(--1);
-    --color-primary-dark: color-mix(in srgb, var(--1), black 30%);
-    --color-primary-light: color-mix(in srgb, var(--1), white 40%);
-    --color-primary-reverse: color-mix(in srgb, var(--1), red 60%);
-    --2: color-mix(in srgb, var(--1), cyan 100%);
-    --3: color-mix(in srgb, var(--1), #ffffff 94%);
-}`,
-          tags: ["variables", "colors", "modern", "color-mix"]
-        },
-        /* ===== 40 ===== */
-        {
-          title: "أيقونة الكارت SVG - Custom Cart Icon",
-          code: `.main-nav-container .sicon-cart {
-    --mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 165.42 155.7'%3E%3Cpath fill='%23fff' d='M149.46,28.76H51.9c-...'/%3E%3C/svg%3E");
-    -webkit-mask-image: var(--mask-image);
-    mask-image: var(--mask-image);
-    mask-repeat: no-repeat;
-    mask-size: contain;
-    background-color: var(--1);
-    width: 30px;
-    height: 30px;
-}`,
-          tags: ["icon", "cart", "salla", "svg"]
-        },
-        /* ===== 41 ===== */
-        {
-          title: "سكرول نيون - Neon Teal Scrollbar",
-          code: `:root { --infinte-color: #76e8cd; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: hsla(0,0%,93%,.8); }
-::-webkit-scrollbar-thumb { background: #baf3e6; }
-::selection {
-    background-color: rgba(150,237,217,.05);
-    color: #76e8cd;
-}`,
-          tags: ["scrollbar", "ui", "neon"]
-        },
-        /* ===== 42 ===== */
-        {
-          title: "لون الكتابة في البحث - Search Placeholder Color",
-          code: `.products-details-page #product-form .size-box .form-control::placeholder,
-.products-details-page #product-form .size-box .form-control::-webkit-input-placeholder {
-    color: #fff !important;
-}`,
-          tags: ["input", "search", "salla", "placeholder"]
-        },
-        /* ===== 43 ===== */
-        {
-          title: "توسيط محتوى الفوتر - Footer Center Alignment",
-          code: `footer.store-footer,
-.s-product-card-content-title,
-.s-product-card-content-subtitle,
-.s-product-card-content-sub {
-   justify-content: center;
-   text-align: center;
-   align-items: center;
-   margin-left: auto !important;
-   margin-right: auto !important;
-}
-salla-social.s-social-list.hydrated,
-.store-footer a,
-.items-end {
-    justify-content: center;
-}`,
-          tags: ["footer", "center", "salla", "layout"]
-        },
-        /* ===== 44 ===== */
-        {
-          title: "نص مخصص لزر الشراء - Custom Buy Button Text",
-          code: `.s-product-card-entry salla-add-product-button.hydrated .s-button-text span {
-    font-size: 0;
-    width: 72px;
-    visibility: visible;
-}
-.s-product-card-entry salla-add-product-button.hydrated .s-button-text span:before {
-    font-size: 0.875rem;
-    content: ' اشتر الان';
-    color: #000;
-}`,
-          tags: ["button", "product", "salla", "text"]
-        },
-        /* ===== 45 ===== */
-        {
-          title: "إظهار كل المحتوى - Remove Read More",
-          code: `article#more-content {
-    max-height: unset !important;
-}
-a#btn-show-more {
-    display: none;
-}`,
-          tags: ["content", "salla", "product"]
-        },
-        /* ===== 46 ===== */
-        {
-          title: "فوتر بتدرج - Footer Gradient",
-          code: `footer.store-footer {
-    border-radius: 20px;
-    margin: 15px;
-    background: linear-gradient(134deg, transparent -1041%, #292929 83%, #fff 200%),
-                url(IMAGE_URL) 0rem 0rem/545% no-repeat !important;
-}
-@media (max-width: 600px) {
-    footer.store-footer { padding-bottom: 50px; }
-}
-.store-footer__inner {
-    border-top: 5px solid #828282;
-    border-radius: 24px;
-    justify-content: center;
-}`,
-          tags: ["footer", "gradient", "salla", "background"]
-        },
-        /* ===== 47 ===== */
-        {
-          title: "تبديل الصور حسب الجهاز - Responsive Image Swap",
-          code: `@media (max-width: 767px) {
-    img[src*="DESKTOP_IMAGE"] {
-        content: url(MOBILE_IMAGE.png);
-    }
-    img[src*="DESKTOP_IMAGE2"] {
-        content: url(MOBILE_IMAGE2.png);
-    }
-}`,
-          tags: ["responsive", "image", "media"]
-        },
-        /* ===== 48 ===== */
-        {
-          title: "حماية النطاق بقائمة ثابتة - Static Domain List",
-          code: `const allowedDomains = ["rasinonline.com", "salla.sa"];
-const currentDomain = window.location.hostname;
 
-if (allowedDomains.includes(currentDomain)) {
-    document.body.classList.remove("no-js");
-    document.body.classList.add("show-content");
-} else {
-    document.body.classList.add("hide-content");
-}
+    /* ===== RENDER ===== */
+    function render() {
+      const q = searchQ.toLowerCase().trim();
+      const list = document.getElementById('snippetsList');
 
-/* في CSS */
-body { display: none; }
-body.show-content { display: block; }
-body.hide-content { display: none; }`,
-          tags: ["security", "domain", "protection", "javascript"]
-        },
-        /* ===== 49 ===== */
-        {
-          title: "حماية النطاق عبر API - API Domain Protection (lftah)",
-          code: `fetch("https://script.google.com/macros/s/AKfycbwLUGZt2Nm-A_iEUY-cZrydWrePQaVxNQkS6FOpudb_dkxZZKwVN39n1fzZMnCZLJlp/exec")
-  .then(res => res.json())
-  .then(allowedDomains => {
-    const currentDomain = window.location.hostname.replace('www.', '');
+      const filtered = SnippetsData.map((s, i) => {
+        if (showFavOnly && !favorites.includes(s.t)) return null;
+        if (activeTag !== 'all' && !s.g.includes(activeTag)) return null;
+        if (q && !s.t.toLowerCase().includes(q) && !s.c.toLowerCase().includes(q) && !s.g.some(t => t.toLowerCase().includes(q))) return null;
+        return { s, i };
+      }).filter(Boolean);
 
-    const style = document.createElement('style');
-    style.textContent = \`
-      body.show-content { display: block !important; }
-      body.hide-content { display: none !important; background: #000 !important; color: red !important; }
-    \`;
-    document.head.appendChild(style);
+      document.getElementById('resultCount').textContent = String(filtered.length);
 
-    if (allowedDomains.includes(currentDomain)) {
-      document.body.classList.add("show-content");
-    } else {
-      document.body.classList.add("hide-content");
-      alert("\ud83d\udea9 موقع غير مصرح به! سيتم تحويلك...");
-      setTimeout(() => window.location.href = "https://lftah.blogspot.com/p/contact-designer.html", 1500);
-    }
-  });`,
-          tags: ["security", "domain", "protection", "javascript", "api"]
-        },
-        /* ===== 50 ===== */
-        {
-          title: "حماية النطاق عبر API - API Domain Protection (elwa2)",
-          code: `fetch("https://script.google.com/macros/s/AKfycbwLUGZt2Nm-A_iEUY-cZrydWrePQaVxNQkS6FOpudb_dkxZZKwVN39n1fzZMnCZLJlp/exec")
-  .then(res => res.json())
-  .then(allowedDomains => {
-    const currentDomain = window.location.hostname.replace('www.', '');
-
-    const style = document.createElement('style');
-    style.textContent = \`
-      body.show-content { display: block !important; }
-      body.hide-content { display: none !important; background: #000 !important; color: red !important; }
-    \`;
-    document.head.appendChild(style);
-
-    if (allowedDomains.includes(currentDomain)) {
-      document.body.classList.add("show-content");
-    } else {
-      document.body.classList.add("hide-content");
-      alert("\ud83d\udea9 موقع غير مصرح به! سيتم تحويلك...");
-      setTimeout(() => window.location.href = "https://elwa2.github.io/portfolio/contact.html", 1500);
-    }
-  });`,
-          tags: ["security", "domain", "protection", "javascript", "api"]
-        },
-        /* ===== 50b ===== */
-        {
-          title: "حماية النطاق بـ display - Simple Display Protection",
-          code: `const allowedDomains = ["mygezor.com", "salla.sa"];
-const currentDomain = window.location.hostname;
-
-if (allowedDomains.includes(currentDomain)) {
-    document.body.style.display = 'block';
-} else {
-    document.body.style.display = 'none';
-    document.body.innerHTML = '';
-}
-
-/* في CSS */
-body { display: none; }`,
-          tags: ["security", "domain", "protection", "javascript"]
-        },
-        /* ===== 51 ===== */
-        {
-          title: "حركة تدرج الخلفية - Section Gradient Animation",
-          code: `section.s-block {
-    background: var(--gr);
-    background-size: 200% 200%;
-    animation: gradientAnimation 5s ease infinite;
-}
-@keyframes gradientAnimation {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}`,
-          tags: ["background", "animation", "gradient"]
-        },
-        /* ===== 52 ===== */
-        {
-          title: "إيقاف المتجر - Disable Store Sliders",
-          code: `.s-slider-wrapper,
-img.lazy.loaded {
-    display: none !important;
-}`,
-          tags: ["hide", "salla", "store", "slider"]
-        },
-        /* ===== 53 ===== */
-        {
-          title: "فوتر مخصص - Custom Footer Overlay",
-          code: `.footer-is-custom .store-footer {
-    --footer-bg: #0e0f0f3d;
-    background-color: var(--footer-bg);
-    border-radius: 20px 20px 0 0;
-    background: linear-gradient(134deg, transparent -1041%, #180606 83%, #fff 200%),
-                url(IMAGE_URL) 0rem 0rem/545% no-repeat !important;
-}`,
-          tags: ["footer", "gradient", "salla", "custom"]
-        },
-        /* ===== 54 ===== */
-        {
-          title: "منع التمرير الأفقي - Overflow X Hidden",
-          code: `body,
-body > section,
-head,
-html {
-  overflow-x: hidden !important;
-}`,
-          tags: ["base", "responsive", "layout"]
-        },
-        /* ===== 55 ===== */
-        {
-          title: "تجاوز زر المنتج - Product Card Cart Override",
-          code: `.product-card__normal-cart__btn .s-button-text {
-  font-size: 0;
-}
-.product-card__normal-cart__btn .s-button-text:before {
-  font-size: 0.875rem;
-  content: '  ';
-}`,
-          tags: ["button", "product", "salla"]
-        },
-        /* ===== 56 ===== */
-        {
-          title: "سكرول بسيط - Simple Scrollbar",
-          code: `::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-::-webkit-scrollbar-track-piece {
-    background-color: #00000033;
-}
-::-webkit-scrollbar-thumb:vertical {
-    height: 200px;
-    background-color: #585858;
-}
-
-::-webkit-scrollbar-thumb:horizontal {
-    width: 200px;
-    background-color: #7d7d7db3;
-}`,
-          tags: ["scrollbar", "ui"]
-        }
-      ];
-
-      /* ============================================================
-         STATE
-      ============================================================ */
-      let activeTag   = 'all';
-      let showFavOnly = false;
-      let searchQuery = '';
-      let favorites   = [];
-      let recentCopies = [];
-      try { favorites = JSON.parse(localStorage.getItem('csm_favs') || '[]'); } catch(e) {}
-      try { recentCopies = JSON.parse(localStorage.getItem('csm_recent') || '[]'); } catch(e) {}
-
-      /* ============================================================
-         SYNTAX HIGHLIGHTING (enhanced CSS/JS)
-      ============================================================ */
-      function highlightLine(raw) {
-        if (!raw.trim()) return '\u00a0';
-        let esc = escHtml(raw);
-
-        // Comment
-        if (/^\s*\/\//.test(raw)) {
-          return `<span class="hl-comment">${esc}</span>`;
-        }
-        if (/^\s*\/\*/.test(raw) || /^\s*\*/.test(raw)) {
-          return `<span class="hl-comment">${esc}</span>`;
-        }
-        // @-rules
-        if (/^\s*@/.test(raw)) {
-          return esc.replace(/(@[\w-]+)/, '<span class="hl-atrule">$1</span>');
-        }
-        // JS function declaration
-        if (/^\s*(function|const|let|var)\b/.test(raw)) {
-          return esc.replace(/\b(function|const|let|var)\b/g, '<span class="hl-keyword">$1</span>')
-                    .replace(/(\w+)\s*\(/, '<span class="hl-function">$1</span>(');
-        }
-        // !important
-        esc = esc.replace(/(!important)/g, '<span class="hl-important">$1</span>');
-        // CSS variable declaration
-        if (/^\s*--[\w-]+\s*:/.test(raw)) {
-          return esc.replace(/(--[\w-]+)(\s*:\s*)(.+)/, '<span class="hl-var">$1</span>$2<span class="hl-value">$3</span>');
-        }
-        // Property: value
-        if (/^\s+[\w-]+\s*:/.test(raw)) {
-          return esc.replace(/^(\s+)([\w-]+)(\s*:\s*)(.+)/, '$1<span class="hl-prop">$2</span>$3<span class="hl-value">$4</span>');
-        }
-        // Selector (starts with . or #)
-        if (/^\s*[.#]/.test(raw) || /^\s*\w+\s*\{/.test(raw) || /^\s*\w+\s*$/.test(raw)) {
-          esc = esc.replace(/([.#][\w-]+)/g, '<span class="hl-selector">$1</span>');
-        }
-        // Hex colors
-        esc = esc.replace(/(#[0-9a-fA-F]{3,8})\b/g, '<span class="hl-num">$1</span>');
-        // URLs
-        esc = esc.replace(/(https?:\/\/[^\s"')]+)/g, '<span class="hl-url">$1</span>');
-        // Numbers with units
-        esc = esc.replace(/\b(\d+\.?\d*)(px|rem|em|%|vw|vh|s|ms|deg|pt)\b/g, '<span class="hl-num">$1$2</span>');
-        return esc;
+      if (!filtered.length) {
+        list.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><p>لا توجد نتائج مطابقة</p></div>';
+        return;
       }
 
-      /* ============================================================
-         BUILD FILTER BAR
-      ============================================================ */
-      function buildFilters() {
-        const tags = new Set();
-        snippets.forEach(s => s.tags.forEach(t => tags.add(t)));
-        const bar = document.getElementById('filterBar');
-        bar.innerHTML = '<button class="filter-btn active" data-tag="all">الكل</button>';
-        [...tags].sort().forEach(tag => {
-          const btn = document.createElement('button');
-          btn.className = 'filter-btn';
-          btn.dataset.tag = tag;
-          btn.textContent = tag;
-          bar.appendChild(btn);
-        });
-        bar.addEventListener('click', e => {
-          const btn = e.target.closest('.filter-btn');
-          if (!btn) return;
-          activeTag = btn.dataset.tag;
-          bar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === activeTag));
-          updateSearchSuggestions();
-          render();
-        });
-      }
-
-      /* ============================================================
-         SEARCH SUGGESTIONS
-      ============================================================ */
-      function updateSearchSuggestions() {
-        const q = searchQuery.toLowerCase().trim();
-        const box = document.getElementById('searchSuggestions');
-        if (!q) { box.classList.remove('show'); return; }
-
-        const matched = snippets.filter(s => {
-          if (activeTag !== 'all' && !s.tags.includes(activeTag)) return false;
-          return s.title.toLowerCase().includes(q) ||
-                 s.tags.some(t => t.toLowerCase().includes(q));
-        }).slice(0, 6);
-
-        if (!matched.length) { box.classList.remove('show'); return; }
-
-        box.innerHTML = matched.map(s =>
-          `<div class="suggestion-item" data-title="${escAttr(s.title)}">
-            <span>${highlightMatch(s.title, q)}</span>
-            <span class="sug-tag">${s.tags[0]}</span>
-          </div>`
-        ).join('');
-        box.classList.add('show');
-
-        box.querySelectorAll('.suggestion-item').forEach(el => {
-          el.addEventListener('click', () => {
-            document.getElementById('snippetSearch').value = el.dataset.title;
-            searchQuery = el.dataset.title;
-            box.classList.remove('show');
-            render();
-          });
-        });
-      }
-
-      function highlightMatch(text, query) {
-        const idx = text.toLowerCase().indexOf(query);
-        if (idx === -1) return escHtml(text);
-        return escHtml(text.slice(0, idx)) +
-          `<span class="hl-match">${escHtml(text.slice(idx, idx + query.length))}</span>` +
-          escHtml(text.slice(idx + query.length));
-      }
-
-      /* ============================================================
-         RENDER LINES (with search highlighting)
-      ============================================================ */
-      function renderLines(code, snippetIdx) {
-        return code.split('\n').map((line, i) => {
-          const num = i + 1;
-          let content = highlightLine(line);
-          if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const lineLower = line.toLowerCase();
-            if (lineLower.includes(q)) {
-              content = content.replace(
-                new RegExp(escRegExp(searchQuery), 'gi'),
-                m => `<span class="hl-match">${escHtml(m)}</span>`
-              );
-            }
-          }
-          return `<div class="code-line" data-sidx="${snippetIdx}" data-lidx="${i}">` +
-            `<span class="line-num">${num}</span>` +
-            `<span class="line-content">${content}</span>` +
-            `<button class="line-copy-btn" title="نسخ السطر ${num}"><i class="far fa-copy"></i></button>` +
-          `</div>`;
-        }).join('');
-      }
-
-      /* ============================================================
-         RENDER SNIPPET CARD
-      ============================================================ */
-      function renderCard(s, cardIdx, snippetIdx) {
-        const isFav  = favorites.includes(s.title);
-        const lines  = s.code.split('\n');
-        const isLong = lines.length > 8;
-        const remaining = lines.length - 8;
-
-        return `<div class="snippet-card" style="animation-delay:${cardIdx * 0.04}s">
-          <div class="snippet-meta">
-            <div class="snippet-left">
-              <button class="fav-btn${isFav ? ' active' : ''}" data-title="${escAttr(s.title)}" title="${isFav ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}">${isFav ? '★' : '☆'}</button>
-              <span class="snippet-title">${escHtml(s.title)}</span>
-            </div>
-            <div class="tags">
-              ${s.tags.map(t => `<span class="tag" data-tag="${escAttr(t)}">${escHtml(t)}</span>`).join('')}
-            </div>
+      let html = '';
+      filtered.forEach(({ s, i }) => {
+        const isFav = favorites.includes(s.t);
+        const isLocked = lockStates[i] !== false;
+        const isJS = s.c.includes('function') || s.c.includes('const ') || s.c.includes('fetch(') || s.c.includes('allowedDomains');
+        html += `<div class="snippet-card" data-idx="${i}">
+          <div class="snippet-header">
+            <span class="toggle-arrow">▶</span>
+            <span class="snippet-title">${esc(s.t)}</span>
+            <span class="snippet-tags">${s.g.map(t => `<span class="snp-tag" data-tag="${esc(t)}">${esc(t)}</span>`).join('')}</span>
+            <span class="snippet-actions">
+              <button class="sa-btn copy-quick" data-idx="${i}" title="نسخ">📋</button>
+              <button class="sa-btn fav${isFav?' on':''}" data-title="${esc(s.t)}" title="${isFav?'إزالة من المفضلة':'إضافة للمفضلة'}">${isFav?'★':'☆'}</button>
+              <button class="sa-btn lock${isLocked?'':' unlocked'}" data-idx="${i}" title="${isLocked?'مقفل - اضغط للفتح':'محرر - اضغط للقفل'}">${isLocked?'🔒':'🔓'}</button>
+              <button class="sa-btn" title="حذف">🗑️</button>
+            </span>
           </div>
-          <div class="code-block">
-            <div class="code-block-header">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="code-dots"><span></span><span></span><span></span></div>
-                <span class="code-lang-label">${s.code.includes('fetch(') || s.code.includes('const ') || s.code.includes('function ') || s.code.includes('allowedDomains') ? 'JS' : 'CSS'}</span>
+          <div class="snippet-body">
+            <div class="code-wrapper${!isLocked?' editable':''}">
+              <div class="code-header">
+                <span class="code-lang-badge">${isJS?'JavaScript':'CSS'} <span class="status-badge ${isLocked?'locked':'editing'}">${isLocked?'🔒 مقفل':'✏️ محرر'}</span></span>
+                <div class="code-header-actions">
+                  <button class="ch-btn copy-btn" data-idx="${i}">📋 نسخ الكود</button>
+                </div>
               </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <button class="minify-btn" data-sidx="${snippetIdx}" title="نسخ بدون تعليقات"><i class="fas fa-compress-alt"></i> مصغر</button>
-                <button class="copy-all-btn" data-sidx="${snippetIdx}"><i class="far fa-copy"></i> نسخ الكل</button>
-              </div>
+              <div class="code-body" contenteditable="${!isLocked}" data-idx="${i}">${esc(s.c)}</div>
             </div>
-            <div class="code-lines${isLong ? ' collapsed' : ''}" id="cl-${cardIdx}">
-              ${renderLines(s.code, snippetIdx)}
-            </div>
-            ${isLong ? `<button class="expand-btn" data-target="cl-${cardIdx}" data-remaining="${remaining}"><i class="fas fa-chevron-down"></i> عرض ${remaining} سطر إضافي</button>` : ''}
           </div>
         </div>`;
-      }
+      });
+      list.innerHTML = html;
+      attachEvents();
+      applyHighlight();
+      restoreToggles();
+    }
 
-      /* ============================================================
-         MAIN RENDER
-      ============================================================ */
-      function render() {
-        const q = searchQuery.toLowerCase();
-        const filtered = [];
-        snippets.forEach((s, origIdx) => {
-          if (showFavOnly && !favorites.includes(s.title)) return;
-          if (activeTag !== 'all' && !s.tags.includes(activeTag)) return;
-          if (q && !s.title.toLowerCase().includes(q) &&
-                   !s.code.toLowerCase().includes(q) &&
-                   !s.tags.some(t => t.toLowerCase().includes(q))) return;
-          filtered.push({ s, origIdx });
-        });
-
-        document.getElementById('resultCount').textContent = `${filtered.length} كود`;
-
-        const list = document.getElementById('snippetsList');
-        if (!filtered.length) {
-          list.innerHTML = `<div class="no-results"><i class="fas fa-search"></i><p>لا توجد نتائج مطابقة</p></div>`;
-          return;
+    /* ===== SYNTAX HIGHLIGHT ===== */
+    function applyHighlight() {
+      document.querySelectorAll('.code-body').forEach(el => {
+        const code = el.textContent.replace(/\u00a0/g, ' ').trim();
+        if (!code) return;
+        const isJS = code.includes('function') || code.includes('const ') || code.includes('fetch(') || code.includes('allowedDomains');
+        const lang = isJS ? 'javascript' : 'css';
+        el.innerHTML = Prism ? Prism.highlight(code, Prism.languages[lang], lang) : esc(code);
+        // Apply search highlight
+        const q = searchQ.trim();
+        if (q) {
+          el.innerHTML = el.innerHTML.replace(
+            new RegExp(escRegExp(q), 'gi'),
+            m => `<span class="hl-match">${esc(m)}</span>`
+          );
         }
+      });
+    }
 
-        list.innerHTML = filtered.map(({ s, origIdx }, cardIdx) => renderCard(s, cardIdx, origIdx)).join('');
-        attachEvents();
-      }
+    /* ===== EVENTS ===== */
+    function attachEvents() {
+      const list = document.getElementById('snippetsList');
 
-      /* ============================================================
-         ATTACH EVENTS
-      ============================================================ */
-      function attachEvents() {
-        const list = document.getElementById('snippetsList');
-
-        list.querySelectorAll('.code-line').forEach(lineEl => {
-          lineEl.addEventListener('click', e => {
-            if (e.target.closest('.line-copy-btn')) return;
-            copyLine(lineEl);
-          });
+      // Toggle open/close + copy code
+      list.querySelectorAll('.snippet-header').forEach(hdr => {
+        hdr.addEventListener('click', e => {
+          if (e.target.closest('.snippet-actions') || e.target.closest('.snp-tag')) return;
+          const card = hdr.closest('.snippet-card');
+          const idx = +card.dataset.idx;
+          const code = SnippetsData[idx].c;
+          copyText(code, '✓ تم نسخ الكود');
+          card.classList.toggle('open');
+          saveToggles();
         });
+      });
 
-        list.querySelectorAll('.line-copy-btn').forEach(btn => {
-          btn.addEventListener('click', e => {
-            e.stopPropagation();
-            copyLine(btn.closest('.code-line'));
-          });
-        });
-
-        list.querySelectorAll('.copy-all-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const code = snippets[+btn.dataset.sidx].code;
-            copyText(code, '✓ تم نسخ الكود كاملاً');
-            addRecent(snippets[+btn.dataset.sidx].title);
-            btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+      // Copy buttons
+      list.querySelectorAll('.copy-btn, .copy-quick').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const idx = +btn.dataset.idx;
+          const code = SnippetsData[idx].c;
+          copyText(code, '✓ تم نسخ الكود');
+          if (btn.classList.contains('copy-btn')) {
+            btn.textContent = '✓ تم';
             btn.classList.add('copied');
-            setTimeout(() => {
-              btn.innerHTML = '<i class="far fa-copy"></i> نسخ الكل';
-              btn.classList.remove('copied');
-            }, 2000);
-          });
+            setTimeout(() => { btn.textContent = '📋 نسخ الكود'; btn.classList.remove('copied'); }, 1800);
+          }
         });
-
-        list.querySelectorAll('.minify-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const code = snippets[+btn.dataset.sidx].code;
-            const minified = minifyCSS(code);
-            copyText(minified, '✓ تم نسخ الكود المصغر');
-            addRecent(snippets[+btn.dataset.sidx].title + ' (مصغر)');
-          });
-        });
-
-        list.querySelectorAll('.expand-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const target = document.getElementById(btn.dataset.target);
-            const collapsed = target.classList.contains('collapsed');
-            if (collapsed) {
-              target.classList.remove('collapsed');
-              btn.innerHTML = '<i class="fas fa-chevron-up"></i> طي الكود';
-            } else {
-              target.classList.add('collapsed');
-              btn.innerHTML = `<i class="fas fa-chevron-down"></i> عرض ${btn.dataset.remaining} سطر إضافي`;
-            }
-          });
-        });
-
-        list.querySelectorAll('.fav-btn').forEach(btn => {
-          btn.addEventListener('click', e => {
-            e.stopPropagation();
-            const title = btn.dataset.title;
-            if (favorites.includes(title)) {
-              favorites = favorites.filter(f => f !== title);
-              btn.textContent = '☆';
-              btn.classList.remove('active');
-            } else {
-              favorites.push(title);
-              btn.textContent = '★';
-              btn.classList.add('active');
-            }
-            try { localStorage.setItem('csm_favs', JSON.stringify(favorites)); } catch(e) {}
-            if (showFavOnly) render();
-          });
-        });
-
-        list.querySelectorAll('.tags .tag').forEach(tag => {
-          tag.addEventListener('click', e => {
-            e.stopPropagation();
-            activeTag = tag.dataset.tag;
-            document.querySelectorAll('#filterBar .filter-btn').forEach(b => {
-              b.classList.toggle('active', b.dataset.tag === activeTag);
-            });
-            updateSearchSuggestions();
-            render();
-          });
-        });
-      }
-
-      /* ============================================================
-         MINIFY CSS
-      ============================================================ */
-      function minifyCSS(code) {
-        return code
-          .replace(/\/\*[\s\S]*?\*\//g, '')
-          .replace(/\s*:\s*/g, ':')
-          .replace(/\s*\{\s*/g, '{')
-          .replace(/\s*\}\s*/g, '}')
-          .replace(/\s*;\s*/g, ';')
-          .replace(/\s*,\s*/g, ',')
-          .replace(/\s*>\s*/g, '>')
-          .replace(/\s*~\s*/g, '~')
-          .replace(/\s*\+\s*/g, '+')
-          .replace(/;\}/g, '}')
-          .replace(/\n\s*/g, '')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-
-      /* ============================================================
-         RECENTLY COPIED
-      ============================================================ */
-      function addRecent(title) {
-        recentCopies = [title, ...recentCopies.filter(t => t !== title)].slice(0, 5);
-        try { localStorage.setItem('csm_recent', JSON.stringify(recentCopies)); } catch(e) {}
-        renderRecentTray();
-      }
-
-      function removeRecent(title) {
-        recentCopies = recentCopies.filter(t => t !== title);
-        try { localStorage.setItem('csm_recent', JSON.stringify(recentCopies)); } catch(e) {}
-        renderRecentTray();
-      }
-
-      function renderRecentTray() {
-        const tray = document.getElementById('recentTray');
-        if (!recentCopies.length) { tray.classList.remove('show'); return; }
-        tray.innerHTML =
-          `<span class="tray-label"><i class="fas fa-history"></i> آخر المنسوخ:</span>` +
-          recentCopies.map(t =>
-            `<span class="recent-chip" data-title="${escAttr(t)}">
-              ${escHtml(t)}
-              <span class="chip-close" data-title="${escAttr(t)}">&times;</span>
-            </span>`
-          ).join('');
-        tray.classList.add('show');
-
-        tray.querySelectorAll('.recent-chip').forEach(chip => {
-          chip.addEventListener('click', e => {
-            if (e.target.closest('.chip-close')) return;
-            const title = chip.dataset.title.replace(' (مصغر)', '');
-            const s = snippets.find(sn => sn.title === title);
-            if (s) {
-              copyText(s.code, '✓ تم نسخ: ' + s.title);
-            }
-          });
-        });
-        tray.querySelectorAll('.chip-close').forEach(el => {
-          el.addEventListener('click', e => {
-            e.stopPropagation();
-            removeRecent(el.dataset.title);
-          });
-        });
-      }
-
-      /* ============================================================
-         COPY HELPERS
-      ============================================================ */
-      function copyLine(lineEl) {
-        const text = lineEl.querySelector('.line-content').textContent.replace(/\u00a0/g, '');
-        if (!text.trim()) return;
-        copyText(text, '✓ تم نسخ السطر');
-        addRecent('سطر: ' + text.trim().slice(0, 40) + (text.trim().length > 40 ? '...' : ''));
-        lineEl.classList.add('flash');
-        setTimeout(() => lineEl.classList.remove('flash'), 380);
-      }
-
-      async function copyText(text, msg) {
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch {
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-        }
-        showToast(msg);
-      }
-
-      /* ============================================================
-         TOAST
-      ============================================================ */
-      let _toastTimer;
-      function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.add('show');
-        clearTimeout(_toastTimer);
-        _toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-      }
-
-      /* ============================================================
-         ESCAPE UTILS
-      ============================================================ */
-      function escHtml(str) {
-        return String(str)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-      function escAttr(str) {
-        return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-      }
-      function escRegExp(str) {
-        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-
-      /* ============================================================
-         CONTROLS
-      ============================================================ */
-      document.getElementById('snippetSearch').addEventListener('input', e => {
-        searchQuery = e.target.value;
-        updateSearchSuggestions();
-        render();
       });
 
-      document.addEventListener('keydown', e => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-          e.preventDefault();
-          document.getElementById('snippetSearch').focus();
-        }
-        if (e.key === 'Escape') {
-          document.getElementById('searchSuggestions').classList.remove('show');
-        }
+      // Fav buttons
+      list.querySelectorAll('.fav').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const title = btn.dataset.title;
+          if (favorites.includes(title)) {
+            favorites = favorites.filter(f => f !== title);
+            btn.textContent = '☆'; btn.classList.remove('on');
+          } else {
+            favorites.push(title);
+            btn.textContent = '★'; btn.classList.add('on');
+          }
+          try { localStorage.setItem('csm_favs', JSON.stringify(favorites)); } catch(e) {}
+          if (showFavOnly) render();
+        });
       });
 
-      document.addEventListener('click', e => {
-        if (!e.target.closest('.search-wrapper')) {
-          document.getElementById('searchSuggestions').classList.remove('show');
-        }
+      // Lock buttons
+      list.querySelectorAll('.lock').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const idx = +btn.dataset.idx;
+          const card = btn.closest('.snippet-card');
+          const body = card.querySelector('.code-body');
+          const wrapper = card.querySelector('.code-wrapper');
+          const badge = card.querySelector('.status-badge');
+          const isLocked = lockStates[idx] !== false;
+          lockStates[idx] = isLocked ? false : true;
+          try { localStorage.setItem('csm_locks', JSON.stringify(lockStates)); } catch(e) {}
+          btn.title = isLocked ? 'محرر - اضغط للقفل' : 'مقفل - اضغط للفتح';
+          btn.classList.toggle('unlocked');
+          body.contentEditable = isLocked ? 'true' : 'false';
+          wrapper.classList.toggle('editable');
+          badge.className = `status-badge ${isLocked?'editing':'locked'}`;
+          badge.textContent = isLocked ? '✏️ محرر' : '🔒 مقفل';
+        });
       });
 
-      document.getElementById('favToggle').addEventListener('click', function() {
-        showFavOnly = !showFavOnly;
-        this.classList.toggle('fav-active', showFavOnly);
-        render();
+      // Tag clicks
+      list.querySelectorAll('.snp-tag').forEach(tag => {
+        tag.addEventListener('click', e => {
+          e.stopPropagation();
+          activeTag = tag.dataset.tag;
+          document.querySelectorAll('#filterWrap .fl-btn').forEach(b => b.classList.toggle('active', b.dataset.tag === activeTag));
+          const fw = document.getElementById('filterWrap');
+          if (!fw.classList.contains('open')) fw.classList.add('open');
+          if (!document.getElementById('filterToggle').classList.contains('active')) document.getElementById('filterToggle').classList.add('active');
+          render();
+        });
       });
 
-      document.getElementById('recentToggle').addEventListener('click', function() {
-        const tray = document.getElementById('recentTray');
-        tray.classList.toggle('show');
-        if (tray.classList.contains('show')) renderRecentTray();
+      // ContentEditable: save on blur
+      list.querySelectorAll('.code-body').forEach(el => {
+        el.addEventListener('blur', () => {
+          const idx = +el.dataset.idx;
+          if (lockStates[idx] === false) {
+            SnippetsData[idx].c = el.textContent.trim();
+            applyHighlight();
+          }
+        });
       });
+    }
 
-      /* ============================================================
-         INIT
-      ============================================================ */
-      buildFilters();
+    /* ===== TOGGLE PERSISTENCE ===== */
+    function saveToggles() {
+      const states = {};
+      document.querySelectorAll('.snippet-card').forEach(c => {
+        states[c.dataset.idx] = c.classList.contains('open');
+      });
+      try { localStorage.setItem('csm_toggles', JSON.stringify(states)); } catch(e) {}
+    }
+
+    function restoreToggles() {
+      try {
+        const states = JSON.parse(localStorage.getItem('csm_toggles') || '{}');
+        document.querySelectorAll('.snippet-card').forEach(c => {
+          if (states[c.dataset.idx]) c.classList.add('open');
+        });
+      } catch(e) {}
+    }
+
+    document.addEventListener('click', e => {
+      const card = e.target.closest('.snippet-card');
+      if (card && e.target.closest('.snippet-header') && !e.target.closest('.snippet-actions') && !e.target.closest('.snp-tag')) {
+        saveToggles();
+      }
+    });
+
+    /* ===== COPY ===== */
+    async function copyText(text, msg) {
+      try { await navigator.clipboard.writeText(text); }
+      catch {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove();
+      }
+      showToast(msg);
+    }
+
+    /* ===== TOAST ===== */
+    let _tt;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    /* ===== UTILS ===== */
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function escRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    /* ===== CONTROLS ===== */
+    document.getElementById('searchToggle').addEventListener('click', function() {
+      document.getElementById('searchWrap').classList.toggle('open');
+      this.classList.toggle('active');
+      if (document.getElementById('searchWrap').classList.contains('open')) document.getElementById('snippetSearch').focus();
+    });
+    document.getElementById('snippetSearch').addEventListener('input', e => { searchQ = e.target.value; render(); });
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        document.getElementById('searchToggle').click();
+      }
+    });
+
+    document.getElementById('filterToggle').addEventListener('click', function() {
+      document.getElementById('filterWrap').classList.toggle('open');
+      this.classList.toggle('active');
+    });
+
+    document.getElementById('favFilter').addEventListener('click', function() {
+      showFavOnly = !showFavOnly;
+      this.classList.toggle('fav-on', showFavOnly);
       render();
-      renderRecentTray();
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
-  </body>
+    });
+
+    document.getElementById('expandAll').addEventListener('click', () => {
+      document.querySelectorAll('.snippet-card').forEach(c => c.classList.add('open'));
+      saveToggles();
+    });
+    document.getElementById('collapseAll').addEventListener('click', () => {
+      document.querySelectorAll('.snippet-card').forEach(c => c.classList.remove('open'));
+      saveToggles();
+    });
+
+    // Block menu
+    const blockMenu = document.getElementById('blockMenu');
+    const overlay = document.getElementById('overlay');
+    document.getElementById('blockMenuBtn').addEventListener('click', () => {
+      blockMenu.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+    overlay.addEventListener('click', () => {
+      blockMenu.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+
+    /* ===== CONSTELLATION CANVAS ===== */
+    const canvas = document.getElementById('constellationCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [], mouse = {x:-999,y:-999};
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const COUNT = 80;
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 1
+      });
+    }
+
+    canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    canvas.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      });
+
+      // Draw connections
+      ctx.strokeStyle = 'rgba(123,94,167,0.12)';
+      ctx.lineWidth = 0.6;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            ctx.globalAlpha = (1 - dist / 140) * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+        // Mouse connection
+        if (mouse.x > 0) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 180) {
+            ctx.strokeStyle = `rgba(255,75,43,${(1 - dist / 180) * 0.3})`;
+            ctx.globalAlpha = (1 - dist / 180) * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw particles
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(123,94,167,0.4)';
+        ctx.fill();
+      });
+
+      // Mouse glow
+      if (mouse.x > 0) {
+        const grd = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100);
+        grd.addColorStop(0, 'rgba(255,75,43,0.06)');
+        grd.addColorStop(1, 'rgba(255,75,43,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    /* ===== INIT ===== */
+    buildFilters();
+    render();
+  </script>
+</body>
 </html>
