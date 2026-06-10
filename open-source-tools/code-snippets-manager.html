@@ -1504,6 +1504,23 @@ body.hide-content { display: none; }`,
   });`,
           tags: ["security", "domain", "protection", "javascript", "api"]
         },
+        /* ===== 50b ===== */
+        {
+          title: "حماية النطاق بـ display - Simple Display Protection",
+          code: `const allowedDomains = ["mygezor.com", "salla.sa"];
+const currentDomain = window.location.hostname;
+
+if (allowedDomains.includes(currentDomain)) {
+    document.body.style.display = 'block';
+} else {
+    document.body.style.display = 'none';
+    document.body.innerHTML = '';
+}
+
+/* في CSS */
+body { display: none; }`,
+          tags: ["security", "domain", "protection", "javascript"]
+        },
         /* ===== 51 ===== */
         {
           title: "حركة تدرج الخلفية - Section Gradient Animation",
