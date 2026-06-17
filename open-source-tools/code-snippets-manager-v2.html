@@ -480,6 +480,32 @@
     .has-builder-grid { grid-template-columns: 1fr; }
   }
 
+  /* ===== PATTERN BAR ===== */
+  .pattern-bar {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .pattern-tab {
+    font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 500;
+    padding: 5px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-sub);
+    background: var(--bg-overlay);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pattern-tab:hover {
+    background: var(--glass-str);
+    color: var(--text-1);
+    border-color: var(--border-def);
+  }
+  .pattern-tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -680,7 +706,23 @@
     {t:"تنسيق الـ Nav عند وجود submenu - Nav :has()",c:".nav-item:has(.sub-menu,.dropdown-menu)>.nav-link:after{content:\"▾\";margin-inline-start:4px;font-size:10px}",g:["has","nav","dropdown"]},
     {t:"إخفاء السعر بدون عروض - Price :has() no Discount",c:".s-product-card-price:has(.s-product-card-price-regular:only-child) .s-product-card-price-save{display:none}",g:["has","salla","price"]},
     {t:"تحديد الكارد الذي يحتوي على صورة - Card :has() Image",c:".product-card:has(img[src*=\"discount\"]) .product-card__badge{background:#e8734a;color:#fff}",g:["has","card","image"]},
-    {t:"تغيير لون الفوتر عند وجود بانر - Footer :has() Banner",c:"footer.store-footer:has(> :last-child:nth-child(2)){padding-bottom:0}",g:["has","footer","salla"]}
+    {t:"تغيير لون الفوتر عند وجود بانر - Footer :has() Banner",c:"footer.store-footer:has(> :last-child:nth-child(2)){padding-bottom:0}",g:["has","footer","salla"]},
+    {t:"محدد :is - CSS :is() Selector",c:":root{--1:#ff6347;--2:#ff6347}\n:is(ul, ol) li{background-color:var(--1)}\n.card:is(ul, ol) li{background-color:var(--1)}\n:is(.box, section, aside, article) h1,:is(.box, section, aside, article) h3,:is(.box, section, aside, article) h5{color:var(--2)}\n:is(section, aside, article) :is(h1, h3, h5){color:var(--2)}",g:["selectors","css","modern"]},
+     {t:"محدد :has المتقدم - Advanced :has() Patterns",
+       p: [
+         {name:"Banners", code:":root{--b1:#e8734a}\n.section[data-type=banner]:has(img[src*=\"banner.png\"]){margin-bottom:24px!important}"},
+         {name:"Instagram", code:":root{--ig1:#f09433;--ig2:#e6683c;--ig3:#dc2743;--ig4:#cc2366;--ig5:#bc1888}\na:has(.sicon-instagram2){background:linear-gradient(45deg,var(--ig1) 0,var(--ig2) 25%,var(--ig3) 50%,var(--ig4) 75%,var(--ig5) 100%)}"},
+         {name:"Twitter", code:":root{--tw1:#66757f;--tw2:#00acee;--tw3:#36d8ff}\na:has(.sicon-twitter2){background:linear-gradient(45deg,var(--tw1),var(--tw2),var(--tw3),var(--tw3),var(--tw3))}"},
+         {name:"Snapchat", code:":root{--snap1:#fffc00}\na:has(.sicon-snapchat){background:linear-gradient(120deg,var(--snap1),var(--snap1));color:#000}"},
+         {name:"Card Price", code:":root{--cp1:#ff6347}\n.card-body:has(.price){background-color:var(--cp1);border:2px solid var(--cp1)}"},
+         {name:"Dropdown", code:":root{--dd1:#ff6347}\n.navbar-item:has(.dropdown){border:2px solid var(--dd1)}"},
+         {name:"Disabled", code:":root{--dis1:#ff6347}\n.product-entry__image.flex-1:has(.s-button-disabled){filter:grayscale(1)}"}
+       ],
+       g:["selectors","css","modern","has"]},
+    {t:"@supports - اختبار دعم المتصفح",c:":root{--1:#fff9c4;--2:#333}\n@supports (accent-color:#fff){.notice{display:none}}\n.notice{background:var(--1);border-radius:6px;color:var(--2);margin:0 auto 1.5rem;padding:.5rem;text-align:center;width:clamp(300px,60%,850px)}",g:["css","modern","feature"]},
+    {t:"Aspect Ratio - نسبة العرض إلى الارتفاع",c:":root{--1:#000}\n.card-img{border:2px solid var(--1);width:100%;aspect-ratio:1/1}\n.card-img{width:100%}\n.card-img.facebook{aspect-ratio:4/3}\n.card-img.instagram{aspect-ratio:1/1}\n.card-img.youtube{aspect-ratio:16/9}\n.card-img.tiktok{aspect-ratio:9/16}",g:["css","layout","modern"]},
+    {t:"Scroll Behavior - تمرير سلس",c:"html{scroll-behavior:smooth}",g:["css","ui","modern"]},
+    {t:"Clamp - تحجيم سائل متقدم",c:":root{--1:#ee82ee;--2:#fefefe}\n.clamp{border:2px solid var(--1);background-color:var(--2);margin:0 auto;padding:15px;width:clamp(500px,80%,1200px)}\n.clamp p{font-size:clamp(14px,1vw,1.2rem)}",g:["responsive","css","modern"]}
   ];
 
   // ── HELPERS ──
@@ -689,14 +731,17 @@
   function isJS(c){ return /function|const |let |var |fetch\(|allowedDomains|\.log\(|=>/.test(c); }
   function detectTag(t){ if(isJS(t.c)) return 'javascript'; if(t.g.some(x=>['layout','responsive','media'].includes(x))) return 'responsive'; if(t.g.some(x=>['brand','logo'].includes(x))) return 'brand'; if(t.g.some(x=>['has'].includes(x))) return 'has'; if(t.g.some(x=>['salla','zid','cart','product','footer','button'].includes(x))) return 'salla'; return 'css'; }
 
-  let DATA = SRC.map((s,i) => ({
-    id: 's' + i,
-    title: s.t,
-    tags: s.g,
-    starred: false,
-    desc: s.t.split(' - ')[1] || s.t.split(' - ')[0] || 'مقطع كود',
-    codes: [{ lang: isJS(s.c) ? 'JS' : 'CSS', code: s.c }]
-  }));
+  let DATA = SRC.map((s,i) => {
+    const std = {
+      id: 's' + i,
+      title: s.t,
+      tags: s.g,
+      starred: false,
+      desc: s.t.split(' - ')[1] || s.t.split(' - ')[0] || 'مقطع كود'
+    };
+    if (s.p) return { ...std, patterns: s.p, selectedPattern: 0, codes: [{ lang: isJS(s.p[0].code) ? 'JS' : 'CSS', code: s.p[0].code }] };
+    return { ...std, codes: [{ lang: isJS(s.c) ? 'JS' : 'CSS', code: s.c }] };
+  });
 
   let openIds  = new Set();
   let starredIds = new Set();
@@ -712,7 +757,7 @@
     let s = escHtml(code);
     s = s.replace(/(\/\*[\s\S]*?\*\/|\/\/[^\n]*)/g, m => `<span class="cmt">${m}</span>`);
     s = s.replace(/(&quot;[^&]*&quot;|&#39;[^&]*&#39;|url\([^)]*\))/g, m => `<span class="str">${m}</span>`);
-    const kws = ['@media','@keyframes','@font-face','@import','!important','content','display','background','border','padding','margin','color','height','width','max-height','direction','box-sizing','font-family','border-radius','overflow','position','transform','transition','animation','flex','grid','gap'];
+    const kws = ['@media','@keyframes','@font-face','@import','@supports','!important','content','display','background','border','padding','margin','color','height','width','max-height','direction','box-sizing','font-family','border-radius','overflow','position','transform','transition','animation','flex','grid','gap','aspect-ratio','scroll-behavior','filter','backdrop-filter','accent-color'];
     kws.forEach(k => { s = s.replace(new RegExp(`\\b(${k})\\b`, 'g'), '<span class="kw">$1</span>'); });
     s = s.replace(/((?:[\.\#\:][a-zA-Z][^\{<\n]*|\*)\s*(?=\{))/g, m => `<span class="sel">${m}</span>`);
     return s;
@@ -772,7 +817,7 @@
         const pctKey = '__pct_' + pctIdx;
         const short = key.replace(/^--color-|^--/, '');
         vars.push({ key: pctKey, label: short + ' (' + cm[2].trim() + ' ' + cm[3] + '%)', value: cm[3], type: 'range', baseVar: cm[1], secondColor: cm[2].trim(), varName: key });
-      } else if (/^--\d+$/.test(key)) {
+      } else if (/^--\d+$/.test(key) || /^#[0-9a-fA-F]{3,8}$/.test(val)) {
         vars.push({ key, label: key, value: val, type: /^#[0-9a-fA-F]{3,8}$/.test(val) ? 'color' : 'text' });
       }
     }
@@ -898,6 +943,14 @@
       const mixed = mixColors(c1, v.secondColor, pct);
       swatch.style.background = mixed || 'var(--bg-elevated)';
     });
+  }
+
+  function selectPattern(sectionId, idx){
+    const section = DATA.find(s => s.id === sectionId);
+    if (!section || !section.patterns) return;
+    section.selectedPattern = idx;
+    section.codes[0] = { lang: isJS(section.patterns[idx].code) ? 'JS' : 'CSS', code: section.patterns[idx].code };
+    renderAll();
   }
 
   function showToast(msg){
@@ -1262,8 +1315,17 @@
           </div>`;
         }).join('');
 
+        let patternBarHtml = '';
+        if (s.patterns) {
+          patternBarHtml = `<div class="pattern-bar">${
+            s.patterns.map((p,i) =>
+              `<button class="pattern-tab${i === (s.selectedPattern||0) ? ' active' : ''}" onclick="event.stopPropagation(); selectPattern('${s.id}',${i})">${escHtml(p.name)}</button>`
+            ).join('')
+          }</div>`;
+        }
         bodyHtml = `<div class="section-body open">
           <p class="section-desc">${escHtml(s.desc)}</p>
+          ${patternBarHtml}
           ${varPanelHtml}
           ${codesHtml}
         </div>`;
@@ -1324,7 +1386,7 @@
 
   // ── EXPORT / IMPORT ──
   function exportData(){
-    const exportArr = DATA.map(s => ({ title:s.title, tags:s.tags, desc:s.desc, codes:s.codes, starred:starredIds.has(s.id) }));
+    const exportArr = DATA.map(s => ({ title:s.title, tags:s.tags, desc:s.desc, codes:s.codes, patterns:s.patterns, selectedPattern:s.selectedPattern, starred:starredIds.has(s.id) }));
     const json = JSON.stringify(exportArr, null, 2);
     const blob = new Blob([json], { type:'application/json' });
     const url  = URL.createObjectURL(blob);
