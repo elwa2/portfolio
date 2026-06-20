@@ -362,6 +362,58 @@
         letter-spacing: -2px;
       }
 
+      .cut-line-vertical {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        left: auto;
+        right: auto;
+        background: var(--split-blue);
+        cursor: ew-resize;
+        z-index: 10;
+        box-shadow: 2px 0 8px rgba(59, 130, 246, 0.5);
+      }
+
+      .cut-line-vertical::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 40px;
+        background: var(--split-blue);
+        border-radius: 10px;
+      }
+
+      .cut-line-vertical::after {
+        content: '⋯⋯';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: -2px;
+      }
+
+      .cut-line-vertical .cut-line-label {
+        right: auto;
+        left: 50%;
+        top: 10px;
+        transform: translateX(-50%);
+        background: var(--split-blue);
+        writing-mode: horizontal-tb;
+      }
+
+      .cut-line-vertical .cut-line-remove {
+        left: -12px;
+        top: auto;
+        bottom: 10px;
+      }
+
       .cut-line-label {
         position: absolute;
         right: 10px;
@@ -811,9 +863,9 @@
                 </div>
               </div>
 
-              <div class="info-banner">
+              <div class="info-banner" id="infoBanner">
                 <i class="fas fa-info-circle"></i>
-                <span>انقر في أي مكان على الصورة لإضافة خط قطع. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.</span>
+                <span id="infoBannerText">انقر في أي مكان على الصورة لإضافة خط قطع أفقي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.</span>
               </div>
 
               <!-- Controls -->
@@ -830,6 +882,17 @@
                   <div class="control-item">
                     <label><i class="fas fa-sliders-h"></i> جودة الصورة (1-100)</label>
                     <input type="number" id="qualityInput" min="1" max="100" value="95" />
+                  </div>
+                  <div class="control-item">
+                    <label><i class="fas fa-arrows-alt"></i> اتجاه القطع</label>
+                    <div style="display: flex; gap: 8px;">
+                      <button class="btn btn-sm" id="btnHorizontal" style="flex:1; background: var(--primary-color); color: white;" onclick="setCutDirection('horizontal')">
+                        <i class="fas fa-arrows-alt-h"></i> أفقي
+                      </button>
+                      <button class="btn btn-sm" id="btnVertical" style="flex:1; background: var(--bg-color-alt); color: var(--text-color); border: 2px solid var(--border-color);" onclick="setCutDirection('vertical')">
+                        <i class="fas fa-arrows-alt-v"></i> عمودي
+                      </button>
+                    </div>
                   </div>
                   <div class="control-item">
                     <label><i class="fas fa-ruler-vertical"></i> عدد الأجزاء المتساوية</label>
@@ -1008,9 +1071,11 @@
       let isDragging = false;
       let draggedLine = null;
       let dragOffsetY = 0;
+      let dragOffsetX = 0;
       let currentImageSignature = null;
       let currentPdfPages = [];
       let currentPageIndex = 0;
+      let cutDirection = 'horizontal';
 
       const MAX_SEGMENT_SIZE_BYTES = 1024 * 1024; // 1MB
       const CROP_STORAGE_KEY = 'megasplit.savedCuts.v1';
@@ -1057,6 +1122,53 @@
             }
           }
         });
+      }
+
+      // Set Cut Direction
+      function setCutDirection(direction) {
+        cutDirection = direction;
+        const btnH = document.getElementById('btnHorizontal');
+        const btnV = document.getElementById('btnVertical');
+        const infoText = document.getElementById('infoBannerText');
+
+        if (direction === 'horizontal') {
+          btnH.style.background = 'var(--primary-color)';
+          btnH.style.color = 'white';
+          btnH.style.border = 'none';
+          btnV.style.background = 'var(--bg-color-alt)';
+          btnV.style.color = 'var(--text-color)';
+          btnV.style.border = '2px solid var(--border-color)';
+          infoText.textContent = 'انقر في أي مكان على الصورة لإضافة خط قطع أفقي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.';
+        } else {
+          btnV.style.background = 'var(--split-blue)';
+          btnV.style.color = 'white';
+          btnV.style.border = 'none';
+          btnH.style.background = 'var(--bg-color-alt)';
+          btnH.style.color = 'var(--text-color)';
+          btnH.style.border = '2px solid var(--border-color)';
+          infoText.textContent = 'انقر في أي مكان على الصورة لإضافة خط قطع عمودي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.';
+        }
+
+        cutLines = [];
+        updateCutLinesDisplay();
+        setupCanvasClick();
+      }
+
+      // Setup Canvas Click Handler
+      function setupCanvasClick() {
+        canvas.onclick = (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+
+          if (cutDirection === 'horizontal') {
+            const clickY = (e.clientY - rect.top) * scaleY;
+            addCutLine(clickY);
+          } else {
+            const clickX = (e.clientX - rect.left) * scaleX;
+            addCutLine(clickX);
+          }
+        };
       }
 
       // Handle File Upload
@@ -1170,15 +1282,7 @@
           totalPages: currentPdfPages.length
         });
         
-        // Setup canvas click for adding cut lines
-        canvas.onclick = (e) => {
-          const rect = canvas.getBoundingClientRect();
-          const scaleX = canvas.width / rect.width;
-          const scaleY = canvas.height / rect.height;
-          const clickY = (e.clientY - rect.top) * scaleY;
-          
-          addCutLine(clickY);
-        };
+        setupCanvasClick();
         
         // Reset cut lines
         cutLines = [];
@@ -1243,15 +1347,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
 
-        // Setup canvas click for adding cut lines
-        canvas.onclick = (e) => {
-          const rect = canvas.getBoundingClientRect();
-          const scaleX = canvas.width / rect.width;
-          const scaleY = canvas.height / rect.height;
-          const clickY = (e.clientY - rect.top) * scaleY;
-          
-          addCutLine(clickY);
-        };
+        setupCanvasClick();
 
         // Reset cut lines
         cutLines = [];
@@ -1273,14 +1369,22 @@
       }
 
       // Add Cut Line
-      function addCutLine(y) {
-        if (y < 10 || y > canvas.height - 10) {
-          return; // Too close to edges
+      function addCutLine(pos) {
+        if (cutDirection === 'horizontal') {
+          if (pos < 10 || pos > canvas.height - 10) return;
+        } else {
+          if (pos < 10 || pos > canvas.width - 10) return;
         }
 
         const lineId = ++lineIdCounter;
-        cutLines.push({ id: lineId, y: y });
-        cutLines.sort((a, b) => a.y - b.y);
+        cutLines.push({ id: lineId, pos: pos, direction: cutDirection });
+
+        if (cutDirection === 'horizontal') {
+          cutLines.sort((a, b) => a.pos - b.pos);
+        } else {
+          cutLines.sort((a, b) => a.pos - b.pos);
+        }
+
         updateCutLinesDisplay();
         saveCurrentCutLines();
       }
@@ -1295,12 +1399,18 @@
 
         cutLines.forEach((line, index) => {
           const lineEl = document.createElement('div');
-          lineEl.className = 'cut-line';
+          lineEl.className = line.direction === 'vertical' ? 'cut-line cut-line-vertical' : 'cut-line';
           lineEl.dataset.lineId = line.id;
-          
-          const scaleY = rect.height / canvas.height;
-          const topPos = line.y * scaleY;
-          lineEl.style.top = topPos + 'px';
+
+          if (line.direction === 'vertical') {
+            const scaleX = rect.width / canvas.width;
+            const leftPos = line.pos * scaleX;
+            lineEl.style.left = leftPos + 'px';
+          } else {
+            const scaleY = rect.height / canvas.height;
+            const topPos = line.pos * scaleY;
+            lineEl.style.top = topPos + 'px';
+          }
 
           // Label
           const label = document.createElement('div');
@@ -1344,7 +1454,12 @@
         draggedLine = cutLines.find(l => l.id === lineId);
         const lineEl = document.querySelector(`[data-line-id="${lineId}"]`);
         const rect = lineEl.getBoundingClientRect();
-        dragOffsetY = e.clientY - rect.top;
+
+        if (draggedLine.direction === 'vertical') {
+          dragOffsetX = e.clientX - rect.left - rect.width / 2;
+        } else {
+          dragOffsetY = e.clientY - rect.top - rect.height / 2;
+        }
 
         document.onmousemove = onDrag;
         document.onmouseup = stopDrag;
@@ -1355,13 +1470,25 @@
         if (!isDragging || !draggedLine) return;
 
         const canvasRect = canvas.getBoundingClientRect();
-        const scaleY = canvas.height / canvasRect.height;
-        const newY = (e.clientY - canvasRect.top - dragOffsetY) * scaleY;
 
-        if (newY >= 10 && newY <= canvas.height - 10) {
-          draggedLine.y = newY;
-          cutLines.sort((a, b) => a.y - b.y);
-          updateCutLinesDisplay();
+        if (draggedLine.direction === 'vertical') {
+          const scaleX = canvas.width / canvasRect.width;
+          const newX = (e.clientX - canvasRect.left) * scaleX;
+
+          if (newX >= 10 && newX <= canvas.width - 10) {
+            draggedLine.pos = newX;
+            cutLines.sort((a, b) => a.pos - b.pos);
+            updateCutLinesDisplay();
+          }
+        } else {
+          const scaleY = canvas.height / canvasRect.height;
+          const newY = (e.clientY - canvasRect.top) * scaleY;
+
+          if (newY >= 10 && newY <= canvas.height - 10) {
+            draggedLine.pos = newY;
+            cutLines.sort((a, b) => a.pos - b.pos);
+            updateCutLinesDisplay();
+          }
         }
       }
 
@@ -1398,11 +1525,17 @@
         }
 
         cutLines = [];
-        const segmentHeight = canvas.height / count;
-        
-        for (let i = 1; i < count; i++) {
-          const y = segmentHeight * i;
-          cutLines.push({ id: ++lineIdCounter, y: y });
+
+        if (cutDirection === 'horizontal') {
+          const segmentHeight = canvas.height / count;
+          for (let i = 1; i < count; i++) {
+            cutLines.push({ id: ++lineIdCounter, pos: segmentHeight * i, direction: 'horizontal' });
+          }
+        } else {
+          const segmentWidth = canvas.width / count;
+          for (let i = 1; i < count; i++) {
+            cutLines.push({ id: ++lineIdCounter, pos: segmentWidth * i, direction: 'vertical' });
+          }
         }
 
         updateCutLinesDisplay();
@@ -1422,30 +1555,44 @@
 
           segments = [];
 
-          // Get Y positions and add start/end
-          // إذا لم تكن هناك خطوط قطع، سيتم التعامل مع الصورة كصورة واحدة
-          const yPositions = cutLines.length === 0 ? 
-            [0, canvas.height] : 
-            [0, ...cutLines.map(l => l.y), canvas.height];
+          const isHorizontal = cutDirection === 'horizontal';
+          const totalSize = isHorizontal ? canvas.height : canvas.width;
+
+          const positions = cutLines.length === 0 ? 
+            [0, totalSize] : 
+            [0, ...cutLines.map(l => l.pos), totalSize];
 
           // Create segments
-          for (let i = 0; i < yPositions.length - 1; i++) {
-            const startY = yPositions[i];
-            const endY = yPositions[i + 1];
-            const height = endY - startY;
+          for (let i = 0; i < positions.length - 1; i++) {
+            const startPos = positions[i];
+            const endPos = positions[i + 1];
+            const size = endPos - startPos;
 
-            // Create temporary canvas for segment
             const segCanvas = document.createElement('canvas');
-            segCanvas.width = canvas.width;
-            segCanvas.height = height;
+
+            if (isHorizontal) {
+              segCanvas.width = canvas.width;
+              segCanvas.height = size;
+            } else {
+              segCanvas.width = size;
+              segCanvas.height = canvas.height;
+            }
+
             const segCtx = segCanvas.getContext('2d');
 
-            // Draw segment
-            segCtx.drawImage(
-              canvas,
-              0, startY, canvas.width, height,
-              0, 0, canvas.width, height
-            );
+            if (isHorizontal) {
+              segCtx.drawImage(
+                canvas,
+                0, startPos, canvas.width, size,
+                0, 0, canvas.width, size
+              );
+            } else {
+              segCtx.drawImage(
+                canvas,
+                startPos, 0, size, canvas.height,
+                0, 0, size, canvas.height
+              );
+            }
 
             // Auto-compress each segment to stay below 1MB.
             const compressedSegment = await compressSegmentToLimit(
@@ -1589,7 +1736,8 @@
           const img = new Image();
           img.onload = async () => {
             // Save current cut line ratios before replacing
-            const oldRatios = cutLines.map(line => line.y / canvas.height);
+            const total = cutDirection === 'horizontal' ? canvas.height : canvas.width;
+            const oldRatios = cutLines.map(line => line.pos / total);
 
             currentImage = img;
             currentImageSignature = await createImageSignature(file, img);
@@ -1599,10 +1747,11 @@
             // But first try to restore from old ratios if no preset exists for new image
             const presets = getSavedCutPresets();
             if (!presets[currentImageSignature]) {
+              const newTotal = cutDirection === 'horizontal' ? canvas.height : canvas.width;
               cutLines = oldRatios
-                .map(ratio => ({ id: ++lineIdCounter, y: Math.round(ratio * canvas.height) }))
-                .filter(line => line.y >= 10 && line.y <= canvas.height - 10)
-                .sort((a, b) => a.y - b.y);
+                .map(ratio => ({ id: ++lineIdCounter, pos: Math.round(ratio * newTotal), direction: cutDirection }))
+                .filter(line => line.pos >= 10 && line.pos <= newTotal - 10)
+                .sort((a, b) => a.pos - b.pos);
               updateCutLinesDisplay();
               saveCurrentCutLines();
             } else {
@@ -1631,6 +1780,25 @@
         cutLines = [];
         segments = [];
         lineIdCounter = 0;
+        cutDirection = 'horizontal';
+
+        // Reset direction buttons
+        const btnH = document.getElementById('btnHorizontal');
+        const btnV = document.getElementById('btnVertical');
+        const infoText = document.getElementById('infoBannerText');
+        if (btnH) {
+          btnH.style.background = 'var(--primary-color)';
+          btnH.style.color = 'white';
+          btnH.style.border = 'none';
+        }
+        if (btnV) {
+          btnV.style.background = 'var(--bg-color-alt)';
+          btnV.style.color = 'var(--text-color)';
+          btnV.style.border = '2px solid var(--border-color)';
+        }
+        if (infoText) {
+          infoText.textContent = 'انقر في أي مكان على الصورة لإضافة خط قطع أفقي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.';
+        }
 
         document.getElementById('uploadSection').style.display = 'block';
         document.getElementById('editorSection').style.display = '';
@@ -1676,8 +1844,12 @@
         presets[currentImageSignature] = {
           width: canvas.width,
           height: canvas.height,
+          direction: cutDirection,
           ratios: cutLines
-            .map(line => Number((line.y / canvas.height).toFixed(6)))
+            .map(line => {
+              const total = cutDirection === 'horizontal' ? canvas.height : canvas.width;
+              return Number((line.pos / total).toFixed(6));
+            })
             .filter(ratio => ratio > 0 && ratio < 1),
           updatedAt: Date.now()
         };
@@ -1702,13 +1874,40 @@
         if (!preset || !Array.isArray(preset.ratios)) return;
         if (preset.width !== canvas.width || preset.height !== canvas.height) return;
 
+        const dir = preset.direction || 'horizontal';
+        cutDirection = dir;
+
+        // Update UI buttons
+        const btnH = document.getElementById('btnHorizontal');
+        const btnV = document.getElementById('btnVertical');
+        const infoText = document.getElementById('infoBannerText');
+        if (dir === 'vertical') {
+          btnV.style.background = 'var(--split-blue)';
+          btnV.style.color = 'white';
+          btnV.style.border = 'none';
+          btnH.style.background = 'var(--bg-color-alt)';
+          btnH.style.color = 'var(--text-color)';
+          btnH.style.border = '2px solid var(--border-color)';
+          infoText.textContent = 'انقر في أي مكان على الصورة لإضافة خط قطع عمودي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.';
+        } else {
+          btnH.style.background = 'var(--primary-color)';
+          btnH.style.color = 'white';
+          btnH.style.border = 'none';
+          btnV.style.background = 'var(--bg-color-alt)';
+          btnV.style.color = 'var(--text-color)';
+          btnV.style.border = '2px solid var(--border-color)';
+          infoText.textContent = 'انقر في أي مكان على الصورة لإضافة خط قطع أفقي. يمكنك سحب الخطوط لتغيير موضعها أو حذفها.';
+        }
+
+        const total = dir === 'horizontal' ? canvas.height : canvas.width;
         const restoredLines = preset.ratios
           .map(ratio => Number(ratio))
           .filter(ratio => Number.isFinite(ratio) && ratio > 0 && ratio < 1)
-          .map(ratio => ({ id: ++lineIdCounter, y: Math.round(ratio * canvas.height) }))
-          .filter(line => line.y >= 10 && line.y <= canvas.height - 10);
+          .map(ratio => ({ id: ++lineIdCounter, pos: Math.round(ratio * total), direction: dir }))
+          .filter(line => line.pos >= 10 && line.pos <= total - 10);
 
-        cutLines = restoredLines.sort((a, b) => a.y - b.y);
+        cutLines = restoredLines.sort((a, b) => a.pos - b.pos);
+        setupCanvasClick();
         updateCutLinesDisplay();
       }
 
