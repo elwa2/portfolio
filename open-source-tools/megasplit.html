@@ -801,6 +801,10 @@
               <div class="editor-header">
                 <h3><i class="fas fa-edit"></i> تحرير وتقسيم الصورة</h3>
                 <div class="editor-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('replaceImageInput').click()">
+                    <i class="fas fa-exchange-alt"></i> استبدال الصورة
+                  </button>
+                  <input type="file" id="replaceImageInput" accept="image/*" style="display:none" onchange="replaceImage(event)" />
                   <button class="btn btn-secondary btn-sm" onclick="resetApp()">
                     <i class="fas fa-undo"></i> تحميل صورة جديدة
                   </button>
@@ -880,6 +884,9 @@
               <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="downloadAll()">
                   <i class="fas fa-download"></i> تحميل الكل (ZIP)
+                </button>
+                <button class="btn btn-primary" onclick="editSegments()">
+                  <i class="fas fa-edit"></i> تعديل القطع
                 </button>
                 <button class="btn btn-secondary" onclick="resetApp()">
                   <i class="fas fa-redo"></i> بدء مشروع جديد
@@ -1254,8 +1261,11 @@
       // Show Editor
       function showEditor(isPdf = false) {
         document.getElementById('uploadSection').style.display = 'none';
-        document.getElementById('editorSection').classList.add('active');
+        const editorEl = document.getElementById('editorSection');
+        editorEl.style.display = '';
+        editorEl.classList.add('active');
         document.getElementById('segmentsSection').classList.remove('active');
+        document.getElementById('segmentsSection').style.display = 'none';
         
         if (isPdf && currentPdfPages.length > 1) {
           showPdfPageControls();
@@ -1470,7 +1480,10 @@
       // Show Segments
       function showSegments() {
         document.getElementById('editorSection').style.display = 'none';
-        document.getElementById('segmentsSection').classList.add('active');
+        document.getElementById('editorSection').classList.remove('active');
+        const segEl = document.getElementById('segmentsSection');
+        segEl.style.display = '';
+        segEl.classList.add('active');
         document.getElementById('segmentsTotal').textContent = segments.length;
 
         const grid = document.getElementById('segmentsGrid');
@@ -1551,6 +1564,60 @@
         }
       }
 
+      // Edit Segments - go back to editor with same image and cut lines
+      function editSegments() {
+        if (!currentImage) return;
+        document.getElementById('segmentsSection').classList.remove('active');
+        showEditor();
+      }
+
+      // Replace image while keeping cut lines
+      function replaceImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          alert('يرجى اختيار ملف صورة صالح');
+          return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+          alert('حجم الملف كبير جداً. الحد الأقصى 20MB');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = async () => {
+            // Save current cut line ratios before replacing
+            const oldRatios = cutLines.map(line => line.y / canvas.height);
+
+            currentImage = img;
+            currentImageSignature = await createImageSignature(file, img);
+            loadImageToCanvas(img);
+
+            // Restore cut lines based on saved presets (which use the new image signature)
+            // But first try to restore from old ratios if no preset exists for new image
+            const presets = getSavedCutPresets();
+            if (!presets[currentImageSignature]) {
+              cutLines = oldRatios
+                .map(ratio => ({ id: ++lineIdCounter, y: Math.round(ratio * canvas.height) }))
+                .filter(line => line.y >= 10 && line.y <= canvas.height - 10)
+                .sort((a, b) => a.y - b.y);
+              updateCutLinesDisplay();
+              saveCurrentCutLines();
+            } else {
+              restoreSavedCutLines();
+            }
+
+            // Reset file input so same file can be re-selected
+            event.target.value = '';
+          };
+          img.onerror = () => alert('فشل تحميل الصورة. يرجى المحاولة مرة أخرى.');
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
       // Reset App
       function resetApp() {
         if (segments.length > 0) {
@@ -1566,7 +1633,9 @@
         lineIdCounter = 0;
 
         document.getElementById('uploadSection').style.display = 'block';
+        document.getElementById('editorSection').style.display = '';
         document.getElementById('editorSection').classList.remove('active');
+        document.getElementById('segmentsSection').style.display = '';
         document.getElementById('segmentsSection').classList.remove('active');
         document.getElementById('fileInput').value = '';
 
