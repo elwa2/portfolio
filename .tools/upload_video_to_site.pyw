@@ -1,16 +1,337 @@
+#!/usr/bin/env python3
+"""
+VideoToolkit Server
+يخدم HTML واجهة تحويل/ضغط/رفع الفيديو، ويستخدم ffmpeg للمعالجة و Git للرفع.
+"""
+
+import base64
+import io
+import json
+import logging
+import os
+import re
 import shutil
 import subprocess
+import sys
+import tempfile
+import threading
+import time
+import webbrowser
 from datetime import datetime
 from pathlib import Path
-from tkinter import Tk, Text, ttk, filedialog, messagebox, StringVar
-from urllib.parse import quote
 
+import flask
+from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("video_toolkit")
+
+# ── Paths ──────────────────────────────────────────────────────────────────
+REPO_ROOT = Path(__file__).resolve().parents[1]
 ASSETS_DIR = REPO_ROOT / "assets" / "video" / "work"
 BASE_URL = "https://elwa2.github.io/portfolio/assets/video/work"
+HTML_FILE = REPO_ROOT / "open-source-tools" / "video-toolkit.html"
+PORT = int(os.environ.get("VIDEO_TOOLKIT_PORT", 8765))
+
+# ── Progress State ─────────────────────────────────────────────────────────
+_progress = {"percent": 0, "label": ""}
+_progress_lock = threading.Lock()
 
 
+def set_progress(pct: int, label: str = ""):
+    with _progress_lock:
+        _progress["percent"] = min(max(pct, 0), 100)
+        if label:
+            _progress["label"] = label
+
+
+def get_progress():
+    with _progress_lock:
+        return dict(_progress)
+
+
+# ── FFmpeg helpers ─────────────────────────────────────────────────────────
+_FFMPEG_CANDIDATE_PATHS = [
+    r"C:\ffmpeg\bin\ffmpeg.exe",
+    r"C:\ffmpeg\ffmpeg.exe",
+    r"C:\ffmpeg.exe",
+]
+
+def _find_ffmpeg() -> str | None:
+    # 1) Try PATH
+    which = shutil.which("ffmpeg")
+    if which:
+        return which
+    # 2) Try common installation paths
+    for p in _FFMPEG_CANDIDATE_PATHS:
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+FFMPEG_BIN = _find_ffmpeg()
+
+
+def check_ffmpeg() -> bool:
+    return FFMPEG_BIN is not None
+
+
+def ffmpeg_cmd() -> list[str]:
+    """Return the command prefix for invoking ffmpeg."""
+    return [FFMPEG_BIN] if FFMPEG_BIN else ["ffmpeg"]
+
+
+def run_ffmpeg(args, duration_sec: float = None):
+    """Run ffmpeg and parse progress from stderr."""
+    cmd = ffmpeg_cmd() + ["-y"] + args
+    logger.info("Running: %s", " ".join(cmd))
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    # Parse progress
+    prog_re = re.compile(r"time=(\d+):(\d+):(\d+\.\d+)")
+    while True:
+        line = proc.stderr.readline()
+        if not line and proc.poll() is not None:
+            break
+        m = prog_re.search(line)
+        if m and duration_sec:
+            h, m_, s = int(m.group(1)), int(m.group(2)), float(m.group(3))
+            elapsed = h * 3600 + m_ * 60 + s
+            pct = int(elapsed / duration_sec * 100)
+            set_progress(min(pct, 99))
+    rc = proc.wait()
+    if rc != 0:
+        err = proc.stderr.read()
+        raise RuntimeError(f"ffmpeg failed (rc={rc}): {err[:500]}")
+    set_progress(100)
+
+
+def get_video_duration(file_path: Path) -> float:
+    """Get video duration in seconds using ffprobe."""
+    ffprobe = str(Path(FFMPEG_BIN).parent / "ffprobe.exe") if FFMPEG_BIN else "ffprobe"
+    cmd = [
+        ffprobe,
+        "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        str(file_path),
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return float(result.stdout.strip())
+    except Exception:
+        return 60  # fallback
+
+
+def ffmpeg_probe_resolution(file_path: Path) -> tuple:
+    """Get (width, height) of video."""
+    ffprobe = str(Path(FFMPEG_BIN).parent / "ffprobe.exe") if FFMPEG_BIN else "ffprobe"
+    cmd = [
+        ffprobe, "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=p=0",
+        str(file_path),
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        parts = result.stdout.strip().split(",")
+        return int(parts[0]), int(parts[1])
+    except Exception:
+        return (1920, 1080)
+
+
+# ── Flask App ──────────────────────────────────────────────────────────────
+app = Flask(__name__)
+CORS(app)
+
+
+@app.route("/")
+def index():
+    if HTML_FILE.exists():
+        return send_file(str(HTML_FILE))
+    return "HTML file not found", 404
+
+
+@app.route("/api/progress")
+def api_progress():
+    return jsonify(get_progress())
+
+
+@app.route("/api/video", methods=["POST"])
+def api_video():
+    action = request.form.get("action", "")
+    logger.info("API request: action=%s", action)
+
+    try:
+        if action == "convert":
+            return handle_convert(request)
+        elif action == "compress":
+            return handle_compress(request)
+        elif action == "upload":
+            return handle_upload(request)
+        else:
+            return jsonify({"error": f"Unknown action: {action}"}), 400
+    except Exception as e:
+        logger.exception("Error in %s", action)
+        return jsonify({"error": str(e)}), 500
+
+
+def get_uploaded_file(req) -> tuple:
+    """Extract uploaded file and optional custom name from request."""
+    f = req.files.get("file")
+    if not f:
+        raise ValueError("لم يتم إرسال ملف")
+    name = req.form.get("name") or f.filename or "video"
+    return f, name
+
+
+def save_temp_file(f) -> Path:
+    tmp = Path(tempfile.mkdtemp()) / f.filename
+    f.save(str(tmp))
+    return tmp
+
+
+# ── Convert ────────────────────────────────────────────────────────────────
+def handle_convert(req):
+    if not check_ffmpeg():
+        return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
+
+    f, name = get_uploaded_file(req)
+    crf = req.form.get("crf", "23")
+    preset = req.form.get("preset", "medium")
+    scale = req.form.get("scale", "1")
+
+    tmp_input = save_temp_file(f)
+    try:
+        duration = get_video_duration(tmp_input)
+        output_name = Path(name).stem + ".webm"
+        tmp_output = tmp_input.parent / output_name
+
+        args = ["-i", str(tmp_input), "-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset]
+
+        if scale != "1":
+            w, h = ffmpeg_probe_resolution(tmp_input)
+            new_w = int(w * float(scale))
+            new_h = int(h * float(scale))
+            if new_w % 2:
+                new_w += 1
+            if new_h % 2:
+                new_h += 1
+            args += ["-vf", f"scale={new_w}:{new_h}"]
+
+        args += ["-an", str(tmp_output)]
+
+        set_progress(0, "جاري التحويل إلى WebM...")
+        run_ffmpeg(args, duration)
+
+        with open(tmp_output, "rb") as bf:
+            b64 = base64.b64encode(bf.read()).decode()
+
+        return jsonify({
+            "data": b64,
+            "mime": "video/webm",
+            "name": output_name,
+        })
+    finally:
+        shutil.rmtree(tmp_input.parent, ignore_errors=True)
+
+
+# ── Compress ───────────────────────────────────────────────────────────────
+def handle_compress(req):
+    if not check_ffmpeg():
+        return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
+
+    f, name = get_uploaded_file(req)
+    target_mb = int(req.form.get("target", "10"))
+    fmt = req.form.get("format", "webm")
+    audio_bitrate = req.form.get("audio_bitrate", "128")
+
+    tmp_input = save_temp_file(f)
+    try:
+        duration = get_video_duration(tmp_input)
+        ext = "webm" if fmt == "webm" else "mp4"
+        output_name = Path(name).stem + f"_compressed.{ext}"
+        tmp_output = tmp_input.parent / output_name
+
+        target_bits = target_mb * 8 * 1024 * 1024
+        audio_bits = int(audio_bitrate) * 1000 * duration
+        video_bitrate = max(50000, int((target_bits - audio_bits) / duration))
+
+        vcodec = "libvpx-vp9" if fmt == "webm" else "libx264"
+        acodec = "libopus" if fmt == "webm" else "aac"
+
+        args = [
+            "-i", str(tmp_input),
+            "-c:v", vcodec,
+            "-b:v", str(video_bitrate),
+            "-maxrate", str(int(video_bitrate * 1.5)),
+            "-bufsize", str(video_bitrate * 2),
+            "-c:a", acodec,
+            "-b:a", f"{audio_bitrate}k",
+            str(tmp_output),
+        ]
+
+        set_progress(0, "جاري ضغط الفيديو...")
+        run_ffmpeg(args, duration)
+
+        with open(tmp_output, "rb") as bf:
+            b64 = base64.b64encode(bf.read()).decode()
+
+        mime = "video/webm" if fmt == "webm" else "video/mp4"
+        return jsonify({"data": b64, "mime": mime, "name": output_name})
+    finally:
+        shutil.rmtree(tmp_input.parent, ignore_errors=True)
+
+
+# ── Upload ─────────────────────────────────────────────────────────────────
+def handle_upload(req):
+    f, name = get_uploaded_file(req)
+
+    set_progress(10, "جاري حفظ الملف...")
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+
+    dest = unique_destination(ASSETS_DIR, name)
+    f.save(str(dest))
+
+    rel_path = dest.relative_to(REPO_ROOT).as_posix()
+    file_url = f"{BASE_URL}/{dest.name}"
+
+    logger.info("Saved to %s", dest)
+
+    set_progress(40, "جاري رفع إلى GitHub...")
+
+    try:
+        run_git(["add", rel_path], REPO_ROOT)
+        try:
+            run_git(["commit", "-m", f"Add video {dest.name}"], REPO_ROOT)
+        except subprocess.CalledProcessError as exc:
+            if "nothing to commit" not in (exc.stderr or "") and "nothing to commit" not in (exc.stdout or ""):
+                raise
+
+        try:
+            run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
+            set_progress(70)
+        except subprocess.CalledProcessError as exc:
+            return jsonify({"error": f"Git pull failed: {exc.stderr}"}), 500
+
+        run_git(["push"], REPO_ROOT)
+        set_progress(100, "تم الرفع!")
+    except subprocess.CalledProcessError as exc:
+        error_text = exc.stderr.strip() or exc.stdout.strip() or "فشل git"
+        logger.error("Git error: %s", error_text)
+        return jsonify({"error": error_text}), 500
+
+    logger.info("Uploaded: %s", file_url)
+    return jsonify({"url": file_url, "path": rel_path})
+
+
+# ── Git helpers ────────────────────────────────────────────────────────────
 def run_git(args, cwd):
     return subprocess.run(
         ["git", *args],
@@ -31,115 +352,33 @@ def unique_destination(dest_dir, filename):
     return dest_dir / f"{stem}_{stamp}{suffix}"
 
 
-def upload_video(status_var, log_box):
-    src_path = filedialog.askopenfilename(
-        title="اختيار ملف فيديو",
-        filetypes=[
-            ("Video files", "*.mp4;*.mov;*.mkv;*.webm;*.avi;*.wmv"),
-            ("All files", "*.*"),
-        ],
-    )
-    if not src_path:
-        return
+# ── Main ───────────────────────────────────────────────────────────────────
+def main():
+    if not HTML_FILE.exists():
+        print(f"❌ HTML file not found: {HTML_FILE}")
+        sys.exit(1)
 
-    src = Path(src_path)
-    if not src.exists():
-        messagebox.showerror("خطأ", "الملف غير موجود.")
-        return
+    if not check_ffmpeg():
+        print("⚠️  ffmpeg غير مثبت على النظام.")
+        print("   سيتم تعطيل خاصية التحويل والضغط.")
+        print("   قم بتثبيت ffmpeg من: https://ffmpeg.org/download.html")
+        print()
+
+    print(f"🚀 VideoToolkit Server")
+    print(f"   الرابط: http://localhost:{PORT}")
+    print("   اضغط Ctrl+C للإيقاف")
+    print()
+
+    # Open browser
+    threading.Timer(1.5, lambda: webbrowser.open(f"http://localhost:{PORT}")).start()
 
     try:
-        ASSETS_DIR.mkdir(parents=True, exist_ok=True)
-        dest = unique_destination(ASSETS_DIR, src.name)
-        shutil.copy2(src, dest)
-
-        rel_path = dest.relative_to(REPO_ROOT).as_posix()
-        status_var.set("جارٍ رفع الملف إلى GitHub...")
-        log_box.insert("end", f"تم نسخ الملف إلى: {dest}\n")
-
-        run_git(["add", rel_path], REPO_ROOT)
-        try:
-            run_git(["commit", "-m", f"Add video {dest.name}"], REPO_ROOT)
-        except subprocess.CalledProcessError as exc:
-            if "nothing to commit" not in (exc.stderr or "") and "nothing to commit" not in (exc.stdout or ""):
-                raise
-
-        # Ensure we are up to date before pushing
-        try:
-            run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
-        except subprocess.CalledProcessError as exc:
-            error_text = exc.stderr.strip() or exc.stdout.strip() or "فشل git pull."
-            log_box.insert("end", f"فشل git pull:\n{error_text}\n")
-            status_var.set("فشل الرفع.")
-            messagebox.showerror("خطأ Git", error_text)
-            return
-
-        run_git(["push"], REPO_ROOT)
-
-        file_url = f"{BASE_URL}/{quote(dest.name)}"
-        log_box.insert("end", f"تم الرفع بنجاح.\nالرابط: {file_url}\n")
-        status_var.set("تم الرفع بنجاح.")
-        messagebox.showinfo("تم", f"الرابط:\n{file_url}")
-    except subprocess.CalledProcessError as exc:
-        error_text = exc.stderr.strip() or exc.stdout.strip() or "خطأ غير معروف."
-        log_box.insert("end", f"فشل أمر git:\n{error_text}\n")
-        status_var.set("فشل الرفع.")
-        messagebox.showerror("خطأ Git", error_text)
-    except Exception as exc:
-        log_box.insert("end", f"خطأ: {exc}\n")
-        status_var.set("فشل الرفع.")
-        messagebox.showerror("خطأ", str(exc))
-
-
-def main():
-    root = Tk()
-    root.title("رفع فيديو للموقع")
-    root.geometry("520x320")
-
-    status_var = StringVar(value="جاهز.")
-
-    frame = ttk.Frame(root, padding=12)
-    frame.pack(fill="both", expand=True)
-
-    ttk.Label(
-        frame,
-        text="اختر ملف الفيديو وسيتم نسخه إلى assets/video/work ثم رفعه إلى GitHub.",
-        wraplength=480,
-        justify="left",
-    ).pack(anchor="w")
-
-    ttk.Button(
-        frame,
-        text="اختيار فيديو ورفعه",
-        command=lambda: upload_video(status_var, log_box),
-    ).pack(pady=10, anchor="w")
-
-    log_box = Text(frame, height=10)
-    log_box.pack(fill="both", expand=True)
-
-    def copy_latest_link():
-        content = log_box.get("1.0", "end")
-        lines = [line.strip() for line in content.splitlines() if line.strip()]
-        link = ""
-        for line in reversed(lines):
-            if line.startswith("الرابط:"):
-                link = line.replace("الرابط:", "", 1).strip()
-                break
-        if not link:
-            messagebox.showwarning("تنبيه", "لا يوجد رابط لنسخه بعد.")
-            return
-        root.clipboard_clear()
-        root.clipboard_append(link)
-        status_var.set("تم نسخ الرابط.")
-
-    ttk.Button(
-        frame,
-        text="نسخ رابط آخر فيديو",
-        command=copy_latest_link,
-    ).pack(pady=6, anchor="w")
-
-    ttk.Label(frame, textvariable=status_var).pack(anchor="w", pady=(8, 0))
-
-    root.mainloop()
+        app.run(host="127.0.0.1", port=PORT, debug=False)
+    except KeyboardInterrupt:
+        print("\n👋 إيقاف...")
+    except OSError as e:
+        print(f"❌ فشل تشغيل السيرفر: {e}")
+        print(f"   قد يكون هناك برنامج آخر يستخدم المنفذ {PORT}")
 
 
 if __name__ == "__main__":
