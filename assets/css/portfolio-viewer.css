@@ -234,6 +234,31 @@
   z-index: 10001;
 }
 
+/* زر المعاينة في بطاقة العمل */
+.work-card-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  white-space: nowrap;
+}
+
+.work-card-preview:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+  color: white;
+}
+
 /* تحسينات للموبايل */
 @media (max-width: 768px) {
   .viewer-toolbar {

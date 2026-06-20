@@ -368,6 +368,44 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // فتح المعاينة بالشاشة الكاملة
+  // ═══════════════════════════════════════════════════════════════
+
+  function openPreview(imgSrc) {
+    const previewWindow = window.open("", "_blank");
+    if (previewWindow) {
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>معاينة</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            html, body {
+              width: 100%; height: 100%;
+              background: #000;
+              overflow: hidden;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${imgSrc}" alt="معاينة" />
+        </body>
+        </html>
+      `);
+      previewWindow.document.close();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // التهيئة التلقائية
   // ═══════════════════════════════════════════════════════════════
 
@@ -384,12 +422,11 @@
       if (card) {
         const heading = card.querySelector("h3");
         if (heading) title = heading.textContent;
+        const overlay = card.querySelector(".work-card-overlay");
 
         // Inject zoom button if missing
         let zoomBtn = card.querySelector(".work-card-zoom");
-        if (!zoomBtn) {
-          const overlay = card.querySelector(".work-card-overlay");
-          if (overlay) {
+        if (!zoomBtn && overlay) {
             let actions = overlay.querySelector(".work-card-actions");
             if (!actions) {
               // Create actions wrapper if missing (wrapping existing links)
@@ -409,7 +446,36 @@
               </svg>
             `;
             actions.appendChild(zoomBtn);
-          }
+        }
+
+        // Inject preview button if missing
+        let previewBtn = card.querySelector(".work-card-preview");
+        if (!previewBtn && overlay) {
+            let actions = overlay.querySelector(".work-card-actions");
+            if (!actions) {
+              actions = document.createElement("div");
+              actions.className = "work-card-actions";
+              const existingLinks = overlay.querySelectorAll("a");
+              existingLinks.forEach((link) => actions.appendChild(link));
+              overlay.appendChild(actions);
+            }
+
+            const imgSrc = img.getAttribute("src") || img.src;
+            previewBtn = document.createElement("button");
+            previewBtn.className = "work-card-preview";
+            previewBtn.title = "معاينة الصورة بالحجم الكامل";
+            previewBtn.innerHTML = `
+              <svg class="svg-icon" viewBox="0 0 576 512" style="width: 14px; height: 14px; fill: currentColor;">
+                <use xlink:href="assets/images/icons.svg#icon-eye"></use>
+              </svg>
+              معاينة
+            `;
+            previewBtn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              openPreview(imgSrc);
+            });
+            actions.insertBefore(previewBtn, zoomBtn);
         }
 
         // Add click listener to the ZOOM BUTTON
