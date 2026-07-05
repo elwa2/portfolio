@@ -33,6 +33,42 @@
     <meta content='مصمم متاجر سلة و زد ورمز' property='og:site_name'/>
     <meta content='summary_large_image' name='twitter:card'/>
     <meta content='@salla1zid' name='twitter:site'/>
+    <meta content='https://www.salla1zid.com/' name='twitter:url'/>
+
+    <!-- JSON-LD Schema -->
+    <script type='application/ld+json'>
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Ali Ahmed",
+      "url": "https://www.salla1zid.com/",
+      "image": "https://www.salla1zid.com/logo.png",
+      "jobTitle": "مصمم متاجر إلكترونية",
+      "description": "مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة ورمز",
+      "sameAs": [
+        "https://wa.me/201002241591",
+        "https://www.instagram.com/salla1zid/",
+        "https://twitter.com/salla1zid",
+        "https://t.me/cssfree1",
+        "https://www.youtube.com/@customcss296",
+        "https://www.behance.net/3lwaaa1"
+      ]
+    }
+    </script>
+    <script type='application/ld+json'>
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "مصمم متاجر سلة و زد ورمز",
+      "url": "https://www.salla1zid.com/",
+      "description": "نقدم خدمات تصميم وتطوير متاجر سلة وزد ورمز، تخصيص CSS احترافي، أكواد خصم حصرية، وأدوات مفتوحة المصدر لنجاح متجرك الإلكتروني.",
+      "inLanguage": "ar",
+      "author": {
+        "@type": "Person",
+        "name": "Ali Ahmed"
+      }
+    }
+    </script>
 
     <!-- Fonts -->
     <link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&amp;display=swap' rel='stylesheet'/>
@@ -69,6 +105,9 @@
   --shadow: 0 4px 20px rgba(94, 59, 238, 0.1);
   --shadow-hover: 0 12px 40px rgba(94, 59, 238, 0.2);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --header-bg: rgba(65, 47, 144, 0.2);
 }
 
@@ -248,6 +287,54 @@ img { max-width: 100%; height: auto; }
   .mobile-toggle { display: flex !important; }
   .header { width: 95%; padding: 8px 15px; }
   .header-whatsapp-btn span { display: none; }
+}
+
+/* ===== Focus & Accessibility ===== */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus-visible, a:focus-visible { outline-offset: 3px; }
+
+/* ===== Card Hover Refinements ===== */
+.service-card, .help-card, .discount-card, .store-link-card, .blog-post-card {
+  transition: transform 0.4s var(--ease-out-quart), box-shadow 0.4s var(--ease-out-quart), border-color 0.3s ease;
+}
+.service-card:hover, .help-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ===== Section Title Polish ===== */
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+}
+.section-title h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+}
+.section-title h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.section-title p {
+  color: var(--text-light);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
 }
 
 /* ===== Hero Section ===== */
@@ -629,8 +716,12 @@ img { max-width: 100%; height: auto; }
   padding: 20px 0;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  cursor: grab;
 }
+.portfolio-scroll:active { cursor: grabbing; }
 .portfolio-scroll::-webkit-scrollbar { height: 6px; }
+.portfolio-scroll::-webkit-scrollbar-track { background: var(--bg-alt); border-radius: 3px; }
 .portfolio-scroll::-webkit-scrollbar-thumb { background: var(--primary-gradient); border-radius: 3px; }
 .portfolio-item-snap {
   flex: 0 0 300px;
@@ -639,26 +730,83 @@ img { max-width: 100%; height: auto; }
   overflow: hidden;
   scroll-snap-align: start;
   box-shadow: var(--shadow);
-  transition: var(--transition);
+  transition: transform 0.4s var(--ease-out-quart), box-shadow 0.4s var(--ease-out-quart);
   position: relative;
   cursor: pointer;
+  border: 1px solid var(--border);
 }
+.portfolio-item-snap:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .portfolio-item-snap:hover { transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-hover); }
+.portfolio-item-snap .mockup-browser {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.portfolio-item-snap .mockup-bar {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+}
+.portfolio-item-snap .mockup-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.portfolio-item-snap .mockup-url {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.7);
+  margin-right: auto;
+  direction: ltr;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.portfolio-item-snap .mockup-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.4s var(--ease-out-quart);
+}
+.portfolio-item-snap .mockup-icon { font-size: 2.5rem; margin-bottom: 8px; transition: transform 0.3s var(--ease-out-quart); }
+.portfolio-item-snap .mockup-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.95);
+}
+.portfolio-item-snap .mockup-desc {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 3px;
+}
+.portfolio-item-snap:hover .mockup-content { transform: scale(1.04); }
+.portfolio-item-snap:hover .mockup-icon { transform: scale(1.15); }
+.portfolio-item-snap:active { transform: translateY(-4px) scale(0.98); }
 .portfolio-item-snap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s var(--ease-out-quart);
 }
 .portfolio-item-snap:hover img { transform: scale(1.1); }
 .portfolio-item-snap .overlay {
   position: absolute;
   bottom: 0; left: 0; right: 0;
   padding: 20px;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
   color: white;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s var(--ease-out-quart);
+  pointer-events: none;
 }
 .portfolio-item-snap:hover .overlay { opacity: 1; }
 .portfolio-item-snap .overlay h4 { font-size: 1rem; margin-bottom: 5px; }
@@ -668,7 +816,82 @@ img { max-width: 100%; height: auto; }
   display: flex;
   align-items: center;
   gap: 5px;
+  pointer-events: auto;
 }
+.portfolio-item-snap .overlay a:focus-visible { outline: 2px solid white; outline-offset: 2px; border-radius: 4px; }
+
+/* ===== Toast Notification ===== */
+.copy-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.4s var(--ease-out-quart);
+  pointer-events: none;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== Button Outline Glow ===== */
+.btn-outline-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 50px;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-quart);
+  text-decoration: none;
+  position: relative;
+}
+.btn-outline-glow:hover {
+  background: var(--primary-gradient);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 5px 20px rgba(var(--primary-rgb), 0.3);
+  transform: translateY(-2px);
+}
+.btn-outline-glow:active { transform: translateY(0) scale(0.98); }
+
+/* ===== Primary Glow Button ===== */
+.btn-primary-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  border-radius: 50px;
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-quart);
+  text-decoration: none;
+  box-shadow: 0 5px 20px rgba(var(--primary-rgb), 0.25);
+}
+.btn-primary-glow:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.4);
+  color: white;
+}
+.btn-primary-glow:active { transform: translateY(0) scale(0.97); }
 
 /* ===== Store Links ===== */
 .stores-section { padding: 80px 0; }
@@ -1302,6 +1525,19 @@ img { max-width: 100%; height: auto; }
   .partners-grid { grid-template-columns: repeat(2, 1fr); }
   .tool-squircle { width: 100px; height: 100px; }
   .services-grid { grid-template-columns: 1fr; }
+  .portfolio-scroll { padding: 15px 0 25px; gap: 15px; }
+  .portfolio-item-snap { flex: 0 0 260px; height: 230px; }
+  .discounts-grid { grid-template-columns: 1fr; }
+  .discount-card { padding: 20px; }
+  .section-title h2 { font-size: 1.5rem; }
+  .section-title h2::after { width: 40px; }
+  .help-grid { grid-template-columns: 1fr; }
+}
+@media (pointer: coarse) {
+  .nav-links li a { padding: 12px 20px; min-height: 44px; display: flex; align-items: center; }
+  .theme-toggle, .mobile-toggle { width: 44px; height: 44px; }
+  .portfolio-item-snap { min-height: 44px; }
+  .store-link-card { padding: 20px 15px; }
 }
 
 /* ===== Page Header (for inner pages) ===== */
@@ -1315,7 +1551,28 @@ img { max-width: 100%; height: auto; }
 .page-header h1 { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; }
 .page-header p { color: var(--text-light); font-size: 1.05rem; }
 
-/* ===== Blog Styles ===== */
+/* ===== Tab Panels ===== */
+.tab-panels { width: 100%; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.tab-panel.active .hero-section { display: flex; }
+
+/* Tab switching animation */
+.tab-panel.active { animation: tabFadeIn 0.35s var(--ease-out-quart); will-change: transform, opacity; }
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-panel.active .hero-section { animation: heroFadeIn 0.5s var(--ease-out-expo); }
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel.active, .tab-panel.active .hero-section { animation: none; }
+}
+
+/* Blog Styles */
 .blog-container {
   padding: 140px 0 60px;
   max-width: 1200px;
@@ -1440,18 +1697,20 @@ img { max-width: 100%; height: auto; }
         <div class='logo'><a href='/'>Ali Ahmed</a></div>
         <nav class='nav'>
           <ul class='nav-links'>
-            <li><a class='active' href='/'>الرئيسية</a></li>
-            <li><a href='#services'>الخدمات</a></li>
-            <li><a href='#about'>من نحن</a></li>
-            <li><a href='#portfolio'>أعمالنا</a></li>
+            <li><a class='active' href='javascript:void(0)' onclick='switchTab("home")'>الرئيسية</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("services")'>الخدمات</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("about")'>من نحن</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("portfolio")'>أعمالنا</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("tools")'>الأدوات</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("discounts")'>أكواد الخصم</a></li>
             <li><a href='/search'>المدونة</a></li>
-            <li><a href='#contact'>اتصل بنا</a></li>
+            <li><a href='javascript:void(0)' onclick='switchTab("contact")'>اتصل بنا</a></li>
           </ul>
         </nav>
         <div class='header-actions'>
-          <button class='theme-toggle' onclick='toggleTheme()'>🌙</button>
-          <a class='header-whatsapp-btn' href='https://wa.me/201002241591' target='_blank' rel='noopener'>💬 <span>تواصل</span></a>
-          <button class='mobile-toggle'>☰</button>
+          <button class='theme-toggle' onclick='toggleTheme()' aria-label='تبديل الثيم'>🌙</button>
+          <a class='header-whatsapp-btn' href='https://wa.me/201002241591' target='_blank' rel='noopener' aria-label='تواصل عبر واتساب'>💬 <span>تواصل</span></a>
+          <button class='mobile-toggle' aria-label='فتح القائمة'>☰</button>
         </div>
       </div>
     </header>
@@ -1472,6 +1731,7 @@ img { max-width: 100%; height: auto; }
               initBackToTop();
               initYear();
               initActiveNav();
+              initTabSwipe();
             });
             
             // ===== نظام الألوان =====
@@ -1588,7 +1848,7 @@ img { max-width: 100%; height: auto; }
             
             // ===== نسخ النص =====
             function copyCode(code, btn) {
-              navigator.clipboard.writeText(code).then(function() {
+              function done() {
                 const orig = btn.textContent;
                 btn.textContent = '✅ تم النسخ';
                 btn.style.background = '#10B981';
@@ -1598,7 +1858,24 @@ img { max-width: 100%; height: auto; }
                   btn.style.background = '';
                   btn.disabled = false;
                 }, 2000);
-              });
+              }
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(done, function() {
+                  fallbackCopy(code, done);
+                });
+              } else {
+                fallbackCopy(code, done);
+              }
+            }
+            function fallbackCopy(text, callback) {
+              var ta = document.createElement('textarea');
+              ta.value = text;
+              ta.style.position = 'fixed'; ta.style.left = '-9999px';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              if (callback) callback();
             }
             
             // ===== إرسال واتساب =====
@@ -1674,41 +1951,99 @@ img { max-width: 100%; height: auto; }
               window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
             }
             
-            // ===== التمرير السلس للروابط =====
-            document.addEventListener('click', function(e) {
-              var target = e.target.closest('a');
-              if (!target) return;
-              var href = target.getAttribute('href');
-              if (href && href.indexOf('#') === 0 && href.length > 1) {
-                var el = document.getElementById(href.substring(1));
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // ===== تبديل التبويبات =====
+            function switchTab(name) {
+              var panels = document.querySelectorAll('.tab-panel');
+              var tabs = document.querySelectorAll('.nav-links a');
+              panels.forEach(function(p) { p.classList.remove('active'); });
+              tabs.forEach(function(t) { t.classList.remove('active'); });
+              var target = document.querySelector('.tab-panel[data-tab="' + name + '"], #panel-' + name);
+              if (target) target.classList.add('active');
+              var activeTab = document.querySelector('.nav-links a[onclick*="' + name + '"]');
+              if (activeTab) activeTab.classList.add('active');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              // إعادة تشغيل عدادات الإحصائيات عند العودة للرئيسية
+              if (name === 'home') {
+                setTimeout(function() {
+                  document.querySelectorAll('.stat-number:not(.counted)').forEach(function(el) {
+                    var target = parseInt(el.getAttribute('data-target'));
+                    if (target && !isNaN(target)) {
+                      el.classList.add('counted');
+                      var current = 0;
+                      var inc = Math.ceil(target / 40);
+                      var timer = setInterval(function() {
+                        current += inc;
+                        if (current >= target) { current = target; clearInterval(timer); }
+                        el.textContent = current;
+                      }, 30);
+                    }
+                  });
+                }, 350);
+              }
+            }
+            
+            // ===== تفعيل التاب النشط حسب الصفحة =====
+            function initActiveNav() {
+              var allTabs = document.querySelectorAll('.nav-links a');
+              allTabs.forEach(function(t) { t.classList.remove('active'); });
+              if (document.querySelector('.tab-panel')) {
+                switchTab('home');
+              } else if (window.location.pathname.indexOf('/search') === 0) {
+                var blogTab = document.querySelector('.nav-links a[href="/search"]');
+                if (blogTab) blogTab.classList.add('active');
+              } else {
+                var homeTab = document.querySelector('.nav-links a[href="/"]');
+                if (homeTab) homeTab.classList.add('active');
+              }
+            }
+            
+            // ===== التنقل بالسحب (Swipe) للتبويبات =====
+            function initTabSwipe() {
+              var panels = document.querySelector('.tab-panels');
+              if (!panels) return;
+              var startX = 0, endX = 0;
+              var tabs = ['home', 'services', 'about', 'portfolio', 'tools', 'discounts', 'contact'];
+              panels.addEventListener('touchstart', function(e) {
+                startX = e.changedTouches[0].screenX;
+              }, { passive: true });
+              panels.addEventListener('touchend', function(e) {
+                endX = e.changedTouches[0].screenX;
+                var diff = startX - endX;
+                if (Math.abs(diff) < 50) return;
+                var current = document.querySelector('.tab-panel.active');
+                if (!current) return;
+                var idx = -1;
+                var id = current.id || '';
+                var dataTab = current.getAttribute('data-tab') || '';
+                var currentName = id.replace('panel-', '') || dataTab;
+                tabs.forEach(function(t, i) { if (t === currentName) idx = i; });
+                if (idx === -1) return;
+                if (diff > 0 && idx < tabs.length - 1) {
+                  switchTab(tabs[idx + 1]);
+                } else if (diff < 0 && idx > 0) {
+                  switchTab(tabs[idx - 1]);
                 }
+              }, { passive: true });
+            }
+            
+            // ===== دعم روابط التبويبات (هاش لينكس) =====
+            document.addEventListener('click', function(e) {
+              var a = e.target.closest('a[href^="#"]');
+              if (!a) return;
+              var section = a.getAttribute('href').substring(1);
+              var tabMap = { home:'home', services:'services', about:'about', portfolio:'portfolio', tools:'tools', discounts:'discounts', contact:'contact' };
+              if (tabMap[section]) {
+                e.preventDefault();
+                switchTab(tabMap[section]);
               }
             });
-            
-            // ===== تفعيل التاب النشط =====
-            function initActiveNav() {
-              var links = document.querySelectorAll('.nav-links a');
-              var currentPath = window.location.pathname;
-              links.forEach(function(link) {
-                link.classList.remove('active');
-                var href = link.getAttribute('href');
-                if (href === '/' && (currentPath === '/' || currentPath === '')) {
-                  link.classList.add('active');
-                } else if (href.indexOf('/search') === 0 && currentPath.indexOf('/search') === 0) {
-                  link.classList.add('active');
-                }
-              });
-            }
             
             //]]>
           </script>
 
-    <b:if cond='data:view.isHomepage'>
-    <div id='custom-content-wrapper' style='display:none;'/>
-          
+    <b:if cond='data:view.isHomepage    <div class='tab-panels'>
+    
+    <div class='tab-panel active' id='panel-home'>
           <!-- ===== HERO SECTION ===== -->
           <section class='hero-section' id='home'>
             <div class='hero-particles' id='heroParticles'></div>
@@ -1724,7 +2059,6 @@ img { max-width: 100%; height: auto; }
             </div>
             <script>
               //<![CDATA[
-              // جسيمات الخلفية المتحركة
               (function(){
                 var container = document.getElementById('heroParticles');
                 if (!container) return;
@@ -1765,6 +2099,49 @@ img { max-width: 100%; height: auto; }
             </div>
           </section>
           
+          <!-- ===== HELP SECTION ===== -->
+          <section class='help-section' id='help'>
+            <div class='container'>
+              <h2>كيف يمكننا مساعدتك!</h2>
+              <p>نقدم حلولاً متكاملة لمساعدتك في إطلاق وتطوير متجرك الإلكتروني بكل احترافية</p>
+              <div class='help-grid'>
+                <div class='help-card'>
+                  <span>✓ استشارات مجانية</span>
+                  <span>✓ دعم فني متواصل</span>
+                  <span>✓ تحسين محركات البحث</span>
+                  <span>✓ تحليل الكلمات المفتاحية</span>
+                  <span>✓ تقارير أداء</span>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <!-- ===== STATS SECTION ===== -->
+          <section class='stats-section'>
+            <div class='container'>
+              <div class='stats-grid'>
+                <div class='stat-item'>
+                  <span class='stat-number' data-target='50'>0</span>
+                  <span class='stat-label'>مشروع مكتمل</span>
+                </div>
+                <div class='stat-item'>
+                  <span class='stat-number' data-target='39'>0</span>
+                  <span class='stat-label'>متجر مصمم</span>
+                </div>
+                <div class='stat-item'>
+                  <span class='stat-number' data-target='100'>0</span>
+                  <span class='stat-label'>نسبة رضا</span>
+                </div>
+                <div class='stat-item'>
+                  <span class='stat-number' data-target='3'>0</span>
+                  <span class='stat-label'>سنوات خبرة</span>
+                </div>
+              </div>
+            </div>
+          </section>
+    </div>
+          
+    <div class='tab-panel' id='panel-services'>
           <!-- ===== SERVICES SECTION ===== -->
           <section class='section' id='services'>
             <div class='container'>
@@ -1788,50 +2165,37 @@ img { max-width: 100%; height: auto; }
                   <a class='btn' href='https://wa.me/201002241591' style='margin-top:20px;' target='_blank'>طلب الخدمة</a>
                 </div>
                 <div class='service-card'>
-                  <div class='service-icon'>💼</div>
-                  <h3>باقة رواد الأعمال</h3>
-                  <p>خدمات متكاملة لرواد الأعمال تشمل التصميم والتطوير والتسويق</p>
+                  <div class='service-icon'>🎨</div>
+                  <h3>باقة التطوير</h3>
+                  <p>تطوير متجرك الحالي بإضافة ميزات متقدمة وتحسين الأداء وتجربة المستخدم</p>
                   <ul class='service-features'>
-                    <li>✓ تصميم هوية بصرية كاملة</li>
-                    <li>✓ إنشاء متجر إلكتروني احترافي</li>
-                    <li>✓ استضافة لمدة سنة</li>
-                    <li>✓ إعداد وسائل التواصل الاجتماعي</li>
-                    <li>✓ حملة تسويقية أساسية</li>
-                    <li>✓ دعم فني لمدة 3 أشهر</li>
+                    <li>✓ تطوير المتجر الحالي</li>
+                    <li>✓ إضافة ميزات مخصصة</li>
+                    <li>✓ تحسين سرعة المتجر</li>
+                    <li>✓ تحسين تجربة المستخدم</li>
+                    <li>✓ رفع معدلات التحويل</li>
+                    <li>✓ مراجعة أمنية شاملة</li>
                   </ul>
                   <a class='btn' href='https://wa.me/201002241591' style='margin-top:20px;' target='_blank'>طلب الخدمة</a>
                 </div>
                 <div class='service-card'>
-                  <div class='service-icon'>📱</div>
-                  <h3>السوشيال ميديا</h3>
-                  <p>إدارة منصات التواصل الاجتماعي وتصميم المحتوى الإبداعي</p>
+                  <div class='service-icon'>✨</div>
+                  <h3>باقة الدعم</h3>
+                  <p>دعم فني مستمر وتحديثات دورية لمتجرك، مع استشارات وحلول للمشاكل التقنية</p>
                   <ul class='service-features'>
-                    <li>✓ إدارة حسابات التواصل الاجتماعي</li>
-                    <li>✓ تصميم محتوى إبداعي</li>
-                    <li>✓ جدولة المنشورات</li>
-                    <li>✓ تحليل الأداء وتقارير شهرية</li>
-                    <li>✓ إدارة الإعلانات المدفوعة</li>
-                    <li>✓ التفاعل مع الجمهور</li>
-                  </ul>
-                  <a class='btn' href='https://wa.me/201002241591' style='margin-top:20px;' target='_blank'>طلب الخدمة</a>
-                </div>
-                <div class='service-card'>
-                  <div class='service-icon'>👑</div>
-                  <h3>الباقة الكاملة</h3>
-                  <p>حلول شاملة للتجارة الإلكترونية من الإنشاء إلى التسويق والمبيعات</p>
-                  <ul class='service-features'>
-                    <li>✓ جميع مميزات الباقات السابقة</li>
-                    <li>✓ استراتيجية تسويقية متكاملة</li>
-                    <li>✓ حملات إعلانية مدفوعة</li>
+                    <li>✓ دعم فني مستمر</li>
+                    <li>✓ تحديثات دورية للمتجر</li>
+                    <li>✓ استشارات فنية</li>
+                    <li>✓ حل المشاكل التقنية</li>
                     <li>✓ تحسين محركات البحث SEO</li>
                     <li>✓ تصوير المنتجات بجودة عالية</li>
-                    <li>✓ تقارير أداء شهرية</li>
                   </ul>
                   <a class='btn' href='https://wa.me/201002241591' style='margin-top:20px;' target='_blank'>طلب الخدمة</a>
                 </div>
               </div>
             </div>
           </section>
+    </div>
           
           <!-- ===== HELP SECTION ===== -->
           <section class='help-section' id='help'>
@@ -1900,6 +2264,7 @@ img { max-width: 100%; height: auto; }
             </div>
           </section>
           
+    <div class='tab-panel' data-tab='about'>
           <!-- ===== ABOUT SECTION ===== -->
           <section class='about-section-centered' id='about'>
             <div class='container'>
@@ -2004,7 +2369,9 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
           
+    <div class='tab-panel' data-tab='portfolio'>
           <!-- ===== PORTFOLIO GALLERY ===== -->
           <section class='portfolio-slider-section' id='portfolio'>
             <div class='container'>
@@ -2013,57 +2380,153 @@ img { max-width: 100%; height: auto; }
                 <p>أكثر من 150 متجر تم تصميمه بطريقة إبداعية واحترافية</p>
               </div>
               <div class='portfolio-scroll'>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--primary-gradient);color:white;font-size:3rem;'>🏪</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.15);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>shurfa.shop</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>🏪</span>
+                      <span class='mockup-title'>شرفة</span>
+                      <span class='mockup-desc'>متجر شاملة</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>شرفة</h4>
                     <a href='https://shurfa.shop/' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-size:3rem;'>💎</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>jeweler-y-inc.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>💎</span>
+                      <span class='mockup-title'>الجواهري</span>
+                      <span class='mockup-desc'>متجر مجوهرات</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>الجواهري</h4>
                     <a href='https://jeweler-y-inc.com/' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;font-size:3rem;'>🌷</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>violetbouquets.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>🌷</span>
+                      <span class='mockup-title'>باقة بنفسج</span>
+                      <span class='mockup-desc'>متجر ورود</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>باقة بنفسج</h4>
                     <a href='https://violetbouquets.com/ar' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;font-size:3rem;'>🎮</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>gamer2light.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>🎮</span>
+                      <span class='mockup-title'>قيمر لايت</span>
+                      <span class='mockup-desc'>متجر ألعاب</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>قيمر لايت</h4>
                     <a href='https://gamer2light.com/ar' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#11998e,#38ef7d);color:white;font-size:3rem;'>☕</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>seedroastery.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>☕</span>
+                      <span class='mockup-title'>محمصة سييد</span>
+                      <span class='mockup-desc'>متجر قهوة</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>محمصة سييد</h4>
                     <a href='https://seedroastery.com/' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f7971e,#ffd200);color:white;font-size:3rem;'>⭐</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#f7971e 0%,#ffd200 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>jazebia.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>⭐</span>
+                      <span class='mockup-title'>جاذبية</span>
+                      <span class='mockup-desc'>متجر عام</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>جاذبية</h4>
                     <a href='https://jazebia.com/' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#a855f7,#6366f1);color:white;font-size:3rem;'>🐎</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#a855f7 0%,#6366f1 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>qrnas-ksa.com</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>🐎</span>
+                      <span class='mockup-title'>قرناس</span>
+                      <span class='mockup-desc'>متجر عام</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>قرناس</h4>
                     <a href='https://qrnas-ksa.com/' target='_blank'>🔗 زيارة المتجر</a>
                   </div>
                 </div>
-                <div class='portfolio-item-snap'>
-                  <div style='width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-size:3rem;'>🌿</div>
+                <div class='portfolio-item-snap' tabindex='0'>
+                  <div class='mockup-browser' style='background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);'>
+                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
+                      <span class='mockup-dot' style='background:#ff5f57;'></span>
+                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
+                      <span class='mockup-dot' style='background:#28c840;'></span>
+                      <span class='mockup-url'>hadaiqalteeb.sa</span>
+                    </div>
+                    <div class='mockup-content'>
+                      <span class='mockup-icon'>🌿</span>
+                      <span class='mockup-title'>حدائق الطيب</span>
+                      <span class='mockup-desc'>متجر عطور</span>
+                    </div>
+                  </div>
                   <div class='overlay'>
                     <h4>حدائق الطيب</h4>
                     <a href='https://hadaiqalteeb.sa/' target='_blank'>🔗 زيارة المتجر</a>
@@ -2156,14 +2619,7 @@ img { max-width: 100%; height: auto; }
                   🖼️ معرض الأعمال الكامل
                 </a>
               </div>
-              <div class='copy-toast' id='copy-toast' style='
-                position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
-                background:linear-gradient(135deg,#10B981,#059669);color:white;
-                padding:15px 30px;border-radius:50px;
-                box-shadow:0 10px 30px rgba(16,185,129,0.4);
-                z-index:9999;opacity:0;
-                transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-              '>✅ تم نسخ جميع الروابط بنجاح!</div>
+              <div class='copy-toast' id='copy-toast'>✅ تم نسخ جميع الروابط بنجاح!</div>
             </div>
           </section>
           
@@ -2191,8 +2647,8 @@ img { max-width: 100%; height: auto; }
                   <p style='margin-top:8px;font-size:0.85rem;color:var(--text-light);'>75% - تقريباً وصلت للجائزة!</p>
                 </div>
                 <div class='game-buttons'>
-                  <button class='game-btn chrome-btn'>🏆 تحميل للكروم</button>
-                  <button class='game-btn edge-btn'>⚡ تحميل للإيدج</button>
+                  <button class='game-btn chrome-btn' onclick='window.open("https://chrome.google.com/webstore","_blank")' aria-label='تحميل إضافة كروم'>🏆 تحميل للكروم</button>
+                  <button class='game-btn edge-btn' onclick='window.open("https://microsoftedge.microsoft.com/addons","_blank")' aria-label='تحميل إضافة إيدج'>⚡ تحميل للإيدج</button>
                 </div>
                 <div class='scarcity-notice'>
                   🔥 فقط <strong>47</strong> كود خصم متبقي اليوم!
@@ -2200,7 +2656,9 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
           
+    <div class='tab-panel' data-tab='tools'>
           <!-- ===== CREATORS TOOLS ===== -->
           <section class='tools-section' id='tools'>
             <div class='container'>
@@ -2240,7 +2698,9 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
           
+    <div class='tab-panel' data-tab='discounts'>
           <!-- ===== DISCOUNT COUPONS ===== -->
           <section class='discounts-section' id='discounts'>
             <div class='container'>
@@ -2354,7 +2814,9 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
           
+    <div class='tab-panel' data-tab='about'>
           <!-- ===== PARTNERS ===== -->
           <section class='partners-section' id='partners'>
             <div class='container'>
@@ -2388,7 +2850,9 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
           
+    <div class='tab-panel' data-tab='contact'>
           <!-- ===== CTA ===== -->
           <section class='cta-section'>
             <div class='container'>
@@ -2502,6 +2966,8 @@ img { max-width: 100%; height: auto; }
               </div>
             </div>
           </section>
+    </div>
+    </div>
     </b:if>
 
     <!-- ===== FOOTER (جميع الصفحات) ===== -->
