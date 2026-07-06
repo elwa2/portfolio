@@ -78,41 +78,53 @@ function copyToClipboard(textOrId, button) {
 // تحديث السنة في الفوتر
 document.getElementById("currentYear").textContent = new Date().getFullYear();
 
-// Helper to get correct assets path
-function getAssetsPath() {
-  return window.location.href.indexOf("open-source-tools") > -1 ? "../" : "";
+// Helper to get correct assets path - IMPROVED VERSION
+function getBasePath() {
+  // استخدم URL API للكشف الموثوق عن المسار
+  const url = new URL(window.location.href);
+  const pathname = url.pathname;
+  
+  // إذا كنا في مجلد open-source-tools
+  if (pathname.includes("/open-source-tools/")) {
+    return "../";
+  }
+  
+  // في جميع الحالات الأخرى
+  return "";
 }
 
-// إدارة وضع الظلام (Dark Mode)
+// إدارة وضع الظلام (Dark Mode) - مع معالجة أفضل للأخطاء
 function setTheme(themeName) {
-  localStorage.setItem("theme", themeName);
-  document.documentElement.setAttribute("data-theme", themeName);
+  try {
+    localStorage.setItem("theme", themeName);
+    document.documentElement.setAttribute("data-theme", themeName);
 
-  // تحديث أيقونة زر التبديل
-  const themeToggleSvg = document.querySelector(".theme-toggle svg use");
-  if (themeToggleSvg) {
-    const basePath = getAssetsPath();
-    if (themeName === "dark") {
-      themeToggleSvg.setAttribute(
-        "href",
-        basePath + "assets/images/icons.svg#icon-sun",
-      );
-    } else {
-      themeToggleSvg.setAttribute(
-        "href",
-        basePath + "assets/images/icons.svg#icon-moon",
-      );
+    // تحديث أيقونة زر التبديل
+    const themeToggleSvg = document.querySelector(".theme-toggle svg use");
+    if (themeToggleSvg) {
+      const basePath = getBasePath();
+      const iconHref = themeName === "dark" 
+        ? basePath + "assets/images/icons.svg#icon-sun"
+        : basePath + "assets/images/icons.svg#icon-moon";
+      
+      themeToggleSvg.setAttribute("href", iconHref);
     }
+    
+    // تطلق حدث للمستمعين
+    window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme: themeName } }));
+  } catch (error) {
+    console.error("خطأ في تعيين الثيم:", error);
   }
 }
 
 // تبديل الوضع المظلم
 function toggleTheme() {
-  if (localStorage.getItem("theme") === "dark") {
-    setTheme("light");
-  } else {
-    setTheme("dark");
-  }
+  const currentTheme = localStorage.getItem("theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  setTheme(newTheme);
+  
+  // تطلق حدث مخصص للمستمعين
+  window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme: newTheme } }));
 }
 
 // التحقق من الوضع المفضل عند تحميل الصفحة
@@ -159,7 +171,7 @@ function closeMobileMenu() {
 function updateMenuIcon() {
   const iconUse = mobileToggle?.querySelector("svg use");
   if (iconUse) {
-    const basePath = getAssetsPath();
+    const basePath = getBasePath();
     if (nav.classList.contains("active")) {
       iconUse.setAttribute(
         "href",
@@ -179,13 +191,16 @@ if (mobileToggle) {
 }
 
 // إغلاق القائمة عند الضغط على أي رابط
+let navLinksEventListeners = [];
 if (nav) {
   nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeMobileMenu);
+    const listener = () => closeMobileMenu();
+    link.addEventListener("click", listener);
+    navLinksEventListeners.push({ element: link, listener });
   });
 
   // إغلاق القائمة عند الضغط على زر X (الـ ::before pseudo-element)
-  nav.addEventListener("click", function (e) {
+  const navClickListener = function (e) {
     // التحقق من الضغط في منطقة زر الإغلاق (أعلى يسار القائمة)
     const rect = nav.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -195,17 +210,45 @@ if (nav) {
     if (clickX <= 70 && clickY <= 70 && clickX >= 10 && clickY >= 10) {
       closeMobileMenu();
     }
-  });
+  };
+  nav.addEventListener("click", navClickListener);
 }
 
 // إغلاق القائمة عند الضغط خارجها
-document.addEventListener("click", function (e) {
+let documentClickListener = function (e) {
   if (nav && nav.classList.contains("active")) {
     if (!nav.contains(e.target) && !mobileToggle?.contains(e.target)) {
       closeMobileMenu();
     }
   }
-});
+};
+document.addEventListener("click", documentClickListener);
+
+// دالة للتنظيف (Cleanup) - إزالة Event Listeners عند عدم الحاجة
+window.cleanupEventListeners = function() {
+  try {
+    // حذف مستمعي روابط القائمة
+    navLinksEventListeners.forEach(({ element, listener }) => {
+      element.removeEventListener("click", listener);
+    });
+    navLinksEventListeners = [];
+
+    // حذف مستمع الزر الرئيسي
+    if (mobileToggle) {
+      mobileToggle.removeEventListener("click", toggleMobileMenu);
+    }
+
+    // حذف مستمع الضغط الخارجي
+    document.removeEventListener("click", documentClickListener);
+
+    console.log("✓ Event listeners cleaned up successfully");
+  } catch (error) {
+    console.warn("Error during cleanup:", error);
+  }
+};
+
+// تنظيف عند إغلاق الصفحة (page unload)
+window.addEventListener("beforeunload", cleanupEventListeners);
 
 // إضافة تأثير التمرير للقائمة العلوية
 window.addEventListener("scroll", function () {

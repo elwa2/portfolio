@@ -164,7 +164,7 @@
     </script>
 
     <!-- SVG Icons Definitions - محسّن للـ SEO والأداء -->
-    <svg style='display: none;' xmlns='http://www.w3.org/2000/svg'>
+    <svg aria-hidden='true' style='position:absolute;width:0;height:0;overflow:hidden;' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
       <defs>
         <!-- Salla Icon -->
         <symbol id='icon-salla' viewBox='0 0 24 24' fill='currentColor'>
@@ -596,6 +596,9 @@ img { max-width: 100%; height: auto; }
   color: white;
   transform: translateY(-2px);
 }
+.nav-links li a:active {
+  transform: translateY(0) scale(0.97);
+}
 .nav-links li a:hover::before,
 .nav-links li a.active::before {
   transform: scaleX(1);
@@ -637,13 +640,20 @@ img { max-width: 100%; height: auto; }
   transform: scale(0);
   transition: transform 0.4s var(--ease-back);
 }
-.theme-toggle:hover { 
+.theme-toggle:hover {
   transform: scale(1.1);
+}
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
 }
 .theme-toggle:hover::before {
   transform: scale(1);
 }
-[data-theme="light"] .theme-toggle { 
+[data-theme="light"] .theme-toggle {
   color: #333;
   background: rgba(0,0,0,0.05);
 }
@@ -656,14 +666,20 @@ img { max-width: 100%; height: auto; }
   align-items: center;
   justify-content: center;
   border: none;
-  font-size: 1.3rem;
   color: white;
   transition: var(--transition);
 }
 .mobile-toggle:hover {
   transform: scale(1.1);
 }
-[data-theme="light"] .mobile-toggle { 
+.mobile-toggle:active {
+  transform: scale(0.95);
+}
+.mobile-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+[data-theme="light"] .mobile-toggle {
   color: #333;
   background: rgba(0,0,0,0.05);
 }
@@ -722,6 +738,20 @@ img { max-width: 100%; height: auto; }
   border-radius: 4px;
 }
 button:focus-visible, a:focus-visible { outline-offset: 3px; }
+
+/* ===== Disabled States ===== */
+button:disabled,
+.btn:disabled,
+.btn-primary-glow:disabled,
+.btn-outline-glow:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
 
 /* ===== Card Hover Refinements ===== */
 .service-card, .help-card, .discount-card, .store-link-card, .blog-post-card {
@@ -855,7 +885,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   border-color: rgba(129,140,248,0.3);
 }
 .hero-content h1 {
-  font-size: 3.8rem;
+  font-size: clamp(1.9rem, 5vw, 4.5rem);
   font-weight: 800;
   line-height: 1.15;
   margin-bottom: 25px;
@@ -953,11 +983,25 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Scroll Reveal */
+.section-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+}
+.section-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-reveal { opacity: 1; transform: none; transition: none; }
+}
+
 /* ===== Section Common ===== */
 .section { padding: 80px 0; }
 .section-title { text-align: center; margin-bottom: 50px; }
 .section-title h2 {
-  font-size: 2.5rem;
+  font-size: clamp(1.6rem, 3.5vw, 2.8rem);
   font-weight: 800;
   background: var(--primary-gradient);
   -webkit-background-clip: text;
@@ -1021,7 +1065,6 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
   background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));
   color: var(--primary);
   box-shadow: 0 8px 20px rgba(99,102,241,0.15);
@@ -1029,7 +1072,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   position: relative;
   z-index: 1;
 }
-.service-card:hover .service-icon { 
+.service-card:hover .service-icon {
   transform: scale(1.15) rotate(-8deg);
   background: var(--primary-gradient);
   color: white;
@@ -1164,7 +1207,6 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
   background: var(--primary-gradient);
   color: white;
   box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
@@ -1252,6 +1294,54 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   border-color: transparent;
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(99,102,241,0.35);
+}
+.btn-outline-glow:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  gap: 6px;
+}
+.btn-lg {
+  padding: 20px 48px;
+  font-size: 1.15rem;
+  gap: 12px;
+}
+.btn-icon {
+  width: 44px; height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-ghost:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+.btn-ghost:active {
+  transform: translateY(0) scale(0.97);
 }
 
 /* ===== Testimonials ===== */
@@ -1456,7 +1546,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   position: relative;
   transition: transform 0.4s var(--ease-out-quart);
 }
-.portfolio-item-snap .mockup-icon { font-size: 2.5rem; margin-bottom: 8px; transition: transform 0.3s var(--ease-out-quart); }
+.portfolio-item-snap .mockup-icon { margin-bottom: 8px; transition: transform 0.3s var(--ease-out-quart); }
 .portfolio-item-snap .mockup-title {
   font-size: 0.85rem;
   font-weight: 700;
@@ -1612,8 +1702,15 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   border-color: var(--primary);
   box-shadow: var(--shadow-hover);
 }
-.store-link-card:hover::before { 
+.store-link-card:hover::before {
   transform: scaleX(1);
+}
+.store-link-card:active {
+  transform: translateY(-4px) scale(0.98);
+}
+.store-link-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 .store-link-card .store-icon {
   width: 60px; height: 60px;
@@ -1801,21 +1898,26 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   box-shadow: var(--shadow-hover);
   border-color: var(--primary);
 }
+.tool-squircle:active {
+  transform: translateY(-4px) scale(0.98);
+}
+.tool-squircle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
 .tool-squircle:hover::before {
   opacity: 1;
 }
 .tool-squircle .tool-icon {
-  font-size: 2.5rem;
   color: var(--primary);
   margin-bottom: 12px;
   transition: var(--transition);
   position: relative;
   z-index: 1;
 }
-.tool-squircle:hover .tool-icon { 
+.tool-squircle:hover .tool-icon {
   transform: scale(1.2) rotate(10deg);
   color: var(--secondary);
-  text-shadow: 0 8px 20px rgba(99,102,241,0.3);
 }
 .tool-squircle .tool-name { 
   font-size: 0.9rem; 
@@ -1882,6 +1984,8 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
 .chrome-btn { background: #4285F4; color: white; }
 .edge-btn { background: #0078D7; color: white; }
 .game-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.game-btn:active { transform: translateY(0) scale(0.97); }
+.game-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 .scarcity-notice {
   margin-top: 20px;
   padding: 12px;
@@ -1976,7 +2080,6 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
   color: var(--primary);
   transition: var(--transition);
   flex-shrink: 0;
@@ -2069,6 +2172,49 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   box-shadow: 0 0 0 5px rgba(99,102,241,0.1);
   transform: translateY(-2px);
 }
+
+/* Placeholder styling */
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-muted, #94a3b8);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.form-group input:focus::placeholder,
+.form-group textarea:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Select arrow */
+.form-group select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 16px center;
+  padding-left: 40px;
+}
+
+/* Validation states */
+.form-group input:user-valid,
+.form-group textarea:user-valid {
+  border-color: #10B981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+.form-group input:user-invalid,
+.form-group textarea:user-invalid {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+/* Autofill override */
+.form-group input:-webkit-autofill,
+.form-group textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--bg) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text);
+}
+
 .form-group textarea { 
   resize: vertical; 
   min-height: 120px;
@@ -2224,7 +2370,6 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   align-items: center;
   justify-content: center;
   color: white !important;
-  font-size: 1.8rem;
   box-shadow: 0 8px 30px rgba(37,211,102,0.5);
   z-index: 998;
   transition: var(--transition);
@@ -2300,7 +2445,6 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   cursor: pointer;
   z-index: 997;
   opacity: 0;
@@ -2470,6 +2614,17 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   margin: 0;
 }
 
+/* ===== Large Desktop ===== */
+@media (min-width: 1400px) {
+  .container, .header { max-width: 1400px; }
+  .hero-content h1 { font-size: 4.5rem; }
+  .hero-content > p { font-size: 1.4rem; }
+  .services-grid { grid-template-columns: repeat(4, 1fr); }
+  .stores-grid { grid-template-columns: repeat(5, 1fr); }
+  .help-cards { grid-template-columns: repeat(3, 1fr); }
+  .testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 992px) {
   .hero-content h1 { font-size: 2.8rem; }
@@ -2489,7 +2644,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   .section-title h2::after { width: 50px; }
   .section { padding: 70px 0; }
   .service-card { padding: 35px 25px; }
-  .service-icon { width: 70px; height: 70px; font-size: 1.8rem; }
+  .service-icon { width: 70px; height: 70px; }
   .stat-number { font-size: 2.6rem; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 25px; }
   .help-cards { grid-template-columns: repeat(2, 1fr); gap: 25px; }
@@ -2499,8 +2654,8 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   .contact-grid-wrapper { grid-template-columns: 1fr; gap: 30px; }
   .contact-card-modern, .contact-form-card { padding: 30px; }
   .form-group input, .form-group textarea { padding: 12px 14px; }
-  .floating-whatsapp { width: 56px; height: 56px; font-size: 1.5rem; bottom: 20px; left: 20px; }
-  .back-to-top { width: 50px; height: 50px; font-size: 1.2rem; bottom: 20px; right: 20px; }
+  .floating-whatsapp { width: 56px; height: 56px; bottom: 20px; left: 20px; }
+  .back-to-top { width: 50px; height: 50px; bottom: 20px; right: 20px; }
   .discounts-grid { grid-template-columns: 1fr; }
   .quest-banner { flex-direction: column; gap: 10px; text-align: center; }
   .stores-actions { flex-direction: column; }
@@ -2522,9 +2677,9 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   .section-title h2::after { width: 40px; }
   .section { padding: 60px 0; }
   .service-card { padding: 30px 20px; margin-bottom: 20px; }
-  .service-icon { width: 65px; height: 65px; font-size: 1.6rem; margin-bottom: 18px; }
+  .service-icon { width: 65px; height: 65px; margin-bottom: 18px; }
   .tool-squircle { width: 110px; height: 110px; }
-  .tool-squircle .tool-icon { font-size: 2.2rem; margin-bottom: 8px; }
+  .tool-squircle .tool-icon { margin-bottom: 8px; }
   .tool-squircle .tool-name { font-size: 0.85rem; }
   .tools-horizontal-grid { gap: 20px; }
   .discounts-grid { grid-template-columns: 1fr; }
@@ -2537,9 +2692,9 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   .contact-card-modern, .contact-form-card { padding: 25px; }
   .contact-item { padding: 15px 16px; }
   .contact-item .contact-text h3 { font-size: 0.95rem; }
-  .contact-item .contact-icon-box { width: 45px; height: 45px; font-size: 1.2rem; }
-  .floating-whatsapp { width: 52px; height: 52px; font-size: 1.4rem; bottom: 15px; left: 15px; }
-  .back-to-top { width: 48px; height: 48px; font-size: 1.1rem; bottom: 15px; right: 15px; }
+  .contact-item .contact-icon-box { width: 45px; height: 45px; }
+  .floating-whatsapp { width: 52px; height: 52px; bottom: 15px; left: 15px; }
+  .back-to-top { width: 48px; height: 48px; bottom: 15px; right: 15px; }
   .blog-layout { flex-direction: column; }
   .blog-sidebar { width: 100%; }
   .blog-post-card .post-title { font-size: 1.3rem; }
@@ -2746,14 +2901,14 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
         <div class='logo'><a href='/'>Ali Ahmed</a></div>
         <nav class='nav'>
           <ul class='nav-links'>
-            <li><a class='active' href='javascript:void(0)' onclick='switchTab("home")'>الرئيسية</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("services")'>الخدمات</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("about")'>من نحن</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("portfolio")'>أعمالنا</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("tools")'>الأدوات</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("discounts")'>أكواد الخصم</a></li>
+            <li><a class='active' href='/#home'>الرئيسية</a></li>
+            <li><a href='/#services'>الخدمات</a></li>
+            <li><a href='/#about'>من نحن</a></li>
+            <li><a href='/#portfolio'>أعمالنا</a></li>
+            <li><a href='/#tools'>الأدوات</a></li>
+            <li><a href='/#discounts'>أكواد الخصم</a></li>
             <li><a href='/search'>المدونة</a></li>
-            <li><a href='javascript:void(0)' onclick='switchTab("contact")'>اتصل بنا</a></li>
+            <li><a href='/#contact'>اتصل بنا</a></li>
           </ul>
         </nav>
         <div class='header-actions'>
@@ -2789,6 +2944,8 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
               initYear();
               initActiveNav();
               initTabSwipe();
+              initScrollReveal();
+              initSVGs();
             });
             
             // ===== نظام الألوان =====
@@ -2915,12 +3072,12 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
             // ===== نسخ النص =====
             function copyCode(code, btn) {
               function done() {
-                const orig = btn.textContent;
-                btn.textContent = '✅ تم النسخ';
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<svg width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'currentColor\' style=\'vertical-align:middle;margin-left:6px;\'><use href=\'#icon-check-circle\'/></svg> تم النسخ';
                 btn.style.background = '#10B981';
                 btn.disabled = true;
                 setTimeout(function() {
-                  btn.textContent = orig;
+                  btn.innerHTML = orig;
                   btn.style.background = '';
                   btn.disabled = false;
                 }, 2000);
@@ -3020,12 +3177,17 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
             // ===== تبديل التبويبات =====
             function switchTab(name) {
               var panels = document.querySelectorAll('.tab-panel');
+              if (!panels.length) {
+                // في صفحة غير الرئيسية - نوجه للرئيسية مع الهاش
+                window.location.href = '/#' + name;
+                return;
+              }
               var tabs = document.querySelectorAll('.nav-links a');
               panels.forEach(function(p) { p.classList.remove('active'); });
               tabs.forEach(function(t) { t.classList.remove('active'); });
               var target = document.querySelector('.tab-panel[data-tab="' + name + '"], #panel-' + name);
               if (target) target.classList.add('active');
-              var activeTab = document.querySelector('.nav-links a[onclick*="' + name + '"]');
+              var activeTab = document.querySelector('.nav-links a[href$="/#' + name + '"], .nav-links a[href$="#' + name + '"]');
               if (activeTab) activeTab.classList.add('active');
               window.scrollTo({ top: 0, behavior: 'smooth' });
               // إعادة تشغيل عدادات الإحصائيات عند العودة للرئيسية
@@ -3052,15 +3214,54 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
             function initActiveNav() {
               var allTabs = document.querySelectorAll('.nav-links a');
               allTabs.forEach(function(t) { t.classList.remove('active'); });
+              var hash = window.location.hash.substring(1);
               if (document.querySelector('.tab-panel')) {
-                switchTab('home');
+                if (hash && ['home','services','about','portfolio','tools','discounts','contact'].indexOf(hash) !== -1) {
+                  switchTab(hash);
+                } else {
+                  switchTab('home');
+                }
               } else if (window.location.pathname.indexOf('/search') === 0) {
                 var blogTab = document.querySelector('.nav-links a[href="/search"]');
                 if (blogTab) blogTab.classList.add('active');
               } else {
-                var homeTab = document.querySelector('.nav-links a[href="/"]');
-                if (homeTab) homeTab.classList.add('active');
+                var blogTab = document.querySelector('.nav-links a[href="/search"]');
+                if (blogTab) blogTab.classList.remove('active');
               }
+            }
+            
+            // ===== كشف الأقسام عند التمرير =====
+            function initScrollReveal() {
+              var els = document.querySelectorAll('.section-reveal');
+              if (!els.length) return;
+              if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                  entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                      entry.target.classList.add('revealed');
+                      observer.unobserve(entry.target);
+                    }
+                  });
+                }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+                els.forEach(function(el) { observer.observe(el); });
+              } else {
+                els.forEach(function(el) { el.classList.add('revealed'); });
+              }
+            }
+            
+            // ===== إصلاح SVG للتوافق مع جميع المتصفحات =====
+            function initSVGs() {
+              var svgs = document.querySelectorAll('svg:not([xmlns])');
+              svgs.forEach(function(svg) {
+                svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+              });
+              // دعم xlink:href كبديل للمتصفحات القديمة
+              var uses = document.querySelectorAll('use[href]');
+              uses.forEach(function(u) {
+                if (!u.hasAttribute('xlink:href')) {
+                  u.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', u.getAttribute('href'));
+                }
+              });
             }
             
             // ===== التنقل بالسحب (Swipe) للتبويبات =====
@@ -3100,7 +3301,20 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
               var tabMap = { home:'home', services:'services', about:'about', portfolio:'portfolio', tools:'tools', discounts:'discounts', contact:'contact' };
               if (tabMap[section]) {
                 e.preventDefault();
-                switchTab(tabMap[section]);
+                if (!document.querySelector('.tab-panel')) {
+                  window.location.href = '/#' + section;
+                } else {
+                  switchTab(tabMap[section]);
+                }
+              }
+            });
+            
+            // ===== تفعيل التاب من الهاش عند تحميل الصفحة =====
+            window.addEventListener('hashchange', function() {
+              var hash = window.location.hash.substring(1);
+              if (hash && document.querySelector('.tab-panel')) {
+                var tabMap = { home:'home', services:'services', about:'about', portfolio:'portfolio', tools:'tools', discounts:'discounts', contact:'contact' };
+                if (tabMap[hash]) switchTab(tabMap[hash]);
               }
             });
             
@@ -3272,7 +3486,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
           
     <div class='tab-panel' id='panel-services'>
           <!-- ===== SERVICES SECTION ===== -->
-          <section class='section' id='services'>
+          <section class='section section-reveal' id='services'>
             <div class='container'>
               <div class='section-title'>
                 <h2>خدماتنا</h2>
@@ -3328,7 +3542,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
           
     <div class='tab-panel' data-tab='about'>
           <!-- ===== ABOUT SECTION ===== -->
-          <section class='about-section-centered' id='about'>
+          <section class='about-section-centered section-reveal' id='about'>
             <div class='container'>
               <div class='about-content-centered'>
                 <div class='about-icon-centered'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-code'/></svg></div>
@@ -3395,7 +3609,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
           </section>
           
           <!-- ===== TESTIMONIALS ===== -->
-          <section class='section' style='background:var(--bg-alt);'>
+          <section class='section section-reveal' style='background:var(--bg-alt);'>
             <div class='container'>
               <div class='section-title'>
                 <h2>آراء عملاؤنا</h2>
@@ -3425,7 +3639,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
                     <p>يعطيكم العافية المتجر روعة ايش تكلفة باقات التسويق الشاملة ؟</p>
                   </div>
                   <div class='testimonial-author'>
-                    <div class='author-image'>👤</div>
+                    <div class='author-image'><svg class='icon' width='32' height='32'><use href='#icon-user'/></svg></div>
                     <h4>محمد علي البراك</h4>
                   </div>
                 </div>
@@ -3435,454 +3649,26 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
     </div>
           
     <div class='tab-panel' data-tab='portfolio'>
-          <!-- ===== PORTFOLIO GALLERY ===== -->
-          <section class='portfolio-slider-section' id='portfolio'>
-            <div class='container'>
-              <div class='section-title'>
-                <h2><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:8px;'><use href='#icon-image'/></svg> معرض الأعمال</h2>
-                <p>أكثر من 150 متجر تم تصميمه بطريقة إبداعية واحترافية</p>
-              </div>
-              <div class='portfolio-scroll'>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.15);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>shurfa.shop</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                      <span class='mockup-title'>شرفة</span>
-                      <span class='mockup-desc'>متجر شاملة</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>شرفة</h4>
-                    <a href='https://shurfa.shop/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>jeweler-y-inc.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-diamond'/></svg></span>
-                      <span class='mockup-title'>الجواهري</span>
-                      <span class='mockup-desc'>متجر مجوهرات</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>الجواهري</h4>
-                    <a href='https://jeweler-y-inc.com/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>violetbouquets.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-flower'/></svg></span>
-                      <span class='mockup-title'>باقة بنفسج</span>
-                      <span class='mockup-desc'>متجر ورود</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>باقة بنفسج</h4>
-                    <a href='https://violetbouquets.com/ar' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>gamer2light.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-gamepad'/></svg></span>
-                      <span class='mockup-title'>قيمر لايت</span>
-                      <span class='mockup-desc'>متجر ألعاب</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>قيمر لايت</h4>
-                    <a href='https://gamer2light.com/ar' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>seedroastery.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-coffee'/></svg></span>
-                      <span class='mockup-title'>محمصة سييد</span>
-                      <span class='mockup-desc'>متجر قهوة</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>محمصة سييد</h4>
-                    <a href='https://seedroastery.com/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#f7971e 0%,#ffd200 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>jazebia.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-star'/></svg></span>
-                      <span class='mockup-title'>جاذبية</span>
-                      <span class='mockup-desc'>متجر عام</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>جاذبية</h4>
-                    <a href='https://jazebia.com/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#a855f7 0%,#6366f1 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>qrnas-ksa.com</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-crown'/></svg></span>
-                      <span class='mockup-title'>قرناس</span>
-                      <span class='mockup-desc'>متجر عام</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>قرناس</h4>
-                    <a href='https://qrnas-ksa.com/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-                <div class='portfolio-item-snap' tabindex='0'>
-                  <div class='mockup-browser' style='background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);'>
-                    <div class='mockup-bar' style='background:rgba(0,0,0,0.12);'>
-                      <span class='mockup-dot' style='background:#ff5f57;'></span>
-                      <span class='mockup-dot' style='background:#ffbd2e;'></span>
-                      <span class='mockup-dot' style='background:#28c840;'></span>
-                      <span class='mockup-url'>hadaiqalteeb.sa</span>
-                    </div>
-                    <div class='mockup-content'>
-                      <span class='mockup-icon'><svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-leaf'/></svg></span>
-                      <span class='mockup-title'>حدائق الطيب</span>
-                      <span class='mockup-desc'>متجر عطور</span>
-                    </div>
-                  </div>
-                  <div class='overlay'>
-                    <h4>حدائق الطيب</h4>
-                    <a href='https://hadaiqalteeb.sa/' target='_blank'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-external'/></svg> زيارة المتجر</a>
-                  </div>
-                </div>
-              </div>
-              <div style='text-align:center;margin-top:30px;'>
-                <a class='btn-outline-glow' href='#' style='display:inline-flex;'><svg width='20' height='20' viewBox='0 0 24 24' fill='currentColor' style='margin-left:8px;'><use href='#icon-image'/></svg> معرض الأعمال الكامل</a>
-              </div>
-            </div>
-          </section>
-          
-          <!-- ===== STORE LINKS ===== -->
-          <section class='stores-section' id='stores'>
-            <div class='container'>
-              <div class='section-title'>
-                <h2><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:8px;'><use href='#icon-store'/></svg> متاجرنا</h2>
-                <p>أكثر من 1150 متجر تم تصميمه بطريقة احترافية</p>
-              </div>
-              <div class='stores-grid'>
-                <a class='store-link-card' data-store='https://shurfa.shop/' href='https://shurfa.shop/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>شرفة</span>
-                  <span class='store-url'>shurfa.shop</span>
-                </a>
-                <a class='store-link-card' data-store='https://jeweler-y-inc.com/' href='https://jeweler-y-inc.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>الجواهري</span>
-                  <span class='store-url'>jeweler-y-inc.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://violetbouquets.com/ar' href='https://violetbouquets.com/ar' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>باقة بنفسج</span>
-                  <span class='store-url'>violetbouquets.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://gamer2light.com/ar' href='https://gamer2light.com/ar' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>قيمر لايت</span>
-                  <span class='store-url'>gamer2light.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://seedroastery.com/' href='https://seedroastery.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>محمصة سييد</span>
-                  <span class='store-url'>seedroastery.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://jazebia.com/' href='https://jazebia.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>جاذبية</span>
-                  <span class='store-url'>jazebia.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://qrnas-ksa.com/' href='https://qrnas-ksa.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>قرناس</span>
-                  <span class='store-url'>qrnas-ksa.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://hadaiqalteeb.sa/' href='https://hadaiqalteeb.sa/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>حدائق الطيب</span>
-                  <span class='store-url'>hadaiqalteeb.sa</span>
-                </a>
-                <a class='store-link-card' data-store='https://woceanstore.com/' href='https://woceanstore.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>ووشن</span>
-                  <span class='store-url'>woceanstore.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://arwmed.com/' href='https://arwmed.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>أرووميد</span>
-                  <span class='store-url'>arwmed.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://volt-visions.com/' href='https://volt-visions.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>فولت فيجن</span>
-                  <span class='store-url'>volt-visions.com</span>
-                </a>
-                <a class='store-link-card' data-store='https://mikkka.com/' href='https://mikkka.com/' target='_blank'>
-                  <span class='store-icon'><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-store'/></svg></span>
-                  <span class='store-name'>ميكّا</span>
-                  <span class='store-url'>mikkka.com</span>
-                </a>
-              </div>
-              <div class='stores-actions'>
-                <button class='action-btn copy-all-btn' onclick='copyAllStoreLinks()'>
-                  <svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='margin-left:6px;'><use href='#icon-clipboard'/></svg>
-                  نسخ كل الروابط
-                </button>
-                <button class='action-btn share-whatsapp-btn' onclick='shareViaWhatsApp()'>
-                  <svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='margin-left:6px;'><use href='#icon-whatsapp'/></svg>
-                  إرسال عبر واتساب
-                </button>
-                <a class='action-btn view-gallery-btn' href='#portfolio'>
-                  <svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='margin-left:6px;'><use href='#icon-image'/></svg>
-                  معرض الأعمال الكامل
-                </a>
-              </div>
-              <div class='copy-toast' id='copy-toast'>✅ تم نسخ جميع الروابط بنجاح!</div>
-            </div>
-          </section>
-          
-          <!-- ===== THEME DETECTOR GAME ===== -->
-          <section class='theme-detector-game' id='theme-detector'>
-            <div class='container'>
-              <div class='quest-banner'>
-                <div style='display:flex;align-items:center;gap:15px;'>
-                  <svg width='32' height='32' viewBox='0 0 24 24' fill='currentColor' style='color:white;flex-shrink:0;'><use href='#icon-target'/></svg>
-                  <h2>مهمتك: اكتشف أسرار المنافسين!</h2>
-                </div>
-                <div class='live-counter'>
-                  <span class='pulse-dot'></span>
-                  <span>800 تاجر يستخدمها الآن</span>
-                </div>
-              </div>
-              <div class='mission-card'>
-                <svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor' style='color:var(--primary);margin-bottom:15px;'><use href='#icon-trophy'/></svg>
-                <h3>كاشف ثيمات متاجر سلة</h3>
-                <p>اكتشف الثيم الذي يستخدمه أي متجر على سلة بنقرة واحدة! <strong>واحصل على كود خصم حصري كمكافأة! <svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;'><use href='#icon-gift'/></svg></strong></p>
-                <div style='margin:20px 0;'>
-                  <div style='height:8px;background:var(--border);border-radius:4px;overflow:hidden;'>
-                    <div style='height:100%;width:75%;background:var(--primary-gradient);border-radius:4px;'></div>
-                  </div>
-                  <p style='margin-top:8px;font-size:0.85rem;color:var(--text-light);'>75% - تقريباً وصلت للجائزة!</p>
-                </div>
-                <div class='game-buttons'>
-                  <button class='game-btn chrome-btn' onclick='window.open("https://chrome.google.com/webstore","_blank")' aria-label='تحميل إضافة كروم'><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='margin-left:6px;'><use href='#icon-trophy'/></svg> تحميل للكروم</button>
-                  <button class='game-btn edge-btn' onclick='window.open("https://microsoftedge.microsoft.com/addons","_blank")' aria-label='تحميل إضافة إيدج'><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='margin-left:6px;'><use href='#icon-bolt'/></svg> تحميل للإيدج</button>
-                </div>
-                <div class='scarcity-notice'>
-                  <svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-fire'/></svg>
-                  فقط <strong>47</strong> كود خصم متبقي اليوم!
-                </div>
-              </div>
-            </div>
-          </section>
+      <style>
+        .portfolio-iframe { width:100%; border:none; display:block; height:100vh; }
+      </style>
+      <iframe class='portfolio-iframe' src='https://elwa2.github.io/portfolio/works.html' loading='lazy' title='معرض الأعمال'></iframe>
     </div>
-          
+    
     <div class='tab-panel' data-tab='tools'>
-          <!-- ===== CREATORS TOOLS ===== -->
-          <section class='tools-section' id='tools'>
-            <div class='container'>
-              <div class='section-title'>
-                <h2><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:8px;'><use href='#icon-settings'/></svg> أدوات المبدعين</h2>
-                <p>مجموعة أدوات احترافية لتسريع عملك</p>
-              </div>
-              <div class='tools-horizontal-grid'>
-                <a class='tool-squircle' href='#' title='مولد QR'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-qr'/></svg></span>
-                  <span class='tool-name'>مولد QR</span>
-                </a>
-                <a class='tool-squircle' href='#' title='أدوات الألوان'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-palette'/></svg></span>
-                  <span class='tool-name'>ألوان</span>
-                </a>
-                <a class='tool-squircle' href='#' title='تغيير حجم الصور'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-ruler'/></svg></span>
-                  <span class='tool-name'>تصغير الصور</span>
-                </a>
-                <a class='tool-squircle' href='#' title='تدرجات لونية'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-magic'/></svg></span>
-                  <span class='tool-name'>تدرجات</span>
-                </a>
-                <a class='tool-squircle' href='#' title='مولد كلمات مرور'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-shield'/></svg></span>
-                  <span class='tool-name'>حماية</span>
-                </a>
-                <a class='tool-squircle' href='#' title='محول صور'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-image'/></svg></span>
-                  <span class='tool-name'>محول صور</span>
-                </a>
-                <a class='tool-squircle' href='#' title='المزيد'>
-                  <span class='tool-icon'><svg width='36' height='36' viewBox='0 0 24 24' fill='currentColor'><use href='#icon-package'/></svg></span>
-                  <span class='tool-name'>المزيد...</span>
-                </a>
-              </div>
-            </div>
-          </section>
+      <style>
+        .tools-iframe { width:100%; border:none; display:block; height:100vh; }
+      </style>
+      <iframe class='tools-iframe' src='https://elwa2.github.io/portfolio/index.html#salla-discounts' loading='lazy' title='الأدوات'></iframe>
     </div>
-          
+    
     <div class='tab-panel' data-tab='discounts'>
-          <!-- ===== DISCOUNT COUPONS ===== -->
-          <section class='discounts-section' id='discounts'>
-            <div class='container'>
-              <div class='section-title'>
-                <h2><svg width='28' height='28' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:8px;'><use href='#icon-gift'/></svg> أكواد خصم سلة</h2>
-                <p>أكواد خصم حصرية لقوالب وثيمات سلة - وفر الآن!</p>
-              </div>
-              <div class='discounts-grid' id='discounts-grid'>
-                <!-- كود الخصم المميز 1 -->
-                <div class='discount-card' style='grid-column:1/-1;display:flex;gap:20px;padding:30px;flex-wrap:wrap;'>
-                  <div style='flex:1;min-width:200px;'>
-                    <h3><svg width='22' height='22' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-currency'/></svg> كوبون خصم زد</h3>
-                    <div class='code' style='color:#a855f7;border:2px solid #a855f7;'>AliAHMED26</div>
-                    <p style='color:var(--text-light);margin-top:8px;'>خصم خاص وحصري</p>
-                  </div>
-                  <div style='flex:1;min-width:200px;'>
-                    <h3><svg width='22' height='22' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-gift'/></svg> باقة سلة</h3>
-                    <div class='code' style='color:#3b82f6;border:2px solid #3b82f6;'>F-HSB0U3YN</div>
-                    <p style='color:var(--text-light);margin-top:8px;'>خصم خاص وحصري</p>
-                  </div>
-                </div>
-                
-                <div class='discount-card'>
-                  <h3>ثيم سيليا</h3>
-                  <div class='code'>F-PSDOIDV4</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-PSDOIDV4",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/XqG7keYSfD' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم ملاك</h3>
-                  <div class='code'>F-YLKSA1DX</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-YLKSA1DX",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/EraL4acka6' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم شوبنج</h3>
-                  <div class='code'>F-AXDEMMC1</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-AXDEMMC1",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/DCwN6mjweZ' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم يافا</h3>
-                  <div class='code'>F-FQARWHFY</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-FQARWHFY",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/I8uJvRnXDo' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم بريستيج</h3>
-                  <div class='code'>F-DCAJSVCA</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-DCAJSVCA",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/eajOVO8rUS' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم علا</h3>
-                  <div class='code'>F-ZOZAVB1N</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-ZOZAVB1N",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/E8CjtqUhXM' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم جلامور</h3>
-                  <div class='code'>F-3YKPR0NI</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-3YKPR0NI",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/46caLXhw8d' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم عالي</h3>
-                  <div class='code'>F-NMHPXPOK</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-NMHPXPOK",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/PKX1CuD1q3' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم بوتيك</h3>
-                  <div class='code'>F-JKGJJPTZ</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-JKGJJPTZ",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/X5TWle8EUj' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم بيلا</h3>
-                  <div class='code'>F-U3YHN4Q3</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-U3YHN4Q3",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/eXlF5Fq4l3' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-                <div class='discount-card'>
-                  <h3>ثيم مبدع</h3>
-                  <div class='code'>F-Y0XZMKSJ</div>
-                  <div class='discount-actions'>
-                    <button class='copy-btn' onclick='copyCode("F-Y0XZMKSJ",this)'><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-clipboard'/></svg> نسخ</button>
-                    <a class='activate-btn' href='https://mtjr.at/atgHNyKysx' target='_blank'>تفعيل</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+      <style>
+        .discounts-iframe { width:100%; border:none; display:block; height:100vh; }
+      </style>
+      <iframe class='discounts-iframe' src='https://elwa2.github.io/portfolio/index.html#salla-discounts' loading='lazy' title='أكواد الخصم'></iframe>
     </div>
-          
+    
     <div class='tab-panel' data-tab='contact'>
           <!-- ===== CTA ===== -->
           <section class='cta-section'>
@@ -3900,7 +3686,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
           </section>
           
           <!-- ===== CONTACT SECTION ===== -->
-          <section class='contact-section' id='contact'>
+          <section class='contact-section section-reveal' id='contact'>
             <div class='container'>
               <div class='section-title'>
                 <h2>تواصل معنا</h2>
@@ -4072,10 +3858,10 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
                   <article class='blog-single'>
                     <h1 class='post-title'><data:post.title/></h1>
                     <div class='blog-post-meta'>
-                      <span>📅 <data:post.date/></span>
-                      <span>👤 <data:post.author/></span>
+                      <span><svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-calendar'/></svg> <data:post.date/></span>
+                      <span><svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-user'/></svg> <data:post.author/></span>
                       <b:if cond='data:post.allowComments'>
-                        <span>💬 <data:post.numComments/> تعليق</span>
+                        <span><svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-comment'/></svg> <data:post.numComments/> تعليق</span>
                       </b:if>
                     </div>
                     <div class='blog-post-body'><data:post.body/></div>
@@ -4083,7 +3869,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
                   </b:loop>
                   <!-- ===== التعليقات ===== -->
                   <div class='comments-section'>
-                    <h3>💬 التعليقات</h3>
+                    <h3><svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-comment'/></svg> التعليقات</h3>
                     <b:include data='post' name='comments'/>
                   </div>
                 <b:else/>
@@ -4092,8 +3878,8 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
                   <article class='blog-post-card'>
                     <h2 class='post-title'><a expr:href='data:post.url'><data:post.title/></a></h2>
                     <div class='blog-post-meta'>
-                      <span>📅 <data:post.date/></span>
-                      <span>👤 <data:post.author/></span>
+                      <span><svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-calendar'/></svg> <data:post.date/></span>
+                      <span><svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:4px;'><use href='#icon-user'/></svg> <data:post.author/></span>
                     </div>
                     <div class='blog-post-body'><data:post.snippets/></div>
                     <a class='read-more' expr:href='data:post.url'>قراءة المزيد ←</a>
@@ -4119,7 +3905,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
             <b:widget id='Label1' locked='true' title='التصنيفات' type='Label'>
               <b:includable id='main'>
               <div class='sidebar-widget'>
-                <h3>📂 التصنيفات</h3>
+                <h3><svg width='16' height='16' viewBox='0 0 24 24' fill='currentColor' style='vertical-align:middle;margin-left:6px;'><use href='#icon-folder'/></svg> التصنيفات</h3>
                 <ul>
                 <b:loop values='data:labels' var='label'>
                   <li><a expr:href='data:label.url'><data:label.name/></a></li>

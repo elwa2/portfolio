@@ -25,10 +25,17 @@
   --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.4);
   --shadow-colored: 0 10px 40px rgba(102, 126, 234, 0.3);
 
-  /* Glassmorphism */
+  /* Glassmorphism - مع vendor prefixes */
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-blur: 20px;
+
+  /* Z-Index منظم */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
 }
 
 [data-theme="dark"] {
@@ -724,7 +731,21 @@
 }
 
 /* ===== Responsive Typography ===== */
+@media (max-width: 1024px) {
+  .card-pro {
+    padding: 24px;
+  }
+
+  .section-title-pro h2 {
+    font-size: 2.8rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .card-pro {
+    padding: 20px;
+  }
+
   .section-title-pro h2 {
     font-size: 2.2rem;
   }
@@ -740,6 +761,58 @@
   .btn-pro {
     padding: 12px 24px;
     font-size: 0.95rem;
+  }
+
+  /* Glassmorphism على mobile */
+  .card-pro {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+@media (max-width: 480px) {
+  .card-pro {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .btn-pro {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .section-title-pro h2 {
+    font-size: 1.8rem;
+  }
+
+  .stat-card-pro .stat-number {
+    font-size: 2rem;
+  }
+}
+
+/* ===== Accessibility Media Queries ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ===== High Contrast Mode ===== */
+@media (prefers-contrast: more) {
+  .card-pro {
+    border: 2px solid var(--primary-color);
+  }
+
+  .btn-pro {
+    border: 2px solid currentColor;
   }
 }
 

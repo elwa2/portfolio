@@ -2,13 +2,33 @@
  * أنماط أيقونات SVG
  * ═══════════════════════════════════════════════════════════════ */
 
+/* متغيرات الألوان للأيقونات */
+:root {
+  /* Light Mode - SVG Colors */
+  --svg-icon-color: var(--text-color);
+  --svg-icon-hover-color: var(--primary-color);
+  --svg-icon-active-color: var(--primary-light);
+  --svg-icon-muted-color: var(--text-color-muted);
+  --svg-icon-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  /* Dark Mode - SVG Colors */
+  --svg-icon-color: var(--text-color-light);
+  --svg-icon-hover-color: var(--primary-light);
+  --svg-icon-active-color: var(--light-purple);
+  --svg-icon-muted-color: var(--text-color-muted);
+}
+
 .svg-icon {
   display: inline-block;
   width: 1em;
   height: 1em;
   vertical-align: -0.125em;
-  fill: currentColor;
+  fill: var(--svg-icon-color);
+  color: var(--svg-icon-color);
   overflow: visible;
+  transition: var(--svg-icon-transition);
 }
 
 /* أحجام مختلفة */
@@ -100,4 +120,83 @@
 
 .svg-icon.fa-rotate-270 {
   transform: rotate(270deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SVG Icon States
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hover State */
+.svg-icon:hover,
+button:hover .svg-icon,
+a:hover .svg-icon {
+  fill: var(--svg-icon-hover-color);
+  color: var(--svg-icon-hover-color);
+}
+
+/* Active State */
+.svg-icon.active,
+button.active .svg-icon,
+a.active .svg-icon {
+  fill: var(--svg-icon-active-color);
+  color: var(--svg-icon-active-color);
+}
+
+/* Muted State */
+.svg-icon.muted,
+.text-muted .svg-icon {
+  fill: var(--svg-icon-muted-color);
+  color: var(--svg-icon-muted-color);
+}
+
+/* في الأزرار */
+button .svg-icon {
+  transition: all 0.2s ease;
+}
+
+button:hover .svg-icon {
+  transform: scale(1.05);
+}
+
+button:active .svg-icon {
+  transform: scale(0.95);
+}
+
+/* في القوائم والروابط */
+nav .svg-icon,
+.sidebar .svg-icon {
+  transition: all 0.2s ease;
+}
+
+nav a:hover .svg-icon,
+.sidebar a:hover .svg-icon,
+nav a.active .svg-icon,
+.sidebar a.active .svg-icon {
+  fill: var(--svg-icon-hover-color);
+  transform: translateX(2px);
+}
+
+/* في البطاقات */
+.card .svg-icon {
+  fill: var(--primary-color);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.card:hover .svg-icon {
+  fill: var(--primary-light);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* في التنبيهات */
+.alert .svg-icon {
+  margin-right: 0.5em;
+  vertical-align: -0.2em;
+}
+
+/* في الخدمات */
+.service-icon .svg-icon {
+  font-size: 2.5em;
+  fill: var(--primary-gradient);
 }

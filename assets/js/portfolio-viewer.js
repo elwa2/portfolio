@@ -30,21 +30,21 @@
         <!-- شريط الأدوات -->
         <div class="viewer-toolbar">
           <button class="viewer-btn close-btn" id="viewer-close" title="إغلاق">
-            <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-times"></use></svg>
+            <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-times"></use></svg>
           </button>
           <span class="viewer-title" id="viewer-title"></span>
           <div class="viewer-controls">
             <button class="viewer-btn" id="viewer-zoom-out" title="تصغير">
-               <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-minus"></use></svg>
+               <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-minus"></use></svg>
             </button>
             <button class="viewer-btn" id="viewer-zoom-in" title="تكبير">
-               <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-plus"></use></svg>
+               <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-plus"></use></svg>
             </button>
             <button class="viewer-btn" id="viewer-fit" title="ملء الشاشة">
-               <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-expand"></use></svg>
+               <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-expand"></use></svg>
             </button>
             <a href="#" target="_blank" class="viewer-btn store-link-btn" id="viewer-store-link" title="زيارة المتجر">
-               <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-external-link-alt"></use></svg>
+               <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-external-link-alt"></use></svg>
             </a>
           </div>
         </div>
@@ -52,12 +52,12 @@
         <!-- أزرار التنقل -->
         <div class="viewer-nav prev">
           <button class="viewer-nav-btn" id="viewer-prev" title="السابق">
-             <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-chevron-right"></use></svg>
+             <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-chevron-right"></use></svg>
           </button>
         </div>
         <div class="viewer-nav next">
           <button class="viewer-nav-btn" id="viewer-next" title="التالي">
-             <svg class="svg-icon" aria-hidden="true"><use xlink:href="assets/images/icons.svg#icon-chevron-left"></use></svg>
+             <svg class="svg-icon" aria-hidden="true"><use href="assets/images/icons.svg#icon-chevron-left"></use></svg>
           </button>
         </div>
         
