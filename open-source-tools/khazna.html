@@ -351,6 +351,37 @@ body{
 }
 .back-link:hover{color:var(--text-primary);}
 
+/* ===== Sheet (Excel-style grid) ===== */
+.sheet-table{width:100%; border-collapse:collapse; font-size:0.85rem; background:var(--canvas-raised);}
+.sheet-table thead th{
+  background:var(--canvas-elevated); color:var(--text-secondary); font-weight:700;
+  font-size:0.7rem; padding:var(--space-3) var(--space-2); text-align:center;
+  border-bottom:1px solid var(--border-default); white-space:nowrap;
+}
+.sheet-table td{
+  border-bottom:1px solid var(--border-subtle); border-inline-end:1px solid var(--border-subtle);
+  padding:0; vertical-align:middle;
+}
+.sheet-table tbody tr:hover{background:var(--glass-subtle);}
+.sheet-idx{
+  text-align:center; color:var(--text-tertiary); font-size:0.72rem;
+  font-family:'JetBrains Mono',monospace; padding:0 var(--space-2) !important;
+}
+.grid-cell{
+  width:100%; background:transparent; border:1.5px solid transparent; border-radius:0;
+  padding:10px 12px; color:var(--text-primary); font-family:'Cairo',sans-serif; font-size:0.85rem;
+}
+.grid-cell:focus{
+  outline:none; background:var(--canvas-elevated); border-color:var(--border-accent);
+  box-shadow:inset 0 0 0 1px var(--accent-glow); position:relative; z-index:2;
+}
+.grid-amount{font-family:'JetBrains Mono',monospace; text-align:left; direction:ltr;}
+.grid-select{cursor:pointer;}
+.sheet-table tfoot td{padding:var(--space-3) var(--space-4); border-top:2px solid var(--border-default); font-size:0.85rem;}
+.sheet-del{opacity:0.45; margin:0 auto; display:flex;}
+.sheet-del:hover{opacity:1; color:var(--semantic-danger); border-color:rgba(248,113,113,0.4);}
+.sheet-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4); flex-wrap:wrap; gap:var(--space-3);}
+
 /* ===== Toast ===== */
 #toast-container{position:fixed; bottom:110px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .toast{
@@ -421,6 +452,7 @@ input[type="file"]{display:none;}
 
   /* ===================== STORAGE ===================== */
   const STORAGE_KEY = "khazna_v1_state";
+  const APP_VERSION = "1.4.0";
 
   function loadState(){
     try{
@@ -455,6 +487,28 @@ input[type="file"]{display:none;}
   let selectedCustomerId = null;
   let customerSearchQuery = "";
 
+  /* ===================== SHEET (Excel-style bulk entry) DRAFT ===================== */
+  const SHEET_DRAFT_KEY = "khazna_sheet_draft_v1";
+  function makeEmptySheetRows(n){
+    const arr = [];
+    for(let i=0;i<n;i++) arr.push({id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''});
+    return arr;
+  }
+  function loadSheetDraft(){
+    try{
+      const raw = localStorage.getItem(SHEET_DRAFT_KEY);
+      if(raw){
+        const arr = JSON.parse(raw);
+        if(Array.isArray(arr) && arr.length) return arr;
+      }
+    }catch(e){ /* تجاهل واستخدم صفوف فاضية */ }
+    return makeEmptySheetRows(6);
+  }
+  function saveSheetDraft(){
+    try{ localStorage.setItem(SHEET_DRAFT_KEY, JSON.stringify(sheetRows)); }catch(e){}
+  }
+  let sheetRows = loadSheetDraft();
+
   /* ===================== HELPERS ===================== */
   function todayStr(){
     const d = new Date();
@@ -463,7 +517,41 @@ input[type="file"]{display:none;}
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
   function fmt(n){
     const num = Number(n)||0;
-    return num.toLocaleString('ar-EG', {minimumFractionDigits:0, maximumFractionDigits:2});
+    /* استخدام en-US لضمان فاصل آلاف ثابت وأرقام لاتينية واضحة حتى لو تصفح المستخدم بيدعم أرقام عربية شرقية */
+    return num.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:2});
+  }
+
+  /* تنسيق المبلغ بفاصل آلاف وهو لسه بيتكتب (زي جوجل شيت بالظبط) */
+  function formatMoneyLive(raw){
+    const str = (raw||'').toString();
+    const neg = str.trim().startsWith('-');
+    let cleaned = str.replace(/[^0-9.]/g,'');
+    const firstDot = cleaned.indexOf('.');
+    if(firstDot!==-1){
+      cleaned = cleaned.slice(0,firstDot+1) + cleaned.slice(firstDot+1).replace(/\./g,'');
+    }
+    let [intPart, decPart] = cleaned.split('.');
+    intPart = (intPart||'').replace(/^0+(?=\d)/,'');
+    const withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg?'-':'') + withCommas + (decPart!==undefined ? '.'+decPart : (cleaned.endsWith('.') ? '.' : ''));
+  }
+  function parseMoneyString(str){
+    return parseFloat((str||'').toString().replace(/,/g,'')) || 0;
+  }
+  /* يربط أي حقل إدخال مبلغ بتنسيق الفاصل الحي مع الحفاظ على موضع المؤشر */
+  function attachMoneyFormatting(inputEl){
+    if(!inputEl) return;
+    inputEl.addEventListener('input', ()=>{
+      const cursorPos = inputEl.selectionStart;
+      const before = inputEl.value;
+      let digitsBeforeCursor = 0;
+      for(let i=0;i<cursorPos;i++){ if(/[0-9]/.test(before[i])) digitsBeforeCursor++; }
+      const formatted = formatMoneyLive(before);
+      inputEl.value = formatted;
+      let pos=0, seen=0;
+      while(pos<formatted.length && seen<digitsBeforeCursor){ if(/[0-9]/.test(formatted[pos])) seen++; pos++; }
+      inputEl.setSelectionRange(pos,pos);
+    });
   }
   function fmtDate(dstr){
     const d = new Date(dstr+"T00:00:00");
@@ -606,6 +694,7 @@ input[type="file"]{display:none;}
   /* ===================== TABS ===================== */
   const ICONS = {
     quick: '<path d="M13 2 3 14h7l-1 8 10-12h-7z"/>',
+    sheet: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15.5h18M9 4v16M15 4v16"/>',
     journal: '<path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/>',
     customers: '<circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17" cy="8.5" r="2.3"/><path d="M15.3 13.9c2.6.2 4.8 2.1 5.7 4.6"/>',
     recon: '<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
@@ -614,6 +703,7 @@ input[type="file"]{display:none;}
   };
   const TABS = [
     {id:'quick', label:'قيد سريع', short:'قيد'},
+    {id:'sheet', label:'تسجيل اليومية', short:'الشيت'},
     {id:'journal', label:'دفتر اليومية', short:'اليومية'},
     {id:'customers', label:'العملاء', short:'العملاء'},
     {id:'recon', label:'جرد الخزنة', short:'الجرد'},
@@ -674,7 +764,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="field">
         <label>المبلغ (ج.م)</label>
-        <input type="number" inputmode="decimal" class="num-input" id="qAmount" placeholder="0.00" min="0" step="0.01">
+        <input type="text" inputmode="decimal" class="num-input" id="qAmount" placeholder="0.00">
       </div>
       <div class="field">
         <label>البيان / السبب</label>
@@ -730,7 +820,7 @@ input[type="file"]{display:none;}
         const amountEl = document.getElementById('qAmount');
         const noteEl = document.getElementById('qNote');
         const customerEl = document.getElementById('qCustomer');
-        let rawAmount = parseFloat(amountEl.value);
+        let rawAmount = parseMoneyString(amountEl.value);
         if(!rawAmount || rawAmount===0){ showToast('⚠️ اكتب مبلغ صحيح'); amountEl.focus(); return; }
         /* كتابة رقم سالب معناها منصرف تلقائي، حتى لو الزرار شايل وارد */
         const finalType = rawAmount < 0 ? 'out' : quickType;
@@ -748,9 +838,10 @@ input[type="file"]{display:none;}
         renderAll();
       });
       const amountEl = document.getElementById('qAmount');
+      attachMoneyFormatting(amountEl);
       amountEl.addEventListener('input', ()=>{
-        const v = parseFloat(amountEl.value);
-        if(!isNaN(v) && v<0){ quickType = 'out'; updateQuickTypeButtons(); }
+        const v = parseMoneyString(amountEl.value);
+        if(v<0){ quickType = 'out'; updateQuickTypeButtons(); }
       });
     }
     bindEntryListActions('qList');
@@ -786,7 +877,7 @@ input[type="file"]{display:none;}
             <button class="type-btn ${tx.type==='in'?'active':''}" data-etype="in">💰 وارد</button>
             <button class="type-btn ${tx.type==='out'?'active':''}" data-etype="out">📤 منصرف</button>
           </div>
-          <div class="field"><label>المبلغ</label><input type="number" class="num-input" id="eAmount" value="${tx.amount}"></div>
+          <div class="field"><label>المبلغ</label><input type="text" inputmode="decimal" class="num-input" id="eAmount" value="${fmt(tx.amount)}"></div>
           <div class="field"><label>البيان</label><input type="text" id="eNote" value="${escapeHtml(tx.note||'')}"></div>
           <div class="field"><label>العميل (اختياري)</label><input type="text" id="eCustomer" list="customerNamesList" value="${escapeHtml(tx.customerId ? (getCustomerById(tx.customerId)||{}).name||'' : '')}"></div>
           <div class="field"><label>التاريخ</label><input type="date" id="eDate" value="${tx.date}"></div>
@@ -806,8 +897,9 @@ input[type="file"]{display:none;}
     });
     document.getElementById('eCancel').addEventListener('click', ()=> root.innerHTML='');
     document.getElementById('editOverlay').addEventListener('click', (e)=>{ if(e.target.id==='editOverlay') root.innerHTML=''; });
+    attachMoneyFormatting(document.getElementById('eAmount'));
     document.getElementById('eSave').addEventListener('click', ()=>{
-      const amount = parseFloat(document.getElementById('eAmount').value);
+      const amount = parseMoneyString(document.getElementById('eAmount').value);
       if(!amount || amount<=0){ showToast('⚠️ اكتب مبلغ صحيح'); return; }
       tx.amount = amount;
       tx.note = document.getElementById('eNote').value.trim();
@@ -835,6 +927,185 @@ input[type="file"]{display:none;}
     document.getElementById('confCancel').addEventListener('click', ()=> root.innerHTML='');
     document.getElementById('confOverlay').addEventListener('click', (e)=>{ if(e.target.id==='confOverlay') root.innerHTML=''; });
     document.getElementById('confYes').addEventListener('click', ()=>{ root.innerHTML=''; onConfirm(); });
+  }
+
+  /* ===================== VIEW: SHEET (Excel-style bulk entry) ===================== */
+  function sheetRowHtml(r, displayIndex){
+    return `
+    <tr data-row-id="${r.id}">
+      <td class="sheet-idx">${displayIndex+1}</td>
+      <td><input type="date" class="grid-cell" data-row-id="${r.id}" data-field="date" value="${r.date}"></td>
+      <td>
+        <select class="grid-cell grid-select" data-row-id="${r.id}" data-field="type">
+          <option value="in" ${r.type==='in'?'selected':''}>وارد</option>
+          <option value="out" ${r.type==='out'?'selected':''}>منصرف</option>
+        </select>
+      </td>
+      <td><input type="text" inputmode="decimal" class="grid-cell grid-amount" data-row-id="${r.id}" data-field="amount" value="${escapeHtml(r.amount)}" placeholder="0.00"></td>
+      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="note" value="${escapeHtml(r.note)}" placeholder="البيان..."></td>
+      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="customer" list="customerNamesList" value="${escapeHtml(r.customer)}" placeholder="اسم العميل..."></td>
+      <td><button class="icon-btn sheet-del" data-row-id="${r.id}" title="حذف الصف">✕</button></td>
+    </tr>`;
+  }
+
+  function renderSheet(){
+    return `
+    <div class="panel" style="padding:var(--space-4);">
+      <div class="sheet-toolbar">
+        <h2 style="margin:0;"><span class="dot"></span> تسجيل اليومية — جدول سريع</h2>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-ghost" id="sheetAddRow">+ إضافة صف</button>
+          <button class="btn-primary" id="sheetPost" style="width:auto; padding:10px 22px;">🚀 ترحيل الكل</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto; border:1px solid var(--border-subtle); border-radius:12px;">
+        <table class="sheet-table" id="sheetTable">
+          <thead>
+            <tr>
+              <th style="width:32px;">#</th>
+              <th style="min-width:130px;">التاريخ</th>
+              <th style="width:90px;">النوع</th>
+              <th style="min-width:130px;">المبلغ</th>
+              <th style="min-width:180px;">البيان</th>
+              <th style="min-width:160px;">العميل</th>
+              <th style="width:34px;"></th>
+            </tr>
+          </thead>
+          <tbody id="sheetBody">
+            ${sheetRows.map((r,i)=>sheetRowHtml(r,i)).join('')}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:start; font-weight:700; font-size:0.8rem; color:var(--text-tertiary);">الإجمالي</td>
+              <td colspan="4">
+                <span class="num" id="sheetTotalIn" style="color:var(--semantic-success); font-weight:700;">+0</span>
+                &nbsp;/&nbsp;
+                <span class="num" id="sheetTotalOut" style="color:var(--semantic-danger); font-weight:700;">-0</span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:var(--space-3); line-height:1.6;">
+        اكتب البيانات صف بصف زي إكسل بالظبط — دوس <b>Enter</b> عشان تنزل للصف اللي بعده (لو آخر صف هيتضاف صف جديد تلقائي)، ودوس <b>Tab</b> للتنقل بين الخانات. البيانات بتتحفظ تلقائي كمسودة حتى لو قفلت الصفحة قبل الترحيل. لما تخلص، دوس "ترحيل الكل" عشان تتسجل كل الصفوف دفعة واحدة في دفتر اليومية والعملاء يتربطوا تلقائي.
+      </div>
+    </div>
+    `;
+  }
+
+  function bindSheetEvents(){
+    const body = document.getElementById('sheetBody');
+    if(!body) return;
+
+    function findRow(id){ return sheetRows.find(r=>r.id===id); }
+    function updateTotals(){
+      let inT=0, outT=0;
+      sheetRows.forEach(r=>{
+        const v = parseMoneyString(r.amount);
+        if(!v) return;
+        if(r.type==='out') outT += v; else inT += v;
+      });
+      const inEl = document.getElementById('sheetTotalIn');
+      const outEl = document.getElementById('sheetTotalOut');
+      if(inEl) inEl.textContent = '+' + fmt(inT);
+      if(outEl) outEl.textContent = '-' + fmt(outT);
+    }
+    updateTotals();
+
+    body.addEventListener('input', (e)=>{
+      const el = e.target;
+      if(!el.classList.contains('grid-cell')) return;
+      const row = findRow(el.dataset.rowId);
+      if(!row) return;
+      const field = el.dataset.field;
+      if(field==='amount'){
+        const cursorPos = el.selectionStart;
+        const before = el.value;
+        let digitsBeforeCursor = 0;
+        for(let i=0;i<cursorPos;i++){ if(/[0-9]/.test(before[i])) digitsBeforeCursor++; }
+        const formatted = formatMoneyLive(before);
+        el.value = formatted;
+        let pos=0, seen=0;
+        while(pos<formatted.length && seen<digitsBeforeCursor){ if(/[0-9]/.test(formatted[pos])) seen++; pos++; }
+        el.setSelectionRange(pos,pos);
+        row.amount = formatted;
+        updateTotals();
+      } else {
+        row[field] = el.value;
+      }
+      saveSheetDraft();
+    });
+
+    body.addEventListener('change', (e)=>{
+      const el = e.target;
+      if(!el.classList.contains('grid-cell')) return;
+      const row = findRow(el.dataset.rowId);
+      if(!row) return;
+      row[el.dataset.field] = el.value;
+      if(el.dataset.field==='type') updateTotals();
+      saveSheetDraft();
+    });
+
+    body.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Enter') return;
+      const el = e.target;
+      if(!el.classList.contains('grid-cell')) return;
+      e.preventDefault();
+      const field = el.dataset.field;
+      const idx = sheetRows.findIndex(r=>r.id===el.dataset.rowId);
+      if(idx===-1) return;
+      let nextIdx = idx+1;
+      if(nextIdx >= sheetRows.length){
+        const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''};
+        sheetRows.push(newRow);
+        body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
+        saveSheetDraft();
+      }
+      const nextRow = sheetRows[nextIdx];
+      setTimeout(()=>{
+        const nextEl = body.querySelector(`[data-row-id="${nextRow.id}"][data-field="${field}"]`);
+        if(nextEl){ nextEl.focus(); if(typeof nextEl.select==='function') nextEl.select(); }
+      }, 0);
+    });
+
+    body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.sheet-del');
+      if(!btn) return;
+      if(sheetRows.length<=1){ showToast('⚠️ لازم يفضل صف واحد على الأقل'); return; }
+      sheetRows = sheetRows.filter(r=>r.id!==btn.dataset.rowId);
+      saveSheetDraft();
+      renderAll();
+    });
+
+    const addBtn = document.getElementById('sheetAddRow');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''};
+      sheetRows.push(newRow);
+      body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
+      saveSheetDraft();
+    });
+
+    const postBtn = document.getElementById('sheetPost');
+    if(postBtn) postBtn.addEventListener('click', ()=>{
+      let posted = 0;
+      sheetRows.forEach(row=>{
+        const amt = parseMoneyString(row.amount);
+        if(!amt || amt<=0) return;
+        const customerId = getOrCreateCustomerId(row.customer);
+        state.transactions.push({
+          id: uid(), date: row.date || todayStr(), type: row.type==='out' ? 'out' : 'in',
+          amount: amt, note: (row.note||'').trim(), customerId: customerId,
+          createdAt: new Date().toISOString()
+        });
+        posted++;
+      });
+      if(posted===0){ showToast('⚠️ مفيش صفوف فيها مبالغ للترحيل'); return; }
+      saveState();
+      sheetRows = makeEmptySheetRows(6);
+      saveSheetDraft();
+      showToast(`✓ اترحّل ${posted} عملية بنجاح`);
+      renderAll();
+    });
   }
 
   /* ===================== VIEW: JOURNAL ===================== */
@@ -1008,7 +1279,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="field">
         <label>المبلغ اللي عديته فعلياً في الخزنة</label>
-        <input type="number" class="num-input" id="rCounted" placeholder="0.00" step="0.01">
+        <input type="text" inputmode="decimal" class="num-input" id="rCounted" placeholder="0.00">
       </div>
       <div class="field">
         <label>ملاحظات (اختياري)</label>
@@ -1037,14 +1308,15 @@ input[type="file"]{display:none;}
   function bindReconEvents(){
     const dateEl = document.getElementById('rDate');
     if(dateEl) dateEl.addEventListener('change', ()=>{ reconDate = dateEl.value; renderAll(); });
+    attachMoneyFormatting(document.getElementById('rCounted'));
 
     const submitBtn = document.getElementById('rSubmit');
     if(submitBtn){
       submitBtn.addEventListener('click', ()=>{
         const countedEl = document.getElementById('rCounted');
         const noteEl = document.getElementById('rNote');
-        const counted = parseFloat(countedEl.value);
-        if(counted===undefined || isNaN(counted) || counted<0){ showToast('⚠️ اكتب المبلغ اللي عديته'); return; }
+        const counted = parseMoneyString(countedEl.value);
+        if(countedEl.value.trim()==='' || counted<0){ showToast('⚠️ اكتب المبلغ اللي عديته'); return; }
         const calc = balanceUpTo(reconDate);
         const diff = Math.round((counted - calc)*100)/100;
         state.reconciliations.push({
@@ -1070,6 +1342,72 @@ input[type="file"]{display:none;}
 
   /* ===================== VIEW: REPORTS ===================== */
   let reportPeriod = 'day';
+  let reportMonth = todayStr().slice(0,7);
+  const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+  function monthRange(monthStr){
+    const [y,m] = monthStr.split('-').map(Number);
+    const start = monthStr+'-01';
+    const lastDay = new Date(y, m, 0).getDate();
+    const end = monthStr+'-'+String(lastDay).padStart(2,'0');
+    return {start, end};
+  }
+
+  function computeMonthlyReport(monthStr){
+    const {start, end} = monthRange(monthStr);
+    const t = totalsForRange(start, end);
+    const openBal = balanceUpTo(addDays(start,-1));
+    const closeBal = balanceUpTo(end);
+    const txs = state.transactions.filter(tx=>tx.date>=start && tx.date<=end);
+    const txCount = txs.length;
+    const avgTx = txCount ? (t.inTotal+t.outTotal)/txCount : 0;
+
+    const custMap = {};
+    txs.forEach(tx=>{
+      if(!tx.customerId) return;
+      if(!custMap[tx.customerId]) custMap[tx.customerId] = {inTotal:0, outTotal:0, count:0};
+      custMap[tx.customerId].count++;
+      if(tx.type==='in') custMap[tx.customerId].inTotal += Number(tx.amount);
+      else custMap[tx.customerId].outTotal += Number(tx.amount);
+    });
+    const topCustomers = Object.entries(custMap)
+      .map(([id,v])=>({ id, name:(getCustomerById(id)||{}).name || '—', ...v, total: v.inTotal+v.outTotal }))
+      .sort((a,b)=>b.total-a.total)
+      .slice(0,5);
+
+    const recons = state.reconciliations.filter(r=>r.date>=start && r.date<=end);
+    const reconSummary = {
+      count: recons.length,
+      okCount: recons.filter(r=>r.diff===0).length,
+      surplusCount: recons.filter(r=>r.diff>0).length,
+      deficitCount: recons.filter(r=>r.diff<0).length,
+      totalDiff: recons.reduce((s,r)=>s+r.diff,0)
+    };
+
+    let days = [];
+    let cur = start;
+    while(cur <= end){ const dt = totalsForDate(cur); days.push({date:cur, ...dt}); cur = addDays(cur,1); }
+
+    return { start, end, openBal, closeBal, inTotal:t.inTotal, outTotal:t.outTotal, net:t.inTotal-t.outTotal, txCount, avgTx, topCustomers, reconSummary, days };
+  }
+
+  function monthlyChartSVG(days){
+    const maxVal = Math.max(1, ...days.map(d=>Math.max(d.inTotal, d.outTotal)));
+    const W=600, H=140;
+    const n = Math.max(days.length,1);
+    const groupW = W/n;
+    const barW = Math.max(1.5, groupW/2 - 1.5);
+    let bars = '';
+    days.forEach((d,i)=>{
+      const x = i*groupW;
+      const hIn = (d.inTotal/maxVal)*(H-16);
+      const hOut = (d.outTotal/maxVal)*(H-16);
+      bars += `<rect x="${(x+0.5).toFixed(1)}" y="${(H-hIn).toFixed(1)}" width="${barW.toFixed(1)}" height="${hIn.toFixed(1)}" fill="var(--semantic-success)" opacity="0.85" rx="1.5"></rect>`;
+      bars += `<rect x="${(x+0.5+barW+1).toFixed(1)}" y="${(H-hOut).toFixed(1)}" width="${barW.toFixed(1)}" height="${hOut.toFixed(1)}" fill="var(--semantic-danger)" opacity="0.85" rx="1.5"></rect>`;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:140px; display:block; overflow:visible;">${bars}<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="var(--border-subtle)" stroke-width="1"></line></svg>`;
+  }
+
   function renderReports(){
     let start, end, label;
     const today = todayStr();
@@ -1119,12 +1457,244 @@ input[type="file"]{display:none;}
         </div>`).join('')
       }
     </div>
+    ${renderMonthlyPanel()}
     `;
   }
+
+  function renderMonthlyPanel(){
+    const r = computeMonthlyReport(reportMonth);
+    const [y,m] = reportMonth.split('-');
+    const monthLabel = ARABIC_MONTHS[parseInt(m,10)-1] + ' ' + y;
+
+    return `
+    <div class="panel">
+      <h2><span class="dot"></span> التقرير الشهري الشامل</h2>
+      <div class="field">
+        <label>اختار الشهر</label>
+        <input type="month" id="repMonth" value="${reportMonth}">
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="k">إجمالي وارد ${monthLabel}</div><div class="v num" style="color:var(--semantic-success)">+${fmt(r.inTotal)}</div></div>
+        <div class="stat-card"><div class="k">إجمالي منصرف</div><div class="v num" style="color:var(--semantic-danger)">-${fmt(r.outTotal)}</div></div>
+        <div class="stat-card"><div class="k">صافي الشهر</div><div class="v num">${fmt(r.net)}</div></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="k">الرصيد الافتتاحي</div><div class="v num">${fmt(r.openBal)}</div></div>
+        <div class="stat-card"><div class="k">الرصيد الختامي</div><div class="v num">${fmt(r.closeBal)}</div></div>
+        <div class="stat-card"><div class="k">عدد العمليات</div><div class="v num">${r.txCount}</div></div>
+      </div>
+      <div style="margin:var(--space-5) 0 var(--space-3);">
+        <div style="font-size:0.72rem; color:var(--text-tertiary); font-weight:600; margin-bottom:var(--space-3);">حركة الوارد والمنصرف يوم بيوم خلال الشهر</div>
+        ${monthlyChartSVG(r.days)}
+        <div style="display:flex; gap:8px; margin-top:var(--space-3);">
+          <span class="cust-chip" style="cursor:default;">🟢 وارد</span>
+          <span class="cust-chip" style="cursor:default;">🔴 منصرف</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><span class="dot"></span> أعلى العملاء نشاطاً — ${monthLabel}</h2>
+      ${ r.topCustomers.length===0 ? `<div class="empty-state"><div class="icon">👥</div><div class="txt">مفيش حركات عملاء الشهر ده</div></div>` :
+        r.topCustomers.map(c=>`
+        <div class="customer-row" data-open-customer="${c.id}">
+          <div class="customer-avatar">${escapeHtml((c.name||'?').trim().charAt(0) || '?')}</div>
+          <div class="customer-info">
+            <div class="name">${escapeHtml(c.name)}</div>
+            <div class="meta">${c.count} عملية &nbsp;•&nbsp; وارد ${fmt(c.inTotal)} &nbsp;•&nbsp; منصرف ${fmt(c.outTotal)}</div>
+          </div>
+          <div class="customer-net num">${fmt(c.total)}</div>
+        </div>`).join('')
+      }
+    </div>
+
+    <div class="panel">
+      <h2><span class="dot"></span> ملخص الجرد خلال الشهر</h2>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="k">عدد عمليات الجرد</div><div class="v num">${r.reconSummary.count}</div></div>
+        <div class="stat-card"><div class="k">مرات مظبوطة</div><div class="v num" style="color:var(--semantic-success)">${r.reconSummary.okCount}</div></div>
+        <div class="stat-card"><div class="k">صافي الفروقات</div><div class="v num" style="color:${r.reconSummary.totalDiff===0?'var(--text-secondary)': r.reconSummary.totalDiff>0?'var(--accent-warm)':'var(--semantic-danger)'}">${fmt(r.reconSummary.totalDiff)}</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><span class="dot"></span> تصدير التقرير</h2>
+      <div style="display:flex; gap:var(--space-3); flex-wrap:wrap;">
+        <button class="btn-primary" id="exportExcelBtn" style="flex:1; min-width:160px;">📊 تصدير Excel</button>
+        <button class="btn-ghost" id="exportPdfBtn" style="flex:1; min-width:160px; padding:var(--space-4); font-size:0.95rem;">🖨️ تصدير PDF</button>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:var(--space-3); line-height:1.6;">
+        تصدير الإكسل محتاج اتصال إنترنت أول مرة بس عشان يحمّل مكتبة التصدير. تصدير PDF بيفتح صفحة طباعة، احفظها PDF من نافذة الطباعة في المتصفح.
+      </div>
+    </div>
+    `;
+  }
+
   function bindReportsEvents(){
     document.querySelectorAll('[data-period]').forEach(b=>{
       b.addEventListener('click', ()=>{ reportPeriod = b.dataset.period; renderAll(); });
     });
+    const monthEl = document.getElementById('repMonth');
+    if(monthEl){
+      monthEl.addEventListener('change', ()=>{ reportMonth = monthEl.value || reportMonth; renderAll(); });
+    }
+    document.querySelectorAll('.customer-row[data-open-customer]').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        selectedCustomerId = row.dataset.openCustomer;
+        activeTab = 'customers';
+        renderAll();
+      });
+    });
+    const excelBtn = document.getElementById('exportExcelBtn');
+    if(excelBtn) excelBtn.addEventListener('click', exportExcel);
+    const pdfBtn = document.getElementById('exportPdfBtn');
+    if(pdfBtn) pdfBtn.addEventListener('click', exportPDF);
+  }
+
+  /* ===================== EXPORT: EXCEL & PDF ===================== */
+  function loadScriptOnce(url){
+    return new Promise((resolve, reject)=>{
+      if(document.querySelector(`script[data-src="${url}"]`) && window.XLSX){ resolve(); return; }
+      const existing = document.querySelector(`script[data-src="${url}"]`);
+      if(existing){ existing.addEventListener('load', ()=>resolve()); existing.addEventListener('error', ()=>reject(new Error('تعذر تحميل المكتبة'))); return; }
+      const s = document.createElement('script');
+      s.src = url; s.dataset.src = url;
+      s.onload = ()=>resolve();
+      s.onerror = ()=>reject(new Error('تعذر تحميل مكتبة التصدير، تأكد من اتصال الإنترنت'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function exportExcel(){
+    try{
+      showToast('⏳ جاري تجهيز ملف الإكسل...');
+      await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+      if(!window.XLSX){ showToast('⚠️ تعذر تحميل مكتبة التصدير'); return; }
+
+      const wb = XLSX.utils.book_new();
+
+      const txRows = state.transactions
+        .slice().sort((a,b)=> (a.date+a.createdAt).localeCompare(b.date+b.createdAt))
+        .map(tx=>({
+          'التاريخ': tx.date,
+          'الوقت': fmtTime(tx.createdAt),
+          'النوع': tx.type==='in' ? 'وارد' : 'منصرف',
+          'المبلغ': Number(tx.amount),
+          'البيان': tx.note || '',
+          'العميل': tx.customerId ? ((getCustomerById(tx.customerId)||{}).name || '') : ''
+        }));
+      const ws1 = XLSX.utils.json_to_sheet(txRows);
+      XLSX.utils.book_append_sheet(wb, ws1, 'المعاملات');
+
+      const custRows = state.customers.map(c=>{
+        const t = customerTotals(c.id);
+        return {'اسم العميل': c.name, 'إجمالي وارد': t.inTotal, 'إجمالي منصرف': t.outTotal, 'الصافي': t.net};
+      });
+      const ws2 = XLSX.utils.json_to_sheet(custRows.length ? custRows : [{'اسم العميل':'لا يوجد عملاء بعد'}]);
+      XLSX.utils.book_append_sheet(wb, ws2, 'العملاء');
+
+      const r = computeMonthlyReport(reportMonth);
+      const monthRows = r.days.map(d=>({'التاريخ': d.date, 'وارد': d.inTotal, 'منصرف': d.outTotal, 'الصافي': d.inTotal-d.outTotal}));
+      monthRows.push({'التاريخ':'', 'وارد':'', 'منصرف':'', 'الصافي':''});
+      monthRows.push({'التاريخ':'إجمالي الشهر', 'وارد': r.inTotal, 'منصرف': r.outTotal, 'الصافي': r.net});
+      monthRows.push({'التاريخ':'الرصيد الافتتاحي', 'وارد': r.openBal});
+      monthRows.push({'التاريخ':'الرصيد الختامي', 'وارد': r.closeBal});
+      const ws3 = XLSX.utils.json_to_sheet(monthRows);
+      XLSX.utils.book_append_sheet(wb, ws3, 'التقرير الشهري');
+
+      const reconRows = state.reconciliations
+        .slice().sort((a,b)=>a.date.localeCompare(b.date))
+        .map(rc=>({'التاريخ': rc.date, 'الرصيد المحسوب': rc.calculatedBalance, 'المبلغ المعدود': rc.countedAmount, 'الفرق': rc.diff, 'ملاحظات': rc.note || ''}));
+      const ws4 = XLSX.utils.json_to_sheet(reconRows.length ? reconRows : [{'التاريخ':'لا يوجد جرد بعد'}]);
+      XLSX.utils.book_append_sheet(wb, ws4, 'الجرد');
+
+      XLSX.writeFile(wb, 'khazna-report-'+reportMonth+'.xlsx');
+      showToast('✓ اتحمّل ملف الإكسل');
+    }catch(e){
+      console.error(e);
+      showToast('⚠️ ' + (e.message || 'حصل خطأ في التصدير'));
+    }
+  }
+
+  function exportPDF(){
+    const r = computeMonthlyReport(reportMonth);
+    const [y,m] = reportMonth.split('-');
+    const monthLabel = ARABIC_MONTHS[parseInt(m,10)-1] + ' ' + y;
+    const generatedAt = new Date().toLocaleString('en-US');
+
+    const txRowsHtml = state.transactions
+      .filter(tx=>tx.date>=r.start && tx.date<=r.end)
+      .sort((a,b)=>(a.date+a.createdAt).localeCompare(b.date+b.createdAt))
+      .map(tx=>`
+        <tr>
+          <td>${tx.date}</td>
+          <td>${tx.type==='in'?'وارد':'منصرف'}</td>
+          <td>${fmt(tx.amount)}</td>
+          <td>${escapeHtml(tx.note||'')}</td>
+          <td>${tx.customerId ? escapeHtml((getCustomerById(tx.customerId)||{}).name||'') : ''}</td>
+        </tr>`).join('');
+
+    const topCustHtml = r.topCustomers.map(c=>`
+      <tr><td>${escapeHtml(c.name)}</td><td>${c.count}</td><td>${fmt(c.inTotal)}</td><td>${fmt(c.outTotal)}</td><td>${fmt(c.total)}</td></tr>
+    `).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8">
+<title>تقرير خزنتي - ${monthLabel}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif; direction:rtl; color:#1a1a1a; padding:32px; max-width:900px; margin:0 auto;}
+.header{display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #e8734a; padding-bottom:16px; margin-bottom:24px;}
+.header h1{font-size:1.5rem; margin:0; font-weight:800;}
+.header .meta{font-size:0.8rem; color:#666; text-align:left;}
+.stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px;}
+.stat-box{border:1px solid #ddd; border-radius:10px; padding:14px; text-align:center;}
+.stat-box .k{font-size:0.7rem; color:#777; margin-bottom:6px;}
+.stat-box .v{font-size:1.15rem; font-weight:800;}
+h2{font-size:1.05rem; margin:28px 0 12px; border-inline-start:4px solid #e8734a; padding-inline-start:10px;}
+table{width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:20px;}
+th,td{border:1px solid #ddd; padding:6px 8px; text-align:right;}
+th{background:#f4f4f4; font-weight:700;}
+.footer{margin-top:32px; font-size:0.7rem; color:#999; text-align:center;}
+@media print{ body{padding:10mm;} }
+</style></head>
+<body>
+  <div class="header">
+    <h1>خزنتي — التقرير الشهري</h1>
+    <div class="meta">${monthLabel}<br>تاريخ الإصدار: ${generatedAt}</div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="k">إجمالي وارد</div><div class="v">${fmt(r.inTotal)} ج.م</div></div>
+    <div class="stat-box"><div class="k">إجمالي منصرف</div><div class="v">${fmt(r.outTotal)} ج.م</div></div>
+    <div class="stat-box"><div class="k">صافي الشهر</div><div class="v">${fmt(r.net)} ج.م</div></div>
+    <div class="stat-box"><div class="k">الرصيد الافتتاحي</div><div class="v">${fmt(r.openBal)} ج.م</div></div>
+    <div class="stat-box"><div class="k">الرصيد الختامي</div><div class="v">${fmt(r.closeBal)} ج.م</div></div>
+    <div class="stat-box"><div class="k">عدد العمليات</div><div class="v">${r.txCount}</div></div>
+  </div>
+
+  <h2>أعلى العملاء نشاطاً</h2>
+  ${ r.topCustomers.length===0 ? '<p style="color:#888; font-size:0.85rem;">مفيش حركات عملاء الشهر ده</p>' : `
+  <table>
+    <thead><tr><th>العميل</th><th>عدد العمليات</th><th>وارد</th><th>منصرف</th><th>الإجمالي</th></tr></thead>
+    <tbody>${topCustHtml}</tbody>
+  </table>`}
+
+  <h2>كل معاملات الشهر</h2>
+  <table>
+    <thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>البيان</th><th>العميل</th></tr></thead>
+    <tbody>${txRowsHtml || '<tr><td colspan="5" style="text-align:center; color:#888;">لا توجد معاملات</td></tr>'}</tbody>
+  </table>
+
+  <div class="footer">تم إنشاء هذا التقرير تلقائياً بواسطة تطبيق خزنتي</div>
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    if(!win){ showToast('⚠️ المتصفح منع فتح نافذة جديدة، فعّل النوافذ المنبثقة'); return; }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.onload = ()=>{ setTimeout(()=> win.print(), 400); };
   }
 
   /* ===================== VIEW: SETTINGS ===================== */
@@ -1134,7 +1704,7 @@ input[type="file"]{display:none;}
       <h2><span class="dot"></span> الرصيد الافتتاحي</h2>
       <div class="field">
         <label>الفلوس اللي كانت في الخزنة قبل ما تبدأ تستخدم التطبيق</label>
-        <input type="number" class="num-input" id="sOpening" value="${state.openingBalance}" step="0.01">
+        <input type="text" inputmode="decimal" class="num-input" id="sOpening" value="${fmt(state.openingBalance)}">
       </div>
       <button class="btn-primary" id="sSaveOpening">حفظ الرصيد الافتتاحي</button>
     </div>
@@ -1159,12 +1729,17 @@ input[type="file"]{display:none;}
         <button class="btn-danger-ghost" id="sClearAll">مسح الكل 🗑️</button>
       </div>
     </div>
+
+    <div style="text-align:center; font-size:0.7rem; color:var(--text-tertiary); margin-top:var(--space-2); font-family:'JetBrains Mono',monospace;">
+      خزنتي — إصدار ${APP_VERSION}
+    </div>
     `;
   }
   function bindSettingsEvents(){
+    attachMoneyFormatting(document.getElementById('sOpening'));
     document.getElementById('sSaveOpening').addEventListener('click', ()=>{
-      const v = parseFloat(document.getElementById('sOpening').value);
-      state.openingBalance = isNaN(v) ? 0 : v;
+      const v = parseMoneyString(document.getElementById('sOpening').value);
+      state.openingBalance = v;
       saveState(); showToast('✓ اتحفظ الرصيد الافتتاحي'); renderAll();
     });
 
@@ -1255,6 +1830,7 @@ input[type="file"]{display:none;}
     renderCustomerDatalist();
     const content = document.getElementById('content');
     if(activeTab==='quick'){ content.innerHTML = renderQuick(); bindQuickEvents(); }
+    else if(activeTab==='sheet'){ content.innerHTML = renderSheet(); bindSheetEvents(); }
     else if(activeTab==='journal'){ content.innerHTML = renderJournal(); bindJournalEvents(); }
     else if(activeTab==='customers'){ content.innerHTML = renderCustomers(); bindCustomersEvents(); }
     else if(activeTab==='recon'){ content.innerHTML = renderRecon(); bindReconEvents(); }
