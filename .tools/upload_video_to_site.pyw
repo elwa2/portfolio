@@ -38,6 +38,10 @@ PORT = int(os.environ.get("VIDEO_TOOLKIT_PORT", 8765))
 _progress = {"percent": 0, "label": ""}
 _progress_lock = threading.Lock()
 
+_current_process = None
+_job_state = {"active": False, "action": "", "file": "", "can_cancel": False}
+_job_lock = threading.Lock()
+
 
 def set_progress(pct: int, label: str = ""):
     with _progress_lock:
@@ -49,6 +53,27 @@ def set_progress(pct: int, label: str = ""):
 def get_progress():
     with _progress_lock:
         return dict(_progress)
+
+
+def set_job(action: str, file: str = ""):
+    with _job_lock:
+        _job_state["active"] = True
+        _job_state["action"] = action
+        _job_state["file"] = file
+        _job_state["can_cancel"] = True
+
+
+def clear_job():
+    with _job_lock:
+        _job_state["active"] = False
+        _job_state["action"] = ""
+        _job_state["file"] = ""
+        _job_state["can_cancel"] = False
+
+
+def get_job():
+    with _job_lock:
+        return dict(_job_state)
 
 
 # ── FFmpeg helpers ─────────────────────────────────────────────────────────
@@ -83,7 +108,8 @@ def ffmpeg_cmd() -> list[str]:
 
 
 def run_ffmpeg(args, duration_sec: float = None):
-    """Run ffmpeg and parse progress from stderr."""
+    """Run ffmpeg and parse progress from stderr. Supports cancellation."""
+    global _current_process
     cmd = ffmpeg_cmd() + ["-y"] + args
     logger.info("Running: %s", " ".join(cmd))
     proc = subprocess.Popen(
@@ -92,9 +118,15 @@ def run_ffmpeg(args, duration_sec: float = None):
         stderr=subprocess.PIPE,
         text=True,
     )
-    # Parse progress
+    _current_process = proc
     prog_re = re.compile(r"time=(\d+):(\d+):(\d+\.\d+)")
     while True:
+        with _job_lock:
+            if _job_state.get("cancel_requested"):
+                proc.kill()
+                _current_process = None
+                clear_job()
+                raise RuntimeError("تم إلغاء التحويل")
         line = proc.stderr.readline()
         if not line and proc.poll() is not None:
             break
@@ -105,6 +137,7 @@ def run_ffmpeg(args, duration_sec: float = None):
             pct = int(elapsed / duration_sec * 100)
             set_progress(min(pct, 99))
     rc = proc.wait()
+    _current_process = None
     if rc != 0:
         err = proc.stderr.read()
         raise RuntimeError(f"ffmpeg failed (rc={rc}): {err[:500]}")
@@ -158,6 +191,44 @@ def index():
     return "HTML file not found", 404
 
 
+@app.route("/api/shutdown", methods=["POST"])
+def api_shutdown():
+    logger.info("Shutdown requested")
+    cancel_current_process()
+    set_progress(100, "جاري إيقاف السيرفر...")
+    import threading
+    threading.Thread(target=lambda: (time.sleep(1), os._exit(0))).start()
+    return jsonify({"ok": True, "message": "تم إيقاف السيرفر"})
+
+
+@app.route("/api/status")
+def api_status():
+    job = get_job()
+    prog = get_progress()
+    return jsonify({"job": job, "progress": prog})
+
+
+@app.route("/api/cancel", methods=["POST"])
+def api_cancel():
+    logger.info("Cancel requested by user")
+    cancel_current_process()
+    return jsonify({"ok": True, "message": "تم إلغاء العملية"})
+
+
+def cancel_current_process():
+    global _current_process
+    with _job_lock:
+        _job_state["cancel_requested"] = True
+    if _current_process:
+        try:
+            _current_process.kill()
+        except Exception:
+            pass
+        _current_process = None
+    clear_job()
+    set_progress(0, "تم إلغاء العملية")
+
+
 @app.route("/api/progress")
 def api_progress():
     return jsonify(get_progress())
@@ -175,6 +246,8 @@ def api_video():
             return handle_compress(request)
         elif action == "upload":
             return handle_upload(request)
+        elif action == "batch_upload":
+            return handle_batch_upload(request)
         else:
             return jsonify({"error": f"Unknown action: {action}"}), 400
     except Exception as e:
@@ -227,12 +300,14 @@ def handle_convert(req):
 
         args += ["-an", str(tmp_output)]
 
+        set_job("convert", name)
         set_progress(0, "جاري التحويل إلى WebM...")
         run_ffmpeg(args, duration)
 
         with open(tmp_output, "rb") as bf:
             b64 = base64.b64encode(bf.read()).decode()
 
+        clear_job()
         return jsonify({
             "data": b64,
             "mime": "video/webm",
@@ -277,6 +352,7 @@ def handle_compress(req):
             str(tmp_output),
         ]
 
+        set_job("compress", name)
         set_progress(0, "جاري ضغط الفيديو...")
         run_ffmpeg(args, duration)
 
@@ -284,6 +360,7 @@ def handle_compress(req):
             b64 = base64.b64encode(bf.read()).decode()
 
         mime = "video/webm" if fmt == "webm" else "video/mp4"
+        clear_job()
         return jsonify({"data": b64, "mime": mime, "name": output_name})
     finally:
         shutil.rmtree(tmp_input.parent, ignore_errors=True)
@@ -350,6 +427,61 @@ def unique_destination(dest_dir, filename):
     stem = dest.stem
     suffix = dest.suffix
     return dest_dir / f"{stem}_{stamp}{suffix}"
+
+
+# ── Batch Upload ────────────────────────────────────────────────────────────
+def handle_batch_upload(req):
+    files = req.files.getlist("files[]")
+    if not files:
+        return jsonify({"error": "لم يتم إرسال ملفات"}), 400
+
+    results = []
+    total = len(files)
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+
+    for i, f in enumerate(files):
+        name = f.filename or f"video_{i+1}"
+        set_progress(int((i / total) * 80), f"جاري رفع {i+1}/{total}: {name}")
+        logger.info("Batch upload %d/%d: %s", i + 1, total, name)
+
+        try:
+            dest = unique_destination(ASSETS_DIR, name)
+            f.save(str(dest))
+            rel_path = dest.relative_to(REPO_ROOT).as_posix()
+            file_url = f"{BASE_URL}/{dest.name}"
+
+            run_git(["add", rel_path], REPO_ROOT)
+            try:
+                run_git(["commit", "-m", f"Add video {dest.name}"], REPO_ROOT)
+            except subprocess.CalledProcessError as exc:
+                if "nothing to commit" not in (exc.stderr or "") and "nothing to commit" not in (exc.stdout or ""):
+                    raise
+
+            results.append({"name": name, "url": file_url, "path": rel_path, "success": True})
+            logger.info("Uploaded: %s", file_url)
+        except Exception as e:
+            results.append({"name": name, "error": str(e), "success": False})
+            logger.error("Failed to upload %s: %s", name, str(e))
+
+    set_progress(90, "جاري Pull و Push...")
+    try:
+        run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
+        run_git(["push"], REPO_ROOT)
+        set_progress(100, "تم رفع جميع الملفات!")
+    except subprocess.CalledProcessError as exc:
+        error_text = exc.stderr.strip() or exc.stdout.strip() or "فشل git"
+        logger.error("Git error: %s", error_text)
+        for r in results:
+            if r["success"]:
+                r["git_push_error"] = error_text
+
+    success_count = sum(1 for r in results if r["success"])
+    return jsonify({
+        "results": results,
+        "total": total,
+        "success": success_count,
+        "failed": total - success_count,
+    })
 
 
 # ── Main ───────────────────────────────────────────────────────────────────

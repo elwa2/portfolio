@@ -26,6 +26,38 @@
 
       .video-box { display: none; margin-top: 20px; }
       .video-box.show { display: block; }
+
+      .video-item {
+        display: flex; align-items: center; gap: 15px; padding: 12px;
+        background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 8px;
+        border: 2px solid transparent; transition: 0.2s;
+      }
+      .video-item:hover { background: rgba(255,255,255,0.05); }
+      .video-item.selected { border-color: #5e3bee; background: rgba(94,59,238,0.1); }
+      .video-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #5e3bee; cursor: pointer; }
+      .video-item-thumb { width: 80px; height: 50px; border-radius: 6px; background: #000; object-fit: cover; }
+      .video-item-info { flex: 1; }
+      .video-item-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+      .video-item-meta { font-size: 0.75rem; color: #888; }
+      .video-item-status { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
+      .video-item-status.pending { background: rgba(255,255,255,0.1); color: #aaa; }
+      .video-item-status.processing { background: rgba(94,59,238,0.2); color: #5e3bee; }
+      .video-item-status.done { background: rgba(16,185,129,0.2); color: #10b981; }
+      .video-item-status.error { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+      .action-radio {
+        cursor: pointer; display: inline-flex;
+      }
+      .action-radio input { display: none; }
+      .action-radio span {
+        padding: 10px 18px; border: 2px solid #2a2a4a; border-radius: 10px;
+        background: #16162a; color: #aaa; font-size: 0.85rem; font-weight: 600;
+        transition: 0.2s; display: flex; align-items: center; gap: 6px;
+      }
+      .action-radio:hover span { border-color: #5e3bee; color: #e0e0e0; }
+      .action-radio.selected span, .action-radio input:checked + span {
+        border-color: #5e3bee; background: rgba(94,59,238,0.15); color: #fff;
+      }
       video { width: 100%; max-height: 400px; border-radius: 12px; background: #000; margin-bottom: 15px; }
       .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
       .info-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; text-align: center; }
@@ -116,11 +148,13 @@
       <div class="card">
         <div class="drop-zone" id="dropZone">
           <i class="fas fa-cloud-upload-alt"></i>
-          <h3>اسحب وأفلت الفيديو هنا</h3>
-          <p>أو انقر لاختيار ملف — MP4, MOV, MKV, AVI, WebM (حد أقصى 500MB)</p>
-          <input type="file" id="fileInput" accept="video/*" />
+          <h3>اسحب وأفلت الفيديوهات هنا</h3>
+          <p>أو انقر لاختيار ملفات — MP4, MOV, MKV, AVI, WebM (حد أقصى 500MB لكل ملف)</p>
+          <p style="margin-top:8px; color:#5e3bee; font-size:0.85rem;"><i class="fas fa-folder-open"></i> يمكنك اختيار عدة ملفات أو فولدر كامل</p>
+          <input type="file" id="fileInput" accept="video/*" multiple />
         </div>
 
+        <!-- Single Video Box -->
         <div class="video-box" id="videoBox">
           <video id="videoPlayer" controls></video>
           <div class="info-grid">
@@ -129,7 +163,43 @@
             <div class="info-item"><label>المدة</label><span id="infoDuration">—</span></div>
             <div class="info-item"><label>الدقة</label><span id="infoResolution">—</span></div>
           </div>
+        </div>
 
+        <!-- Multiple Videos Box -->
+        <div class="video-box" id="multiVideoBox">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h4 style="display:flex; align-items:center; gap:8px;"><i class="fas fa-list" style="color:#5e3bee;"></i> الفيديوهات المختارة (<span id="videoCount">0</span>)</h4>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-ghost" onclick="selectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><i class="fas fa-check-double"></i> تحديد الكل</button>
+              <button class="btn btn-ghost" onclick="deselectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><i class="fas fa-times"></i> إلغاء التحديد</button>
+            </div>
+          </div>
+          <div id="videoListContainer" style="max-height:400px; overflow-y:auto;"></div>
+          <div style="margin-top:15px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:8px; color:#aaa;">الإجراء المطلوب</label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;" id="actionRadios">
+              <label class="action-radio selected">
+                <input type="radio" name="batchAction" value="upload" checked onchange="updateBatchAction()" />
+                <span><i class="fas fa-upload"></i> رفع إلى GitHub</span>
+              </label>
+              <label class="action-radio">
+                <input type="radio" name="batchAction" value="convert" onchange="updateBatchAction()" />
+                <span><i class="fas fa-exchange-alt"></i> تحويل WebM + رفع</span>
+              </label>
+              <label class="action-radio">
+                <input type="radio" name="batchAction" value="compress" onchange="updateBatchAction()" />
+                <span><i class="fas fa-compress-alt"></i> ضغط + رفع</span>
+              </label>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+              <button class="btn btn-primary" id="btnBatchProcess" onclick="batchProcess()" disabled><i class="fas fa-play"></i> تنفيذ للتحديد</button>
+              <button class="btn btn-ghost" onclick="resetAll()"><i class="fas fa-redo"></i> إعادة</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shared controls (appear with single or multi video) -->
+        <div class="video-box" id="sharedPanel">
           <div class="controls">
             <!-- Conversion -->
             <div class="card" style="padding:20px; margin-bottom:15px;">
@@ -189,6 +259,9 @@
           <div class="progress-box" id="progressBox">
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
             <div class="progress-text"><span id="progressLabel">جاري...</span><span id="progressPercent">0%</span></div>
+            <div style="text-align:center; margin-top:10px;">
+              <button class="btn btn-danger" id="btnCancel" onclick="cancelOperation()" style="display:none; padding:8px 20px; font-size:0.85rem;"><i class="fas fa-stop"></i> إلغاء التحويل</button>
+            </div>
           </div>
 
           <!-- Result -->
@@ -215,6 +288,9 @@
       </div>
 
       <p style="text-align:center; color:#555; font-size:0.8rem; margin:30px 0;">Ali Ahmed &copy; 2026 — VideoToolkit</p>
+      <div style="text-align:center; margin-top:10px;">
+        <button class="btn btn-danger" onclick="shutdownServer()" style="font-size:0.8rem; padding:8px 16px;"><i class="fas fa-power-off"></i> إيقاف السيرفر</button>
+      </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -224,20 +300,32 @@
       let currentBlob = null;
       let currentResultName = '';
       let uploadUrl = '';
+      let selectedFiles = [];
+      let processingResults = [];
+      let batchCancelled = false;
 
       // Setup upload zone
       const dropZone = document.getElementById('dropZone');
       const fileInput = document.getElementById('fileInput');
 
       dropZone.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+      fileInput.addEventListener('change', e => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        if (files.length === 1) {
+          handleFile(files[0]);
+        } else {
+          handleMultipleFiles(files);
+        }
+      });
       dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
       dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
       dropZone.addEventListener('drop', e => {
         e.preventDefault(); dropZone.classList.remove('drag-over');
-        const f = e.dataTransfer.files[0];
-        if (f && f.type.startsWith('video/')) handleFile(f);
-        else toast('يرجى رفع ملف فيديو صالح', 'error');
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
+        if (files.length === 0) { toast('يرجى رفع ملفات فيديو صالحة', 'error'); return; }
+        if (files.length === 1) { handleFile(files[0]); }
+        else { handleMultipleFiles(files); }
       });
 
       function handleFile(file) {
@@ -257,6 +345,8 @@
           document.getElementById('infoDuration').textContent = formatTime(video.duration);
           document.getElementById('infoResolution').textContent = `${video.videoWidth}×${video.videoHeight}`;
           document.getElementById('videoBox').classList.add('show');
+          document.getElementById('multiVideoBox').classList.remove('show');
+          document.getElementById('sharedPanel').classList.add('show');
           document.getElementById('btnConvert').disabled = false;
           document.getElementById('btnCompress').disabled = false;
           document.getElementById('btnUpload').disabled = false;
@@ -394,8 +484,10 @@
       }
 
       function resetAll() {
-        currentFile = null; currentBlob = null;
+        currentFile = null; currentBlob = null; selectedFiles = []; processingResults = [];
         document.getElementById('videoBox').classList.remove('show');
+        document.getElementById('multiVideoBox').classList.remove('show');
+        document.getElementById('sharedPanel').classList.remove('show');
         document.getElementById('resultBox').classList.remove('show');
         document.getElementById('urlSection').style.display = 'none';
         document.getElementById('progressBox').classList.remove('show');
@@ -403,6 +495,226 @@
         document.getElementById('btnConvert').disabled = true;
         document.getElementById('btnCompress').disabled = true;
         document.getElementById('btnUpload').disabled = true;
+        document.getElementById('btnBatchProcess').disabled = true;
+        document.getElementById('logBox').innerHTML = '';
+      }
+
+      function handleMultipleFiles(files) {
+        selectedFiles = files.filter(f => f.size <= 500 * 1024 * 1024);
+        const tooLarge = files.length - selectedFiles.length;
+        if (tooLarge > 0) toast(`تم تخطي ${tooLarge} ملف (يتجاوز 500MB)`, 'warn');
+
+        document.getElementById('videoBox').classList.remove('show');
+        document.getElementById('resultBox').classList.remove('show');
+        document.getElementById('urlSection').style.display = 'none';
+        document.getElementById('logBox').innerHTML = '';
+
+        renderVideoList();
+        document.getElementById('multiVideoBox').classList.add('show');
+        document.getElementById('sharedPanel').classList.add('show');
+        document.getElementById('btnBatchProcess').disabled = selectedFiles.length === 0;
+        log('info', `تم اختيار ${selectedFiles.length} فيديو`);
+      }
+
+      function renderVideoList() {
+        const container = document.getElementById('videoListContainer');
+        document.getElementById('videoCount').textContent = selectedFiles.length;
+        container.innerHTML = '';
+
+        selectedFiles.forEach((file, idx) => {
+          const item = document.createElement('div');
+          item.className = 'video-item' + (file._selected !== false ? ' selected' : '');
+          item.innerHTML = `
+            <input type="checkbox" ${file._selected !== false ? 'checked' : ''} onchange="toggleVideo(${idx}, this.checked)" />
+            <div class="video-item-thumb" id="thumb_${idx}"></div>
+            <div class="video-item-info">
+              <div class="video-item-name">${file.name}</div>
+              <div class="video-item-meta">${formatBytes(file.size)} — ${file.type || 'video'}</div>
+            </div>
+            <div class="video-item-status ${file._status || 'pending'}" id="status_${idx}">${file._statusText || 'في الانتظار'}</div>
+          `;
+          container.appendChild(item);
+
+          // Generate thumbnail
+          const url = URL.createObjectURL(file);
+          const video = document.createElement('video');
+          video.src = url;
+          video.onloadeddata = () => {
+            video.currentTime = 1;
+          };
+          video.onseeked = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 80; canvas.height = 50;
+            canvas.getContext('2d').drawImage(video, 0, 0, 80, 50);
+            document.getElementById(`thumb_${idx}`).src = canvas.toDataURL();
+            URL.revokeObjectURL(url);
+          };
+        });
+      }
+
+      function toggleVideo(idx, checked) {
+        selectedFiles[idx]._selected = checked;
+        renderVideoList();
+        updateBatchButton();
+      }
+
+      function selectAllVideos() {
+        selectedFiles.forEach(f => f._selected = true);
+        renderVideoList();
+        updateBatchButton();
+      }
+
+      function deselectAllVideos() {
+        selectedFiles.forEach(f => f._selected = false);
+        renderVideoList();
+        updateBatchButton();
+      }
+
+      function updateBatchButton() {
+        const count = selectedFiles.filter(f => f._selected !== false).length;
+        document.getElementById('btnBatchProcess').disabled = count === 0;
+      }
+
+      async function batchProcess() {
+        const toProcess = selectedFiles.filter(f => f._selected !== false && f._status !== 'done');
+        if (toProcess.length === 0) { toast('لا يوجد فيديوهات للمعالجة', 'info'); return; }
+
+        const action = document.querySelector('input[name="batchAction"]:checked').value;
+        disableButtons(true);
+        showProgress('جاري المعالجة...');
+        processingResults = [];
+
+        // Process conversions/compressions first, then batch upload
+        const filesToUpload = [];
+
+        for (let i = 0; i < toProcess.length; i++) {
+          const file = toProcess[i];
+          const idx = selectedFiles.indexOf(file);
+          file._status = 'processing';
+          file._statusText = 'جاري المعالجة...';
+          renderVideoList();
+
+          setProgress(Math.round((i / toProcess.length) * 50), `المعالجة ${i + 1}/${toProcess.length}: ${file.name}`);
+          log('info', `--- بدء معالجة: ${file.name} (${i + 1}/${toProcess.length}) ---`);
+
+          try {
+            if (action === 'upload') {
+              filesToUpload.push({ file: file, name: file.name });
+              file._statusText = 'جاري الرفع...';
+            } else if (action === 'convert') {
+              setProgress(Math.round((i / toProcess.length) * 50), `تحويل ${file.name}...`);
+              const converted = await convertSingleFile(file);
+              filesToUpload.push({ file: converted.blob, name: converted.name });
+              file._statusText = 'جاري الرفع...';
+            } else if (action === 'compress') {
+              setProgress(Math.round((i / toProcess.length) * 50), `ضغط ${file.name}...`);
+              const compressed = await compressSingleFile(file);
+              filesToUpload.push({ file: compressed.blob, name: compressed.name });
+              file._statusText = 'جاري الرفع...';
+            }
+            renderVideoList();
+          } catch (e) {
+            file._status = 'error';
+            file._statusText = 'فشل المعالجة';
+            processingResults.push({ name: file.name, error: e.message, success: false });
+            log('err', `خطأ في ${file.name}: ${e.message}`);
+            renderVideoList();
+          }
+        }
+
+        // Batch upload all files
+        if (filesToUpload.length > 0) {
+          setProgress(50, `جاري رفع ${filesToUpload.length} فيديو إلى GitHub...`);
+          log('info', `--- بدء الرفع الجماعي: ${filesToUpload.length} ملف ---`);
+
+          try {
+            const formData = new FormData();
+            filesToUpload.forEach((item, idx) => {
+              formData.append('files[]', item.file, item.name);
+            });
+            formData.append('action', 'batch_upload');
+
+            const resp = await fetch('/api/video', { method: 'POST', body: formData });
+            const data = await resp.json();
+
+            if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
+
+            data.results.forEach(result => {
+              const file = toProcess.find(f => f.name === result.name || filesToUpload.find(u => u.name === result.name));
+              if (file) {
+                if (result.success) {
+                  file._status = 'done';
+                  file._statusText = 'تم الرفع';
+                  processingResults.push({ name: result.name, url: result.url, success: true });
+                } else {
+                  file._status = 'error';
+                  file._statusText = 'فشل الرفع';
+                  processingResults.push({ name: result.name, error: result.error, success: false });
+                }
+              }
+              renderVideoList();
+            });
+
+            log('ok', `اكتمل الرفع: ${data.success} نجح، ${data.failed} فشل`);
+          } catch (e) {
+            toProcess.forEach(f => {
+              if (f._status !== 'done') {
+                f._status = 'error';
+                f._statusText = 'فشل الرفع';
+              }
+            });
+            renderVideoList();
+            log('err', `خطأ في الرفع الجماعي: ${e.message}`);
+          }
+        }
+
+        setProgress(100, 'اكتملت المعالجة!');
+        const successCount = processingResults.filter(r => r.success).length;
+        const failCount = processingResults.filter(r => !r.success).length;
+        log('ok', `--- انتهت المعالجة: ${successCount} نجح، ${failCount} فشل ---`);
+        toast(`اكتملت: ${successCount} نجح، ${failCount} فشل`, successCount > 0 ? 'success' : 'error');
+        disableButtons(false);
+        hideProgress();
+      }
+
+      async function convertSingleFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'convert');
+        formData.append('crf', document.getElementById('crfQuality').value);
+        formData.append('preset', document.getElementById('presetSpeed').value);
+        formData.append('scale', document.getElementById('resolutionScale').value);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل التحويل');
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name };
+      }
+
+      async function compressSingleFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'compress');
+        formData.append('target', document.getElementById('targetSize').value);
+        formData.append('format', document.getElementById('compressFormat').value);
+        formData.append('audio_bitrate', document.getElementById('audioBitrate').value);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل الضغط');
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name };
+      }
+
+      async function uploadSingleFile(file, customName) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'upload');
+        if (customName) formData.append('name', customName);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
+        return data;
       }
 
       function showResult(origSize, newSize, name) {
@@ -413,21 +725,63 @@
         document.getElementById('resultBox').classList.add('show');
       }
 
+      function updateBatchAction() {
+        document.querySelectorAll('#actionRadios .action-radio').forEach(l => {
+          l.classList.toggle('selected', l.querySelector('input').checked);
+        });
+      }
+
+      async function cancelOperation() {
+        if (!confirm('هل أنت متأكد من إلغاء العملية الجارية؟')) return;
+        try {
+          await fetch('/api/cancel', { method: 'POST' });
+          toast('تم إلغاء العملية', 'info');
+          document.getElementById('btnCancel').style.display = 'none';
+        } catch (e) {
+          toast('فشل إلغاء العملية', 'error');
+        }
+      }
+
+      async function checkServerStatus() {
+        try {
+          const resp = await fetch('/api/status');
+          const data = await resp.json();
+          if (data.job && data.job.active) {
+            document.getElementById('sharedPanel').classList.add('show');
+            showProgress(data.progress.label || 'جاري المعالجة...');
+            document.getElementById('progressFill').style.width = data.progress.percent + '%';
+            document.getElementById('progressPercent').textContent = data.progress.percent + '%';
+            log('info', `تم استعادة حالة السيرفر: ${data.job.action} - ${data.job.file}`);
+          }
+        } catch (e) {
+          // Server not running or not available
+        }
+      }
+
       function showProgress(label) {
         document.getElementById('progressLabel').textContent = label;
         document.getElementById('progressPercent').textContent = '0%';
         document.getElementById('progressFill').style.width = '0%';
         document.getElementById('progressBox').classList.add('show');
+        document.getElementById('btnCancel').style.display = 'inline-flex';
+      }
+
+      function setProgress(pct, label) {
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressPercent').textContent = pct + '%';
+        if (label) document.getElementById('progressLabel').textContent = label;
       }
 
       function hideProgress() {
         document.getElementById('progressBox').classList.remove('show');
+        document.getElementById('btnCancel').style.display = 'none';
       }
 
       function disableButtons(disabled) {
         document.getElementById('btnConvert').disabled = disabled;
         document.getElementById('btnCompress').disabled = disabled;
         document.getElementById('btnUpload').disabled = disabled;
+        document.getElementById('btnBatchProcess').disabled = disabled;
       }
 
       function log(type, msg) {
@@ -443,6 +797,17 @@
         t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> ${msg}`;
         clearTimeout(t._timeout);
         t._timeout = setTimeout(() => t.classList.remove('show'), 4000);
+      }
+
+      async function shutdownServer() {
+        if (!confirm('هل أنت متأكد من إيقاف السيرفر؟')) return;
+        try {
+          await fetch('/api/shutdown', { method: 'POST' });
+          toast('تم إيقاف السيرفر', 'success');
+          document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;"><h1 style="color:#10b981;">تم إيقاف السيرفر بنجاح</h1></div>';
+        } catch (e) {
+          toast('تم إيقاف السيرفر', 'success');
+        }
       }
 
       function formatBytes(b) {
@@ -493,6 +858,9 @@
         document.getElementById('progressFill').style.width = '100%';
         document.getElementById('progressPercent').textContent = '100%';
       };
+
+      // Check server status on page load
+      checkServerStatus();
     </script>
   </body>
 </html>
