@@ -57,7 +57,7 @@ body{
 }
 .num{font-family:'JetBrains Mono',monospace;}
 
-.shell{max-width:1180px; margin:0 auto; display:flex; min-height:100vh;}
+.shell{max-width:1600px; margin:0 auto; display:flex; min-height:100vh;}
 
 /* ===== Sidebar (desktop) ===== */
 .sidebar{
@@ -452,22 +452,23 @@ input[type="file"]{display:none;}
 
   /* ===================== STORAGE ===================== */
   const STORAGE_KEY = "khazna_v1_state";
-  const APP_VERSION = "1.6.0";
+  const APP_VERSION = "1.7.0";
 
   function loadState(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return { openingBalance:0, transactions:[], reconciliations:[], customers:[] };
+      if(!raw) return { openingBalance:0, transactions:[], reconciliations:[], customers:[], accounts:[] };
       const parsed = JSON.parse(raw);
       return {
         openingBalance: parsed.openingBalance || 0,
         transactions: parsed.transactions || [],
         reconciliations: parsed.reconciliations || [],
-        customers: parsed.customers || []
+        customers: parsed.customers || [],
+        accounts: parsed.accounts || []
       };
     }catch(e){
       console.error("تعذر قراءة البيانات المحفوظة", e);
-      return { openingBalance:0, transactions:[], reconciliations:[], customers:[] };
+      return { openingBalance:0, transactions:[], reconciliations:[], customers:[], accounts:[] };
     }
   }
 
@@ -494,12 +495,13 @@ input[type="file"]{display:none;}
   let reconDate = todayStr();
   let selectedCustomerId = null;
   let customerSearchQuery = "";
+  let selectedLedgerAccount = null; /* {kind, id} */
 
   /* ===================== SHEET (Excel-style bulk entry) DRAFT ===================== */
   const SHEET_DRAFT_KEY = "khazna_sheet_draft_v1";
   function makeEmptySheetRows(n){
     const arr = [];
-    for(let i=0;i<n;i++) arr.push({id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null});
+    for(let i=0;i<n;i++) arr.push({id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', account:'', transactionId:null});
     return arr;
   }
   function loadSheetDraft(){
@@ -702,6 +704,154 @@ input[type="file"]{display:none;}
     });
   }
 
+  /* ===================== ACCOUNTS (الحساب المقابل + دفتر الأستاذ + ميزان المراجعة) ===================== */
+  const ACCOUNT_TYPE_LABELS = { bank:'بنك', expense:'مصروفات', capital:'رأس مال', other:'حساب آخر' };
+  const UNCLASSIFIED_ACCOUNT_ID = '__unclassified__';
+  const CASH_ACCOUNT_ID = '__cash__';
+
+  function getAccountById(id){
+    return state.accounts.find(a=>a.id===id) || null;
+  }
+  function findAccountByName(name){
+    const clean = (name||'').trim().toLowerCase();
+    if(!clean) return null;
+    return state.accounts.find(a=>a.name.trim().toLowerCase()===clean) || null;
+  }
+  function getOrCreateAccountId(name, type){
+    const clean = (name||'').trim();
+    if(!clean) return null;
+    const existing = findAccountByName(clean);
+    if(existing) return existing.id;
+    const a = { id: uid(), name: clean, type: type||'other', createdAt: new Date().toISOString() };
+    state.accounts.push(a);
+    return a.id;
+  }
+  function deleteAccount(id){
+    state.accounts = state.accounts.filter(a=>a.id!==id);
+    state.transactions.forEach(t=>{ if(t.contraAccountId===id) t.contraAccountId=null; });
+    sheetRows.forEach(r=>{ if(r.account===id) r.account=''; });
+  }
+
+  /* بيرجع "الحساب المقابل" الفعلي لأي قيد: العميل (لو متسجل) وإلا الحساب المخصص وإلا "غير مصنف" */
+  function effectiveContraOf(tx){
+    if(tx.customerId) return { kind:'customer', id: tx.customerId };
+    if(tx.contraAccountId) return { kind:'account', id: tx.contraAccountId };
+    return { kind:'unclassified', id: UNCLASSIFIED_ACCOUNT_ID };
+  }
+
+  /* قايمة كل الحسابات (نقدية + عملاء + حسابات مخصصة + غير مصنف) بأرصدتها لميزان المراجعة */
+  function buildTrialBalance(){
+    let cashDebit=0, cashCredit=0;
+    const map = new Map(); // key -> {kind,id,name,debit,credit}
+    function bump(kind,id,name,debit,credit){
+      const key = kind+':'+id;
+      if(!map.has(key)) map.set(key, {kind,id,name,debit:0,credit:0});
+      const row = map.get(key);
+      row.debit += debit; row.credit += credit;
+    }
+    for(const tx of state.transactions){
+      const amt = Number(tx.amount)||0;
+      if(amt<=0) continue;
+      if(tx.type==='in'){ cashDebit += amt; }
+      else { cashCredit += amt; }
+      const contra = effectiveContraOf(tx);
+      let name;
+      if(contra.kind==='customer') name = (getCustomerById(contra.id)||{}).name || 'عميل محذوف';
+      else if(contra.kind==='account') name = (getAccountById(contra.id)||{}).name || 'حساب محذوف';
+      else name = 'غير مصنف';
+      /* عكس اتجاه القيد: وارد = دائن على الحساب المقابل، منصرف = مدين عليه */
+      if(tx.type==='in') bump(contra.kind, contra.id, name, 0, amt);
+      else bump(contra.kind, contra.id, name, amt, 0);
+    }
+    const rows = [{ kind:'cash', id:CASH_ACCOUNT_ID, name:'الصندوق (الخزنة)', debit:cashDebit, credit:cashCredit, balance:cashDebit-cashCredit }];
+    for(const row of map.values()){
+      rows.push({ kind:row.kind, id:row.id, name:row.name, debit:row.debit, credit:row.credit, balance:row.debit-row.credit });
+    }
+    rows.sort((a,b)=>{
+      if(a.kind==='cash') return -1;
+      if(b.kind==='cash') return 1;
+      if(a.kind!==b.kind) return a.kind==='account' ? -1 : 1;
+      return a.name.localeCompare(b.name,'ar');
+    });
+    const totalDebit = rows.reduce((s,r)=>s+r.debit,0);
+    const totalCredit = rows.reduce((s,r)=>s+r.credit,0);
+    return { rows, totalDebit, totalCredit };
+  }
+
+  /* حركات دفتر الأستاذ لحساب معيّن (مرتبة بالتاريخ) مع رصيد متراكم */
+  function ledgerEntriesFor(kind, id){
+    let txs;
+    if(kind==='cash'){
+      txs = state.transactions.slice();
+    } else if(kind==='customer'){
+      txs = state.transactions.filter(t=>t.customerId===id);
+    } else if(kind==='account'){
+      txs = state.transactions.filter(t=>!t.customerId && t.contraAccountId===id);
+    } else {
+      txs = state.transactions.filter(t=>!t.customerId && !t.contraAccountId);
+    }
+    txs.sort((a,b)=> (a.date+a.createdAt).localeCompare(b.date+b.createdAt));
+    let running = 0;
+    return txs.map(tx=>{
+      const amt = Number(tx.amount)||0;
+      let debit=0, credit=0;
+      if(kind==='cash'){
+        if(tx.type==='in') debit=amt; else credit=amt;
+      } else {
+        if(tx.type==='in') credit=amt; else debit=amt;
+      }
+      running += debit-credit;
+      return { tx, debit, credit, running };
+    });
+  }
+
+  function contraAccountOptionsHtml(selectedId){
+    const custom = state.accounts.slice().sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+    return `<option value="" ${!selectedId?'selected':''}>بدون تصنيف (صندوق فقط)</option>` +
+      custom.map(a=>`<option value="${a.id}" ${selectedId===a.id?'selected':''}>${escapeHtml(a.name)} (${ACCOUNT_TYPE_LABELS[a.type]||'حساب'})</option>`).join('') +
+      `<option value="__new__">+ إضافة حساب جديد...</option>`;
+  }
+
+  /* مودال بسيط لإضافة حساب مقابل جديد (بنك / مصروفات / رأس مال / آخر) */
+  function openNewAccountModal(onCreate, onCancelResetTo){
+    const root = document.getElementById('modal-root');
+    root.innerHTML = `
+      <div class="modal-overlay" id="acctOverlay">
+        <div class="modal-box">
+          <h3>إضافة حساب جديد</h3>
+          <div class="field"><label>اسم الحساب</label><input type="text" id="acctName" placeholder="مثال: البنك الأهلي"></div>
+          <div class="field">
+            <label>نوع الحساب</label>
+            <select id="acctType" class="grid-select" style="width:100%; padding:12px 14px; border-radius:12px; background:var(--canvas-raised); border:1px solid var(--border-subtle); color:var(--text-primary); font-family:'Cairo',sans-serif;">
+              <option value="bank">بنك</option>
+              <option value="expense">مصروفات</option>
+              <option value="capital">رأس مال</option>
+              <option value="other">حساب آخر</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-ghost" id="acctCancel">إلغاء</button>
+            <button class="btn-primary" id="acctSave">إضافة</button>
+          </div>
+        </div>
+      </div>
+    `;
+    const nameEl = document.getElementById('acctName');
+    nameEl.focus();
+    function close(){ root.innerHTML=''; if(onCancelResetTo) onCancelResetTo(); }
+    document.getElementById('acctCancel').addEventListener('click', close);
+    document.getElementById('acctOverlay').addEventListener('click', (e)=>{ if(e.target.id==='acctOverlay') close(); });
+    document.getElementById('acctSave').addEventListener('click', ()=>{
+      const name = nameEl.value.trim();
+      if(!name){ showToast('⚠️ اكتب اسم الحساب'); return; }
+      const type = document.getElementById('acctType').value;
+      const id = getOrCreateAccountId(name, type);
+      saveState();
+      root.innerHTML='';
+      onCreate(id);
+    });
+  }
+
   /* ===================== RENDER: TOPBAR ===================== */
   function renderTopbar(){
     const bal = currentBalance();
@@ -725,6 +875,7 @@ input[type="file"]{display:none;}
     journal: '<path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/>',
     customers: '<circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17" cy="8.5" r="2.3"/><path d="M15.3 13.9c2.6.2 4.8 2.1 5.7 4.6"/>',
     recon: '<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
+    accounts: '<path d="M4 4h16v4H4z"/><path d="M6 8v12M12 8v12M18 8v12"/><path d="M4 20h16"/>',
     reports: '<path d="M4 20V11"/><path d="M11 20V4"/><path d="M18 20v-6.5"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M3 12h2.5M18.5 12H21M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>'
   };
@@ -733,6 +884,7 @@ input[type="file"]{display:none;}
     {id:'sheet', label:'تسجيل اليومية', short:'الشيت'},
     {id:'journal', label:'دفتر اليومية', short:'اليومية'},
     {id:'customers', label:'العملاء', short:'العملاء'},
+    {id:'accounts', label:'الحسابات', short:'الحسابات'},
     {id:'recon', label:'جرد الخزنة', short:'الجرد'},
     {id:'reports', label:'التقارير', short:'تقارير'},
     {id:'settings', label:'الإعدادات', short:'إعدادات'}
@@ -744,6 +896,7 @@ input[type="file"]{display:none;}
   function selectTab(tabId){
     setActiveTab(tabId);
     if(activeTab==='customers') selectedCustomerId = null;
+    if(activeTab==='accounts') selectedLedgerAccount = null;
     renderAll();
     window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -801,6 +954,12 @@ input[type="file"]{display:none;}
         <label>العميل (اختياري)</label>
         <input type="text" id="qCustomer" list="customerNamesList" placeholder="اكتب اسم العميل — لو جديد هيتسجل تلقائي">
       </div>
+      <div class="field">
+        <label>الحساب المقابل (اختياري — بنك / مصروفات / رأس مال...)</label>
+        <select class="grid-select" id="qAccount" style="width:100%; padding:12px 14px; border-radius:12px; background:var(--canvas-raised); border:1px solid var(--border-subtle); color:var(--text-primary); font-family:'Cairo',sans-serif;">
+          ${contraAccountOptionsHtml('')}
+        </select>
+      </div>
       <button class="btn-primary" id="qSubmit">إضافة القيد</button>
     </div>
 
@@ -843,24 +1002,37 @@ input[type="file"]{display:none;}
     });
     const submitBtn = document.getElementById('qSubmit');
     if(submitBtn){
+      const accountEl = document.getElementById('qAccount');
+      if(accountEl){
+        accountEl.addEventListener('change', ()=>{
+          if(accountEl.value==='__new__'){
+            openNewAccountModal((newId)=>{
+              accountEl.innerHTML = contraAccountOptionsHtml(newId);
+            }, ()=>{ accountEl.value=''; });
+          }
+        });
+      }
       submitBtn.addEventListener('click', ()=>{
         const amountEl = document.getElementById('qAmount');
         const noteEl = document.getElementById('qNote');
         const customerEl = document.getElementById('qCustomer');
+        const acctEl = document.getElementById('qAccount');
         let rawAmount = parseMoneyString(amountEl.value);
         if(!rawAmount || rawAmount===0){ showToast('⚠️ اكتب مبلغ صحيح'); amountEl.focus(); return; }
         /* كتابة رقم سالب معناها منصرف تلقائي، حتى لو الزرار شايل وارد */
         const finalType = rawAmount < 0 ? 'out' : quickType;
         const amount = Math.abs(rawAmount);
         const customerId = getOrCreateCustomerId(customerEl.value);
+        const contraAccountId = (acctEl && acctEl.value && acctEl.value!=='__new__') ? acctEl.value : null;
         state.transactions.push({
           id: uid(), date: todayStr(), type: finalType,
           amount: amount, note: noteEl.value.trim(), customerId: customerId,
+          contraAccountId: contraAccountId,
           createdAt: new Date().toISOString()
         });
         saveState();
         showToast(finalType==='in' ? '✓ اتسجل الوارد' : '✓ اتسجل المنصرف');
-        amountEl.value=''; noteEl.value=''; customerEl.value='';
+        amountEl.value=''; noteEl.value=''; customerEl.value=''; if(acctEl) acctEl.value='';
         quickType = 'in';
         renderAll();
       });
@@ -915,6 +1087,12 @@ input[type="file"]{display:none;}
           <div class="field"><label>المبلغ</label><input type="text" inputmode="decimal" class="num-input" id="eAmount" value="${fmt(tx.amount)}"></div>
           <div class="field"><label>البيان</label><input type="text" id="eNote" value="${escapeHtml(tx.note||'')}"></div>
           <div class="field"><label>العميل (اختياري)</label><input type="text" id="eCustomer" list="customerNamesList" value="${escapeHtml(tx.customerId ? (getCustomerById(tx.customerId)||{}).name||'' : '')}"></div>
+          <div class="field">
+            <label>الحساب المقابل (اختياري)</label>
+            <select id="eAccount" class="grid-select" style="width:100%; padding:12px 14px; border-radius:12px; background:var(--canvas-raised); border:1px solid var(--border-subtle); color:var(--text-primary); font-family:'Cairo',sans-serif;">
+              ${contraAccountOptionsHtml(tx.contraAccountId||'')}
+            </select>
+          </div>
           <div class="field"><label>التاريخ</label><input type="date" id="eDate" value="${tx.date}"></div>
           <div class="modal-actions">
             <button class="btn-ghost" id="eCancel">إلغاء</button>
@@ -933,12 +1111,19 @@ input[type="file"]{display:none;}
     document.getElementById('eCancel').addEventListener('click', ()=> root.innerHTML='');
     document.getElementById('editOverlay').addEventListener('click', (e)=>{ if(e.target.id==='editOverlay') root.innerHTML=''; });
     attachMoneyFormatting(document.getElementById('eAmount'));
+    const eAccountEl = document.getElementById('eAccount');
+    eAccountEl.addEventListener('change', ()=>{
+      if(eAccountEl.value==='__new__'){
+        openNewAccountModal((newId)=>{ eAccountEl.innerHTML = contraAccountOptionsHtml(newId); }, ()=>{ eAccountEl.value=''; });
+      }
+    });
     document.getElementById('eSave').addEventListener('click', ()=>{
       const amount = parseMoneyString(document.getElementById('eAmount').value);
       if(!amount || amount<=0){ showToast('⚠️ اكتب مبلغ صحيح'); return; }
       tx.amount = amount;
       tx.note = document.getElementById('eNote').value.trim();
       tx.customerId = getOrCreateCustomerId(document.getElementById('eCustomer').value);
+      tx.contraAccountId = (eAccountEl.value && eAccountEl.value!=='__new__') ? eAccountEl.value : null;
       tx.date = document.getElementById('eDate').value || tx.date;
       tx.type = eType;
       saveState(); root.innerHTML=''; showToast('✓ اتحفظ التعديل'); renderAll();
@@ -966,24 +1151,31 @@ input[type="file"]{display:none;}
 
   /* ===================== VIEW: SHEET (Excel-style bulk entry) ===================== */
   function sheetRowHtml(r, displayIndex){
+    const isCarry = !!r.isCarryForward;
     return `
-    <tr data-row-id="${r.id}">
+    <tr data-row-id="${r.id}" ${isCarry ? 'style="background:var(--glass-moderate);"' : ''}>
       <td class="sheet-idx">${displayIndex+1}</td>
-      <td><input type="date" class="grid-cell" data-row-id="${r.id}" data-field="date" value="${r.date}"></td>
+      <td><input type="date" class="grid-cell" data-row-id="${r.id}" data-field="date" value="${r.date}" ${isCarry?'disabled':''}></td>
       <td>
-        <select class="grid-cell grid-select" data-row-id="${r.id}" data-field="type">
+        <select class="grid-cell grid-select" data-row-id="${r.id}" data-field="type" ${isCarry?'disabled':''}>
           <option value="in" ${r.type==='in'?'selected':''}>وارد</option>
           <option value="out" ${r.type==='out'?'selected':''}>منصرف</option>
         </select>
       </td>
-      <td><input type="text" inputmode="decimal" class="grid-cell grid-amount" data-row-id="${r.id}" data-field="amount" value="${escapeHtml(r.amount)}" placeholder="0.00"></td>
-      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="note" value="${escapeHtml(r.note)}" placeholder="البيان..."></td>
-      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="customer" list="customerNamesList" value="${escapeHtml(r.customer)}" placeholder="اسم العميل..."></td>
+      <td><input type="text" inputmode="decimal" class="grid-cell grid-amount" data-row-id="${r.id}" data-field="amount" value="${escapeHtml(r.amount)}" placeholder="0.00" ${isCarry?'disabled':''}></td>
+      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="note" value="${escapeHtml(r.note)}" placeholder="البيان..." ${isCarry?'disabled':''}></td>
+      <td><input type="text" class="grid-cell" data-row-id="${r.id}" data-field="customer" list="customerNamesList" value="${escapeHtml(r.customer)}" placeholder="اسم العميل..." ${isCarry?'disabled':''}></td>
+      <td>
+        <select class="grid-cell grid-select" data-row-id="${r.id}" data-field="account" ${isCarry?'disabled':''}>
+          ${contraAccountOptionsHtml(r.account||'')}
+        </select>
+      </td>
       <td><button class="icon-btn sheet-del" data-row-id="${r.id}" title="حذف الصف">✕</button></td>
     </tr>`;
   }
 
   function renderSheet(){
+    const bal = currentBalance();
     return `
     <div class="panel" style="padding:var(--space-4);">
       <div class="sheet-toolbar">
@@ -991,6 +1183,12 @@ input[type="file"]{display:none;}
         <div style="display:flex; gap:8px;">
           <button class="btn-ghost" id="sheetAddRow">+ إضافة صف</button>
           <button class="btn-primary" id="sheetClear" style="width:auto; padding:10px 22px;">🧹 يومية جديدة</button>
+        </div>
+      </div>
+      <div class="stat-grid" style="grid-template-columns:1fr; margin-bottom:var(--space-4);">
+        <div class="stat-card">
+          <div class="k">رصيدك في اليومية (رصيد الصندوق الفعلي)</div>
+          <div class="v num" id="sheetLiveBalance" style="font-size:1.5rem;">${fmt(bal)}</div>
         </div>
       </div>
       <div style="overflow-x:auto; border:1px solid var(--border-subtle); border-radius:12px;">
@@ -1003,6 +1201,7 @@ input[type="file"]{display:none;}
               <th style="min-width:130px;">المبلغ</th>
               <th style="min-width:180px;">البيان</th>
               <th style="min-width:160px;">العميل</th>
+              <th style="min-width:170px;">الحساب المقابل</th>
               <th style="width:34px;"></th>
             </tr>
           </thead>
@@ -1012,7 +1211,7 @@ input[type="file"]{display:none;}
           <tfoot>
             <tr>
               <td colspan="3" style="text-align:start; font-weight:700; font-size:0.8rem; color:var(--text-tertiary);">الإجمالي</td>
-              <td colspan="4">
+              <td colspan="5">
                 <span class="num" id="sheetTotalIn" style="color:var(--semantic-success); font-weight:700;">+0</span>
                 &nbsp;/&nbsp;
                 <span class="num" id="sheetTotalOut" style="color:var(--semantic-danger); font-weight:700;">-0</span>
@@ -1022,7 +1221,7 @@ input[type="file"]{display:none;}
         </table>
       </div>
       <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:var(--space-3); line-height:1.6;">
-        اكتب البيانات صف بصف زي إكسل بالظبط — دوس <b>Enter</b> للانتقال للخلية اللي جنبها (ولو آخر خلية في الصف هينزلك لصف جديد تلقائي). أي مبلغ تكتبه <b>بيترحّل تلقائي</b> في دفتر اليومية على طول من غير ما تدوس أي زرار — واكتب رقم بإشارة سالب (-) عشان يتسجل منصرف تلقائي. دبل كليك على خانة المبلغ يفتحلك حاسبة سريعة. لما تخلص، دوس "🧹 يومية جديدة" عشان تنضّف الجدول وتبدأ صفوف فاضية (من غير ما يأثر على القيود اللي اترحّلت خلاص).
+        اكتب البيانات صف بصف زي إكسل بالظبط — دوس <b>Enter</b> للانتقال للخلية اللي جنبها (ولو آخر خلية في الصف هينزلك لصف جديد تلقائي). أي مبلغ تكتبه <b>بيترحّل تلقائي</b> في دفتر اليومية على طول من غير ما تدوس أي زرار — واكتب رقم بإشارة سالب (-) عشان يتسجل منصرف تلقائي. اختار "الحساب المقابل" لو الحركة على بنك / مصروفات / رأس مال، وسيبها فاضية لو مجرد حركة صندوق عادية. دبل كليك على خانة المبلغ يفتحلك حاسبة سريعة. لما تخلص، دوس "🧹 يومية جديدة" عشان تنضّف الجدول وتبدأ صفوف فاضية (من غير ما يأثر على القيود اللي اترحّلت خلاص) — ولو فيه فرق جرد لسه معلّق، هيعرض عليك ترحيله كرصيد مرحل الأول.
       </div>
     </div>
     `;
@@ -1031,6 +1230,7 @@ input[type="file"]{display:none;}
   /* يرحّل صف الشيت تلقائياً كقيد فعلي في دفتر اليومية، أو يحدّث القيد لو كان موجود بالفعل */
   function syncRowToTransaction(row){
     const amt = Math.abs(parseMoneyString(row.amount));
+    const contraAccountId = row.account && row.account!=='__new__' ? row.account : null;
     if(amt > 0){
       const customerId = getOrCreateCustomerId(row.customer);
       if(row.transactionId){
@@ -1041,13 +1241,14 @@ input[type="file"]{display:none;}
           tx.amount = amt;
           tx.note = (row.note||'').trim();
           tx.customerId = customerId;
+          tx.contraAccountId = contraAccountId;
         } else {
-          const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, createdAt:new Date().toISOString() };
+          const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, contraAccountId, createdAt:new Date().toISOString() };
           state.transactions.push(newTx);
           row.transactionId = newTx.id;
         }
       } else {
-        const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, createdAt:new Date().toISOString() };
+        const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, contraAccountId, createdAt:new Date().toISOString() };
         state.transactions.push(newTx);
         row.transactionId = newTx.id;
       }
@@ -1117,6 +1318,10 @@ input[type="file"]{display:none;}
     if(!body) return;
 
     function findRow(id){ return sheetRows.find(r=>r.id===id); }
+    function updateLiveBalance(){
+      const el = document.getElementById('sheetLiveBalance');
+      if(el) el.textContent = fmt(currentBalance());
+    }
     function updateTotals(){
       let inT=0, outT=0;
       sheetRows.forEach(r=>{
@@ -1128,6 +1333,7 @@ input[type="file"]{display:none;}
       const outEl = document.getElementById('sheetTotalOut');
       if(inEl) inEl.textContent = '+' + fmt(inT);
       if(outEl) outEl.textContent = '-' + fmt(outT);
+      updateLiveBalance();
     }
     updateTotals();
 
@@ -1165,6 +1371,14 @@ input[type="file"]{display:none;}
       if(!el.classList.contains('grid-cell')) return;
       const row = findRow(el.dataset.rowId);
       if(!row) return;
+      if(el.dataset.field==='account' && el.value==='__new__'){
+        openNewAccountModal((newId)=>{
+          row.account = newId;
+          el.innerHTML = contraAccountOptionsHtml(newId);
+          syncRowToTransaction(row);
+        }, ()=>{ el.value = row.account||''; });
+        return;
+      }
       row[el.dataset.field] = el.value;
       if(el.dataset.field==='type') updateTotals();
       syncRowToTransaction(row);
@@ -1215,7 +1429,7 @@ input[type="file"]{display:none;}
       });
     });
 
-    const SHEET_FIELD_ORDER = ['date','type','amount','note','customer'];
+    const SHEET_FIELD_ORDER = ['date','type','amount','note','customer','account'];
     body.addEventListener('keydown', (e)=>{
       if(e.key !== 'Enter') return;
       const el = e.target;
@@ -1240,7 +1454,7 @@ input[type="file"]{display:none;}
       if(idx===-1) return;
       let nextIdx = idx+1;
       if(nextIdx >= sheetRows.length){
-        const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null};
+        const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', account:'', transactionId:null};
         sheetRows.push(newRow);
         body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
         saveSheetDraft();
@@ -1268,7 +1482,7 @@ input[type="file"]{display:none;}
 
     const addBtn = document.getElementById('sheetAddRow');
     if(addBtn) addBtn.addEventListener('click', ()=>{
-      const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null};
+      const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', account:'', transactionId:null};
       sheetRows.push(newRow);
       body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
       saveSheetDraft();
@@ -1276,12 +1490,70 @@ input[type="file"]{display:none;}
 
     const clearBtn = document.getElementById('sheetClear');
     if(clearBtn) clearBtn.addEventListener('click', ()=>{
-      confirmModal('يومية جديدة', 'هيتم تنظيف الجدول وابتداء صفوف فاضية جديدة. القيود اللي اترحّلت خلاص هتفضل محفوظة في دفتر اليومية زي ما هي، مش هتتأثر. عايز تكمل؟', ()=>{
-        sheetRows = makeEmptySheetRows(6);
-        saveSheetDraft();
-        showToast('✓ الجدول جاهز ليومية جديدة');
-        renderAll();
-      });
+      const pending = state.reconciliations
+        .filter(r=>Math.abs(r.diff||0) > 0.004 && !r.applied)
+        .sort((a,b)=> (b.date+b.createdAt).localeCompare(a.date+a.createdAt))[0];
+      if(pending){
+        openCarryForwardModal(pending);
+      } else {
+        confirmModal('يومية جديدة', 'هيتم تنظيف الجدول وابتداء صفوف فاضية جديدة. القيود اللي اترحّلت خلاص هتفضل محفوظة في دفتر اليومية زي ما هي، مش هتتأثر. عايز تكمل؟', ()=>{
+          sheetRows = makeEmptySheetRows(6);
+          saveSheetDraft();
+          showToast('✓ الجدول جاهز ليومية جديدة');
+          renderAll();
+        });
+      }
+    });
+  }
+
+  /* لو فيه فرق جرد لسه مترحّلش (زيادة/عجز)، اعرض للمستخدم يرحّله كقيد "رصيد مرحل" قبل ما يبدأ يومية جديدة */
+  function openCarryForwardModal(recon){
+    const root = document.getElementById('modal-root');
+    const diff = recon.diff;
+    const kindTxt = diff>0 ? 'زيادة (ليك)' : 'عجز (عليك)';
+    root.innerHTML = `
+      <div class="modal-overlay" id="carryOverlay">
+        <div class="modal-box">
+          <h3>فيه فرق جرد لسه معلّق</h3>
+          <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            آخر جرد بتاريخ ${fmtDate(recon.date)} فيه فرق <b class="num" style="color:${diff>0?'var(--semantic-warning)':'var(--semantic-danger)'}">${diff>0?'+':''}${fmt(diff)} ج.م</b> (${kindTxt}) بين اللي في الدفتر واللي عديته فعلاً.
+            <br>عايز ترحّل الفرق ده كـ"رصيد مرحل" في اليومية الجديدة عشان الدفتر يتظبط مع اللي معاك؟
+          </p>
+          <div class="modal-actions" style="flex-direction:column;">
+            <button class="btn-primary" id="carryApply">رحّل الفرق وابدأ يومية جديدة</button>
+            <button class="btn-ghost" id="carrySkip">ابدأ يومية جديدة من غير ترحيل</button>
+            <button class="btn-ghost" id="carryCancel">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('carryCancel').addEventListener('click', ()=> root.innerHTML='');
+    document.getElementById('carryOverlay').addEventListener('click', (e)=>{ if(e.target.id==='carryOverlay') root.innerHTML=''; });
+    document.getElementById('carrySkip').addEventListener('click', ()=>{
+      root.innerHTML='';
+      sheetRows = makeEmptySheetRows(6);
+      saveSheetDraft();
+      showToast('✓ الجدول جاهز ليومية جديدة');
+      renderAll();
+    });
+    document.getElementById('carryApply').addEventListener('click', ()=>{
+      const amount = Math.abs(diff);
+      const type = diff>0 ? 'in' : 'out';
+      const newTx = {
+        id: uid(), date: todayStr(), type, amount,
+        note: 'رصيد مرحل من جرد ' + fmtDate(recon.date),
+        customerId: null, contraAccountId: null, isCarryForward: true,
+        createdAt: new Date().toISOString()
+      };
+      state.transactions.push(newTx);
+      recon.applied = true;
+      saveState();
+      const carryRow = { id: uid(), date: todayStr(), type, amount: fmt(amount), note: 'رصيد مرحل', customer: '', account: '', transactionId: newTx.id, isCarryForward: true };
+      sheetRows = [carryRow, ...makeEmptySheetRows(5)];
+      saveSheetDraft();
+      root.innerHTML='';
+      showToast('✓ اترحّل الفرق وبدأت يومية جديدة');
+      renderAll();
     });
   }
 
@@ -1438,13 +1710,116 @@ input[type="file"]{display:none;}
     });
   }
 
+  /* ===================== VIEW: ACCOUNTS (دفتر الأستاذ العام + ميزان المراجعة) ===================== */
+  function accountKindLabel(kind){
+    return kind==='cash' ? 'الصندوق' : kind==='customer' ? 'عميل' : kind==='account' ? 'حساب' : 'غير مصنف';
+  }
+
+  function renderAccounts(){
+    if(selectedLedgerAccount) return renderLedgerDetail(selectedLedgerAccount.kind, selectedLedgerAccount.id);
+    const tb = buildTrialBalance();
+    const balanced = Math.abs(tb.totalDebit - tb.totalCredit) < 0.01;
+    return `
+    <div class="panel">
+      <h2><span class="dot"></span> ميزان المراجعة</h2>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="k">إجمالي مدين</div><div class="v num">${fmt(tb.totalDebit)}</div></div>
+        <div class="stat-card"><div class="k">إجمالي دائن</div><div class="v num">${fmt(tb.totalCredit)}</div></div>
+        <div class="stat-card"><div class="k">الحالة</div><div class="v num" style="color:${balanced?'var(--semantic-success)':'var(--semantic-danger)'}">${balanced?'متوازن ✓':'غير متوازن ⚠'}</div></div>
+      </div>
+      <div style="overflow-x:auto; border:1px solid var(--border-subtle); border-radius:12px; margin-top:var(--space-3);">
+        <table class="sheet-table">
+          <thead><tr><th style="min-width:160px;">الحساب</th><th>النوع</th><th>مدين</th><th>دائن</th><th>الرصيد</th></tr></thead>
+          <tbody>
+            ${ tb.rows.map(r=>`
+              <tr class="acct-row" data-kind="${r.kind}" data-id="${r.id}" style="cursor:pointer;">
+                <td>${escapeHtml(r.name)}</td>
+                <td style="font-size:0.78rem; color:var(--text-tertiary);">${accountKindLabel(r.kind)}</td>
+                <td class="num">${fmt(r.debit)}</td>
+                <td class="num">${fmt(r.credit)}</td>
+                <td class="num" style="color:${r.balance>0?'var(--semantic-success)': r.balance<0?'var(--semantic-danger)':'var(--text-secondary)'}">${fmt(r.balance)}</td>
+              </tr>`).join('') }
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:var(--space-3); line-height:1.6;">
+        دوس على أي حساب عشان تفتح دفتر الأستاذ الخاص بيه (كل الحركات بالتفصيل ورصيد متراكم). "مدين" و"دائن" هنا محسوبين بافتراض إن الصندوق هو المرجع: أي وارد للصندوق بيبقى دائن على الحساب المقابل، وأي منصرف من الصندوق بيبقى مدين على الحساب المقابل — عشان كده الميزان بيفضل متوازن دايماً.
+      </div>
+    </div>
+    `;
+  }
+
+  function renderLedgerDetail(kind, id){
+    const entries = ledgerEntriesFor(kind, id);
+    let name;
+    if(kind==='cash') name = 'الصندوق (الخزنة)';
+    else if(kind==='customer') name = (getCustomerById(id)||{}).name || 'عميل محذوف';
+    else if(kind==='account') name = (getAccountById(id)||{}).name || 'حساب محذوف';
+    else name = 'غير مصنف';
+    const totalDebit = entries.reduce((s,e)=>s+e.debit,0);
+    const totalCredit = entries.reduce((s,e)=>s+e.credit,0);
+    return `
+    <div class="panel">
+      <div class="back-link" id="acctBack">→ رجوع لميزان المراجعة</div>
+      <h2><span class="dot"></span> دفتر الأستاذ — ${escapeHtml(name)}</h2>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="k">إجمالي مدين</div><div class="v num">${fmt(totalDebit)}</div></div>
+        <div class="stat-card"><div class="k">إجمالي دائن</div><div class="v num">${fmt(totalCredit)}</div></div>
+        <div class="stat-card"><div class="k">الرصيد</div><div class="v num">${fmt(totalDebit-totalCredit)}</div></div>
+      </div>
+      ${ entries.length===0 ? `<div class="empty-state"><div class="icon">📭</div><div class="txt">لسه مفيش حركات على الحساب ده</div></div>` : `
+      <div style="overflow-x:auto; border:1px solid var(--border-subtle); border-radius:12px;">
+        <table class="sheet-table">
+          <thead><tr><th style="min-width:100px;">التاريخ</th><th style="min-width:160px;">البيان</th><th>مدين</th><th>دائن</th><th>الرصيد</th></tr></thead>
+          <tbody>
+            ${ entries.map(e=>`
+              <tr>
+                <td>${fmtDate(e.tx.date)}</td>
+                <td>${escapeHtml(e.tx.note || (e.tx.type==='in'?'وارد':'منصرف'))}</td>
+                <td class="num" style="color:var(--semantic-success);">${e.debit? fmt(e.debit):''}</td>
+                <td class="num" style="color:var(--semantic-danger);">${e.credit? fmt(e.credit):''}</td>
+                <td class="num">${fmt(e.running)}</td>
+              </tr>`).join('') }
+          </tbody>
+        </table>
+      </div>` }
+    </div>
+    `;
+  }
+
+  function bindAccountsEvents(){
+    if(selectedLedgerAccount){
+      const backBtn = document.getElementById('acctBack');
+      if(backBtn) backBtn.addEventListener('click', ()=>{ selectedLedgerAccount=null; renderAll(); });
+      return;
+    }
+    document.querySelectorAll('.acct-row').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        selectedLedgerAccount = { kind: row.dataset.kind, id: row.dataset.id };
+        renderAll();
+      });
+    });
+  }
+
   /* ===================== VIEW: RECONCILIATION ===================== */
   function renderRecon(){
     const calc = balanceUpTo(reconDate);
     const existing = state.reconciliations.filter(r=>r.date===reconDate).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
     const history = state.reconciliations.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+    const pending = state.reconciliations
+      .filter(r=>Math.abs(r.diff||0) > 0.004 && !r.applied)
+      .sort((a,b)=> (b.date+b.createdAt).localeCompare(a.date+a.createdAt))[0];
 
     return `
+    ${ pending ? `
+    <div class="panel" style="border-color:${pending.diff>0?'var(--semantic-warning)':'var(--semantic-danger)'};">
+      <h2><span class="dot"></span> فيه فرق جرد لسه معلّق</h2>
+      <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.7;">
+        جرد ${fmtDate(pending.date)}: فرق <b class="num">${pending.diff>0?'+':''}${fmt(pending.diff)} ج.م</b>
+        (${pending.diff>0 ? 'زيادة — ليك' : 'عجز — عليك'}). ممكن ترحّله دلوقتي كقيد "رصيد مرحل"، أو من زرار "🧹 يومية جديدة" في تسجيل اليومية.
+      </p>
+      <button class="btn-primary" id="rCarryNow" style="width:auto; padding:10px 22px;">رحّل الفرق الآن</button>
+    </div>` : '' }
     <div class="panel">
       <h2><span class="dot"></span> جرد الخزنة</h2>
       <div class="field">
@@ -1452,10 +1827,10 @@ input[type="file"]{display:none;}
         <input type="date" id="rDate" value="${reconDate}">
       </div>
       <div class="stat-grid" style="grid-template-columns:1fr;">
-        <div class="stat-card"><div class="k">الرصيد المحسوب حتى نهاية هذا اليوم</div><div class="v num" style="font-size:1.4rem;">${fmt(calc)} ج.م</div></div>
+        <div class="stat-card"><div class="k">الرصيد المحسوب حتى نهاية هذا اليوم (اللي في الدفتر)</div><div class="v num" style="font-size:1.4rem;">${fmt(calc)} ج.م</div></div>
       </div>
       <div class="field">
-        <label>المبلغ اللي عديته فعلياً في الخزنة</label>
+        <label>المبلغ اللي عديته فعلياً نقدي في الخزنة</label>
         <input type="text" inputmode="decimal" class="num-input" id="rCounted" placeholder="0.00">
       </div>
       <div class="field">
@@ -1472,9 +1847,9 @@ input[type="file"]{display:none;}
         ${ history.length===0 ? `<div class="empty-state"><div class="icon">🔍</div><div class="txt">لسه معملتش أي جرد</div></div>` :
           history.map(r=>`
           <div class="day-row">
-            <span>${fmtDate(r.date)}</span>
+            <span>${fmtDate(r.date)}${(Math.abs(r.diff||0)>0.004 && !r.applied) ? ' <span style="opacity:.6;">(معلّق)</span>' : ''}</span>
             <span class="num" style="color:${r.diff===0?'var(--semantic-success)': r.diff>0?'var(--accent-warm)':'var(--semantic-danger)'}">
-              ${r.diff===0 ? 'مظبوط ✓' : (r.diff>0? '+'+fmt(r.diff)+' زيادة' : fmt(r.diff)+' عجز')}
+              ${r.diff===0 ? 'مظبوط ✓' : (r.diff>0? '+'+fmt(r.diff)+' زيادة (ليك)' : fmt(r.diff)+' عجز (عليك)')}
             </span>
           </div>`).join('')
         }
@@ -1486,6 +1861,28 @@ input[type="file"]{display:none;}
     const dateEl = document.getElementById('rDate');
     if(dateEl) dateEl.addEventListener('change', ()=>{ reconDate = dateEl.value; renderAll(); });
     attachMoneyFormatting(document.getElementById('rCounted'));
+
+    const carryBtn = document.getElementById('rCarryNow');
+    if(carryBtn){
+      carryBtn.addEventListener('click', ()=>{
+        const pending = state.reconciliations
+          .filter(r=>Math.abs(r.diff||0) > 0.004 && !r.applied)
+          .sort((a,b)=> (b.date+b.createdAt).localeCompare(a.date+a.createdAt))[0];
+        if(!pending) return;
+        const amount = Math.abs(pending.diff);
+        const type = pending.diff>0 ? 'in' : 'out';
+        state.transactions.push({
+          id: uid(), date: todayStr(), type, amount,
+          note: 'رصيد مرحل من جرد ' + fmtDate(pending.date),
+          customerId: null, contraAccountId: null, isCarryForward: true,
+          createdAt: new Date().toISOString()
+        });
+        pending.applied = true;
+        saveState();
+        showToast('✓ اترحّل الفرق كقيد رصيد مرحل');
+        renderAll();
+      });
+    }
 
     const submitBtn = document.getElementById('rSubmit');
     if(submitBtn){
@@ -1499,12 +1896,13 @@ input[type="file"]{display:none;}
         state.reconciliations.push({
           id: uid(), date: reconDate, calculatedBalance: calc,
           countedAmount: counted, diff: diff, note: noteEl.value.trim(),
+          applied: false,
           createdAt: new Date().toISOString()
         });
         saveState();
         const resultEl = document.getElementById('rResult');
         const cls = diff===0 ? 'ok' : (diff>0 ? 'diff-pos' : 'diff-neg');
-        const statusTxt = diff===0 ? '✓ الخزنة مظبوطة تماماً' : (diff>0 ? '⚠ فيه زيادة في الخزنة' : '⚠ فيه عجز في الخزنة');
+        const statusTxt = diff===0 ? '✓ الخزنة مظبوطة تماماً' : (diff>0 ? '⚠ فيه زيادة في الخزنة (ليك)' : '⚠ فيه عجز في الخزنة (عليك)');
         resultEl.innerHTML = `
           <div class="recon-result ${cls}">
             <div class="status">${statusTxt}</div>
@@ -1961,6 +2359,32 @@ th{background:#f4f4f4; font-weight:700;}
     </div>
 
     <div class="panel">
+      <h2><span class="dot"></span> الحسابات المقابلة (بنك / مصروفات / رأس مال...)</h2>
+      <div class="field">
+        <label>إضافة حساب جديد</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="acctNewName" placeholder="اسم الحساب" style="flex:2;">
+          <select id="acctNewType" class="grid-select" style="flex:1; padding:12px 14px; border-radius:12px; background:var(--canvas-raised); border:1px solid var(--border-subtle); color:var(--text-primary); font-family:'Cairo',sans-serif;">
+            <option value="bank">بنك</option>
+            <option value="expense">مصروفات</option>
+            <option value="capital">رأس مال</option>
+            <option value="other">حساب آخر</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" id="acctAddBtn" style="width:auto; padding:10px 22px;">+ إضافة حساب</button>
+      <div id="acctMgmtList" style="margin-top:var(--space-4);">
+        ${ state.accounts.length===0 ? `<div class="empty-state"><div class="icon">🏦</div><div class="txt">لسه معملتش أي حساب مقابل</div></div>` :
+          state.accounts.slice().sort((a,b)=>a.name.localeCompare(b.name,'ar')).map(a=>`
+          <div class="setting-row">
+            <div class="txt"><div class="t">${escapeHtml(a.name)}</div><div class="d">${ACCOUNT_TYPE_LABELS[a.type]||'حساب آخر'}</div></div>
+            <button class="btn-danger-ghost acct-del" data-account-id="${a.id}" style="width:auto; padding:8px 14px;">حذف</button>
+          </div>`).join('')
+        }
+      </div>
+    </div>
+
+    <div class="panel">
       <h2><span class="dot"></span> نقل البيانات بين الأجهزة</h2>
       <div class="setting-row">
         <div class="txt"><div class="t">تصدير البيانات</div><div class="d">احفظ نسخة من كل بياناتك في ملف تقدر تبعته لنفسك</div></div>
@@ -1992,6 +2416,25 @@ th{background:#f4f4f4; font-weight:700;}
       const v = parseMoneyString(document.getElementById('sOpening').value);
       state.openingBalance = v;
       saveState(); showToast('✓ اتحفظ الرصيد الافتتاحي'); renderAll();
+    });
+
+    const acctAddBtn = document.getElementById('acctAddBtn');
+    if(acctAddBtn) acctAddBtn.addEventListener('click', ()=>{
+      const nameEl = document.getElementById('acctNewName');
+      const typeEl = document.getElementById('acctNewType');
+      const name = nameEl.value.trim();
+      if(!name){ showToast('⚠️ اكتب اسم الحساب'); return; }
+      getOrCreateAccountId(name, typeEl.value);
+      saveState(); showToast('✓ اتضاف الحساب'); renderAll();
+    });
+    document.querySelectorAll('.acct-del').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const acc = getAccountById(btn.dataset.accountId);
+        confirmModal('حذف الحساب', `متأكد عايز تحذف حساب "${acc?acc.name:''}"؟ القيود المرتبطة بيه هتفضل موجودة بس تترجع لتصنيف "غير مصنف".`, ()=>{
+          deleteAccount(btn.dataset.accountId);
+          saveState(); showToast('🗑️ اتحذف الحساب'); renderAll();
+        });
+      });
     });
 
     document.getElementById('sExport').addEventListener('click', ()=>{
@@ -2029,7 +2472,7 @@ th{background:#f4f4f4; font-weight:700;}
 
     document.getElementById('sClearAll').addEventListener('click', ()=>{
       confirmModal('مسح كل البيانات', 'هيتم حذف كل القيود وعمليات الجرد نهائياً من هذا الجهاز. الأفضل تعمل تصدير للبيانات الأول. متأكد عايز تكمل؟', ()=>{
-        state = { openingBalance:0, transactions:[], reconciliations:[], customers:[] };
+        state = { openingBalance:0, transactions:[], reconciliations:[], customers:[], accounts:[] };
         saveState(); showToast('🗑️ اتمسحت كل البيانات'); renderAll();
       });
     });
@@ -2059,7 +2502,8 @@ th{background:#f4f4f4; font-weight:700;}
         openingBalance: imported.openingBalance||0,
         transactions: imported.transactions||[],
         reconciliations: imported.reconciliations||[],
-        customers: imported.customers||[]
+        customers: imported.customers||[],
+        accounts: imported.accounts||[]
       };
       saveState(); root.innerHTML=''; showToast('✓ اتبدلت البيانات'); renderAll();
     });
@@ -2070,6 +2514,8 @@ th{background:#f4f4f4; font-weight:700;}
       (imported.reconciliations||[]).forEach(r=>{ if(!existingRIds.has(r.id)) state.reconciliations.push(r); });
       const existingCIds = new Set(state.customers.map(c=>c.id));
       (imported.customers||[]).forEach(c=>{ if(!existingCIds.has(c.id)) state.customers.push(c); });
+      const existingAIds = new Set(state.accounts.map(a=>a.id));
+      (imported.accounts||[]).forEach(a=>{ if(!existingAIds.has(a.id)) state.accounts.push(a); });
       saveState(); root.innerHTML=''; showToast('✓ اتدمجت البيانات'); renderAll();
     });
   }
@@ -2084,6 +2530,7 @@ th{background:#f4f4f4; font-weight:700;}
     else if(activeTab==='sheet'){ content.innerHTML = renderSheet(); bindSheetEvents(); }
     else if(activeTab==='journal'){ content.innerHTML = renderJournal(); bindJournalEvents(); }
     else if(activeTab==='customers'){ content.innerHTML = renderCustomers(); bindCustomersEvents(); }
+    else if(activeTab==='accounts'){ content.innerHTML = renderAccounts(); bindAccountsEvents(); }
     else if(activeTab==='recon'){ content.innerHTML = renderRecon(); bindReconEvents(); }
     else if(activeTab==='reports'){ content.innerHTML = renderReports(); bindReportsEvents(); }
     else if(activeTab==='settings'){ content.innerHTML = renderSettings(); bindSettingsEvents(); }
