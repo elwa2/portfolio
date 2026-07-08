@@ -45,6 +45,25 @@
       .video-item-status.done { background: rgba(16,185,129,0.2); color: #10b981; }
       .video-item-status.error { background: rgba(239,68,68,0.2); color: #ef4444; }
 
+      .video-item-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+      .video-item-actions .btn-sm {
+        padding: 4px 10px; font-size: 0.7rem; border-radius: 6px; border: none;
+        cursor: pointer; font-family: inherit; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px;
+      }
+      .video-item-actions .btn-sm-download { background: rgba(16,185,129,0.15); color: #10b981; }
+      .video-item-actions .btn-sm-download:hover { background: rgba(16,185,129,0.25); }
+      .video-item-actions .btn-sm-copy { background: rgba(94,59,238,0.15); color: #5e3bee; }
+      .video-item-actions .btn-sm-copy:hover { background: rgba(94,59,238,0.25); }
+      .video-item-size { font-size: 0.7rem; color: #888; display: flex; gap: 10px; }
+      .video-item-size .green { color: #10b981; }
+      .video-item-size .red { color: #ef4444; }
+      .video-item-url {
+        font-size: 0.65rem; color: #5e3bee; direction: ltr; display: inline-block;
+        max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        text-decoration: none; vertical-align: middle;
+      }
+      .video-item-url:hover { text-decoration: underline; color: #a855f7; }
+
       .action-radio {
         cursor: pointer; display: inline-flex;
       }
@@ -191,9 +210,16 @@
                 <span><i class="fas fa-compress-alt"></i> ضغط + رفع</span>
               </label>
             </div>
-            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center;">
               <button class="btn btn-primary" id="btnBatchProcess" onclick="batchProcess()" disabled><i class="fas fa-play"></i> تنفيذ للتحديد</button>
               <button class="btn btn-ghost" onclick="resetAll()"><i class="fas fa-redo"></i> إعادة</button>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#aaa; font-size:0.85rem;">
+                <input type="checkbox" id="autoUpload" checked style="accent-color:#10b981; width:16px; height:16px;" />
+                <i class="fas fa-upload"></i> رفع تلقائي بعد المعالجة
+              </label>
+              <button class="btn btn-ghost" id="btnDownloadAll" onclick="downloadAllVideos()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-download"></i> تحميل الكل</button>
+              <button class="btn btn-success" id="btnUploadAll" onclick="batchUploadProcessed()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-upload"></i> رفع الكل إلى GitHub</button>
+              <button class="btn btn-ghost" id="btnCopyAllUrls" onclick="copyAllUrls()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-copy"></i> نسخ جميع الروابط</button>
             </div>
           </div>
         </div>
@@ -432,6 +458,11 @@
       }
 
       async function uploadVideo() {
+        // If in batch mode and there are files pending upload, redirect to batch upload
+        const hasPendingBatch = selectedFiles.some(f => !f._url && (f._status === 'done' || f._status === 'pending_upload'));
+        if (hasPendingBatch) {
+          return batchUploadProcessed();
+        }
         const fileToUpload = currentBlob || currentFile;
         if (!fileToUpload) return;
         disableButtons(true);
@@ -521,15 +552,51 @@
         document.getElementById('videoCount').textContent = selectedFiles.length;
         container.innerHTML = '';
 
+        const doneCount = selectedFiles.filter(f => f._status === 'done').length;
+        document.getElementById('btnDownloadAll').style.display = doneCount > 0 ? 'inline-flex' : 'none';
+        const uploadableCount = selectedFiles.filter(f => (f._status === 'done' || f._status === 'pending_upload') && !f._url).length;
+        document.getElementById('btnUploadAll').style.display = uploadableCount > 0 ? 'inline-flex' : 'none';
+        const urlCount = selectedFiles.filter(f => f._url).length;
+        document.getElementById('btnCopyAllUrls').style.display = urlCount > 0 ? 'inline-flex' : 'none';
+
         selectedFiles.forEach((file, idx) => {
           const item = document.createElement('div');
           item.className = 'video-item' + (file._selected !== false ? ' selected' : '');
+          const isDone = file._status === 'done';
+          const hasActions = isDone && (file._blob || file._url);
+
+          let sizeInfo = '';
+          if (file._origSize && file._newSize) {
+            const savings = ((1 - file._newSize / file._origSize) * 100).toFixed(1);
+            sizeInfo = `
+              <div class="video-item-size">
+                <span>قديم: <span class="red">${formatBytes(file._origSize)}</span></span>
+                <span>جديد: <span class="green">${formatBytes(file._newSize)}</span></span>
+                <span>توفير: <span class="green">${savings}%</span></span>
+              </div>`;
+          }
+
+          let actionsHtml = '';
+          if (hasActions) {
+            actionsHtml = '<div class="video-item-actions">';
+            if (file._blob) {
+              actionsHtml += `<button class="btn-sm btn-sm-download" onclick="downloadSingleVideo(${idx})"><i class="fas fa-download"></i> تحميل</button>`;
+            }
+            if (file._url) {
+              actionsHtml += `<a href="${file._url}" target="_blank" class="video-item-url" title="${file._url}">${file._url}</a>`;
+              actionsHtml += `<button class="btn-sm btn-sm-copy" onclick="copyVideoUrl(${idx})"><i class="fas fa-copy"></i> نسخ الرابط</button>`;
+            }
+            actionsHtml += '</div>';
+          }
+
           item.innerHTML = `
             <input type="checkbox" ${file._selected !== false ? 'checked' : ''} onchange="toggleVideo(${idx}, this.checked)" />
             <div class="video-item-thumb" id="thumb_${idx}"></div>
             <div class="video-item-info">
               <div class="video-item-name">${file.name}</div>
               <div class="video-item-meta">${formatBytes(file.size)} — ${file.type || 'video'}</div>
+              ${sizeInfo}
+              ${actionsHtml}
             </div>
             <div class="video-item-status ${file._status || 'pending'}" id="status_${idx}">${file._statusText || 'في الانتظار'}</div>
           `;
@@ -539,9 +606,7 @@
           const url = URL.createObjectURL(file);
           const video = document.createElement('video');
           video.src = url;
-          video.onloadeddata = () => {
-            video.currentTime = 1;
-          };
+          video.onloadeddata = () => { video.currentTime = 1; };
           video.onseeked = () => {
             const canvas = document.createElement('canvas');
             canvas.width = 80; canvas.height = 50;
@@ -580,85 +645,101 @@
         if (toProcess.length === 0) { toast('لا يوجد فيديوهات للمعالجة', 'info'); return; }
 
         const action = document.querySelector('input[name="batchAction"]:checked').value;
+        const autoUpload = document.getElementById('autoUpload').checked;
         disableButtons(true);
+        batchCancelled = false;
         showProgress('جاري المعالجة...');
         processingResults = [];
 
-        // Process conversions/compressions first, then batch upload
-        const filesToUpload = [];
+        const filesForUpload = []; // { file/blob, name }
 
         for (let i = 0; i < toProcess.length; i++) {
+          if (batchCancelled) {
+            log('warn', 'تم إلغاء المعالجة من قبل المستخدم');
+            break;
+          }
           const file = toProcess[i];
-          const idx = selectedFiles.indexOf(file);
           file._status = 'processing';
           file._statusText = 'جاري المعالجة...';
+          file._origSize = file.size;
           renderVideoList();
 
-          setProgress(Math.round((i / toProcess.length) * 50), `المعالجة ${i + 1}/${toProcess.length}: ${file.name}`);
+          setProgress(Math.round((i / toProcess.length) * 60), `المعالجة ${i + 1}/${toProcess.length}: ${file.name}`);
           log('info', `--- بدء معالجة: ${file.name} (${i + 1}/${toProcess.length}) ---`);
 
           try {
-            if (action === 'upload') {
-              filesToUpload.push({ file: file, name: file.name });
-              file._statusText = 'جاري الرفع...';
-            } else if (action === 'convert') {
-              setProgress(Math.round((i / toProcess.length) * 50), `تحويل ${file.name}...`);
+            if (action === 'convert') {
+              setProgress(Math.round((i / toProcess.length) * 60), `تحويل ${file.name}...`);
               const converted = await convertSingleFile(file);
-              filesToUpload.push({ file: converted.blob, name: converted.name });
-              file._statusText = 'جاري الرفع...';
+              file._blob = converted.blob;
+              file._newSize = converted.blob.size;
+              file._processedName = converted.name;
+              file._status = autoUpload ? 'pending_upload' : 'done';
+              file._statusText = autoUpload ? 'بانتظار الرفع' : 'تم التحويل';
+              filesForUpload.push({ file: converted.blob, name: converted.name });
+              log('ok', `تم تحويل: ${file.name} → ${converted.name}`);
             } else if (action === 'compress') {
-              setProgress(Math.round((i / toProcess.length) * 50), `ضغط ${file.name}...`);
+              setProgress(Math.round((i / toProcess.length) * 60), `ضغط ${file.name}...`);
               const compressed = await compressSingleFile(file);
-              filesToUpload.push({ file: compressed.blob, name: compressed.name });
-              file._statusText = 'جاري الرفع...';
+              file._blob = compressed.blob;
+              file._newSize = compressed.blob.size;
+              file._processedName = compressed.name;
+              file._status = autoUpload ? 'pending_upload' : 'done';
+              file._statusText = autoUpload ? 'بانتظار الرفع' : 'تم الضغط';
+              filesForUpload.push({ file: compressed.blob, name: compressed.name });
+              log('ok', `تم ضغط: ${file.name} → ${compressed.name}`);
+            } else {
+              // upload action
+              file._status = 'pending_upload';
+              file._statusText = 'بانتظار الرفع';
+              filesForUpload.push({ file: file, name: file.name });
             }
-            renderVideoList();
           } catch (e) {
             file._status = 'error';
-            file._statusText = 'فشل المعالجة';
+            file._statusText = 'فشل';
             processingResults.push({ name: file.name, error: e.message, success: false });
             log('err', `خطأ في ${file.name}: ${e.message}`);
-            renderVideoList();
           }
+          renderVideoList();
         }
 
-        // Batch upload all files
-        if (filesToUpload.length > 0) {
-          setProgress(50, `جاري رفع ${filesToUpload.length} فيديو إلى GitHub...`);
-          log('info', `--- بدء الرفع الجماعي: ${filesToUpload.length} ملف ---`);
+        // Batch upload to GitHub (if autoUpload and files exist)
+        if (autoUpload && filesForUpload.length > 0 && !batchCancelled) {
+          setProgress(70, `جاري رفع ${filesForUpload.length} فيديو إلى GitHub...`);
+          log('info', `--- بدء الرفع الجماعي: ${filesForUpload.length} ملف ---`);
 
           try {
             const formData = new FormData();
-            filesToUpload.forEach((item, idx) => {
+            filesForUpload.forEach((item) => {
               formData.append('files[]', item.file, item.name);
             });
             formData.append('action', 'batch_upload');
 
             const resp = await fetch('/api/video', { method: 'POST', body: formData });
             const data = await resp.json();
-
             if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
 
-            data.results.forEach(result => {
-              const file = toProcess.find(f => f.name === result.name || filesToUpload.find(u => u.name === result.name));
-              if (file) {
-                if (result.success) {
-                  file._status = 'done';
-                  file._statusText = 'تم الرفع';
-                  processingResults.push({ name: result.name, url: result.url, success: true });
+            data.results.forEach(r => {
+              const f = selectedFiles.find(x => x._processedName === r.name || x.name === r.name);
+              if (f) {
+                if (r.success) {
+                  f._status = 'done';
+                  f._url = r.url;
+                  f._statusText = 'تم الرفع';
+                  processingResults.push({ name: f.name, url: r.url, success: true });
                 } else {
-                  file._status = 'error';
-                  file._statusText = 'فشل الرفع';
-                  processingResults.push({ name: result.name, error: result.error, success: false });
+                  f._status = 'error';
+                  f._statusText = 'فشل الرفع';
+                  processingResults.push({ name: f.name, error: r.error, success: false });
                 }
               }
-              renderVideoList();
             });
-
+            renderVideoList();
             log('ok', `اكتمل الرفع: ${data.success} نجح، ${data.failed} فشل`);
           } catch (e) {
-            toProcess.forEach(f => {
-              if (f._status !== 'done') {
+            filesForUpload.forEach(item => {
+              const f = selectedFiles.find(x => x._processedName === item.name || x.name === item.name);
+              if (f && f._status !== 'done') {
                 f._status = 'error';
                 f._statusText = 'فشل الرفع';
               }
@@ -666,13 +747,25 @@
             renderVideoList();
             log('err', `خطأ في الرفع الجماعي: ${e.message}`);
           }
+        } else if (!autoUpload) {
+          // Mark upload-only files as ready; others already have their specific status
+          filesForUpload.forEach(item => {
+            const f = selectedFiles.find(x => x._processedName === item.name || x.name === item.name);
+            if (f && f._status !== 'error') {
+              if (action === 'upload') {
+                f._status = 'done';
+                f._statusText = 'جاهز للرفع';
+              }
+            }
+          });
+          renderVideoList();
         }
 
-        setProgress(100, 'اكتملت المعالجة!');
+        setProgress(100, batchCancelled ? 'تم إلغاء المعالجة' : 'اكتملت المعالجة!');
         const successCount = processingResults.filter(r => r.success).length;
         const failCount = processingResults.filter(r => !r.success).length;
-        log('ok', `--- انتهت المعالجة: ${successCount} نجح، ${failCount} فشل ---`);
-        toast(`اكتملت: ${successCount} نجح، ${failCount} فشل`, successCount > 0 ? 'success' : 'error');
+        log('ok', `--- ${batchCancelled ? 'ألغيت المعالجة' : 'انتهت المعالجة'}: ${successCount} نجح، ${failCount} فشل ---`);
+        toast(batchCancelled ? 'تم إلغاء العملية' : `اكتملت: ${successCount} نجح، ${failCount} فشل`, batchCancelled ? 'info' : successCount > 0 ? 'success' : 'error');
         disableButtons(false);
         hideProgress();
       }
@@ -688,7 +781,7 @@
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'فشل التحويل');
-        return { blob: base64ToBlob(data.data, data.mime), name: data.name };
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size };
       }
 
       async function compressSingleFile(file) {
@@ -702,7 +795,7 @@
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'فشل الضغط');
-        return { blob: base64ToBlob(data.data, data.mime), name: data.name };
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size };
       }
 
       async function uploadSingleFile(file, customName) {
@@ -715,6 +808,99 @@
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
         return data;
+      }
+
+      async function uploadBlob(blob, name) {
+        const formData = new FormData();
+        formData.append('file', blob, name);
+        formData.append('action', 'upload');
+        formData.append('name', name);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
+        return data;
+      }
+
+      function downloadSingleVideo(idx) {
+        const file = selectedFiles[idx];
+        if (!file || !file._blob) return;
+        const url = URL.createObjectURL(file._blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = file._processedName || file.name;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        log('info', `تم تحميل: ${file.name}`);
+      }
+
+      function downloadAllVideos() {
+        const doneFiles = selectedFiles.filter(f => f._status === 'done' && f._blob);
+        if (doneFiles.length === 0) { toast('لا يوجد فيديوهات محولة للتحميل', 'info'); return; }
+        doneFiles.forEach((file, i) => {
+          setTimeout(() => downloadSingleVideo(selectedFiles.indexOf(file)), i * 500);
+        });
+        toast(`جاري تحميل ${doneFiles.length} فيديو...`, 'info');
+      }
+
+      function copyVideoUrl(idx) {
+        const file = selectedFiles[idx];
+        if (!file || !file._url) return;
+        navigator.clipboard.writeText(file._url).then(() => {
+          toast('تم نسخ رابط ' + file.name, 'success');
+        }).catch(() => {
+          toast('تعذر نسخ الرابط', 'error');
+        });
+      }
+
+      function copyAllUrls() {
+        const urls = selectedFiles.filter(f => f._url).map(f => f._url);
+        if (urls.length === 0) { toast('لا يوجد روابط للنسخ', 'info'); return; }
+        navigator.clipboard.writeText(urls.join('\n')).then(() => {
+          toast(`تم نسخ ${urls.length} رابط`, 'success');
+        }).catch(() => {
+          toast('تعذر نسخ الروابط', 'error');
+        });
+      }
+
+      async function batchUploadProcessed() {
+        const toUpload = selectedFiles.filter(f => (f._status === 'done' || f._status === 'pending_upload') && !f._url);
+        if (toUpload.length === 0) { toast('لا يوجد فيديوهات للرفع', 'info'); return; }
+
+        disableButtons(true);
+        showProgress(`جاري رفع ${toUpload.length} فيديو...`);
+
+        try {
+          const formData = new FormData();
+          toUpload.forEach(f => {
+            const source = f._blob || f;
+            const name = f._processedName || f.name;
+            formData.append('files[]', source, name);
+          });
+          formData.append('action', 'batch_upload');
+
+          const resp = await fetch('/api/video', { method: 'POST', body: formData });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || 'فشل الرفع');
+
+          data.results.forEach(r => {
+            const f = selectedFiles.find(x => x.name === r.name || x._processedName === r.name);
+            if (f) {
+              if (r.success) { f._url = r.url; f._status = 'done'; f._statusText = 'تم الرفع'; }
+              else { f._status = 'error'; f._statusText = 'فشل الرفع'; }
+            }
+          });
+          renderVideoList();
+          const ok = data.results.filter(r => r.success).length;
+          toast(`تم رفع ${ok} فيديو بنجاح`, ok > 0 ? 'success' : 'error');
+          log('ok', `رفع ${ok}/${data.total} فيديو`);
+        } catch (e) {
+          toast('فشل الرفع: ' + e.message, 'error');
+          log('err', 'خطأ في الرفع: ' + e.message);
+        }
+
+        disableButtons(false);
+        hideProgress();
       }
 
       function showResult(origSize, newSize, name) {
@@ -733,6 +919,7 @@
 
       async function cancelOperation() {
         if (!confirm('هل أنت متأكد من إلغاء العملية الجارية؟')) return;
+        batchCancelled = true;
         try {
           await fetch('/api/cancel', { method: 'POST' });
           toast('تم إلغاء العملية', 'info');
@@ -782,6 +969,7 @@
         document.getElementById('btnCompress').disabled = disabled;
         document.getElementById('btnUpload').disabled = disabled;
         document.getElementById('btnBatchProcess').disabled = disabled;
+        document.getElementById('btnUploadAll').disabled = disabled;
       }
 
       function log(type, msg) {
