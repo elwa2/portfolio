@@ -219,6 +219,7 @@
               </label>
               <button class="btn btn-ghost" id="btnDownloadAll" onclick="downloadAllVideos()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-download"></i> تحميل الكل</button>
               <button class="btn btn-success" id="btnUploadAll" onclick="batchUploadProcessed()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-upload"></i> رفع الكل إلى GitHub</button>
+              <button class="btn btn-ghost" id="btnCopyAllUrls" onclick="copyAllUrls()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-copy"></i> نسخ جميع الروابط</button>
             </div>
           </div>
         </div>
@@ -555,6 +556,8 @@
         document.getElementById('btnDownloadAll').style.display = doneCount > 0 ? 'inline-flex' : 'none';
         const uploadableCount = selectedFiles.filter(f => (f._status === 'done' || f._status === 'pending_upload') && !f._url).length;
         document.getElementById('btnUploadAll').style.display = uploadableCount > 0 ? 'inline-flex' : 'none';
+        const urlCount = selectedFiles.filter(f => f._url).length;
+        document.getElementById('btnCopyAllUrls').style.display = urlCount > 0 ? 'inline-flex' : 'none';
 
         selectedFiles.forEach((file, idx) => {
           const item = document.createElement('div');
@@ -847,6 +850,16 @@
           toast('تم نسخ رابط ' + file.name, 'success');
         }).catch(() => {
           toast('تعذر نسخ الرابط', 'error');
+        });
+      }
+
+      function copyAllUrls() {
+        const urls = selectedFiles.filter(f => f._url).map(f => f._url);
+        if (urls.length === 0) { toast('لا يوجد روابط للنسخ', 'info'); return; }
+        navigator.clipboard.writeText(urls.join('\n')).then(() => {
+          toast(`تم نسخ ${urls.length} رابط`, 'success');
+        }).catch(() => {
+          toast('تعذر نسخ الروابط', 'error');
         });
       }
 
