@@ -305,13 +305,15 @@ def handle_convert(req):
         run_ffmpeg(args, duration)
 
         with open(tmp_output, "rb") as bf:
-            b64 = base64.b64encode(bf.read()).decode()
+            data = bf.read()
+            b64 = base64.b64encode(data).decode()
 
         clear_job()
         return jsonify({
             "data": b64,
             "mime": "video/webm",
             "name": output_name,
+            "size": len(data),
         })
     finally:
         shutil.rmtree(tmp_input.parent, ignore_errors=True)
@@ -357,11 +359,12 @@ def handle_compress(req):
         run_ffmpeg(args, duration)
 
         with open(tmp_output, "rb") as bf:
-            b64 = base64.b64encode(bf.read()).decode()
+            data = bf.read()
+            b64 = base64.b64encode(data).decode()
 
         mime = "video/webm" if fmt == "webm" else "video/mp4"
         clear_job()
-        return jsonify({"data": b64, "mime": mime, "name": output_name})
+        return jsonify({"data": b64, "mime": mime, "name": output_name, "size": len(data)})
     finally:
         shutil.rmtree(tmp_input.parent, ignore_errors=True)
 
