@@ -452,7 +452,7 @@ input[type="file"]{display:none;}
 
   /* ===================== STORAGE ===================== */
   const STORAGE_KEY = "khazna_v1_state";
-  const APP_VERSION = "1.4.0";
+  const APP_VERSION = "1.6.0";
 
   function loadState(){
     try{
@@ -481,7 +481,15 @@ input[type="file"]{display:none;}
   }
 
   let state = loadState();
-  let activeTab = "quick";
+  const ACTIVE_TAB_KEY = "khazna_active_tab_v1";
+  function loadActiveTab(){
+    try{ return localStorage.getItem(ACTIVE_TAB_KEY) || "quick"; }catch(e){ return "quick"; }
+  }
+  function setActiveTab(tabId){
+    activeTab = tabId;
+    try{ localStorage.setItem(ACTIVE_TAB_KEY, tabId); }catch(e){}
+  }
+  let activeTab = loadActiveTab();
   let journalDate = todayStr();
   let reconDate = todayStr();
   let selectedCustomerId = null;
@@ -491,7 +499,7 @@ input[type="file"]{display:none;}
   const SHEET_DRAFT_KEY = "khazna_sheet_draft_v1";
   function makeEmptySheetRows(n){
     const arr = [];
-    for(let i=0;i<n;i++) arr.push({id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''});
+    for(let i=0;i<n;i++) arr.push({id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null});
     return arr;
   }
   function loadSheetDraft(){
@@ -538,18 +546,37 @@ input[type="file"]{display:none;}
   function parseMoneyString(str){
     return parseFloat((str||'').toString().replace(/,/g,'')) || 0;
   }
+  /* بيحسب عدد "الحروف المهمة" (أرقام + إشارة السالب في الأول) قبل نقطة معينة */
+  function countMoneyChars(str, uptoIndex){
+    let count = 0;
+    const limit = Math.min(uptoIndex, str.length);
+    for(let i=0;i<limit;i++){
+      const ch = str[i];
+      if(/[0-9.]/.test(ch)) count++;
+      else if(ch==='-' && i===0) count++;
+    }
+    return count;
+  }
+  /* بيلاقي مكان المؤشر الصح في النص بعد التنسيق، بحيث ميرجعش لقبل إشارة السالب */
+  function findMoneyCursorPos(formatted, targetCount){
+    let count=0, pos=0;
+    while(pos<formatted.length && count<targetCount){
+      const ch = formatted[pos];
+      if(/[0-9.]/.test(ch) || (ch==='-' && pos===0)) count++;
+      pos++;
+    }
+    return pos;
+  }
   /* يربط أي حقل إدخال مبلغ بتنسيق الفاصل الحي مع الحفاظ على موضع المؤشر */
   function attachMoneyFormatting(inputEl){
     if(!inputEl) return;
     inputEl.addEventListener('input', ()=>{
       const cursorPos = inputEl.selectionStart;
       const before = inputEl.value;
-      let digitsBeforeCursor = 0;
-      for(let i=0;i<cursorPos;i++){ if(/[0-9]/.test(before[i])) digitsBeforeCursor++; }
+      const targetCount = countMoneyChars(before, cursorPos);
       const formatted = formatMoneyLive(before);
       inputEl.value = formatted;
-      let pos=0, seen=0;
-      while(pos<formatted.length && seen<digitsBeforeCursor){ if(/[0-9]/.test(formatted[pos])) seen++; pos++; }
+      const pos = findMoneyCursorPos(formatted, targetCount);
       inputEl.setSelectionRange(pos,pos);
     });
   }
@@ -669,7 +696,7 @@ input[type="file"]{display:none;}
       el.addEventListener('click', (e)=>{
         e.stopPropagation();
         selectedCustomerId = el.dataset.openCustomer;
-        activeTab = 'customers';
+        setActiveTab('customers');
         renderAll();
       });
     });
@@ -715,7 +742,7 @@ input[type="file"]{display:none;}
   }
 
   function selectTab(tabId){
-    activeTab = tabId;
+    setActiveTab(tabId);
     if(activeTab==='customers') selectedCustomerId = null;
     renderAll();
     window.scrollTo({top:0, behavior:'smooth'});
@@ -843,6 +870,14 @@ input[type="file"]{display:none;}
         const v = parseMoneyString(amountEl.value);
         if(v<0){ quickType = 'out'; updateQuickTypeButtons(); }
       });
+      amountEl.addEventListener('click', (e)=>{
+        if(e.detail !== 3) return;
+        openCalcModal(amountEl.value, (val)=>{
+          amountEl.value = formatMoneyLive(String(val));
+          if(val < 0){ quickType = 'out'; updateQuickTypeButtons(); }
+          amountEl.focus();
+        });
+      });
     }
     bindEntryListActions('qList');
   }
@@ -955,7 +990,7 @@ input[type="file"]{display:none;}
         <h2 style="margin:0;"><span class="dot"></span> تسجيل اليومية — جدول سريع</h2>
         <div style="display:flex; gap:8px;">
           <button class="btn-ghost" id="sheetAddRow">+ إضافة صف</button>
-          <button class="btn-primary" id="sheetPost" style="width:auto; padding:10px 22px;">🚀 ترحيل الكل</button>
+          <button class="btn-primary" id="sheetClear" style="width:auto; padding:10px 22px;">🧹 يومية جديدة</button>
         </div>
       </div>
       <div style="overflow-x:auto; border:1px solid var(--border-subtle); border-radius:12px;">
@@ -987,10 +1022,94 @@ input[type="file"]{display:none;}
         </table>
       </div>
       <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:var(--space-3); line-height:1.6;">
-        اكتب البيانات صف بصف زي إكسل بالظبط — دوس <b>Enter</b> عشان تنزل للصف اللي بعده (لو آخر صف هيتضاف صف جديد تلقائي)، ودوس <b>Tab</b> للتنقل بين الخانات. البيانات بتتحفظ تلقائي كمسودة حتى لو قفلت الصفحة قبل الترحيل. لما تخلص، دوس "ترحيل الكل" عشان تتسجل كل الصفوف دفعة واحدة في دفتر اليومية والعملاء يتربطوا تلقائي.
+        اكتب البيانات صف بصف زي إكسل بالظبط — دوس <b>Enter</b> للانتقال للخلية اللي جنبها (ولو آخر خلية في الصف هينزلك لصف جديد تلقائي). أي مبلغ تكتبه <b>بيترحّل تلقائي</b> في دفتر اليومية على طول من غير ما تدوس أي زرار — واكتب رقم بإشارة سالب (-) عشان يتسجل منصرف تلقائي. دبل كليك على خانة المبلغ يفتحلك حاسبة سريعة. لما تخلص، دوس "🧹 يومية جديدة" عشان تنضّف الجدول وتبدأ صفوف فاضية (من غير ما يأثر على القيود اللي اترحّلت خلاص).
       </div>
     </div>
     `;
+  }
+
+  /* يرحّل صف الشيت تلقائياً كقيد فعلي في دفتر اليومية، أو يحدّث القيد لو كان موجود بالفعل */
+  function syncRowToTransaction(row){
+    const amt = Math.abs(parseMoneyString(row.amount));
+    if(amt > 0){
+      const customerId = getOrCreateCustomerId(row.customer);
+      if(row.transactionId){
+        const tx = state.transactions.find(t=>t.id===row.transactionId);
+        if(tx){
+          tx.date = row.date || todayStr();
+          tx.type = row.type==='out' ? 'out' : 'in';
+          tx.amount = amt;
+          tx.note = (row.note||'').trim();
+          tx.customerId = customerId;
+        } else {
+          const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, createdAt:new Date().toISOString() };
+          state.transactions.push(newTx);
+          row.transactionId = newTx.id;
+        }
+      } else {
+        const newTx = { id:uid(), date: row.date||todayStr(), type: row.type==='out'?'out':'in', amount:amt, note:(row.note||'').trim(), customerId, createdAt:new Date().toISOString() };
+        state.transactions.push(newTx);
+        row.transactionId = newTx.id;
+      }
+      saveState();
+    } else if(row.transactionId){
+      state.transactions = state.transactions.filter(t=>t.id!==row.transactionId);
+      row.transactionId = null;
+      saveState();
+    }
+    saveSheetDraft();
+  }
+
+  /* حاسبة آمنة تسمح فقط بأرقام وعمليات حسابية بسيطة */
+  function evalSafeMath(str){
+    if(!str) return null;
+    const cleaned = str.trim();
+    if(!cleaned || !/^[0-9+\-*/(). ]+$/.test(cleaned)) return null;
+    try{
+      const val = Function('"use strict"; return ('+cleaned+')')();
+      if(typeof val !== 'number' || !isFinite(val)) return null;
+      return val;
+    }catch(e){ return null; }
+  }
+
+  function openCalcModal(initialValue, onInsert){
+    const root = document.getElementById('modal-root');
+    root.innerHTML = `
+      <div class="modal-overlay" id="calcOverlay">
+        <div class="modal-box" style="max-width:320px;">
+          <h3>حاسبة سريعة</h3>
+          <div class="field">
+            <input type="text" id="calcExpr" class="num-input" style="font-family:'JetBrains Mono',monospace; direction:ltr; text-align:left;" value="${escapeHtml(initialValue||'')}" placeholder="مثال: 15+15">
+          </div>
+          <div style="background:var(--canvas-raised); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 16px; margin-bottom:var(--space-4); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.8rem; color:var(--text-tertiary);">الناتج:</span>
+            <span class="num" id="calcResult" style="font-size:1.2rem; font-weight:800;">0</span>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-ghost" id="calcCancel">إلغاء</button>
+            <button class="btn-primary" id="calcInsert">إدراج</button>
+          </div>
+        </div>
+      </div>
+    `;
+    const exprEl = document.getElementById('calcExpr');
+    const resultEl = document.getElementById('calcResult');
+    function recompute(){
+      const val = evalSafeMath(exprEl.value);
+      resultEl.textContent = val===null ? '—' : fmt(val);
+    }
+    recompute();
+    exprEl.addEventListener('input', recompute);
+    exprEl.focus(); exprEl.select();
+    document.getElementById('calcCancel').addEventListener('click', ()=> root.innerHTML='');
+    document.getElementById('calcOverlay').addEventListener('click', (e)=>{ if(e.target.id==='calcOverlay') root.innerHTML=''; });
+    exprEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('calcInsert').click(); } });
+    document.getElementById('calcInsert').addEventListener('click', ()=>{
+      const val = evalSafeMath(exprEl.value);
+      if(val===null){ showToast('⚠️ اكتب عملية حسابية صحيحة'); return; }
+      root.innerHTML='';
+      onInsert(val);
+    });
   }
 
   function bindSheetEvents(){
@@ -1003,7 +1122,7 @@ input[type="file"]{display:none;}
       sheetRows.forEach(r=>{
         const v = parseMoneyString(r.amount);
         if(!v) return;
-        if(r.type==='out') outT += v; else inT += v;
+        if(r.type==='out') outT += Math.abs(v); else inT += v;
       });
       const inEl = document.getElementById('sheetTotalIn');
       const outEl = document.getElementById('sheetTotalOut');
@@ -1021,19 +1140,24 @@ input[type="file"]{display:none;}
       if(field==='amount'){
         const cursorPos = el.selectionStart;
         const before = el.value;
-        let digitsBeforeCursor = 0;
-        for(let i=0;i<cursorPos;i++){ if(/[0-9]/.test(before[i])) digitsBeforeCursor++; }
+        const targetCount = countMoneyChars(before, cursorPos);
         const formatted = formatMoneyLive(before);
         el.value = formatted;
-        let pos=0, seen=0;
-        while(pos<formatted.length && seen<digitsBeforeCursor){ if(/[0-9]/.test(formatted[pos])) seen++; pos++; }
+        const pos = findMoneyCursorPos(formatted, targetCount);
         el.setSelectionRange(pos,pos);
         row.amount = formatted;
+        /* كتابة رقم سالب معناها منصرف تلقائي */
+        const parsedVal = parseMoneyString(formatted);
+        if(parsedVal < 0){
+          row.type = 'out';
+          const selectEl = body.querySelector(`select[data-row-id="${row.id}"][data-field="type"]`);
+          if(selectEl) selectEl.value = 'out';
+        }
         updateTotals();
       } else {
         row[field] = el.value;
       }
-      saveSheetDraft();
+      syncRowToTransaction(row);
     });
 
     body.addEventListener('change', (e)=>{
@@ -1043,27 +1167,71 @@ input[type="file"]{display:none;}
       if(!row) return;
       row[el.dataset.field] = el.value;
       if(el.dataset.field==='type') updateTotals();
-      saveSheetDraft();
+      syncRowToTransaction(row);
     });
 
+    /* ضغطة واحدة على أي خلية = تحديد كل النص اللي فيها على طول (زي إكسل بالظبط) */
+    body.addEventListener('focusin', (e)=>{
+      const el = e.target;
+      if(el.classList && el.classList.contains('grid-cell') && typeof el.select==='function'){
+        setTimeout(()=>{ el.select(); }, 0);
+      }
+    });
+
+    /* حاسبة سريعة بـ 3 ضغطات على خانة المبلغ (مش ضغطتين) عشان متتعارضش مع تحديد النص */
+    body.addEventListener('click', (e)=>{
+      const el = e.target.closest('.grid-amount');
+      if(!el || e.detail !== 3) return;
+      const row = findRow(el.dataset.rowId);
+      if(!row) return;
+      openCalcModal(el.value, (val)=>{
+        const formatted = formatMoneyLive(String(val));
+        el.value = formatted;
+        row.amount = formatted;
+        if(val < 0){
+          row.type = 'out';
+          const selectEl = body.querySelector(`select[data-row-id="${row.id}"][data-field="type"]`);
+          if(selectEl) selectEl.value = 'out';
+        }
+        updateTotals();
+        syncRowToTransaction(row);
+        el.focus();
+      });
+    });
+
+    const SHEET_FIELD_ORDER = ['date','type','amount','note','customer'];
     body.addEventListener('keydown', (e)=>{
       if(e.key !== 'Enter') return;
       const el = e.target;
       if(!el.classList.contains('grid-cell')) return;
       e.preventDefault();
       const field = el.dataset.field;
-      const idx = sheetRows.findIndex(r=>r.id===el.dataset.rowId);
+      const rowId = el.dataset.rowId;
+      const fieldIdx = SHEET_FIELD_ORDER.indexOf(field);
+
+      if(fieldIdx !== -1 && fieldIdx < SHEET_FIELD_ORDER.length - 1){
+        /* لسه في نص الصف: روح للخلية اللي جنبها على طول */
+        const nextField = SHEET_FIELD_ORDER[fieldIdx+1];
+        setTimeout(()=>{
+          const nextEl = body.querySelector(`[data-row-id="${rowId}"][data-field="${nextField}"]`);
+          if(nextEl){ nextEl.focus(); if(typeof nextEl.select==='function') nextEl.select(); }
+        }, 0);
+        return;
+      }
+
+      /* آخر خلية في الصف (العميل): انزل لأول خلية في الصف الجاي، وأضف صف جديد لو محتاج */
+      const idx = sheetRows.findIndex(r=>r.id===rowId);
       if(idx===-1) return;
       let nextIdx = idx+1;
       if(nextIdx >= sheetRows.length){
-        const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''};
+        const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null};
         sheetRows.push(newRow);
         body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
         saveSheetDraft();
       }
       const nextRow = sheetRows[nextIdx];
       setTimeout(()=>{
-        const nextEl = body.querySelector(`[data-row-id="${nextRow.id}"][data-field="${field}"]`);
+        const nextEl = body.querySelector(`[data-row-id="${nextRow.id}"][data-field="date"]`);
         if(nextEl){ nextEl.focus(); if(typeof nextEl.select==='function') nextEl.select(); }
       }, 0);
     });
@@ -1072,6 +1240,11 @@ input[type="file"]{display:none;}
       const btn = e.target.closest('.sheet-del');
       if(!btn) return;
       if(sheetRows.length<=1){ showToast('⚠️ لازم يفضل صف واحد على الأقل'); return; }
+      const row = findRow(btn.dataset.rowId);
+      if(row && row.transactionId){
+        state.transactions = state.transactions.filter(t=>t.id!==row.transactionId);
+        saveState();
+      }
       sheetRows = sheetRows.filter(r=>r.id!==btn.dataset.rowId);
       saveSheetDraft();
       renderAll();
@@ -1079,32 +1252,20 @@ input[type="file"]{display:none;}
 
     const addBtn = document.getElementById('sheetAddRow');
     if(addBtn) addBtn.addEventListener('click', ()=>{
-      const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:''};
+      const newRow = {id:uid(), date:todayStr(), type:'in', amount:'', note:'', customer:'', transactionId:null};
       sheetRows.push(newRow);
       body.insertAdjacentHTML('beforeend', sheetRowHtml(newRow, sheetRows.length-1));
       saveSheetDraft();
     });
 
-    const postBtn = document.getElementById('sheetPost');
-    if(postBtn) postBtn.addEventListener('click', ()=>{
-      let posted = 0;
-      sheetRows.forEach(row=>{
-        const amt = parseMoneyString(row.amount);
-        if(!amt || amt<=0) return;
-        const customerId = getOrCreateCustomerId(row.customer);
-        state.transactions.push({
-          id: uid(), date: row.date || todayStr(), type: row.type==='out' ? 'out' : 'in',
-          amount: amt, note: (row.note||'').trim(), customerId: customerId,
-          createdAt: new Date().toISOString()
-        });
-        posted++;
+    const clearBtn = document.getElementById('sheetClear');
+    if(clearBtn) clearBtn.addEventListener('click', ()=>{
+      confirmModal('يومية جديدة', 'هيتم تنظيف الجدول وابتداء صفوف فاضية جديدة. القيود اللي اترحّلت خلاص هتفضل محفوظة في دفتر اليومية زي ما هي، مش هتتأثر. عايز تكمل؟', ()=>{
+        sheetRows = makeEmptySheetRows(6);
+        saveSheetDraft();
+        showToast('✓ الجدول جاهز ليومية جديدة');
+        renderAll();
       });
-      if(posted===0){ showToast('⚠️ مفيش صفوف فيها مبالغ للترحيل'); return; }
-      saveState();
-      sheetRows = makeEmptySheetRows(6);
-      saveSheetDraft();
-      showToast(`✓ اترحّل ${posted} عملية بنجاح`);
-      renderAll();
     });
   }
 
@@ -1393,19 +1554,83 @@ input[type="file"]{display:none;}
 
   function monthlyChartSVG(days){
     const maxVal = Math.max(1, ...days.map(d=>Math.max(d.inTotal, d.outTotal)));
-    const W=600, H=140;
+    const W=600, H=150, padTop=8, padBottom=22;
+    const chartH = H - padTop - padBottom;
     const n = Math.max(days.length,1);
     const groupW = W/n;
     const barW = Math.max(1.5, groupW/2 - 1.5);
     let bars = '';
+    /* خطوط شبكية أفقية */
+    let grid = '';
+    for(let g=1; g<=3; g++){
+      const gy = padTop + chartH - (chartH*g/3);
+      grid += `<line x1="0" y1="${gy.toFixed(1)}" x2="${W}" y2="${gy.toFixed(1)}" stroke="var(--border-subtle)" stroke-width="1" stroke-dasharray="3,4"></line>`;
+    }
     days.forEach((d,i)=>{
       const x = i*groupW;
-      const hIn = (d.inTotal/maxVal)*(H-16);
-      const hOut = (d.outTotal/maxVal)*(H-16);
-      bars += `<rect x="${(x+0.5).toFixed(1)}" y="${(H-hIn).toFixed(1)}" width="${barW.toFixed(1)}" height="${hIn.toFixed(1)}" fill="var(--semantic-success)" opacity="0.85" rx="1.5"></rect>`;
-      bars += `<rect x="${(x+0.5+barW+1).toFixed(1)}" y="${(H-hOut).toFixed(1)}" width="${barW.toFixed(1)}" height="${hOut.toFixed(1)}" fill="var(--semantic-danger)" opacity="0.85" rx="1.5"></rect>`;
+      const hIn = (d.inTotal/maxVal)*chartH;
+      const hOut = (d.outTotal/maxVal)*chartH;
+      const dayNum = parseInt(d.date.slice(-2),10);
+      bars += `<rect x="${(x+0.5).toFixed(1)}" y="${(padTop+chartH-hIn).toFixed(1)}" width="${barW.toFixed(1)}" height="${hIn.toFixed(1)}" fill="var(--semantic-success)" opacity="0.85" rx="1.5"><title>${fmtDate(d.date)} — وارد ${fmt(d.inTotal)}</title></rect>`;
+      bars += `<rect x="${(x+0.5+barW+1).toFixed(1)}" y="${(padTop+chartH-hOut).toFixed(1)}" width="${barW.toFixed(1)}" height="${hOut.toFixed(1)}" fill="var(--semantic-danger)" opacity="0.85" rx="1.5"><title>${fmtDate(d.date)} — منصرف ${fmt(d.outTotal)}</title></rect>`;
+      if(n<=15 || i%Math.ceil(n/10)===0){
+        bars += `<text x="${(x+groupW/2).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="8.5" fill="var(--text-tertiary)">${dayNum}</text>`;
+      }
     });
-    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:140px; display:block; overflow:visible;">${bars}<line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="var(--border-subtle)" stroke-width="1"></line></svg>`;
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:150px; display:block; overflow:visible;">${grid}${bars}<line x1="0" y1="${padTop+chartH}" x2="${W}" y2="${padTop+chartH}" stroke="var(--border-default)" stroke-width="1"></line></svg>`;
+  }
+
+  /* رسم اتجاه الرصيد يوم بيوم خلال الشهر (منحنى + تدرج) */
+  function balanceTrendSVG(monthReport){
+    const days = monthReport.days;
+    let running = monthReport.openBal;
+    const points = days.map(d=>{ running += (d.inTotal - d.outTotal); return running; });
+    const allVals = points.concat([monthReport.openBal]);
+    const minV = Math.min(...allVals);
+    const maxV = Math.max(...allVals);
+    const range = (maxV - minV) || 1;
+    const W=600, H=130, pad=8;
+    const n = points.length;
+    const stepX = n>1 ? (W-2*pad)/(n-1) : 0;
+    function yFor(v){ return pad + (H-2*pad) - ((v-minV)/range)*(H-2*pad); }
+    let pathD = '';
+    points.forEach((v,i)=>{
+      const x = pad + i*stepX;
+      const y = yFor(v);
+      pathD += (i===0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+    });
+    const lastX = (pad + (n-1)*stepX).toFixed(1);
+    const areaD = pathD + `L${lastX},${(H-pad).toFixed(1)} L${pad},${(H-pad).toFixed(1)} Z`;
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:130px; display:block; overflow:visible;">
+      <defs><linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.32"/>
+        <stop offset="100%" stop-color="var(--accent-primary)" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="${areaD}" fill="url(#balGrad)" stroke="none"></path>
+      <path d="${pathD}" fill="none" stroke="var(--accent-primary)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+      <line x1="0" y1="${H-pad}" x2="${W}" y2="${H-pad}" stroke="var(--border-subtle)" stroke-width="1"></line>
+    </svg>`;
+  }
+
+  /* رسم دائري بسيط لنسبة الوارد مقابل المنصرف */
+  function donutChartSVG(inTotal, outTotal){
+    const total = inTotal + outTotal;
+    const inPct = total>0 ? inTotal/total : 0;
+    const r=52, cx=64, cy=64, strokeW=20;
+    const circumference = 2*Math.PI*r;
+    const inLen = circumference*inPct;
+    const outLen = circumference - inLen;
+    return `<svg viewBox="0 0 128 128" style="width:128px; height:128px; display:block; margin:0 auto;">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border-subtle)" stroke-width="${strokeW}"></circle>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--semantic-success)" stroke-width="${strokeW}"
+        stroke-dasharray="${inLen.toFixed(1)} ${circumference.toFixed(1)}" stroke-linecap="round"
+        transform="rotate(-90 ${cx} ${cy})"></circle>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--semantic-danger)" stroke-width="${strokeW}"
+        stroke-dasharray="${outLen.toFixed(1)} ${circumference.toFixed(1)}" stroke-dashoffset="${(-inLen).toFixed(1)}" stroke-linecap="round"
+        transform="rotate(-90 ${cx} ${cy})"></circle>
+      <text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="17" font-weight="800" fill="var(--text-primary)">${total>0?Math.round(inPct*100):0}%</text>
+      <text x="${cx}" y="${cy+15}" text-anchor="middle" font-size="9" fill="var(--text-tertiary)">نسبة الوارد</text>
+    </svg>`;
   }
 
   function renderReports(){
@@ -1484,11 +1709,21 @@ input[type="file"]{display:none;}
         <div class="stat-card"><div class="k">عدد العمليات</div><div class="v num">${r.txCount}</div></div>
       </div>
       <div style="margin:var(--space-5) 0 var(--space-3);">
-        <div style="font-size:0.72rem; color:var(--text-tertiary); font-weight:600; margin-bottom:var(--space-3);">حركة الوارد والمنصرف يوم بيوم خلال الشهر</div>
-        ${monthlyChartSVG(r.days)}
-        <div style="display:flex; gap:8px; margin-top:var(--space-3);">
-          <span class="cust-chip" style="cursor:default;">🟢 وارد</span>
-          <span class="cust-chip" style="cursor:default;">🔴 منصرف</span>
+        <div style="font-size:0.72rem; color:var(--text-tertiary); font-weight:600; margin-bottom:var(--space-3);">اتجاه رصيد الخزنة خلال الشهر</div>
+        ${balanceTrendSVG(r)}
+      </div>
+      <div style="display:flex; gap:var(--space-4); flex-wrap:wrap; align-items:center; margin-bottom:var(--space-3);">
+        <div style="flex:1; min-width:280px;">
+          <div style="font-size:0.72rem; color:var(--text-tertiary); font-weight:600; margin-bottom:var(--space-3);">حركة الوارد والمنصرف يوم بيوم</div>
+          ${monthlyChartSVG(r.days)}
+          <div style="display:flex; gap:8px; margin-top:var(--space-3);">
+            <span class="cust-chip" style="cursor:default;">🟢 وارد</span>
+            <span class="cust-chip" style="cursor:default;">🔴 منصرف</span>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.72rem; color:var(--text-tertiary); font-weight:600; margin-bottom:var(--space-3);">نسبة الوارد للمنصرف</div>
+          ${donutChartSVG(r.inTotal, r.outTotal)}
         </div>
       </div>
     </div>
@@ -1541,7 +1776,7 @@ input[type="file"]{display:none;}
     document.querySelectorAll('.customer-row[data-open-customer]').forEach(row=>{
       row.addEventListener('click', ()=>{
         selectedCustomerId = row.dataset.openCustomer;
-        activeTab = 'customers';
+        setActiveTab('customers');
         renderAll();
       });
     });
