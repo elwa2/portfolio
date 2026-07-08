@@ -1170,10 +1170,26 @@ input[type="file"]{display:none;}
       syncRowToTransaction(row);
     });
 
-    /* ضغطة واحدة على أي خلية = تحديد كل النص اللي فيها على طول (زي إكسل بالظبط) */
+    /* ضغطة واحدة على أي خلية = تحديد كل النص اللي فيها على طول (زي إكسل بالظبط)
+       وخلية "البيان" لو فاضية بتاخد نفس بيان الصف اللي فوقها تلقائي */
     body.addEventListener('focusin', (e)=>{
       const el = e.target;
-      if(el.classList && el.classList.contains('grid-cell') && typeof el.select==='function'){
+      if(!(el.classList && el.classList.contains('grid-cell'))) return;
+
+      if(el.dataset.field==='note' && !el.value.trim()){
+        const idx = sheetRows.findIndex(r=>r.id===el.dataset.rowId);
+        if(idx > 0){
+          const prevNote = (sheetRows[idx-1].note || '').trim();
+          if(prevNote){
+            el.value = prevNote;
+            const row = findRow(el.dataset.rowId);
+            if(row){ row.note = prevNote; syncRowToTransaction(row); }
+            saveSheetDraft();
+          }
+        }
+      }
+
+      if(typeof el.select==='function'){
         setTimeout(()=>{ el.select(); }, 0);
       }
     });
