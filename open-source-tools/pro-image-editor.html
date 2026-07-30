@@ -42,28 +42,21 @@
       }
 
       .editor-shell {
-        background: linear-gradient(
-          160deg,
-          rgba(10, 16, 28, 0.96),
-          rgba(16, 26, 44, 0.95)
-        );
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(160deg, rgba(8,14,26,0.97), rgba(12,22,40,0.96));
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 22px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
         padding: 24px;
         color: #e7edf6;
+        backdrop-filter: blur(2px);
       }
 
       .editor-title {
-        margin: 0 0 10px;
-        color: #f7fbff;
-        font-size: 2rem;
+        margin: 0 0 10px; color: #f7fbff; font-size: 2rem;
+        display: flex; align-items: center; gap: 12px;
       }
-
-      .editor-subtitle {
-        margin: 0;
-        color: rgba(231, 237, 246, 0.8);
-      }
+      .editor-title i { color: #58a6ff; font-size: 1.6rem; }
+      .editor-subtitle { margin: 0; color: rgba(231,237,246,0.8); }
 
       .editor-layout {
         display: grid;
@@ -72,285 +65,313 @@
         margin-top: 24px;
       }
 
-      .preview-panel,
-      .controls-panel {
-        background: rgba(4, 10, 20, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.09);
+      .preview-panel, .controls-panel {
+        background: rgba(4,10,20,0.65);
+        border: 1px solid rgba(255,255,255,0.09);
         border-radius: 16px;
         padding: 16px;
       }
 
+      /* ===== Upload Zone ===== */
       .upload-zone {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        border: 2px dashed rgba(88, 166, 255, 0.55);
-        border-radius: 14px;
-        padding: 16px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        margin-bottom: 14px;
-        background: rgba(32, 60, 104, 0.18);
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        width: 100%; box-sizing: border-box;
+        border: 2px dashed rgba(88,166,255,0.55);
+        border-radius: 14px; padding: 20px 16px;
+        text-align: center; cursor: pointer;
+        transition: all 0.3s ease; margin-bottom: 14px;
+        background: rgba(32,60,104,0.18);
+      }
+      .upload-zone i { font-size: 2.2rem; color: #58a6ff; opacity: 0.8; }
+      .upload-zone:hover { border-color: #8ed1ff; background: rgba(80,130,200,0.2); }
+      .upload-zone:hover i { opacity: 1; transform: scale(1.05); }
+      .upload-zone.dragover { border-color: #8ed1ff; background: rgba(80,130,200,0.22); }
+      .upload-zone.dragover i { opacity: 1; animation: uploadPulse 0.8s ease infinite; }
+      @keyframes uploadPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+
+      /* ===== Zoom Toolbar ===== */
+      .zoom-bar {
+        display: flex; align-items: center; gap: 6px;
+        margin-bottom: 10px; padding: 6px 10px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px; justify-content: center;
+      }
+      .zoom-bar .zoom-level {
+        font-size: 0.82rem; color: #8bd0ff; font-weight: 600;
+        min-width: 48px; text-align: center; direction: ltr;
       }
 
-      .upload-zone.dragover {
-        border-color: #8ed1ff;
-        background: rgba(80, 130, 200, 0.22);
-      }
-
+      /* ===== Preview ===== */
       .preview-wrap {
-        position: relative;
-        width: 100%;
-        height: clamp(300px, 62vh, 620px);
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: relative; width: 100%;
+        height: clamp(280px, 56vh, 580px); border-radius: 14px;
+        overflow: hidden; border: 1px solid rgba(255,255,255,0.14);
+        display: flex; align-items: center; justify-content: center;
         background:
-          radial-gradient(circle at 20% 20%, rgba(83, 132, 201, 0.35), transparent 35%),
-          radial-gradient(circle at 80% 0%, rgba(37, 87, 156, 0.35), transparent 30%),
-          repeating-conic-gradient(
-            from 45deg,
-            #0d1422 0deg 10deg,
-            #111b2d 10deg 20deg
-          );
+          radial-gradient(circle at 20% 20%, rgba(83,132,201,0.35), transparent 35%),
+          radial-gradient(circle at 80% 0%, rgba(37,87,156,0.35), transparent 30%),
+          repeating-conic-gradient(from 45deg, #0d1422 0deg 10deg, #111b2d 10deg 20deg);
       }
 
-      #imageCanvas,
-      #overlayCanvas {
-        display: block;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        max-width: none;
-        max-height: none;
+      #imageCanvas, #overlayCanvas {
+        display: block; position: absolute;
+        left: 50%; top: 50%; transform: translate(-50%,-50%);
+        max-width: none; max-height: none;
       }
-
-      #overlayCanvas {
-        pointer-events: none;
-      }
+      #overlayCanvas { pointer-events: none; }
 
       .canvas-empty {
         min-height: 280px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(231, 237, 246, 0.75);
-        text-align: center;
-        padding: 20px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: rgba(231,237,246,0.75); text-align: center; padding: 20px; gap: 8px;
       }
+      .canvas-empty i { font-size: 3rem; color: rgba(88,166,255,0.4); }
 
-      .controls-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-height: 74vh;
-        overflow: auto;
+      /* ===== Image Info Bar ===== */
+      .image-info {
+        display: none; align-items: center; gap: 16px;
+        margin-top: 10px; padding: 6px 12px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px; font-size: 0.78rem; color: rgba(231,237,246,0.65);
       }
+      .image-info.visible { display: flex; }
+      .image-info span { display: flex; align-items: center; gap: 5px; }
+      .image-info i { color: #58a6ff; font-size: 0.75rem; }
+
+      /* ===== Controls Panel ===== */
+      .controls-panel {
+        display: flex; flex-direction: column;
+        max-height: 74vh; gap: 10px; overflow: hidden;
+      }
+      .controls-scroll {
+        flex: 1; overflow-y: auto; min-height: 0;
+        display: flex; flex-direction: column; gap: 10px;
+        scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+      }
+      .controls-scroll::-webkit-scrollbar { width: 4px; }
+      .controls-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+      #group-actions { flex-shrink: 0; }
 
       .control-group {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 12px;
-        padding: 12px;
-        margin-bottom: 0;
       }
 
-      .transform-pair {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
+      .control-group-header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 12px; cursor: pointer; user-select: none;
+        font-size: 0.92rem; font-weight: 700; color: #c9e4ff;
+        transition: background 0.2s;
       }
+      .control-group-header:hover { background: rgba(255,255,255,0.03); }
+      .control-group-header i { font-size: 0.85rem; width: 1.2em; color: #58a6ff; }
+      .control-group-header .collapse-icon { margin-right: auto; font-size: 0.7rem; transition: transform 0.25s; color: rgba(255,255,255,0.3); }
+      .control-group.collapsed .collapse-icon { transform: rotate(-90deg); }
+      .control-group.collapsed .control-group-body { display: none; }
 
-      .transform-pair .btn-tool {
-        width: 100%;
-      }
-
-      #group-transform {
-        order: 1;
-      }
-
-      #group-color {
-        order: 2;
-      }
-
-      #group-tone {
-        order: 3;
-      }
-
-      #group-effects {
-        order: 4;
-      }
-
-      .control-group h3 {
-        font-size: 1rem;
-        margin: 0 0 10px;
-        color: #c9e4ff;
-      }
-
-      .control-row {
-        margin-bottom: 10px;
-      }
-
-      .control-row:last-child {
-        margin-bottom: 0;
-      }
+      .control-group-body { padding: 0 12px 12px; }
+      .control-row { margin-bottom: 8px; }
+      .control-row:last-child { margin-bottom: 0; }
 
       .control-label {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.88rem;
-        margin-bottom: 6px;
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 0.82rem; margin-bottom: 4px; gap: 8px;
       }
-
       .control-label span.value {
-        color: #8bd0ff;
-        font-weight: 700;
+        color: #8bd0ff; font-weight: 700; font-size: 0.78rem;
+        min-width: 40px; text-align: right; direction: ltr;
       }
 
       input[type="range"] {
-        width: 100%;
-        accent-color: #4cb3ff;
+        width: 100%; accent-color: #4cb3ff; margin: 0;
+        -webkit-appearance: none; appearance: none; background: transparent;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none;
+        width: 16px; height: 16px; border-radius: 50%;
+        background: linear-gradient(135deg, #4cb3ff, #2a7fd4);
+        cursor: pointer; margin-top: -6px;
+        box-shadow: 0 0 10px rgba(76,179,255,0.3);
       }
 
+      /* ===== Buttons ===== */
       .btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        display: flex; flex-wrap: wrap; gap: 6px;
       }
-
-      .upload-actions {
-        justify-content: center;
-      }
+      .btn-row .btn-tool { flex: 1; min-width: 0; }
+      .btn-row-center { justify-content: center; }
+      .btn-row-end { justify-content: flex-end; }
 
       .btn-tool {
-        border: 0;
-        border-radius: 10px;
-        padding: 10px 12px;
-        color: #f4f8ff;
+        border: 0; border-radius: 10px; padding: 8px 10px;
+        color: #f4f8ff; font-size: 0.82rem;
         background: linear-gradient(135deg, #1f5aa8, #2f7ec7);
-        cursor: pointer;
-        font-family: "Cairo", sans-serif;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer; font-family: "Cairo", sans-serif;
+        transition: all 0.2s ease;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        white-space: nowrap;
       }
-
+      .btn-tool i { font-size: 0.9rem; }
       .btn-tool:hover {
         transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(41, 124, 209, 0.35);
+        box-shadow: 0 6px 18px rgba(41,124,209,0.35);
       }
+      .btn-tool:active { transform: translateY(0) scale(0.97); }
 
-      .btn-tool.secondary {
-        background: linear-gradient(135deg, #4f6075, #445265);
-      }
+      .btn-tool.secondary { background: linear-gradient(135deg, #4f6075, #445265); }
+      .btn-tool.secondary:hover { background: linear-gradient(135deg, #5a6d85, #4f6075); }
+      .btn-tool.warn { background: linear-gradient(135deg, #9d5a0e, #d98a26); }
+      .btn-tool.warn:hover { background: linear-gradient(135deg, #b06a14, #e89a30); }
+      .btn-tool.danger { background: linear-gradient(135deg, #8a2d2d, #b94545); }
+      .btn-tool.danger:hover { background: linear-gradient(135deg, #9e3535, #c94f4f); }
+      .btn-tool.success { background: linear-gradient(135deg, #1a8a4a, #26b865); }
+      .btn-tool.success:hover { background: linear-gradient(135deg, #1f9e55, #2dd073); }
+      .btn-tool.active { box-shadow: 0 0 0 2px rgba(145,203,255,0.5) inset; }
+      .btn-tool:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
-      .btn-tool.warn {
-        background: linear-gradient(135deg, #9d5a0e, #d98a26);
-      }
+      .btn-tool.icon-only { padding: 8px 10px; min-width: 36px; }
+      .btn-tool.icon-only i { font-size: 1rem; margin: 0; }
 
-      .btn-tool.danger {
-        background: linear-gradient(135deg, #8a2d2d, #b94545);
-      }
+      .tiny-note { font-size: 0.78rem; color: rgba(231,237,246,0.7); }
 
-      .btn-tool.active {
-        box-shadow: 0 0 0 2px rgba(145, 203, 255, 0.5) inset;
-      }
-
-      .tiny-note {
-        font-size: 0.8rem;
-        color: rgba(231, 237, 246, 0.72);
-      }
-
-      #fileInput {
-        display: none;
-      }
-
+      #fileInput, .paste-catcher { display: none; }
       .paste-catcher {
-        position: fixed;
-        left: -9999px;
-        top: -9999px;
-        opacity: 0;
-        pointer-events: none;
+        position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;
       }
 
-      .export-actions {
-        margin: 12px 0 10px;
-      }
+      .export-actions { margin: 10px 0; }
 
-      .data-url-panel {
-        margin-top: 12px;
-      }
-
+      /* ===== Data URL ===== */
+      .data-url-panel { margin-top: 10px; }
       .data-url-output {
-        width: 100%;
-        min-height: 120px;
-        resize: vertical;
-        box-sizing: border-box;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(7, 15, 27, 0.85);
-        color: #dceaff;
-        padding: 10px;
-        font-family: Consolas, "Courier New", monospace;
-        direction: ltr;
-        white-space: pre;
-        overflow-wrap: normal;
-        word-break: normal;
-        overflow-x: auto;
-        overflow-y: auto;
+        width: 100%; min-height: 80px; resize: vertical; box-sizing: border-box;
+        border-radius: 10px; border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(7,15,27,0.85); color: #dceaff; padding: 10px;
+        font-family: Consolas,"Courier New",monospace; direction: ltr;
+        white-space: pre; overflow-wrap: normal; word-break: normal;
+        overflow-x: auto; overflow-y: auto; font-size: 0.78rem;
       }
 
-      .custom-context-menu {
-        position: fixed;
-        z-index: 9999;
-        min-width: 220px;
-        background: rgba(10, 18, 33, 0.98);
-        border: 1px solid rgba(140, 200, 255, 0.35);
-        border-radius: 12px;
-        padding: 8px;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-        display: none;
+      /* ===== PDF Nav ===== */
+      .pdf-nav {
+        display: none; align-items: center; gap: 6px;
+        margin-top: 10px; padding: 8px 10px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px; justify-content: center;
+      }
+      .pdf-nav.visible { display: flex; }
+      .pdf-nav .page-input {
+        width: 44px; text-align: center; direction: ltr;
+        background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 6px; color: #e7edf6; padding: 4px; font-size: 0.82rem; font-family: inherit;
+      }
+      .pdf-nav .page-input:focus { outline: none; border-color: #4cb3ff; }
+      .pdf-nav .page-total { font-size: 0.82rem; color: rgba(231,237,246,0.6); min-width: 20px; }
+      .pdf-nav .btn-tool { padding: 6px 8px; }
+      .pdf-nav .btn-tool i { font-size: 0.85rem; }
+      .pdf-nav .quality-select {
+        background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 6px; color: #e7edf6; padding: 4px 6px;
+        font-size: 0.75rem; font-family: inherit; cursor: pointer;
       }
 
-      .context-menu-btn {
-        width: 100%;
-        text-align: right;
-        border: 0;
-        border-radius: 8px;
-        padding: 10px 12px;
-        color: #ecf5ff;
-        background: transparent;
-        cursor: pointer;
+      /* ===== Filter Presets ===== */
+      .preset-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+      }
+      .preset-btn {
+        border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+        padding: 6px 4px; background: rgba(255,255,255,0.03);
+        color: rgba(231,237,246,0.75); font-size: 0.7rem;
+        cursor: pointer; text-align: center; transition: all 0.2s;
+        font-family: "Cairo", sans-serif;
+        display: flex; flex-direction: column; align-items: center; gap: 3px;
+      }
+      .preset-btn i { font-size: 0.9rem; color: #58a6ff; }
+      .preset-btn:hover { border-color: rgba(88,166,255,0.4); background: rgba(88,166,255,0.08); }
+      .preset-btn.active { border-color: #4cb3ff; background: rgba(76,179,255,0.12); color: #fff; }
+      .preset-btn.active i { color: #8bd0ff; }
+
+      /* ===== Crop Aspect ===== */
+      .aspect-grid {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+      }
+      .aspect-btn {
+        border: 1px solid rgba(255,255,255,0.07); border-radius: 6px;
+        padding: 4px; background: rgba(255,255,255,0.02);
+        color: rgba(231,237,246,0.65); font-size: 0.7rem;
+        cursor: pointer; text-align: center; transition: all 0.2s;
         font-family: "Cairo", sans-serif;
       }
+      .aspect-btn:hover { border-color: rgba(88,166,255,0.35); background: rgba(88,166,255,0.06); }
+      .aspect-btn.active { border-color: #4cb3ff; background: rgba(76,179,255,0.1); color: #fff; }
 
-      .context-menu-btn:hover {
-        background: rgba(79, 150, 224, 0.2);
+      /* ===== Grid Overlay ===== */
+      .grid-overlay-toggle {
+        display: flex; align-items: center; gap: 6px;
+        padding: 6px 10px; border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        font-size: 0.82rem; color: rgba(231,237,246,0.7);
+        background: rgba(255,255,255,0.02);
+      }
+      .grid-overlay-toggle:hover { background: rgba(255,255,255,0.05); }
+      .grid-overlay-toggle.active { border-color: #4cb3ff; color: #fff; }
+      .grid-overlay-toggle i { font-size: 0.9rem; }
+
+      /* ===== Context Menu ===== */
+      .custom-context-menu {
+        position: fixed; z-index: 9999; min-width: 200px;
+        background: rgba(10,18,33,0.98);
+        border: 1px solid rgba(140,200,255,0.35);
+        border-radius: 12px; padding: 6px;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        display: none; backdrop-filter: blur(8px);
+      }
+      .context-menu-btn {
+        width: 100%; text-align: right; border: 0; border-radius: 8px;
+        padding: 8px 10px; color: #ecf5ff; background: transparent;
+        cursor: pointer; font-family: "Cairo", sans-serif;
+        display: flex; align-items: center; gap: 8px; font-size: 0.82rem;
+      }
+      .context-menu-btn i { font-size: 0.85rem; color: #58a6ff; }
+      .context-menu-btn:hover { background: rgba(79,150,224,0.2); }
+
+      /* ===== Keyboard Shortcuts ===== */
+      .kbd-hint {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 0.7rem; color: rgba(231,237,246,0.35);
+        margin-right: 4px;
+      }
+      .kbd-hint kbd {
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 3px; padding: 1px 4px; font-size: 0.65rem;
+        font-family: inherit; color: rgba(231,237,246,0.4);
       }
 
+      /* ===== Responsive ===== */
       @media (max-width: 1100px) {
-        .editor-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .controls-panel {
-          max-height: none;
-        }
+        .editor-layout { grid-template-columns: 1fr; }
+        .controls-panel { max-height: none; overflow: visible; }
+        .controls-scroll { overflow-y: visible; max-height: none; }
+        .preset-grid { grid-template-columns: repeat(3, 1fr); }
+      }
+      @media (max-width: 600px) {
+        .editor-shell { padding: 14px; }
+        .preset-grid { grid-template-columns: repeat(2, 1fr); }
+        .aspect-grid { grid-template-columns: repeat(2, 1fr); }
+        .editor-title { font-size: 1.4rem; flex-wrap: wrap; }
       }
 
-      /* Fix for 3D background overlap */
       #three-canvas-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: -1; pointer-events: none;
       }
     </style>
 
@@ -425,161 +446,222 @@
           <div class="editor-layout">
             <div class="preview-panel">
               <label class="upload-zone" id="uploadZone" for="fileInput">
-                <div><strong>اسحب الصورة أو ملف PDF هنا أو اضغط للرفع / Drag & Drop or Click to Upload</strong></div>
-                <div class="tiny-note">يدعم: PNG, JPG, WEBP, PDF + لصق مباشر Ctrl+V</div>
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div><strong>اسحب الصورة أو ملف PDF هنا أو اضغط للرفع</strong></div>
+                <div class="tiny-note">يدعم: PNG, JPG, WEBP, PDF · لصق Ctrl+V</div>
               </label>
               <input id="fileInput" type="file" accept="image/*,application/pdf" />
-              <textarea
-                id="pasteCatcher"
-                class="paste-catcher"
-                aria-hidden="true"
-                tabindex="-1"
-              ></textarea>
+              <textarea id="pasteCatcher" class="paste-catcher" aria-hidden="true" tabindex="-1"></textarea>
 
-              <div class="btn-row upload-actions" style="margin-bottom: 12px">
-                <button class="btn-tool secondary" id="pasteImageBtn" type="button">
-                  Paste Image / لصق صورة
-                </button>
+              <div class="zoom-bar" id="zoomBar">
+                <button class="btn-tool icon-only secondary" id="zoomOutBtn" type="button" title="تصغير"><i class="fas fa-search-minus"></i></button>
+                <span class="zoom-level" id="zoomLevel">100%</span>
+                <button class="btn-tool icon-only secondary" id="zoomInBtn" type="button" title="تكبير"><i class="fas fa-search-plus"></i></button>
+                <button class="btn-tool icon-only secondary" id="zoomFitBtn" type="button" title="ملاءمة"><i class="fas fa-expand"></i></button>
+                <button class="btn-tool icon-only secondary" id="zoomOneOneBtn" type="button" title="1:1"><i class="fas fa-compress"></i></button>
               </div>
 
               <div class="preview-wrap" id="previewWrap">
                 <div class="canvas-empty" id="emptyState">
-                  ارفع صورة لبدء التعديل الكامل<br />
-                  Upload an image to start editing
+                  <i class="fas fa-image"></i>
+                  ارفع صورة لبدء التعديل<br />
+                  Upload to start editing
                 </div>
                 <canvas id="imageCanvas"></canvas>
                 <canvas id="overlayCanvas"></canvas>
               </div>
 
               <div class="btn-row export-actions">
-                <button class="btn-tool secondary" id="openEditedTabBtn" type="button">
-                  Open Edited Image in New Tab
-                </button>
-                <button class="btn-tool secondary" id="copyEditedImageBtn" type="button">
-                  Copy Edited Image
-                </button>
+                <button class="btn-tool secondary" id="openEditedTabBtn" type="button"><i class="fas fa-external-link-alt"></i> New Tab</button>
+                <button class="btn-tool secondary" id="copyEditedImageBtn" type="button"><i class="fas fa-copy"></i> Copy</button>
+                <button class="btn-tool secondary" id="pasteImageBtn" type="button" title="Paste Image / لصق صورة"><i class="fas fa-paste"></i> Paste</button>
+              </div>
+
+              <div class="pdf-nav" id="pdfNav">
+                <button class="btn-tool icon-only secondary" id="pdfPrevBtn" type="button" title="الصفحة السابقة"><i class="fas fa-chevron-right"></i></button>
+                <input class="page-input" id="pdfPageInput" type="number" min="1" value="1" />
+                <span class="page-total" id="pdfPageTotal">/ 1</span>
+                <button class="btn-tool icon-only secondary" id="pdfNextBtn" type="button" title="الصفحة التالية"><i class="fas fa-chevron-left"></i></button>
+                <select class="quality-select" id="pdfQuality">
+                  <option value="1">Draft</option>
+                  <option value="1.5" selected>Normal</option>
+                  <option value="2.5">High</option>
+                </select>
+              </div>
+
+              <div class="image-info" id="imageInfo">
+                <span><i class="fas fa-file-image"></i> <span id="infoFileName">-</span></span>
+                <span><i class="fas fa-arrows-alt"></i> <span id="infoDimensions">-</span></span>
+                <span><i class="fas fa-file"></i> <span id="infoSize">-</span></span>
               </div>
 
               <div class="data-url-panel">
-                <div class="control-label">
-                  <span>Edited Image Data URL</span>
-                </div>
-                <textarea
-                  id="dataUrlOutput"
-                  class="data-url-output"
-                  wrap="off"
-                  readonly
-                  spellcheck="false"
-                  autocapitalize="off"
-                  autocomplete="off"
-                  autocorrect="off"
-                  placeholder="Load an image and edit it to generate data URL."
-                ></textarea>
-                <div class="btn-row" style="margin-top: 8px">
-                  <button class="btn-tool secondary" id="copyDataUrlBtn" type="button">
-                    Copy Data URL
-                  </button>
+                <div class="control-label"><span><i class="fas fa-code"></i> Data URL</span></div>
+                <textarea id="dataUrlOutput" class="data-url-output" wrap="off" readonly spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Load an image and edit it to generate data URL."></textarea>
+                <div class="btn-row" style="margin-top: 6px">
+                  <button class="btn-tool secondary" id="copyDataUrlBtn" type="button"><i class="fas fa-copy"></i> Copy Data URL</button>
                 </div>
               </div>
             </div>
 
             <aside class="controls-panel">
-              <div class="control-group" id="group-color">
-                <h3>Color / الألوان</h3>
-                <div class="control-row">
-                  <div class="control-label">Red / الأحمر <span class="value" id="val-red">100%</span></div>
-                  <input id="red" type="range" min="0" max="200" value="100" />
+              <div class="controls-scroll">
+              <div class="control-group" id="group-presets">
+                <div class="control-group-header">
+                  <i class="fas fa-layer-group"></i> Filter Presets / مرشحات
+                  <i class="fas fa-chevron-down collapse-icon"></i>
                 </div>
-                <div class="control-row">
-                  <div class="control-label">Green / الأخضر <span class="value" id="val-green">100%</span></div>
-                  <input id="green" type="range" min="0" max="200" value="100" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Blue / الأزرق <span class="value" id="val-blue">100%</span></div>
-                  <input id="blue" type="range" min="0" max="200" value="100" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Hue Rotation / تدوير الهيو <span class="value" id="val-hue">0deg</span></div>
-                  <input id="hue" type="range" min="-180" max="180" value="0" />
-                </div>
-                <div class="btn-row">
-                  <button class="btn-tool secondary" id="toggleSepia" type="button">Sepia / سيبيا</button>
-                  <button class="btn-tool secondary" id="toggleGray" type="button">Grayscale / تدرج رمادي</button>
-                </div>
-              </div>
-
-              <div class="control-group" id="group-tone">
-                <h3>Tone / الإضاءة</h3>
-                <div class="control-row">
-                  <div class="control-label">Brightness / السطوع <span class="value" id="val-brightness">100%</span></div>
-                  <input id="brightness" type="range" min="0" max="200" value="100" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Contrast / التباين <span class="value" id="val-contrast">100%</span></div>
-                  <input id="contrast" type="range" min="0" max="200" value="100" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Saturation / التشبع <span class="value" id="val-saturation">100%</span></div>
-                  <input id="saturation" type="range" min="0" max="200" value="100" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Exposure / التعريض <span class="value" id="val-exposure">0.00</span></div>
-                  <input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" />
-                </div>
-              </div>
-
-              <div class="control-group" id="group-effects">
-                <h3>Effects / المؤثرات</h3>
-                <div class="control-row">
-                  <div class="control-label">Blur / التمويه <span class="value" id="val-blur">0px</span></div>
-                  <input id="blur" type="range" min="0" max="12" step="0.1" value="0" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Sharpen / الحدة <span class="value" id="val-sharpen">0%</span></div>
-                  <input id="sharpen" type="range" min="0" max="100" value="0" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Noise / التشويش <span class="value" id="val-noise">0%</span></div>
-                  <input id="noise" type="range" min="0" max="100" value="0" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Vignette Intensity / شدة الفينيت <span class="value" id="val-vigIntensity">0%</span></div>
-                  <input id="vigIntensity" type="range" min="0" max="100" value="0" />
-                </div>
-                <div class="control-row">
-                  <div class="control-label">Vignette Spread / انتشار الفينيت <span class="value" id="val-vigSpread">65%</span></div>
-                  <input id="vigSpread" type="range" min="10" max="100" value="65" />
+                <div class="control-group-body">
+                  <div class="preset-grid">
+                    <button class="preset-btn" data-preset="original" type="button"><i class="fas fa-undo"></i>Original</button>
+                    <button class="preset-btn" data-preset="vintage" type="button"><i class="fas fa-tint"></i>Vintage</button>
+                    <button class="preset-btn" data-preset="noir" type="button"><i class="fas fa-adjust"></i>Noir</button>
+                    <button class="preset-btn" data-preset="warm" type="button"><i class="fas fa-sun"></i>Warm</button>
+                    <button class="preset-btn" data-preset="cool" type="button"><i class="fas fa-snowflake"></i>Cool</button>
+                    <button class="preset-btn" data-preset="cinematic" type="button"><i class="fas fa-film"></i>Cinema</button>
+                    <button class="preset-btn" data-preset="soft" type="button"><i class="fas fa-feather-alt"></i>Soft</button>
+                    <button class="preset-btn" data-preset="vivid" type="button"><i class="fas fa-bolt"></i>Vivid</button>
+                  </div>
                 </div>
               </div>
 
               <div class="control-group" id="group-transform">
-                <h3>Transform / التحويل</h3>
-                <div class="control-row">
-                  <div class="control-label">Rotation / التدوير <span class="value" id="val-rotate">0deg</span></div>
-                  <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
+                <div class="control-group-header">
+                  <i class="fas fa-crop-alt"></i> Transform / التحويل
+                  <i class="fas fa-chevron-down collapse-icon"></i>
                 </div>
-                <div class="transform-pair" style="margin-bottom: 8px">
-                  <button class="btn-tool secondary" id="rotateLeft" type="button">-90°</button>
-                  <button class="btn-tool secondary" id="rotateRight" type="button">+90°</button>
+                <div class="control-group-body">
+                  <div class="control-row">
+                    <div class="control-label">Rotation <span class="value" id="val-rotate">0°</span></div>
+                    <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
+                  </div>
+                  <div class="btn-row" style="margin-bottom:6px">
+                    <button class="btn-tool secondary" id="rotateLeft" type="button"><i class="fas fa-undo"></i> -90°</button>
+                    <button class="btn-tool secondary" id="rotateRight" type="button"><i class="fas fa-redo"></i> +90°</button>
+                  </div>
+                  <div class="btn-row" style="margin-bottom:6px">
+                    <button class="btn-tool secondary" id="flipH" type="button"><i class="fas fa-arrows-alt-h"></i> Flip H</button>
+                    <button class="btn-tool secondary" id="flipV" type="button"><i class="fas fa-arrows-alt-v"></i> Flip V</button>
+                  </div>
+                  <div class="btn-row" style="margin-bottom:6px">
+                    <button class="btn-tool warn" id="cropMode" type="button"><i class="fas fa-crop"></i> Crop</button>
+                    <button class="btn-tool warn" id="applyCrop" type="button"><i class="fas fa-check"></i> Apply</button>
+                    <button class="btn-tool secondary" id="cancelCrop" type="button"><i class="fas fa-times"></i> Cancel</button>
+                  </div>
+                  <div class="control-label" style="margin-bottom:4px;font-size:0.75rem;color:rgba(231,237,246,0.5)">Aspect Ratio</div>
+                  <div class="aspect-grid" id="aspectGrid">
+                    <button class="aspect-btn" data-ratio="free" type="button">Free</button>
+                    <button class="aspect-btn" data-ratio="1:1" type="button">1:1</button>
+                    <button class="aspect-btn" data-ratio="4:3" type="button">4:3</button>
+                    <button class="aspect-btn" data-ratio="16:9" type="button">16:9</button>
+                    <button class="aspect-btn" data-ratio="3:2" type="button">3:2</button>
+                    <button class="aspect-btn" data-ratio="21:9" type="button">21:9</button>
+                  </div>
                 </div>
-                <div class="transform-pair" style="margin-bottom: 8px">
-                  <button class="btn-tool secondary" id="flipH" type="button">Flip H / عكس أفقي</button>
-                  <button class="btn-tool secondary" id="flipV" type="button">Flip V / عكس رأسي</button>
+              </div>
+
+              <div class="control-group" id="group-color">
+                <div class="control-group-header">
+                  <i class="fas fa-palette"></i> Color / الألوان
+                  <i class="fas fa-chevron-down collapse-icon"></i>
                 </div>
-                <div class="btn-row" style="margin-bottom: 8px">
-                  <button class="btn-tool warn" id="cropMode" type="button">Crop Tool / أداة القص</button>
-                  <button class="btn-tool warn" id="applyCrop" type="button">Apply Crop / تطبيق القص</button>
-                  <button class="btn-tool secondary" id="cancelCrop" type="button">Cancel Crop / إلغاء القص</button>
+                <div class="control-group-body">
+                  <div class="control-row">
+                    <div class="control-label">Red <span class="value" id="val-red">100%</span></div>
+                    <input id="red" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Green <span class="value" id="val-green">100%</span></div>
+                    <input id="green" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Blue <span class="value" id="val-blue">100%</span></div>
+                    <input id="blue" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Hue <span class="value" id="val-hue">0°</span></div>
+                    <input id="hue" type="range" min="-180" max="180" value="0" />
+                  </div>
+                  <div class="btn-row">
+                    <button class="btn-tool secondary" id="toggleSepia" type="button"><i class="fas fa-tint"></i> Sepia</button>
+                    <button class="btn-tool secondary" id="toggleGray" type="button"><i class="fas fa-adjust"></i> Gray</button>
+                  </div>
                 </div>
-                <div class="btn-row">
-                  <button class="btn-tool secondary" id="beforeAfter" type="button">Before / After</button>
-                  <button class="btn-tool danger" id="resetAll" type="button">Reset All / إعادة تعيين</button>
-                  <button class="btn-tool" id="downloadPng" type="button">Download PNG / تنزيل PNG</button>
-                  <button class="btn-tool" id="downloadPdf" type="button">Download PDF / تنزيل PDF</button>
+              </div>
+
+              <div class="control-group" id="group-tone">
+                <div class="control-group-header">
+                  <i class="fas fa-sliders-h"></i> Tone / الإضاءة
+                  <i class="fas fa-chevron-down collapse-icon"></i>
                 </div>
-                <p class="tiny-note" style="margin-top: 8px">
-                  القص يتم بالسحب على الصورة ثم Apply Crop.
-                </p>
+                <div class="control-group-body">
+                  <div class="control-row">
+                    <div class="control-label">Brightness <span class="value" id="val-brightness">100%</span></div>
+                    <input id="brightness" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Contrast <span class="value" id="val-contrast">100%</span></div>
+                    <input id="contrast" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Saturation <span class="value" id="val-saturation">100%</span></div>
+                    <input id="saturation" type="range" min="0" max="200" value="100" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Exposure <span class="value" id="val-exposure">0.00</span></div>
+                    <input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-group" id="group-effects">
+                <div class="control-group-header">
+                  <i class="fas fa-magic"></i> Effects / المؤثرات
+                  <i class="fas fa-chevron-down collapse-icon"></i>
+                </div>
+                <div class="control-group-body">
+                  <div class="control-row">
+                    <div class="control-label">Blur <span class="value" id="val-blur">0px</span></div>
+                    <input id="blur" type="range" min="0" max="12" step="0.1" value="0" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Sharpen <span class="value" id="val-sharpen">0%</span></div>
+                    <input id="sharpen" type="range" min="0" max="100" value="0" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Noise <span class="value" id="val-noise">0%</span></div>
+                    <input id="noise" type="range" min="0" max="100" value="0" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Vignette <span class="value" id="val-vigIntensity">0%</span></div>
+                    <input id="vigIntensity" type="range" min="0" max="100" value="0" />
+                  </div>
+                  <div class="control-row">
+                    <div class="control-label">Vignette Spread <span class="value" id="val-vigSpread">65%</span></div>
+                    <input id="vigSpread" type="range" min="10" max="100" value="65" />
+                  </div>
+                </div>
+              </div>
+
+              </div>
+              <div class="control-group" id="group-actions">
+                <div class="control-group-body" style="padding:12px">
+                  <div class="btn-row" style="margin-bottom:6px">
+                    <button class="btn-tool secondary" id="undoBtn" type="button" title="Undo / تراجع"><i class="fas fa-undo"></i> Undo</button>
+                    <button class="btn-tool secondary" id="redoBtn" type="button" title="Redo / إعادة"><i class="fas fa-redo"></i> Redo</button>
+                    <button class="btn-tool secondary" id="beforeAfter" type="button"><i class="fas fa-eye"></i> Compare</button>
+                  </div>
+                  <div class="grid-overlay-toggle" id="gridToggle">
+                    <i class="fas fa-th"></i> Grid Overlay / شبكة
+                    <span style="margin-right:auto;font-size:0.7rem;color:rgba(231,237,246,0.3)">Ctrl+G</span>
+                  </div>
+                  <div class="btn-row" style="margin-top:6px">
+                    <button class="btn-tool danger" id="resetAll" type="button"><i class="fas fa-trash-alt"></i> Reset</button>
+                    <button class="btn-tool" id="downloadPng" type="button"><i class="fas fa-file-image"></i> PNG</button>
+                    <button class="btn-tool" id="downloadPdf" type="button"><i class="fas fa-file-pdf"></i> PDF</button>
+                  </div>
+                  <p class="tiny-note" style="margin-top:6px">اسحب على الصورة للقص · Ctrl+Z تراجع · Ctrl+Shift+Y إعادة</p>
+                </div>
               </div>
             </aside>
           </div>
@@ -589,10 +671,10 @@
 
     <div id="canvasContextMenu" class="custom-context-menu" role="menu" aria-hidden="true">
       <button class="context-menu-btn" type="button" id="ctxOpenEdited" role="menuitem">
-        Open Edited Image in New Tab
+        <i class="fas fa-external-link-alt"></i> Open in New Tab
       </button>
       <button class="context-menu-btn" type="button" id="ctxCopyEdited" role="menuitem">
-        Copy Edited Image
+        <i class="fas fa-copy"></i> Copy Edited Image
       </button>
     </div>
 
@@ -700,71 +782,52 @@
         const canvasContextMenu = document.getElementById("canvasContextMenu");
         const ctxOpenEdited = document.getElementById("ctxOpenEdited");
         const ctxCopyEdited = document.getElementById("ctxCopyEdited");
-
         const imageCanvas = document.getElementById("imageCanvas");
         const overlayCanvas = document.getElementById("overlayCanvas");
         const imageCtx = imageCanvas.getContext("2d", { willReadFrequently: true });
         const overlayCtx = overlayCanvas.getContext("2d");
+        const zoomLevelEl = document.getElementById("zoomLevel");
+        const pdfNav = document.getElementById("pdfNav");
+        const pdfPageInput = document.getElementById("pdfPageInput");
+        const pdfPageTotal = document.getElementById("pdfPageTotal");
+        const pdfQuality = document.getElementById("pdfQuality");
+        const imageInfoEl = document.getElementById("imageInfo");
+        const infoFileName = document.getElementById("infoFileName");
+        const infoDimensions = document.getElementById("infoDimensions");
+        const infoSize = document.getElementById("infoSize");
 
         const state = {
-          red: 100,
-          green: 100,
-          blue: 100,
-          hue: 0,
-          brightness: 100,
-          contrast: 100,
-          saturation: 100,
-          exposure: 0,
-          blur: 0,
-          sharpen: 0,
-          noise: 0,
-          vigIntensity: 0,
-          vigSpread: 65,
-          rotate: 0,
-          flipH: false,
-          flipV: false,
-          sepia: false,
-          gray: false,
-          showOriginal: false,
-          cropMode: false,
+          red: 100, green: 100, blue: 100, hue: 0,
+          brightness: 100, contrast: 100, saturation: 100, exposure: 0,
+          blur: 0, sharpen: 0, noise: 0, vigIntensity: 0, vigSpread: 65,
+          rotate: 0, flipH: false, flipV: false, sepia: false, gray: false,
+          showOriginal: false, cropMode: false, zoom: 1, gridOverlay: false,
         };
 
-        const rangeMap = [
-          ["red", "val-red", "%"],
-          ["green", "val-green", "%"],
-          ["blue", "val-blue", "%"],
-          ["hue", "val-hue", "deg"],
-          ["brightness", "val-brightness", "%"],
-          ["contrast", "val-contrast", "%"],
-          ["saturation", "val-saturation", "%"],
-          ["exposure", "val-exposure", ""],
-          ["blur", "val-blur", "px"],
-          ["sharpen", "val-sharpen", "%"],
-          ["noise", "val-noise", "%"],
-          ["vigIntensity", "val-vigIntensity", "%"],
-          ["vigSpread", "val-vigSpread", "%"],
-          ["rotate", "val-rotate", "deg"],
-        ];
-
-        let originalImage = null;
-        let cropSelection = null;
-        let isDraggingCrop = false;
-        let cropStart = null;
+        let pdfDoc = null, pdfCurrentPage = 1, pdfTotalPages = 1, pdfScale = 1.5;
+        let undoStack = [], redoStack = [];
+        const MAX_UNDO = 25;
+        let originalImage = null, cropSelection = null, isDraggingCrop = false, cropStart = null, cropAspect = null;
+        let currentFileName = "", currentFileSize = "";
         const beforeAfterBtn = document.getElementById("beforeAfter");
 
-        function clamp(v) {
-          return Math.max(0, Math.min(255, v));
-        }
+        const rangeMap = [
+          ["red","val-red","%"],["green","val-green","%"],["blue","val-blue","%"],
+          ["hue","val-hue","°"],["brightness","val-brightness","%"],
+          ["contrast","val-contrast","%"],["saturation","val-saturation","%"],
+          ["exposure","val-exposure",""],["blur","val-blur","px"],
+          ["sharpen","val-sharpen","%"],["noise","val-noise","%"],
+          ["vigIntensity","val-vigIntensity","%"],["vigSpread","val-vigSpread","%"],
+          ["rotate","val-rotate","°"],
+        ];
+
+        function clamp(v) { return Math.max(0, Math.min(255, v)); }
 
         function updateValueLabels() {
           rangeMap.forEach(([key, out, suffix]) => {
             const el = document.getElementById(out);
             if (!el) return;
-            if (key === "exposure") {
-              el.textContent = Number(state[key]).toFixed(2);
-              return;
-            }
-            el.textContent = `${state[key]}${suffix}`;
+            el.textContent = key === "exposure" ? Number(state[key]).toFixed(2) : `${state[key]}${suffix}`;
           });
         }
 
@@ -773,6 +836,7 @@
             const input = document.getElementById(key);
             if (!input) return;
             input.addEventListener("input", () => {
+              pushUndoState();
               state[key] = Number(input.value);
               updateValueLabels();
               render();
@@ -781,505 +845,262 @@
           updateValueLabels();
         }
 
+        function captureState() { const s = {}; for (const k of Object.keys(state)) s[k] = state[k]; return s; }
+        function applyState(s) {
+          Object.assign(state, s);
+          rangeMap.forEach(([key]) => { const inp = document.getElementById(key); if (inp && s[key] !== undefined) inp.value = s[key]; });
+          updateValueLabels(); updateToggleButtons();
+        }
+        function pushUndoState() { undoStack.push(captureState()); if (undoStack.length > MAX_UNDO) undoStack.shift(); redoStack = []; }
+        function undo() { if (!undoStack.length || !originalImage) return; redoStack.push(captureState()); applyState(undoStack.pop()); render(); }
+        function redo() { if (!redoStack.length || !originalImage) return; undoStack.push(captureState()); applyState(redoStack.pop()); render(); }
+
+        function setZoom(level) { state.zoom = Math.max(0.1, Math.min(5, level)); updateZoomDisplay(); if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); } }
+        function updateZoomDisplay() { zoomLevelEl.textContent = `${Math.round(state.zoom * 100)}%`; }
+
+        function toggleGrid() { state.gridOverlay = !state.gridOverlay; document.getElementById("gridToggle").classList.toggle("active", state.gridOverlay); drawCropOverlay(); }
+        function drawGrid() {
+          if (!state.gridOverlay || !overlayCanvas.width) return;
+          const w = overlayCanvas.width, h = overlayCanvas.height;
+          overlayCtx.strokeStyle = "rgba(255,255,255,0.12)";
+          overlayCtx.lineWidth = 1;
+          [w / 3, w * 2 / 3].forEach(x => { overlayCtx.beginPath(); overlayCtx.moveTo(x, 0); overlayCtx.lineTo(x, h); overlayCtx.stroke(); });
+          [h / 3, h * 2 / 3].forEach(y => { overlayCtx.beginPath(); overlayCtx.moveTo(0, y); overlayCtx.lineTo(w, y); overlayCtx.stroke(); });
+        }
+
         function buildTransformedCanvas() {
-          const w = originalImage.width;
-          const h = originalImage.height;
+          const w = originalImage.width, h = originalImage.height;
           const rad = (state.rotate * Math.PI) / 180;
-          const absCos = Math.abs(Math.cos(rad));
-          const absSin = Math.abs(Math.sin(rad));
+          const absCos = Math.abs(Math.cos(rad)), absSin = Math.abs(Math.sin(rad));
           const outW = Math.max(1, Math.round(w * absCos + h * absSin));
           const outH = Math.max(1, Math.round(w * absSin + h * absCos));
-
-          const transformed = document.createElement("canvas");
-          transformed.width = outW;
-          transformed.height = outH;
-
-          const tctx = transformed.getContext("2d");
-          tctx.translate(outW / 2, outH / 2);
-          tctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
-          tctx.rotate(rad);
-          tctx.drawImage(originalImage, -w / 2, -h / 2);
-
-          return transformed;
+          const t = document.createElement("canvas"); t.width = outW; t.height = outH;
+          const c = t.getContext("2d");
+          c.translate(outW / 2, outH / 2); c.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1); c.rotate(rad);
+          c.drawImage(originalImage, -w / 2, -h / 2);
+          return t;
         }
 
         function applySharpen(imageData, amount) {
           if (amount <= 0) return;
-          const w = imageData.width;
-          const h = imageData.height;
-          const src = new Uint8ClampedArray(imageData.data);
-          const out = imageData.data;
+          const w = imageData.width, h = imageData.height;
+          const src = new Uint8ClampedArray(imageData.data), out = imageData.data;
           const f = (amount / 100) * 1.25;
-
-          for (let y = 1; y < h - 1; y++) {
-            for (let x = 1; x < w - 1; x++) {
-              const idx = (y * w + x) * 4;
-              const left = idx - 4;
-              const right = idx + 4;
-              const up = idx - w * 4;
-              const down = idx + w * 4;
-
-              for (let c = 0; c < 3; c++) {
-                const center = src[idx + c] * (1 + 4 * f);
-                const edge = f * (src[left + c] + src[right + c] + src[up + c] + src[down + c]);
-                out[idx + c] = clamp(center - edge);
-              }
+          for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+            const idx = (y * w + x) * 4;
+            for (let c = 0; c < 3; c++) {
+              const center = src[idx + c] * (1 + 4 * f);
+              const edge = f * (src[idx - 4 + c] + src[idx + 4 + c] + src[idx - w * 4 + c] + src[idx + w * 4 + c]);
+              out[idx + c] = clamp(center - edge);
             }
           }
         }
 
         function applyPixelEffects(imageData) {
           const { width, height, data } = imageData;
-          const rf = state.red / 100;
-          const gf = state.green / 100;
-          const bf = state.blue / 100;
-
-          const vigIntensity = state.vigIntensity / 100;
-          const vigSpread = state.vigSpread / 100;
-          const noiseAmount = state.noise / 100;
-
-          const cx = width / 2;
-          const cy = height / 2;
-          const maxDist = Math.sqrt(cx * cx + cy * cy);
-
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              const idx = (y * width + x) * 4;
-
-              let r = data[idx] * rf;
-              let g = data[idx + 1] * gf;
-              let b = data[idx + 2] * bf;
-
-              if (vigIntensity > 0) {
-                const dist = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
-                const d = dist / maxDist;
-                const t = Math.max(0, (d - vigSpread) / Math.max(0.0001, 1 - vigSpread));
-                const vignette = 1 - vigIntensity * Math.min(1, t * t);
-                r *= vignette;
-                g *= vignette;
-                b *= vignette;
-              }
-
-              if (noiseAmount > 0) {
-                const n = (Math.random() * 2 - 1) * noiseAmount * 64;
-                r += n;
-                g += n;
-                b += n;
-              }
-
-              data[idx] = clamp(r);
-              data[idx + 1] = clamp(g);
-              data[idx + 2] = clamp(b);
+          const rf = state.red / 100, gf = state.green / 100, bf = state.blue / 100;
+          const vigI = state.vigIntensity / 100, vigS = state.vigSpread / 100, noiseA = state.noise / 100;
+          const cx = width / 2, cy = height / 2, maxD = Math.sqrt(cx * cx + cy * cy);
+          for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            let r = data[idx] * rf, g = data[idx + 1] * gf, b = data[idx + 2] * bf;
+            if (vigI > 0) {
+              const d = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2) / maxD;
+              const t = Math.max(0, (d - vigS) / Math.max(1e-4, 1 - vigS));
+              const v = 1 - vigI * Math.min(1, t * t);
+              r *= v; g *= v; b *= v;
             }
+            if (noiseA > 0) { const n = (Math.random() * 2 - 1) * noiseA * 64; r += n; g += n; b += n; }
+            data[idx] = clamp(r); data[idx + 1] = clamp(g); data[idx + 2] = clamp(b);
           }
         }
 
         function drawCropOverlay() {
           overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-          if (!state.cropMode || !cropSelection) return;
-
-          const { x, y, w, h } = cropSelection;
-          overlayCtx.fillStyle = "rgba(0, 0, 0, 0.35)";
-          overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-          overlayCtx.clearRect(x, y, w, h);
-
-          overlayCtx.strokeStyle = "#7ad0ff";
-          overlayCtx.lineWidth = 2;
-          overlayCtx.setLineDash([8, 6]);
-          overlayCtx.strokeRect(x, y, w, h);
-          overlayCtx.setLineDash([]);
+          if (state.gridOverlay) drawGrid();
+          if (state.cropMode && cropSelection) {
+            const { x, y, w, h } = cropSelection;
+            overlayCtx.fillStyle = "rgba(0,0,0,0.35)";
+            overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.clearRect(x, y, w, h);
+            overlayCtx.strokeStyle = "#7ad0ff"; overlayCtx.lineWidth = 2; overlayCtx.setLineDash([8, 6]);
+            overlayCtx.strokeRect(x, y, w, h); overlayCtx.setLineDash([]);
+          }
         }
 
         function fitCanvasDisplaySize() {
           if (!imageCanvas.width || !imageCanvas.height) return;
-
           const padding = 16;
           const areaW = Math.max(1, previewWrap.clientWidth - padding * 2);
           const areaH = Math.max(1, previewWrap.clientHeight - padding * 2);
-          const scale = Math.min(areaW / imageCanvas.width, areaH / imageCanvas.height, 1);
-
-          const displayW = Math.max(1, Math.round(imageCanvas.width * scale));
-          const displayH = Math.max(1, Math.round(imageCanvas.height * scale));
-
-          imageCanvas.style.width = `${displayW}px`;
-          imageCanvas.style.height = `${displayH}px`;
-          overlayCanvas.style.width = `${displayW}px`;
-          overlayCanvas.style.height = `${displayH}px`;
+          const base = Math.min(areaW / imageCanvas.width, areaH / imageCanvas.height, 1);
+          const scale = base * state.zoom;
+          imageCanvas.style.width = `${Math.max(1, Math.round(imageCanvas.width * scale))}px`;
+          imageCanvas.style.height = `${Math.max(1, Math.round(imageCanvas.height * scale))}px`;
+          overlayCanvas.style.width = imageCanvas.style.width;
+          overlayCanvas.style.height = imageCanvas.style.height;
         }
 
         function renderOriginalPreview() {
-          const transformed = buildTransformedCanvas();
-          imageCanvas.width = transformed.width;
-          imageCanvas.height = transformed.height;
-          overlayCanvas.width = transformed.width;
-          overlayCanvas.height = transformed.height;
+          const t = buildTransformedCanvas();
+          imageCanvas.width = t.width; imageCanvas.height = t.height;
+          overlayCanvas.width = t.width; overlayCanvas.height = t.height;
           fitCanvasDisplaySize();
           imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-          imageCtx.drawImage(transformed, 0, 0);
-          drawCropOverlay();
-          updateDataUrlOutput();
+          imageCtx.drawImage(t, 0, 0);
+          drawCropOverlay(); updateDataUrlOutput();
         }
 
         function render() {
           if (!originalImage) return;
           emptyState.style.display = "none";
-
-          if (state.showOriginal) {
-            renderOriginalPreview();
-            return;
-          }
-
+          if (state.showOriginal) { renderOriginalPreview(); return; }
           const transformed = buildTransformedCanvas();
-
           const filtered = document.createElement("canvas");
-          filtered.width = transformed.width;
-          filtered.height = transformed.height;
+          filtered.width = transformed.width; filtered.height = transformed.height;
           const fctx = filtered.getContext("2d", { willReadFrequently: true });
-
-          const exposureBrightness = Math.round(state.brightness * Math.pow(2, state.exposure));
-          fctx.filter = `brightness(${exposureBrightness}%) contrast(${state.contrast}%) saturate(${state.saturation}%) hue-rotate(${state.hue}deg) blur(${state.blur}px) sepia(${state.sepia ? 100 : 0}%) grayscale(${state.gray ? 100 : 0}%)`;
+          const eb = Math.round(state.brightness * Math.pow(2, state.exposure));
+          fctx.filter = `brightness(${eb}%) contrast(${state.contrast}%) saturate(${state.saturation}%) hue-rotate(${state.hue}deg) blur(${state.blur}px) sepia(${state.sepia ? 100 : 0}%) grayscale(${state.gray ? 100 : 0}%)`;
           fctx.drawImage(transformed, 0, 0);
-
-          let imageData = fctx.getImageData(0, 0, filtered.width, filtered.height);
-          applySharpen(imageData, state.sharpen);
-          applyPixelEffects(imageData);
-          fctx.putImageData(imageData, 0, 0);
-
-          imageCanvas.width = filtered.width;
-          imageCanvas.height = filtered.height;
-          overlayCanvas.width = filtered.width;
-          overlayCanvas.height = filtered.height;
+          let id = fctx.getImageData(0, 0, filtered.width, filtered.height);
+          applySharpen(id, state.sharpen); applyPixelEffects(id);
+          fctx.putImageData(id, 0, 0);
+          imageCanvas.width = filtered.width; imageCanvas.height = filtered.height;
+          overlayCanvas.width = filtered.width; overlayCanvas.height = filtered.height;
           fitCanvasDisplaySize();
           imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
           imageCtx.drawImage(filtered, 0, 0);
-          drawCropOverlay();
-          updateDataUrlOutput();
+          drawCropOverlay(); updateDataUrlOutput();
         }
 
-        function getEditedDataUrl() {
-          if (!originalImage || !imageCanvas.width || !imageCanvas.height) return "";
-          try {
-            return imageCanvas.toDataURL("image/png");
-          } catch (error) {
-            return "";
-          }
-        }
-
-        function normalizeDataUrl(value) {
-          return String(value || "").trim().replace(/\s+/g, "");
-        }
+        function getEditedDataUrl() { if (!originalImage || !imageCanvas.width || !imageCanvas.height) return ""; try { return imageCanvas.toDataURL("image/png"); } catch (e) { return ""; } }
+        function normalizeDataUrl(v) { return String(v || "").trim().replace(/\s+/g, ""); }
 
         async function copyTextToClipboard(value) {
-          const text = String(value || "");
-          if (!text) return false;
-
-          if (navigator.clipboard && window.isSecureContext) {
-            try {
-              await navigator.clipboard.writeText(text);
-              return true;
-            } catch (error) {
-              // Continue to fallback copy path.
-            }
-          }
-
-          const temp = document.createElement("textarea");
-          temp.value = text;
-          temp.setAttribute("readonly", "");
-          temp.style.position = "fixed";
-          temp.style.left = "-9999px";
-          temp.style.top = "-9999px";
-          document.body.appendChild(temp);
-          temp.focus();
-          temp.select();
-          temp.setSelectionRange(0, temp.value.length);
-
-          let copied = false;
-          try {
-            copied = document.execCommand("copy");
-          } catch (error) {
-            copied = false;
-          }
-
-          document.body.removeChild(temp);
-          return copied;
+          const text = String(value || ""); if (!text) return false;
+          if (navigator.clipboard && window.isSecureContext) { try { await navigator.clipboard.writeText(text); return true; } catch (e) {} }
+          const temp = document.createElement("textarea"); temp.value = text; temp.setAttribute("readonly", ""); temp.style.position = "fixed"; temp.style.left = "-9999px"; temp.style.top = "-9999px";
+          document.body.appendChild(temp); temp.focus(); temp.select(); temp.setSelectionRange(0, temp.value.length);
+          let copied = false; try { copied = document.execCommand("copy"); } catch (e) {} document.body.removeChild(temp); return copied;
         }
 
-        function updateDataUrlOutput() {
-          dataUrlOutput.value = normalizeDataUrl(getEditedDataUrl());
-          dataUrlOutput.scrollLeft = 0;
-          dataUrlOutput.scrollTop = 0;
-        }
+        function updateDataUrlOutput() { dataUrlOutput.value = normalizeDataUrl(getEditedDataUrl()); dataUrlOutput.scrollLeft = 0; dataUrlOutput.scrollTop = 0; }
 
         function setImageFromDataUrl(dataUrl) {
           const img = new Image();
-          img.onload = () => {
-            originalImage = img;
-            cropSelection = null;
-            render();
-          };
-          img.onerror = () => {
-            alert("Failed to load image. Please try another file.");
-          };
+          img.onload = () => { originalImage = img; cropSelection = null; hidePdfNav(); updateImageInfo(currentFileName, img.width, img.height, currentFileSize); render(); };
+          img.onerror = () => alert("Failed to load image.");
           img.src = dataUrl;
         }
+
+        async function loadPdfPage(num) {
+          if (!pdfDoc) return;
+          try {
+            const page = await pdfDoc.getPage(num);
+            pdfCurrentPage = num;
+            const viewport = page.getViewport({ scale: pdfScale });
+            const canvas = document.createElement("canvas");
+            canvas.width = viewport.width; canvas.height = viewport.height;
+            await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+            const dataUrl = canvas.toDataURL("image/png");
+            const img = new Image();
+            img.onload = () => { originalImage = img; cropSelection = null; updatePdfNav(); render(); };
+            img.src = dataUrl;
+          } catch (e) { alert("Failed to load PDF page."); }
+        }
+
+        function updatePdfNav() { pdfPageInput.value = pdfCurrentPage; pdfPageTotal.textContent = `/ ${pdfTotalPages}`; pdfNav.classList.add("visible"); }
+        function hidePdfNav() { pdfNav.classList.remove("visible"); pdfDoc = null; pdfCurrentPage = 1; pdfTotalPages = 1; }
 
         async function loadPdfFile(file) {
           try {
             const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            const totalPages = pdf.numPages;
-            const page = await pdf.getPage(1);
-            const scale = Math.min(1.5, 2048 / Math.max(page.view[2], page.view[3]));
-            const viewport = page.getViewport({ scale });
-            const canvas = document.createElement("canvas");
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            const ctx = canvas.getContext("2d");
-            await page.render({ canvasContext: ctx, viewport }).promise;
-            const dataUrl = canvas.toDataURL("image/png");
-            setImageFromDataUrl(dataUrl);
-            if (totalPages > 1) {
-              setTimeout(() => alert(`تم تحميل الصفحة 1 من ${totalPages} صفحات / Loaded page 1 of ${totalPages} pages`), 100);
-            }
-          } catch (error) {
-            alert("تعذر تحميل ملف PDF / Failed to load PDF file.");
-          }
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            pdfTotalPages = pdfDoc.numPages; pdfCurrentPage = 1;
+            pdfScale = parseFloat(pdfQuality.value) || 1.5;
+            await loadPdfPage(1);
+          } catch (e) { alert("تعذر تحميل ملف PDF / Failed to load PDF."); }
         }
 
         function loadImageFile(file) {
           if (!file) return;
-          if (file.type === "application/pdf" || file.name?.toLowerCase().endsWith(".pdf")) {
-            loadPdfFile(file);
-            return;
+          if (file.type === "application/pdf" || (file.name && file.name.toLowerCase().endsWith(".pdf"))) {
+            currentFileName = file.name; currentFileSize = file.size > 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${file.size} B`;
+            loadPdfFile(file); return;
           }
-          if (!file.type || !file.type.startsWith("image/")) {
-            alert("Please choose a valid image or PDF file.");
-            return;
-          }
+          if (!file.type || !file.type.startsWith("image/")) { alert("Please choose a valid image or PDF file."); return; }
+          currentFileName = file.name; currentFileSize = file.size > 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${file.size} B`;
           const reader = new FileReader();
-          reader.onload = (event) => setImageFromDataUrl(event.target.result);
-          reader.onerror = () => {
-            alert("Cannot read this image file.");
-          };
+          reader.onload = (e) => setImageFromDataUrl(e.target.result);
+          reader.onerror = () => alert("Cannot read this image file.");
           reader.readAsDataURL(file);
         }
 
-        function extractImageFromDataTransfer(dataTransfer) {
-          if (!dataTransfer) return null;
-
-          if (dataTransfer.files && dataTransfer.files.length > 0) {
-            for (let i = 0; i < dataTransfer.files.length; i++) {
-              const file = dataTransfer.files[i];
-              if (file && file.type && (file.type.startsWith("image/") || file.type === "application/pdf")) {
-                return file;
-              }
-            }
-          }
-
-          const items = dataTransfer.items;
-          if (!items) return null;
-
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            if (item && item.type && (item.type.startsWith("image/") || item.type === "application/pdf")) {
-              return item.getAsFile();
-            }
-          }
-
+        function extractImageFromDataTransfer(dt) {
+          if (!dt) return null;
+          if (dt.files && dt.files.length > 0) for (let i = 0; i < dt.files.length; i++) { const f = dt.files[i]; if (f && f.type && (f.type.startsWith("image/") || f.type === "application/pdf")) return f; }
+          if (!dt.items) return null;
+          for (let i = 0; i < dt.items.length; i++) { const it = dt.items[i]; if (it && it.type && (it.type.startsWith("image/") || it.type === "application/pdf")) return it.getAsFile(); }
           return null;
         }
 
-        function handlePasteEvent(event) {
-          const file = extractImageFromDataTransfer(event.clipboardData);
-          if (!file) return false;
-
-          event.preventDefault();
-          loadImageFile(file);
-          return true;
-        }
-
+        function handlePasteEvent(event) { const f = extractImageFromDataTransfer(event.clipboardData); if (!f) return false; event.preventDefault(); loadImageFile(f); return true; }
         async function readClipboardImageViaApi() {
-          if (!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.read) {
-            return false;
-          }
-
+          if (!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.read) return false;
           try {
             const items = await navigator.clipboard.read();
             for (let i = 0; i < items.length; i++) {
-              const item = items[i];
-              const imageType = item.types.find((type) => type.startsWith("image/"));
-              if (!imageType) continue;
-
-              const blob = await item.getType(imageType);
-              const file = new File([blob], `pasted-${Date.now()}.png`, {
-                type: blob.type || "image/png",
-              });
-              loadImageFile(file);
-              return true;
+              const t = items[i].types.find(t => t.startsWith("image/")); if (!t) continue;
+              const blob = await items[i].getType(t); loadImageFile(new File([blob], `pasted-${Date.now()}.png`, { type: blob.type || "image/png" })); return true;
             }
-          } catch (error) {
-            return false;
-          }
-
-          return false;
+          } catch (e) {} return false;
         }
 
         async function openEditedImageInNewTab() {
-          const dataUrl = normalizeDataUrl(getEditedDataUrl());
-          if (!dataUrl) {
-            alert("Upload an image first.");
-            return;
-          }
-          const newTab = window.open("", "_blank");
-          if (!newTab) {
-            alert("Browser blocked opening a new tab. Please allow popups for this site.");
-            return;
-          }
-
-          try {
-            const blob = await new Promise((resolve) =>
-              imageCanvas.toBlob((result) => resolve(result), "image/png"),
-            );
-
-            if (blob) {
-              const objectUrl = URL.createObjectURL(blob);
-              newTab.location.replace(objectUrl);
-              setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
-              return;
-            }
-          } catch (error) {
-            // Fall back to data URL rendering path below.
-          }
-
+          const dataUrl = normalizeDataUrl(getEditedDataUrl()); if (!dataUrl) { alert("Upload an image first."); return; }
+          const newTab = window.open("", "_blank"); if (!newTab) { alert("Please allow popups."); return; }
+          try { const blob = await new Promise(r => imageCanvas.toBlob(b => r(b), "image/png")); if (blob) { const url = URL.createObjectURL(blob); newTab.location.replace(url); setTimeout(() => URL.revokeObjectURL(url), 60000); return; } } catch (e) {}
           newTab.location.href = dataUrl;
         }
 
         function downloadEditedPdf() {
-          if (!originalImage) {
-            alert("Upload an image first.");
-            return;
-          }
-
-          if (!window.jspdf || !window.jspdf.jsPDF) {
-            alert("PDF library is still loading. Please try again in a moment.");
-            return;
-          }
-
+          if (!originalImage) { alert("Upload an image first."); return; }
+          if (!window.jspdf || !window.jspdf.jsPDF) { alert("PDF library is still loading."); return; }
           const { jsPDF } = window.jspdf;
-          const width = Math.max(1, imageCanvas.width);
-          const height = Math.max(1, imageCanvas.height);
-          const orientation = width >= height ? "landscape" : "portrait";
-
-          const pdf = new jsPDF({
-            orientation,
-            unit: "px",
-            format: [width, height],
-            compress: true,
-          });
-
-          pdf.addImage(imageCanvas.toDataURL("image/png"), "PNG", 0, 0, width, height, undefined, "FAST");
+          const w = Math.max(1, imageCanvas.width), h = Math.max(1, imageCanvas.height);
+          const pdf = new jsPDF({ orientation: w >= h ? "landscape" : "portrait", unit: "px", format: [w, h], compress: true });
+          pdf.addImage(imageCanvas.toDataURL("image/png"), "PNG", 0, 0, w, h, undefined, "FAST");
           pdf.save("pro-image-editor-output.pdf");
         }
 
         async function copyEditedImage() {
-          if (!originalImage) {
-            alert("Upload an image first.");
-            return false;
-          }
-
+          if (!originalImage) { alert("Upload an image first."); return false; }
           try {
-            const blob = await new Promise((resolve) =>
-              imageCanvas.toBlob((result) => resolve(result), "image/png"),
-            );
-
-            if (!blob) {
-              throw new Error("Blob conversion failed");
-            }
-
-            if (navigator.clipboard && window.ClipboardItem) {
-              const item = new ClipboardItem({ [blob.type]: blob });
-              await navigator.clipboard.write([item]);
-              return true;
-            }
-
-            const dataUrl = normalizeDataUrl(getEditedDataUrl());
-            if (dataUrl && (await copyTextToClipboard(dataUrl))) {
-              return true;
-            }
-          } catch (error) {
-            return false;
-          }
-
-          return false;
+            const blob = await new Promise(r => imageCanvas.toBlob(b => r(b), "image/png"));
+            if (!blob) throw new Error();
+            if (navigator.clipboard && window.ClipboardItem) { await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]); return true; }
+            const du = normalizeDataUrl(getEditedDataUrl()); if (du && await copyTextToClipboard(du)) return true;
+          } catch (e) {} return false;
         }
 
         async function copyDataUrlText() {
-          const dataUrl = normalizeDataUrl(getEditedDataUrl());
-          if (!dataUrl) {
-            alert("Upload an image first.");
-            return;
-          }
-
-          const copied = await copyTextToClipboard(dataUrl);
-          if (copied) {
-            alert("Data URL copied.");
-            return;
-          }
-
-          dataUrlOutput.focus();
-          dataUrlOutput.select();
-          dataUrlOutput.setSelectionRange(0, dataUrlOutput.value.length);
+          const du = normalizeDataUrl(getEditedDataUrl()); if (!du) { alert("Upload an image first."); return; }
+          if (await copyTextToClipboard(du)) { alert("Data URL copied."); return; }
+          dataUrlOutput.focus(); dataUrlOutput.select(); dataUrlOutput.setSelectionRange(0, dataUrlOutput.value.length);
           alert("Press Ctrl+C to copy Data URL.");
         }
 
-        function hideContextMenu() {
-          canvasContextMenu.style.display = "none";
-          canvasContextMenu.setAttribute("aria-hidden", "true");
-        }
-
+        function hideContextMenu() { canvasContextMenu.style.display = "none"; canvasContextMenu.setAttribute("aria-hidden", "true"); }
         function showContextMenu(event) {
           if (!originalImage) return;
           event.preventDefault();
-          const viewportW = window.innerWidth;
-          const viewportH = window.innerHeight;
-          const menuW = 240;
-          const menuH = 120;
-          const x = Math.min(event.clientX, viewportW - menuW - 10);
-          const y = Math.min(event.clientY, viewportH - menuH - 10);
-
-          canvasContextMenu.style.left = `${Math.max(8, x)}px`;
-          canvasContextMenu.style.top = `${Math.max(8, y)}px`;
-          canvasContextMenu.style.display = "block";
-          canvasContextMenu.setAttribute("aria-hidden", "false");
+          canvasContextMenu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - 240 - 10))}px`;
+          canvasContextMenu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - 120 - 10))}px`;
+          canvasContextMenu.style.display = "block"; canvasContextMenu.setAttribute("aria-hidden", "false");
         }
-
-        function isEditableElement(target) {
-          if (!target) return false;
-          const tag = (target.tagName || "").toLowerCase();
-          return (
-            tag === "input" ||
-            tag === "textarea" ||
-            target.isContentEditable
-          );
-        }
-
-        function getCanvasPoint(event) {
-          const rect = overlayCanvas.getBoundingClientRect();
-          const sx = overlayCanvas.width / rect.width;
-          const sy = overlayCanvas.height / rect.height;
-          return {
-            x: Math.max(0, Math.min(overlayCanvas.width, (event.clientX - rect.left) * sx)),
-            y: Math.max(0, Math.min(overlayCanvas.height, (event.clientY - rect.top) * sy)),
-          };
-        }
-
-        function normalizeRect(a, b) {
-          const x = Math.min(a.x, b.x);
-          const y = Math.min(a.y, b.y);
-          const w = Math.abs(a.x - b.x);
-          const h = Math.abs(a.y - b.y);
-          return { x, y, w, h };
-        }
+        function isEditableElement(t) { return t && (["input","textarea"].includes((t.tagName||"").toLowerCase()) || t.isContentEditable); }
+        function getCanvasPoint(e) { const r = overlayCanvas.getBoundingClientRect(), sx = overlayCanvas.width / r.width, sy = overlayCanvas.height / r.height; return { x: Math.max(0, Math.min(overlayCanvas.width, (e.clientX - r.left) * sx)), y: Math.max(0, Math.min(overlayCanvas.height, (e.clientY - r.top) * sy)) }; }
+        function normalizeRect(a, b) { const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x, y, w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) }; }
 
         function updateToggleButtons() {
           document.getElementById("toggleSepia").classList.toggle("active", state.sepia);
@@ -1288,345 +1109,157 @@
           document.getElementById("flipV").classList.toggle("active", state.flipV);
           document.getElementById("cropMode").classList.toggle("active", state.cropMode);
           beforeAfterBtn.classList.toggle("active", state.showOriginal);
-          beforeAfterBtn.textContent = state.showOriginal
-            ? "Showing Before / عرض قبل التعديل"
-            : "Before / After";
+          beforeAfterBtn.innerHTML = state.showOriginal ? '<i class="fas fa-eye-slash"></i> Before' : '<i class="fas fa-eye"></i> Compare';
         }
 
         function hasAnyEdits() {
-          return (
-            state.red !== 100 ||
-            state.green !== 100 ||
-            state.blue !== 100 ||
-            state.hue !== 0 ||
-            state.brightness !== 100 ||
-            state.contrast !== 100 ||
-            state.saturation !== 100 ||
-            state.exposure !== 0 ||
-            state.blur !== 0 ||
-            state.sharpen !== 0 ||
-            state.noise !== 0 ||
-            state.vigIntensity !== 0 ||
-            state.vigSpread !== 65 ||
-            state.rotate !== 0 ||
-            state.flipH ||
-            state.flipV ||
-            state.sepia ||
-            state.gray
-          );
+          return state.red !== 100 || state.green !== 100 || state.blue !== 100 || state.hue !== 0 ||
+            state.brightness !== 100 || state.contrast !== 100 || state.saturation !== 100 || state.exposure !== 0 ||
+            state.blur !== 0 || state.sharpen !== 0 || state.noise !== 0 || state.vigIntensity !== 0 || state.vigSpread !== 65 ||
+            state.rotate !== 0 || state.flipH || state.flipV || state.sepia || state.gray;
         }
 
         function resetAdjustments() {
-          Object.assign(state, {
-            red: 100,
-            green: 100,
-            blue: 100,
-            hue: 0,
-            brightness: 100,
-            contrast: 100,
-            saturation: 100,
-            exposure: 0,
-            blur: 0,
-            sharpen: 0,
-            noise: 0,
-            vigIntensity: 0,
-            vigSpread: 65,
-            rotate: 0,
-            flipH: false,
-            flipV: false,
-            sepia: false,
-            gray: false,
-            showOriginal: false,
-            cropMode: false,
-          });
-
-          rangeMap.forEach(([key]) => {
-            const input = document.getElementById(key);
-            if (!input) return;
-            input.value = state[key];
-          });
-
-          cropSelection = null;
-          overlayCanvas.style.pointerEvents = "none";
-          updateValueLabels();
-          updateToggleButtons();
-          render();
+          Object.assign(state, { red: 100, green: 100, blue: 100, hue: 0, brightness: 100, contrast: 100, saturation: 100, exposure: 0, blur: 0, sharpen: 0, noise: 0, vigIntensity: 0, vigSpread: 65, rotate: 0, flipH: false, flipV: false, sepia: false, gray: false, showOriginal: false, cropMode: false });
+          rangeMap.forEach(([key]) => { const inp = document.getElementById(key); if (inp) inp.value = state[key]; });
+          cropSelection = null; overlayCanvas.style.pointerEvents = "none";
+          updateValueLabels(); updateToggleButtons();
+          if (originalImage) render();
         }
 
         function applyCrop() {
-          if (!originalImage || !cropSelection) {
-            alert("حدد منطقة القص أولاً / Select crop area first");
-            return;
-          }
+          if (!originalImage || !cropSelection) { alert("حدد منطقة القص أولاً / Select crop area first"); return; }
+          if (cropSelection.w < 5 || cropSelection.h < 5) { alert("منطقة القص صغيرة جدًا / Crop area is too small"); return; }
+          pushUndoState();
+          const t = buildTransformedCanvas();
+          const c = document.createElement("canvas"); c.width = Math.round(cropSelection.w); c.height = Math.round(cropSelection.h);
+          c.getContext("2d").drawImage(t, cropSelection.x, cropSelection.y, cropSelection.w, cropSelection.h, 0, 0, c.width, c.height);
+          state.rotate = 0; state.flipH = false; state.flipV = false;
+          document.getElementById("rotate").value = 0; cropSelection = null; state.cropMode = false;
+          overlayCanvas.style.pointerEvents = "none"; updateValueLabels(); updateToggleButtons();
+          const img = new Image(); img.onload = () => { originalImage = img; render(); }; img.src = c.toDataURL("image/png");
+        }
 
-          if (cropSelection.w < 5 || cropSelection.h < 5) {
-            alert("منطقة القص صغيرة جدًا / Crop area is too small");
-            return;
-          }
+        function updateImageInfo(name, w, h, size) {
+          if (name) { infoFileName.textContent = name; infoDimensions.textContent = `${w} × ${h}`; infoSize.textContent = size || "-"; imageInfoEl.classList.add("visible"); }
+          else { imageInfoEl.classList.remove("visible"); }
+        }
 
-          const transformed = buildTransformedCanvas();
-          const cropCanvas = document.createElement("canvas");
-          cropCanvas.width = Math.round(cropSelection.w);
-          cropCanvas.height = Math.round(cropSelection.h);
-          const cctx = cropCanvas.getContext("2d");
+        function setCropAspect(ratio) {
+          cropAspect = ratio === "free" ? null : ratio;
+          document.querySelectorAll(".aspect-btn").forEach(b => b.classList.toggle("active", b.dataset.ratio === ratio));
+          cropSelection = null; drawCropOverlay();
+        }
 
-          cctx.drawImage(
-            transformed,
-            cropSelection.x,
-            cropSelection.y,
-            cropSelection.w,
-            cropSelection.h,
-            0,
-            0,
-            cropCanvas.width,
-            cropCanvas.height,
-          );
-
-          state.rotate = 0;
-          state.flipH = false;
-          state.flipV = false;
-          document.getElementById("rotate").value = 0;
-          cropSelection = null;
-          state.cropMode = false;
-          overlayCanvas.style.pointerEvents = "none";
-          updateValueLabels();
-          updateToggleButtons();
-          setImageFromDataUrl(cropCanvas.toDataURL("image/png"));
+        const presets = {
+          original: {},
+          vintage: { red: 120, green: 105, blue: 85, sepia: true, contrast: 85, saturation: 80, vigIntensity: 15 },
+          noir: { gray: true, contrast: 140, brightness: 90, saturation: 0 },
+          warm: { red: 125, green: 108, blue: 90, saturation: 115 },
+          cool: { red: 88, green: 105, blue: 125, saturation: 110, hue: -5 },
+          cinematic: { contrast: 140, saturation: 70, vigIntensity: 35, brightness: 95 },
+          soft: { contrast: 85, saturation: 90, blur: 0.5 },
+          vivid: { saturation: 150, contrast: 120, brightness: 105, sharpen: 15 },
+        };
+        function applyPreset(name) {
+          pushUndoState(); resetAdjustments();
+          const p = presets[name]; if (!p) return;
+          for (const [k, v] of Object.entries(p)) { state[k] = v; const inp = document.getElementById(k); if (inp) inp.value = v; }
+          updateValueLabels(); updateToggleButtons(); render();
         }
 
         function initEvents() {
-          fileInput.addEventListener("click", () => {
-            fileInput.value = "";
+          fileInput.addEventListener("click", () => { fileInput.value = ""; });
+          fileInput.addEventListener("change", (e) => { loadImageFile(e.target.files[0]); });
+          ["dragenter","dragover"].forEach(ev => uploadZone.addEventListener(ev, e => { e.preventDefault(); uploadZone.classList.add("dragover"); }));
+          ["dragleave","drop"].forEach(ev => uploadZone.addEventListener(ev, e => { e.preventDefault(); uploadZone.classList.remove("dragover"); }));
+          uploadZone.addEventListener("drop", e => { const f = extractImageFromDataTransfer(e.dataTransfer) || e.dataTransfer.files[0]; if (f) loadImageFile(f); });
+          document.addEventListener("paste", handlePasteEvent);
+          window.addEventListener("paste", handlePasteEvent);
+          pasteCatcher.addEventListener("paste", handlePasteEvent);
+
+          window.addEventListener("keydown", async (e) => {
+            const c = e.ctrlKey || e.metaKey;
+            if (c && e.key.toLowerCase() === "v" && !isEditableElement(e.target)) { if (await readClipboardImageViaApi()) { e.preventDefault(); return; } pasteCatcher.focus(); setTimeout(() => pasteCatcher.blur(), 100); return; }
+            if (c && e.key.toLowerCase() === "z" && !isEditableElement(e.target)) { e.preventDefault(); undo(); return; }
+            if ((c && e.key.toLowerCase() === "y" || (c && e.shiftKey && e.key.toLowerCase() === "z")) && !isEditableElement(e.target)) { e.preventDefault(); redo(); return; }
+            if (c && e.key.toLowerCase() === "g" && !isEditableElement(e.target)) { e.preventDefault(); toggleGrid(); }
           });
 
-          fileInput.addEventListener("change", (event) => {
-            loadImageFile(event.target.files[0]);
+          document.getElementById("zoomInBtn").addEventListener("click", () => setZoom(state.zoom + 0.25));
+          document.getElementById("zoomOutBtn").addEventListener("click", () => setZoom(state.zoom - 0.25));
+          document.getElementById("zoomFitBtn").addEventListener("click", () => setZoom(1));
+          document.getElementById("zoomOneOneBtn").addEventListener("click", () => {
+            const pad = 16, aw = Math.max(1, previewWrap.clientWidth - pad * 2), ah = Math.max(1, previewWrap.clientHeight - pad * 2);
+            const base = Math.min(aw / imageCanvas.width, ah / imageCanvas.height, 1);
+            setZoom(1 / base);
           });
 
-          ["dragenter", "dragover"].forEach((evt) => {
-            uploadZone.addEventListener(evt, (event) => {
-              event.preventDefault();
-              uploadZone.classList.add("dragover");
-            });
-          });
+          document.getElementById("pdfPrevBtn").addEventListener("click", () => { if (pdfCurrentPage > 1) loadPdfPage(pdfCurrentPage - 1); });
+          document.getElementById("pdfNextBtn").addEventListener("click", () => { if (pdfCurrentPage < pdfTotalPages) loadPdfPage(pdfCurrentPage + 1); });
+          pdfPageInput.addEventListener("change", () => { const p = parseInt(pdfPageInput.value); if (p >= 1 && p <= pdfTotalPages && p !== pdfCurrentPage) loadPdfPage(p); else pdfPageInput.value = pdfCurrentPage; });
+          pdfQuality.addEventListener("change", () => { pdfScale = parseFloat(pdfQuality.value) || 1.5; if (pdfDoc) loadPdfPage(pdfCurrentPage); });
 
-          ["dragleave", "drop"].forEach((evt) => {
-            uploadZone.addEventListener(evt, (event) => {
-              event.preventDefault();
-              uploadZone.classList.remove("dragover");
-            });
-          });
-
-          uploadZone.addEventListener("drop", (event) => {
-            const file = extractImageFromDataTransfer(event.dataTransfer) || event.dataTransfer.files[0];
-            if (file) loadImageFile(file);
-          });
-
-          document.addEventListener("paste", (event) => {
-            handlePasteEvent(event);
-          });
-
-          window.addEventListener("paste", (event) => {
-            handlePasteEvent(event);
-          });
-
-          pasteCatcher.addEventListener("paste", (event) => {
-            handlePasteEvent(event);
-          });
-
-          window.addEventListener("keydown", async (event) => {
-            const isPasteShortcut = (event.ctrlKey || event.metaKey) &&
-              String(event.key).toLowerCase() === "v";
-
-            if (!isPasteShortcut || isEditableElement(event.target)) return;
-
-            const loadedFromApi = await readClipboardImageViaApi();
-            if (loadedFromApi) {
-              event.preventDefault();
-              return;
-            }
-
-            // Fallback path for non-secure contexts to ensure paste target exists.
-            pasteCatcher.focus();
-            setTimeout(() => pasteCatcher.blur(), 100);
-          });
-
-          document.getElementById("pasteImageBtn").addEventListener("click", async () => {
-            const loaded = await readClipboardImageViaApi();
-            if (loaded) return;
-            pasteCatcher.focus();
-
-            alert("استخدم Ctrl+V بعد التركيز على الصفحة، أو امنح إذن الحافظة للمتصفح / Use Ctrl+V with page focus or allow clipboard permission.");
-          });
-
+          document.getElementById("pasteImageBtn").addEventListener("click", async () => { if (await readClipboardImageViaApi()) return; pasteCatcher.focus(); alert("Use Ctrl+V or allow clipboard permission."); });
           openEditedTabBtn.addEventListener("click", openEditedImageInNewTab);
-
-          copyEditedImageBtn.addEventListener("click", async () => {
-            const copied = await copyEditedImage();
-            alert(copied ? "Edited image copied." : "Could not copy image. Try copy Data URL.");
-          });
-
+          copyEditedImageBtn.addEventListener("click", async () => alert(await copyEditedImage() ? "Copied." : "Could not copy."));
           copyDataUrlBtn.addEventListener("click", copyDataUrlText);
 
           previewWrap.addEventListener("contextmenu", showContextMenu);
-          canvasContextMenu.addEventListener("click", (event) => {
-            event.stopPropagation();
-          });
-
-          ctxOpenEdited.addEventListener("click", () => {
-            hideContextMenu();
-            openEditedImageInNewTab();
-          });
-
-          ctxCopyEdited.addEventListener("click", async () => {
-            hideContextMenu();
-            const copied = await copyEditedImage();
-            alert(copied ? "Edited image copied." : "Could not copy image. Try copy Data URL.");
-          });
-
+          canvasContextMenu.addEventListener("click", e => e.stopPropagation());
+          ctxOpenEdited.addEventListener("click", () => { hideContextMenu(); openEditedImageInNewTab(); });
+          ctxCopyEdited.addEventListener("click", async () => { hideContextMenu(); alert(await copyEditedImage() ? "Copied." : "Could not copy."); });
           document.addEventListener("click", hideContextMenu);
           window.addEventListener("scroll", hideContextMenu);
           window.addEventListener("resize", hideContextMenu);
 
-          document.getElementById("toggleSepia").addEventListener("click", () => {
-            state.sepia = !state.sepia;
-            updateToggleButtons();
-            render();
-          });
+          const toggleBtn = (id, key) => document.getElementById(id).addEventListener("click", () => { pushUndoState(); state[key] = !state[key]; updateToggleButtons(); render(); });
+          toggleBtn("toggleSepia", "sepia"); toggleBtn("toggleGray", "gray"); toggleBtn("flipH", "flipH"); toggleBtn("flipV", "flipV");
 
-          document.getElementById("toggleGray").addEventListener("click", () => {
-            state.gray = !state.gray;
-            updateToggleButtons();
-            render();
-          });
+          document.getElementById("rotateLeft").addEventListener("click", () => { pushUndoState(); state.rotate = Math.max(-180, state.rotate - 90); document.getElementById("rotate").value = state.rotate; updateValueLabels(); render(); });
+          document.getElementById("rotateRight").addEventListener("click", () => { pushUndoState(); state.rotate = Math.min(180, state.rotate + 90); document.getElementById("rotate").value = state.rotate; updateValueLabels(); render(); });
 
-          document.getElementById("flipH").addEventListener("click", () => {
-            state.flipH = !state.flipH;
-            updateToggleButtons();
-            render();
-          });
-
-          document.getElementById("flipV").addEventListener("click", () => {
-            state.flipV = !state.flipV;
-            updateToggleButtons();
-            render();
-          });
-
-          document.getElementById("rotateLeft").addEventListener("click", () => {
-            state.rotate = Math.max(-180, state.rotate - 90);
-            document.getElementById("rotate").value = state.rotate;
-            updateValueLabels();
-            render();
-          });
-
-          document.getElementById("rotateRight").addEventListener("click", () => {
-            state.rotate = Math.min(180, state.rotate + 90);
-            document.getElementById("rotate").value = state.rotate;
-            updateValueLabels();
-            render();
-          });
-
-          document.getElementById("cropMode").addEventListener("click", () => {
-            if (!originalImage) return;
-            state.cropMode = !state.cropMode;
-            cropSelection = null;
-            overlayCanvas.style.pointerEvents = state.cropMode ? "auto" : "none";
-            updateToggleButtons();
-            drawCropOverlay();
-          });
-
-          document.getElementById("cancelCrop").addEventListener("click", () => {
-            state.cropMode = false;
-            cropSelection = null;
-            overlayCanvas.style.pointerEvents = "none";
-            updateToggleButtons();
-            drawCropOverlay();
-          });
-
+          document.getElementById("cropMode").addEventListener("click", () => { if (!originalImage) return; state.cropMode = !state.cropMode; cropSelection = null; overlayCanvas.style.pointerEvents = state.cropMode ? "auto" : "none"; updateToggleButtons(); drawCropOverlay(); });
+          document.getElementById("cancelCrop").addEventListener("click", () => { state.cropMode = false; cropSelection = null; overlayCanvas.style.pointerEvents = "none"; updateToggleButtons(); drawCropOverlay(); });
           document.getElementById("applyCrop").addEventListener("click", applyCrop);
 
-          overlayCanvas.addEventListener("mousedown", (event) => {
-            if (!state.cropMode || !originalImage) return;
-            isDraggingCrop = true;
-            cropStart = getCanvasPoint(event);
-            cropSelection = { x: cropStart.x, y: cropStart.y, w: 0, h: 0 };
-            drawCropOverlay();
-          });
-
-          overlayCanvas.addEventListener("mousemove", (event) => {
+          overlayCanvas.addEventListener("mousedown", (e) => { if (!state.cropMode || !originalImage) return; isDraggingCrop = true; cropStart = getCanvasPoint(e); cropSelection = { x: cropStart.x, y: cropStart.y, w: 0, h: 0 }; drawCropOverlay(); });
+          overlayCanvas.addEventListener("mousemove", (e) => {
             if (!isDraggingCrop || !state.cropMode) return;
-            const point = getCanvasPoint(event);
-            cropSelection = normalizeRect(cropStart, point);
+            const p = getCanvasPoint(e);
+            if (cropAspect) {
+              const [aw, ah] = cropAspect.split(":").map(Number);
+              const dx = p.x - cropStart.x, dy = p.y - cropStart.y;
+              const absDx = Math.abs(dx), absDy = Math.abs(dy);
+              if (absDx * ah > absDy * aw) { const s = dy > 0 ? 1 : -1; cropSelection = normalizeRect(cropStart, { x: p.x, y: cropStart.y + s * (absDx / aw * ah) }); }
+              else { const s = dx > 0 ? 1 : -1; cropSelection = normalizeRect(cropStart, { x: cropStart.x + s * (absDy / ah * aw), y: p.y }); }
+            } else { cropSelection = normalizeRect(cropStart, p); }
             drawCropOverlay();
           });
+          window.addEventListener("mouseup", () => { isDraggingCrop = false; });
 
-          window.addEventListener("mouseup", () => {
-            isDraggingCrop = false;
-          });
+          beforeAfterBtn.addEventListener("click", () => { if (!originalImage || !hasAnyEdits()) { if (!hasAnyEdits()) alert("No edits yet."); return; } state.showOriginal = !state.showOriginal; updateToggleButtons(); render(); });
+          const hs = () => { if (!originalImage || !hasAnyEdits()) return; state.showOriginal = true; updateToggleButtons(); render(); };
+          const he = () => { if (!originalImage || !hasAnyEdits()) return; state.showOriginal = false; updateToggleButtons(); render(); };
+          beforeAfterBtn.addEventListener("mousedown", hs); beforeAfterBtn.addEventListener("mouseup", he);
+          beforeAfterBtn.addEventListener("mouseleave", he);
+          beforeAfterBtn.addEventListener("touchstart", hs, { passive: true }); beforeAfterBtn.addEventListener("touchend", he); beforeAfterBtn.addEventListener("touchcancel", he);
 
-          beforeAfterBtn.addEventListener("click", () => {
-            if (!originalImage) return;
-            if (!hasAnyEdits()) {
-              alert("لا توجد تعديلات للمقارنة حالياً / No edits yet to compare.");
-              return;
-            }
-            state.showOriginal = !state.showOriginal;
-            updateToggleButtons();
-            render();
-          });
-
-          const holdStart = () => {
-            if (!originalImage || !hasAnyEdits()) return;
-            state.showOriginal = true;
-            updateToggleButtons();
-            render();
-          };
-
-          const holdEnd = () => {
-            if (!originalImage || !hasAnyEdits()) return;
-            state.showOriginal = false;
-            updateToggleButtons();
-            render();
-          };
-
-          beforeAfterBtn.addEventListener("mousedown", holdStart);
-          beforeAfterBtn.addEventListener("mouseup", holdEnd);
-          beforeAfterBtn.addEventListener("mouseleave", holdEnd);
-          beforeAfterBtn.addEventListener("touchstart", holdStart, { passive: true });
-          beforeAfterBtn.addEventListener("touchend", holdEnd);
-          beforeAfterBtn.addEventListener("touchcancel", holdEnd);
-
-          document.getElementById("resetAll").addEventListener("click", () => {
-            if (!originalImage) return;
-            resetAdjustments();
-          });
-
-          document.getElementById("downloadPng").addEventListener("click", () => {
-            if (!originalImage) {
-              alert("ارفع صورة أولاً / Upload an image first");
-              return;
-            }
-            const link = document.createElement("a");
-            link.href = imageCanvas.toDataURL("image/png");
-            link.download = "pro-image-editor-output.png";
-            link.click();
-          });
-
+          document.getElementById("resetAll").addEventListener("click", () => { if (!originalImage) return; pushUndoState(); resetAdjustments(); });
+          document.getElementById("downloadPng").addEventListener("click", () => { if (!originalImage) { alert("Upload an image first"); return; } const a = document.createElement("a"); a.href = imageCanvas.toDataURL("image/png"); a.download = "pro-image-editor-output.png"; a.click(); });
           document.getElementById("downloadPdf").addEventListener("click", downloadEditedPdf);
+          document.getElementById("undoBtn").addEventListener("click", undo);
+          document.getElementById("redoBtn").addEventListener("click", redo);
+          document.getElementById("gridToggle").addEventListener("click", toggleGrid);
+          document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => applyPreset(b.dataset.preset)));
+          document.querySelectorAll("[data-ratio]").forEach(b => b.addEventListener("click", () => setCropAspect(b.dataset.ratio)));
+          document.querySelectorAll(".control-group-header").forEach(h => h.addEventListener("click", () => h.parentElement.classList.toggle("collapsed")));
         }
 
-        bindRanges();
-        initEvents();
-        updateToggleButtons();
-        overlayCanvas.style.pointerEvents = "none";
-        updateDataUrlOutput();
-
-        window.addEventListener("resize", () => {
-          if (originalImage) {
-            fitCanvasDisplaySize();
-            drawCropOverlay();
-          }
-        });
+        bindRanges(); initEvents(); updateToggleButtons();
+        overlayCanvas.style.pointerEvents = "none"; updateDataUrlOutput(); updateZoomDisplay();
+        document.getElementById("gridToggle").classList.toggle("active", state.gridOverlay);
+        window.addEventListener("resize", () => { if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); } });
       })();
     </script>
   </body>
