@@ -356,6 +356,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
       defer
@@ -424,10 +425,10 @@
           <div class="editor-layout">
             <div class="preview-panel">
               <label class="upload-zone" id="uploadZone" for="fileInput">
-                <div><strong>اسحب الصورة هنا أو اضغط للرفع / Drag & Drop or Click to Upload</strong></div>
-                <div class="tiny-note">يدعم: PNG, JPG, WEBP + لصق مباشر Ctrl+V</div>
+                <div><strong>اسحب الصورة أو ملف PDF هنا أو اضغط للرفع / Drag & Drop or Click to Upload</strong></div>
+                <div class="tiny-note">يدعم: PNG, JPG, WEBP, PDF + لصق مباشر Ctrl+V</div>
               </label>
-              <input id="fileInput" type="file" accept="image/*" />
+              <input id="fileInput" type="file" accept="image/*,application/pdf" />
               <textarea
                 id="pasteCatcher"
                 class="paste-catcher"
@@ -685,6 +686,8 @@
 
     <script>
       (() => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
         const fileInput = document.getElementById("fileInput");
         const uploadZone = document.getElementById("uploadZone");
         const emptyState = document.getElementById("emptyState");
@@ -1020,9 +1023,37 @@
           img.src = dataUrl;
         }
 
+        async function loadPdfFile(file) {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const totalPages = pdf.numPages;
+            const page = await pdf.getPage(1);
+            const scale = Math.min(1.5, 2048 / Math.max(page.view[2], page.view[3]));
+            const viewport = page.getViewport({ scale });
+            const canvas = document.createElement("canvas");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext("2d");
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            const dataUrl = canvas.toDataURL("image/png");
+            setImageFromDataUrl(dataUrl);
+            if (totalPages > 1) {
+              setTimeout(() => alert(`تم تحميل الصفحة 1 من ${totalPages} صفحات / Loaded page 1 of ${totalPages} pages`), 100);
+            }
+          } catch (error) {
+            alert("تعذر تحميل ملف PDF / Failed to load PDF file.");
+          }
+        }
+
         function loadImageFile(file) {
-          if (!file || !file.type || !file.type.startsWith("image/")) {
-            alert("Please choose a valid image file.");
+          if (!file) return;
+          if (file.type === "application/pdf" || file.name?.toLowerCase().endsWith(".pdf")) {
+            loadPdfFile(file);
+            return;
+          }
+          if (!file.type || !file.type.startsWith("image/")) {
+            alert("Please choose a valid image or PDF file.");
             return;
           }
           const reader = new FileReader();
@@ -1039,7 +1070,7 @@
           if (dataTransfer.files && dataTransfer.files.length > 0) {
             for (let i = 0; i < dataTransfer.files.length; i++) {
               const file = dataTransfer.files[i];
-              if (file && file.type && file.type.startsWith("image/")) {
+              if (file && file.type && (file.type.startsWith("image/") || file.type === "application/pdf")) {
                 return file;
               }
             }
@@ -1050,7 +1081,7 @@
 
           for (let i = 0; i < items.length; i++) {
             const item = items[i];
-            if (item && item.type && item.type.startsWith("image/")) {
+            if (item && item.type && (item.type.startsWith("image/") || item.type === "application/pdf")) {
               return item.getAsFile();
             }
           }
@@ -1387,8 +1418,8 @@
           });
 
           uploadZone.addEventListener("drop", (event) => {
-            const file = event.dataTransfer.files[0];
-            loadImageFile(file);
+            const file = extractImageFromDataTransfer(event.dataTransfer) || event.dataTransfer.files[0];
+            if (file) loadImageFile(file);
           });
 
           document.addEventListener("paste", (event) => {
