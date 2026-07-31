@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جدول الدروس الأسبوعي التفاعلي | Ali Ahmed</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link rel="stylesheet" href="../assets/css/svg-icons.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Scripts for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
+    <!-- Export libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+
+    <style>
+      .tool-page-wrapper {
+        padding: 50px 0;
+        min-height: 80vh;
+      }
+
+      .lesson-tool {
+        max-width: 1200px;
+        margin: 0 auto;
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        direction: rtl;
+      }
+      .tool-intro {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .tool-intro h1 {
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .tool-intro p {
+        color: var(--text-color-light);
+        font-size: 1rem;
+        max-width: 650px;
+        margin: 0 auto;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+        justify-content: center;
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 10px;
+        background: var(--primary-gradient);
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+      }
+      .btn.ghost {
+        background: transparent;
+        border: 2px solid rgba(var(--primary-rgb), 0.4);
+        color: var(--primary-color);
+      }
+      .btn.ghost:hover {
+        background: rgba(var(--primary-rgb), 0.08);
+      }
+      .btn.danger {
+        background: var(--secondary-purple);
+        color: #fff;
+      }
+      .btn-block {
+        width: 100%;
+        margin-top: 10px;
+        justify-content: center;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      .font-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-inline-start: auto;
+      }
+      .font-controls span {
+        font-size: 13px;
+        color: var(--text-color-light);
+        min-width: 42px;
+        text-align: center;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 18px;
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
+        box-shadow: 0 15px 40px rgba(15, 40, 90, 0.12);
+        background: #ffffff;
+      }
+      table.weekly {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        background: #ffffff;
+        color: #232a36;
+        font-size: var(--font-size, 14px);
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      }
+      table.weekly th,
+      table.weekly td {
+        border: 1px solid #e9ecf2;
+        padding: 12px 14px;
+        vertical-align: top;
+      }
+      table.weekly thead th {
+        color: #fff;
+        font-weight: 700;
+        text-align: center;
+        min-width: 130px;
+        padding: 14px 12px;
+        font-size: 1.02em;
+        letter-spacing: 0.2px;
+      }
+      table.weekly tbody td {
+        color: #2a3242;
+        background: #ffffff;
+      }
+      .day-col {
+        background: #f6f8fb !important;
+        color: #1d2b4f !important;
+        font-weight: 700;
+        text-align: center;
+        white-space: nowrap;
+        position: sticky;
+        inset-inline-start: 0;
+        z-index: 2;
+        font-size: 0.96em;
+        letter-spacing: 0.2px;
+        box-shadow: inset 0 0 0 1px #e9ecf2;
+      }
+      .day-col::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-purple)
+        );
+        margin-inline-end: 7px;
+        vertical-align: middle;
+      }
+      .day-corner {
+        width: 95px;
+      }
+
+      .col-head {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        align-items: center;
+        justify-content: center;
+      }
+      .col-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+      }
+      .col-actions .icon-btn {
+        background: rgba(255, 255, 255, 0.22);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        width: 27px;
+        height: 27px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .col-actions .icon-btn:hover {
+        background: rgba(255, 255, 255, 0.45);
+        transform: translateY(-1px);
+      }
+      .col-color {
+        width: 28px;
+        height: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 7px;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .lesson-cell {
+        cursor: pointer;
+        position: relative;
+        transition: box-shadow 0.2s ease, background 0.2s ease;
+      }
+      .lesson-cell:hover {
+        box-shadow: inset 0 0 0 2px rgba(var(--primary-rgb), 0.45);
+      }
+      .lesson {
+        margin-bottom: 8px;
+        border-right: 4px solid;
+        padding: 7px 12px;
+        border-radius: 10px;
+        line-height: 1.55;
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 1px 4px rgba(20, 40, 80, 0.08);
+      }
+      .lesson:last-child {
+        margin-bottom: 0;
+      }
+      .lesson-subject {
+        font-weight: 600;
+        display: block;
+        color: #1a2130;
+      }
+      .lesson-time {
+        font-size: 0.8em;
+        color: #667085;
+      }
+      .cell-empty {
+        color: #c6ccd6;
+        text-align: center;
+        font-size: 18px;
+        padding: 12px;
+        transition: color 0.2s ease;
+      }
+      .lesson-cell:hover .cell-empty {
+        color: var(--primary-color);
+      }
+      .merged-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: linear-gradient(
+          135deg,
+          var(--secondary-purple),
+          var(--primary-color)
+        );
+        color: #fff;
+        font-size: 10px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      }
+
+      .tool-note {
+        text-align: center;
+        color: var(--text-color-light);
+        font-size: 0.9rem;
+        margin-top: 20px;
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(3px);
+      }
+      .modal-overlay.show {
+        display: flex;
+      }
+      .modal {
+        background: var(--card-bg);
+        border-radius: 18px;
+        max-width: 540px;
+        width: 100%;
+        max-height: 85vh;
+        overflow: auto;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        background: var(--card-bg);
+        z-index: 3;
+      }
+      .modal-header h3 {
+        font-size: 1.15rem;
+        color: var(--text-color);
+        margin: 0;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        line-height: 1;
+      }
+      .modal-body {
+        padding: 20px 22px;
+      }
+      .lesson-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+      .lesson-row input {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--input-bg);
+        color: var(--text-color);
+        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        font-size: 14px;
+      }
+      .lesson-row input.time {
+        flex: 0 0 130px;
+      }
+      .icon-del {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 14px;
+        flex: 0 0 auto;
+      }
+      .divider {
+        border-top: 1px dashed var(--border-color);
+        margin: 18px 0;
+      }
+      .merge-section h4 {
+        margin-bottom: 10px;
+        color: var(--text-color);
+        font-size: 1rem;
+      }
+      .merge-checks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .merge-checks label {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--text-color);
+        font-size: 14px;
+        background: var(--input-bg);
+      }
+      .merge-hint {
+        color: var(--text-color-light);
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+      }
+
+      /* Fix for 3D Background Overlap */
+      #three-canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+      .tool-page-wrapper {
+        position: relative;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+    <div class="floating-background">
+      <div
+        class="floating-icon"
+        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
+      >
+        🚀
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
+      >
+        ⭐
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
+      >
+        🔥
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
+      >
+        💎
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
+      >
+        🎯
+      </div>
+      <div
+        class="floating-icon"
+        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
+      >
+        ⚡
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
+              <li><a href="index.html" class="active">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+              <li><a href="../index.html#payment">الدفع</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="tool-page-wrapper">
+      <div class="container">
+        <div class="lesson-tool">
+          <div class="tool-intro">
+            <h1>📅 جدول الدروس الأسبوعي التفاعلي</h1>
+            <p>
+              أنشئ جدول دروس أسبوعي لكل شخص، لوّن الأعمدة، ادمج الدروس
+              المشتركة، وصدّر الجدول بالشكل اللي يناسبك.
+            </p>
+          </div>
+
+          <div class="toolbar">
+            <button class="btn" onclick="addColumn()">
+              <i class="fas fa-plus"></i> إضافة عمود / شخص
+            </button>
+            <button
+              class="btn ghost"
+              onclick="document.getElementById('jsonInput').click()"
+            >
+              <i class="fas fa-file-import"></i> استيراد JSON
+            </button>
+            <button class="btn ghost" onclick="exportJSON()">
+              <i class="fas fa-file-export"></i> تصدير JSON
+            </button>
+            <button class="btn ghost" onclick="exportPDF()">
+              <i class="fas fa-file-pdf"></i> تصدير PDF
+            </button>
+            <button class="btn ghost" onclick="exportPNG()">
+              <i class="fas fa-image"></i> تصدير صورة
+            </button>
+            <div class="font-controls">
+              <button class="btn btn-sm" onclick="setFontSize(-1)" title="تصغير الخط">
+                A−
+              </button>
+              <span id="fontLabel">14px</span>
+              <button class="btn btn-sm" onclick="setFontSize(1)" title="تكبير الخط">
+                A+
+              </button>
+            </div>
+          </div>
+
+          <input
+            type="file"
+            id="jsonInput"
+            accept=".json,application/json"
+            style="display: none"
+            onchange="handleImport(event)"
+          />
+
+          <div class="table-wrap">
+            <table class="weekly" id="weeklyTable">
+              <thead>
+                <tr id="weeklyHead"></tr>
+              </thead>
+              <tbody id="weeklyBody"></tbody>
+            </table>
+          </div>
+
+          <p class="tool-note">
+            💡 اضغط على أي خلية لإضافة أو تعديل الدروس، أو لدمجها مع أعمدة
+            أخرى في نفس اليوم.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- نافذة تعديل الخلية -->
+    <div class="modal-overlay" id="cellModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modalTitle"></h3>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="lessonsList"></div>
+          <button class="btn btn-block" onclick="addLesson()">
+            <i class="fas fa-plus"></i> إضافة درس
+          </button>
+          <div class="divider"></div>
+          <div class="merge-section">
+            <h4><i class="fas fa-object-group"></i> دمج الخلية مع أعمدة أخرى</h4>
+            <p class="merge-hint">
+              اختر أعمدة أخرى لنفس اليوم لتجميع دروسهم في خلية واحدة مشتركة.
+            </p>
+            <div class="merge-checks" id="mergeChecks"></div>
+            <button class="btn btn-block" onclick="mergeSelected()">
+              دمج مع المحدد
+            </button>
+            <button
+              class="btn btn-block danger"
+              id="unmergeBtn"
+              onclick="unmergeCell()"
+              style="display: none"
+            >
+              فك الدمج
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز. خبرة واسعة في تحسين واجهة المستخدم
+              وتجربة التسوق لزيادة المبيعات.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use
+                    href="../assets/images/icons.svg#icon-map-marker-alt"
+                  ></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أدوات المطورين
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- زر واتساب عائم -->
+    <a
+      href="https://wa.me/201002241591"
+      class="floating-whatsapp"
+      target="_blank"
+    >
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script>
+      /* ============ الحالة (State) ============ */
+      const LS_KEY = "weekly-lessons-table-v1";
+
+      const DEFAULT_STATE = {
+        columns: [
+          { id: "col1", name: "العمود الاول", color: "#1a7f37" },
+          { id: "col2", name: "العمود الثانى ", color: "#1155cc" }
+        ],
+        days: [
+          "السبت",
+          "الأحد",
+          "الاثنين",
+          "الثلاثاء",
+          "الأربعاء",
+          "الخميس",
+          "الجمعة"
+        ],
+        cells: [
+          {
+            day: "السبت",
+            columnIds: ["col1", "col2"],
+            lessons: [{ subject: "قرآن", time: "الساعة 5" }]
+          },
+          {
+            day: "الأحد",
+            columnIds: ["col1"],
+            lessons: [
+              { subject: "مس بشرى", time: "الساعة 4" },
+              { subject: "رياضة", time: "الساعة 1.5" }
+            ]
+          },
+          {
+            day: "الأحد",
+            columnIds: ["col2"],
+            lessons: [{ subject: "مس دينا", time: "الساعة 3" }]
+          },
+          {
+            day: "الاثنين",
+            columnIds: ["col1"],
+            lessons: [{ subject: "مس بشرى", time: "الساعة 4" }]
+          },
+          {
+            day: "الثلاثاء",
+            columnIds: ["col2"],
+            lessons: [{ subject: "مس دينا", time: "الساعة 3" }]
+          },
+          {
+            day: "الخميس",
+            columnIds: ["col1", "col2"],
+            lessons: [{ subject: "قرآن", time: "الساعة 5" }]
+          }
+        ]
+      };
+
+      let state = loadState();
+      let modal = { day: null, columns: [] };
+
+      const tableEl = document.getElementById("weeklyTable");
+      const headEl = document.getElementById("weeklyHead");
+      const bodyEl = document.getElementById("weeklyBody");
+      const overlay = document.getElementById("cellModal");
+      const fontLabel = document.getElementById("fontLabel");
+      let fontSize = 14;
+
+      /* ============ أدوات مساعدة ============ */
+      function colPos(id) {
+        return state.columns.findIndex((c) => c.id === id);
+      }
+
+      function cellFor(day, colId) {
+        return state.cells.find(
+          (c) => c.day === day && c.columnIds.includes(colId)
+        );
+      }
+
+      function findCell(day, colIds) {
+        const key = colIds.slice().sort().join(",");
+        return state.cells.find(
+          (c) => c.day === day && c.columnIds.slice().sort().join(",") === key
+        );
+      }
+
+      function colById(id) {
+        return state.columns.find((c) => c.id === id);
+      }
+
+      function colorOfCell(cell) {
+        const first = cell && cell.columnIds.length ? colById(cell.columnIds[0]) : null;
+        return first ? first.color : "#a0a6ad";
+      }
+
+      function hexToRgba(hex, a) {
+        let h = String(hex || "").replace("#", "");
+        if (h.length === 3) h = h.split("").map((x) => x + x).join("");
+        if (h.length !== 6) return `rgba(160,166,173,${a})`;
+        const r = parseInt(h.slice(0, 2), 16);
+        const g = parseInt(h.slice(2, 4), 16);
+        const b = parseInt(h.slice(4, 6), 16);
+        return `rgba(${r},${g},${b},${a})`;
+      }
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(LS_KEY);
+          if (raw) {
+            const d = JSON.parse(raw);
+            if (
+              d &&
+              Array.isArray(d.columns) &&
+              Array.isArray(d.days) &&
+              Array.isArray(d.cells)
+            ) {
+              return d;
+            }
+          }
+        } catch (e) {}
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      }
+
+      /* ============ العرض ============ */
+      function render() {
+        renderHead();
+        renderBody();
+        save();
+      }
+
+      function renderHead() {
+        headEl.innerHTML = "";
+        const corner = document.createElement("th");
+        corner.className = "day-col day-corner";
+        corner.textContent = "اليوم";
+        headEl.appendChild(corner);
+        state.columns.forEach((col) => {
+          const th = document.createElement("th");
+          th.dataset.colId = col.id;
+          th.style.borderColor = col.color;
+          th.style.background =
+            "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.22) 100%), linear-gradient(180deg, " +
+            col.color +
+            ", " +
+            col.color +
+            ")";
+          th.innerHTML =
+            '<div class="col-head">' +
+            '<span class="col-name">' +
+            escapeHtml(col.name) +
+            "</span>" +
+            '<div class="col-actions">' +
+            '<button class="icon-btn" title="إعادة تسمية" onclick="renameColumn(\'' +
+            col.id +
+            '\')"><i class="fas fa-pen"></i></button>' +
+            '<input type="color" class="col-color" value="' +
+            col.color +
+            '" title="لون العمود" onchange="setColumnColor(\'' +
+            col.id +
+            '\', this.value)">' +
+            '<button class="icon-btn" title="حذف العمود" onclick="deleteColumn(\'' +
+            col.id +
+            '\')"><i class="fas fa-trash"></i></button>' +
+            "</div></div>";
+          headEl.appendChild(th);
+        });
+      }
+
+      function renderBody() {
+        bodyEl.innerHTML = "";
+        state.days.forEach((day) => {
+          const tr = document.createElement("tr");
+          const th = document.createElement("th");
+          th.className = "day-col";
+          th.textContent = day;
+          tr.appendChild(th);
+
+          const covered = new Set();
+          state.columns.forEach((col) => {
+            if (covered.has(col.id)) return;
+            const cell = cellFor(day, col.id);
+            if (cell && cell.columnIds.length > 1) {
+              tr.appendChild(makeCellTd(day, cell, cell.columnIds.length));
+              cell.columnIds.forEach((id) => covered.add(id));
+            } else {
+              tr.appendChild(makeCellTd(day, cell, 1, col.id));
+              covered.add(col.id);
+            }
+          });
+          bodyEl.appendChild(tr);
+        });
+      }
+
+      function makeCellTd(day, cell, span, singleColId) {
+        const td = document.createElement("td");
+        td.colSpan = span;
+        const color = cell ? colorOfCell(cell) : singleColId ? (colById(singleColId) || {}).color || "#a0a6ad" : "#a0a6ad";
+        td.style.borderColor = hexToRgba(color, 0.45);
+        td.style.background = cell ? hexToRgba(color, 0.08) : "#ffffff";
+        td.className = "lesson-cell";
+
+        if (cell) {
+          cell.lessons.forEach((ls) => {
+            const div = document.createElement("div");
+            div.className = "lesson";
+            div.style.borderColor = color;
+            const sub = document.createElement("span");
+            sub.className = "lesson-subject";
+            sub.textContent = ls.subject || "";
+            const t = document.createElement("span");
+            t.className = "lesson-time";
+            t.textContent = ls.time || "";
+            div.appendChild(sub);
+            div.appendChild(t);
+            td.appendChild(div);
+          });
+          if (cell.columnIds.length > 1) {
+            const badge = document.createElement("span");
+            badge.className = "merged-badge";
+            badge.textContent = "مدمج";
+            td.appendChild(badge);
+          }
+          if (!cell.lessons.length) {
+            const empty = document.createElement("div");
+            empty.className = "cell-empty";
+            empty.textContent = "+";
+            td.appendChild(empty);
+          }
+        } else {
+          const empty = document.createElement("div");
+          empty.className = "cell-empty";
+          empty.textContent = "+";
+          td.appendChild(empty);
+        }
+
+        td.onclick = () => openModal(day, cell ? cell.columnIds.slice() : [singleColId]);
+        return td;
+      }
+
+      /* ============ إدارة الأعمدة ============ */
+      function addColumn() {
+        const palette = [
+          "#1a7f37",
+          "#1155cc",
+          "#b45309",
+          "#9d174d",
+          "#0f766e",
+          "#7c3aed",
+          "#c2410c",
+          "#2563eb"
+        ];
+        const name = prompt("اسم الشخص الجديد:", "شخص جديد");
+        if (name === null) return;
+        const id = "col" + Date.now();
+        const color = palette[state.columns.length % palette.length];
+        state.columns.push({
+          id,
+          name: name.trim() || "شخص جديد",
+          color
+        });
+        render();
+      }
+
+      function renameColumn(id) {
+        const col = colById(id);
+        if (!col) return;
+        const name = prompt("إعادة تسمية العمود:", col.name);
+        if (name !== null && name.trim()) {
+          col.name = name.trim();
+          render();
+        }
+      }
+
+      function deleteColumn(id) {
+        if (!confirm("هل تريد حذف هذا العمود؟ سيتم حذف دروسه من الجدول.")) return;
+        state.columns = state.columns.filter((c) => c.id !== id);
+        state.cells.forEach((c) => {
+          c.columnIds = c.columnIds.filter((x) => x !== id);
+        });
+        state.cells = state.cells.filter((c) => c.columnIds.length > 0);
+        if (modal.columns.includes(id)) closeModal();
+        render();
+      }
+
+      function setColumnColor(id, color) {
+        const col = colById(id);
+        if (col) {
+          col.color = color;
+          render();
+        }
+      }
+
+      /* ============ نافذة تعديل الخلية ============ */
+      function openModal(day, colIds) {
+        modal.day = day;
+        modal.columns = colIds.slice().sort((a, b) => colPos(a) - colPos(b));
+        ensureCell();
+        renderModal();
+        overlay.classList.add("show");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        overlay.classList.remove("show");
+        document.body.style.overflow = "";
+        modal = { day: null, columns: [] };
+      }
+
+      function ensureCell() {
+        let cell = findCell(modal.day, modal.columns);
+        if (!cell) {
+          cell = { day: modal.day, columnIds: modal.columns.slice(), lessons: [] };
+          state.cells.push(cell);
+        }
+        return cell;
+      }
+
+      function currentModalNames() {
+        return modal.columns.map((id) => (colById(id) || { name: "" }).name);
+      }
+
+      function renderModal() {
+        document.getElementById(
+          "modalTitle"
+        ).textContent = modal.day + " — " + currentModalNames().join(" + ");
+
+        const cell = ensureCell();
+
+        const checks = document.getElementById("mergeChecks");
+        checks.innerHTML = "";
+        const others = state.columns.filter((c) => !modal.columns.includes(c.id));
+        if (others.length) {
+          others.forEach((c) => {
+            const label = document.createElement("label");
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            input.value = c.id;
+            input.style.accentColor = c.color;
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(c.name));
+            checks.appendChild(label);
+          });
+        } else {
+          const hint = document.createElement("p");
+          hint.className = "merge-hint";
+          hint.textContent = "لا توجد أعمدة أخرى متاحة للدمج.";
+          checks.appendChild(hint);
+        }
+
+        document.getElementById("unmergeBtn").style.display =
+          modal.columns.length > 1 ? "inline-flex" : "none";
+
+        renderLessonsList();
+      }
+
+      function renderLessonsList() {
+        const cell = ensureCell();
+        const wrap = document.getElementById("lessonsList");
+        wrap.innerHTML = "";
+        cell.lessons.forEach((ls, i) => {
+          const row = document.createElement("div");
+          row.className = "lesson-row";
+          const sub = document.createElement("input");
+          sub.type = "text";
+          sub.placeholder = "اسم الدرس / المادة";
+          sub.value = ls.subject || "";
+          sub.oninput = () => updateLesson(i, "subject", sub.value);
+          const time = document.createElement("input");
+          time.type = "text";
+          time.className = "time";
+          time.placeholder = "الموعد";
+          time.value = ls.time || "";
+          time.oninput = () => updateLesson(i, "time", time.value);
+          const del = document.createElement("button");
+          del.className = "icon-del";
+          del.innerHTML = '<i class="fas fa-trash-alt"></i>';
+          del.title = "حذف الدرس";
+          del.onclick = () => removeLesson(i);
+          row.appendChild(sub);
+          row.appendChild(time);
+          row.appendChild(del);
+          wrap.appendChild(row);
+        });
+        if (!cell.lessons.length) {
+          const hint = document.createElement("p");
+          hint.className = "merge-hint";
+          hint.textContent = "لا توجد دروس بعد — أضف أول درس بالزر أدناه.";
+          wrap.appendChild(hint);
+        }
+      }
+
+      function updateLesson(idx, field, value) {
+        const cell = ensureCell();
+        if (cell.lessons[idx]) cell.lessons[idx][field] = value;
+        save();
+      }
+
+      function addLesson() {
+        const cell = ensureCell();
+        cell.lessons.push({ subject: "", time: "" });
+        renderLessonsList();
+        const inputs = document.querySelectorAll("#lessonsList .lesson-row input");
+        const last = inputs[inputs.length - 1];
+        if (last) last.focus();
+        save();
+      }
+
+      function removeLesson(idx) {
+        const cell = ensureCell();
+        cell.lessons.splice(idx, 1);
+        renderLessonsList();
+        save();
+      }
+
+      /* ============ الدمج والفك ============ */
+      function mergeSelected() {
+        const selected = Array.from(
+          document.querySelectorAll("#mergeChecks input:checked")
+        ).map((i) => i.value);
+        if (!selected.length) {
+          alert("اختر عموداً واحداً على الأقل للدمج.");
+          return;
+        }
+        const cell = ensureCell();
+        const lessons = JSON.parse(JSON.stringify(cell.lessons));
+        const newCols = modal.columns
+          .concat(selected)
+          .sort((a, b) => colPos(a) - colPos(b));
+        state.cells = state.cells.filter(
+          (c) => !(c.day === modal.day && c.columnIds.some((id) => newCols.includes(id)))
+        );
+        state.cells.push({ day: modal.day, columnIds: newCols, lessons });
+        closeModal();
+        render();
+      }
+
+      function unmergeCell() {
+        const cell = findCell(modal.day, modal.columns);
+        if (!cell || cell.columnIds.length < 2) return;
+        const lessons = JSON.parse(JSON.stringify(cell.lessons));
+        state.cells = state.cells.filter((c) => c !== cell);
+        cell.columnIds.forEach((cid) => {
+          state.cells.push({
+            day: modal.day,
+            columnIds: [cid],
+            lessons: JSON.parse(JSON.stringify(lessons))
+          });
+        });
+        closeModal();
+        render();
+      }
+
+      /* ============ حجم الخط ============ */
+      function setFontSize(delta) {
+        fontSize = Math.min(22, Math.max(10, fontSize + delta));
+        tableEl.style.setProperty("--font-size", fontSize + "px");
+        fontLabel.textContent = fontSize + "px";
+      }
+
+      /* ============ الاستيراد والتصدير ============ */
+      function exportJSON() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], {
+          type: "application/json"
+        });
+        const a = document.createElement("a");
+        a.download = "weekly-lessons.json";
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      function handleImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (
+              !Array.isArray(data.columns) ||
+              !Array.isArray(data.days) ||
+              !Array.isArray(data.cells)
+            ) {
+              throw new Error("bad format");
+            }
+            data.columns = data.columns
+              .filter((c) => c && c.id && c.name)
+              .map((c) => ({
+                id: String(c.id),
+                name: String(c.name),
+                color: c.color || "#1a7f37"
+              }));
+            data.cells = data.cells.filter(
+              (c) =>
+                c &&
+                c.day &&
+                Array.isArray(c.columnIds) &&
+                c.columnIds.length
+            );
+            data.cells.forEach((c) => {
+              c.columnIds = c.columnIds.filter((id) =>
+                data.columns.some((x) => x.id === id)
+              );
+              c.lessons = Array.isArray(c.lessons) ? c.lessons : [];
+            });
+            data.cells = data.cells.filter((c) => c.columnIds.length);
+            state = data;
+            render();
+            alert("تم استيراد الجدول بنجاح");
+          } catch (e) {
+            alert("خطأ: ملف JSON غير صالح");
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = "";
+      }
+
+      /* ============ جدول التصدير (نظيف للصورة و PDF) ============ */
+      const exportHost = document.createElement("div");
+      exportHost.style.cssText =
+        "position:fixed;top:0;left:-99999px;background:#fff;padding:20px;z-index:-1;pointer-events:none;";
+      document.body.appendChild(exportHost);
+
+      function buildExportTable() {
+        const t = document.createElement("table");
+        t.dir = "rtl";
+        t.style.borderCollapse = "collapse";
+        t.style.width = "auto";
+        t.style.background = "#ffffff";
+        t.style.color = "#111111";
+        t.style.fontFamily = "'IBM Plex Sans Arabic', 'Tajawal', sans-serif";
+        t.style.fontSize = "14px";
+
+        const thead = document.createElement("thead");
+        const trH = document.createElement("tr");
+        const corner = document.createElement("th");
+        corner.textContent = "اليوم";
+        corner.style.cssText =
+          "background:#f1f3f5;color:#111;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;text-align:center;font-weight:700;white-space:nowrap;";
+        trH.appendChild(corner);
+        state.columns.forEach((col) => {
+          const th = document.createElement("th");
+          th.textContent = col.name;
+          th.style.cssText =
+            "background:" +
+            col.color +
+            ";color:#fff;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;font-weight:700;text-align:center;white-space:nowrap;";
+          trH.appendChild(th);
+        });
+        thead.appendChild(trH);
+        t.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        state.days.forEach((day) => {
+          const tr = document.createElement("tr");
+          const th = document.createElement("th");
+          th.textContent = day;
+          th.style.cssText =
+            "background:#f8f9fa;color:#111;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;font-weight:700;text-align:center;white-space:nowrap;vertical-align:top;";
+          tr.appendChild(th);
+
+          const covered = new Set();
+          state.columns.forEach((col) => {
+            if (covered.has(col.id)) return;
+            const cell = cellFor(day, col.id);
+            if (cell && cell.columnIds.length > 1) {
+              tr.appendChild(buildExportTd(cell, cell.columnIds.length));
+              cell.columnIds.forEach((id) => covered.add(id));
+            } else {
+              tr.appendChild(buildExportTd(cell, 1, col.id));
+              covered.add(col.id);
+            }
+          });
+          tbody.appendChild(tr);
+        });
+        t.appendChild(tbody);
+        return t;
+      }
+
+      function buildExportTd(cell, span, singleColId) {
+        const td = document.createElement("td");
+        td.colSpan = span;
+        let color = "#d0d5da";
+        if (cell && cell.columnIds.length) {
+          const first = colById(cell.columnIds[0]);
+          if (first) color = first.color;
+        } else if (singleColId) {
+          const c = colById(singleColId);
+          if (c) color = c.color;
+        }
+        td.style.border = "1px solid " + hexToRgba(color, 0.45);
+        td.style.background = cell ? hexToRgba(color, 0.08) : "#ffffff";
+        td.style.padding = "10px 16px";
+        td.style.fontSize = "14px";
+        td.style.verticalAlign = "top";
+        td.style.textAlign = "right";
+        td.style.minWidth = "150px";
+
+        if (!cell || !cell.lessons.length) {
+          td.textContent = "—";
+          td.style.textAlign = "center";
+          td.style.color = "#9aa0a6";
+          return td;
+        }
+        cell.lessons.forEach((ls) => {
+          const d = document.createElement("div");
+          d.style.marginBottom = "8px";
+          d.style.borderRight = "3px solid " + color;
+          d.style.paddingRight = "8px";
+          d.innerHTML =
+            '<div style="font-weight:600;line-height:1.5">' +
+            escapeHtml(ls.subject || "") +
+            "</div>" +
+            (ls.time
+              ? '<div style="font-size:12px;color:#555">' +
+                escapeHtml(ls.time) +
+                "</div>"
+              : "");
+          td.appendChild(d);
+        });
+        return td;
+      }
+
+      function exportPNG() {
+        exportHost.innerHTML = "";
+        exportHost.appendChild(buildExportTable());
+        const el = exportHost.firstChild;
+        html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff"
+        }).then((canvas) => {
+          const a = document.createElement("a");
+          a.download = "weekly-lessons.png";
+          a.href = canvas.toDataURL("image/png");
+          a.click();
+          exportHost.innerHTML = "";
+        });
+      }
+
+      function exportPDF() {
+        exportHost.innerHTML = "";
+        exportHost.appendChild(buildExportTable());
+        const el = exportHost.firstChild;
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        html2pdf()
+          .set({
+            margin: 8,
+            filename: "weekly-lessons.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+            jsPDF: {
+              unit: "mm",
+              format: [((w * 25.4) / 96) + 16, ((h * 25.4) / 96) + 16],
+              orientation: "landscape"
+            }
+          })
+          .from(el)
+          .save()
+          .then(() => {
+            exportHost.innerHTML = "";
+          });
+      }
+
+      /* ============ تشغيل ============ */
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
