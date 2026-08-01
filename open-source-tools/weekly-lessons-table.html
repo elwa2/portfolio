@@ -12,12 +12,11 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-1B3TL3YJ0J");
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>جدول الدروس الأسبوعي التفاعلي | Ali Ahmed</title>
+    <title>جدول الدروس الأسبوعي | Ali Ahmed</title>
 
     <link
       rel="stylesheet"
@@ -31,27 +30,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <!-- Scripts for 3D Background -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="../assets/js/three-bg.js" defer></script>
     <script src="../assets/js/main.js" defer></script>
     <script src="../assets/js/svg-icons.js" defer></script>
-    <!-- Export libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link
-      rel="icon"
-      href="../assets/images/logo ico.svg"
-      type="image/svg+xml"
-    />
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
 
     <style>
+      :root {
+        --green-deep: #1b5e20;
+        --green-main: #2e7d32;
+        --green-mid: #388e3c;
+        --green-light: #4caf50;
+        --green-pale: #e8f5e9;
+        --green-tint: #f1f8f2;
+        --gray-bg: #f5f7f5;
+        --gray-border: #dce5de;
+        --text-dark: #1a2e1a;
+        --text-mid: #3a5a3a;
+        --text-light: #6b8a6b;
+      }
+
       .tool-page-wrapper {
-        padding: 50px 0;
+        padding: 50px 0 30px;
         min-height: 80vh;
       }
 
@@ -61,62 +68,114 @@
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
         direction: rtl;
       }
-      .tool-intro {
+
+      /* ======== HEADER BANNER ======== */
+      .schedule-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 28px;
+        position: relative;
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 40%, #388e3c 100%);
+        border-radius: 22px;
+        padding: 40px 30px 36px;
+        box-shadow: 0 10px 40px rgba(27, 94, 32, 0.3), 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
       }
-      .tool-intro h1 {
-        font-size: 2.2rem;
-        color: var(--primary-color);
-        margin-bottom: 10px;
-        font-weight: 700;
+      .schedule-header::before {
+        content: "";
+        position: absolute;
+        top: 0; right: 0; bottom: 0; left: 0;
+        background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
       }
-      .tool-intro p {
-        color: var(--text-color-light);
+      .schedule-header > * {
+        position: relative;
+        z-index: 1;
+      }
+      .schedule-header .deco {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        margin-bottom: 12px;
+      }
+      .schedule-header .deco-icon {
+        font-size: 3rem;
+        line-height: 1;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+      }
+      .schedule-header h1 {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 900;
+        font-size: 3rem;
+        color: #fff;
+        margin: 4px 0 8px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      }
+      .schedule-header .subtitle {
+        color: rgba(255,255,255,0.88);
         font-size: 1rem;
-        max-width: 650px;
-        margin: 0 auto;
+        font-weight: 500;
+      }
+      .schedule-header .line-deco {
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--green-light), var(--green-deep));
+        border-radius: 2px;
+        margin: 12px auto 0;
       }
 
+      /* ======== TOOLBAR ======== */
       .toolbar {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         align-items: center;
         justify-content: center;
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        padding: 16px 20px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 16px;
+        border: 1px solid rgba(var(--primary-rgb), 0.08);
       }
       .btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 18px;
+        gap: 7px;
+        padding: 11px 20px;
         border: none;
-        border-radius: 10px;
-        background: var(--primary-gradient);
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--green-main), var(--green-deep));
         color: #fff;
         font-weight: 700;
         font-size: 14px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        box-shadow: 0 4px 14px rgba(27, 94, 32, 0.3);
       }
       .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+        box-shadow: 0 8px 28px rgba(27, 94, 32, 0.4);
       }
       .btn.ghost {
-        background: transparent;
-        border: 2px solid rgba(var(--primary-rgb), 0.4);
-        color: var(--primary-color);
+        background: var(--green-pale);
+        border: 2px solid var(--green-light);
+        color: var(--green-deep);
+        box-shadow: none;
       }
       .btn.ghost:hover {
-        background: rgba(var(--primary-rgb), 0.08);
+        background: var(--green-light);
+        color: #fff;
+        border-color: var(--green-light);
       }
       .btn.danger {
-        background: var(--secondary-purple);
-        color: #fff;
+        background: linear-gradient(135deg, #e53935, #c62828);
+        box-shadow: 0 4px 14px rgba(229, 57, 53, 0.3);
+      }
+      .btn.danger:hover {
+        box-shadow: 0 8px 28px rgba(229, 57, 53, 0.4);
       }
       .btn-block {
         width: 100%;
@@ -124,10 +183,10 @@
         justify-content: center;
       }
       .btn-sm {
-        padding: 6px 12px;
+        padding: 7px 16px;
         font-size: 13px;
+        border-radius: 10px;
       }
-
       .font-controls {
         display: flex;
         align-items: center;
@@ -136,97 +195,87 @@
       }
       .font-controls span {
         font-size: 13px;
-        color: var(--text-color-light);
+        color: var(--text-light);
         min-width: 42px;
         text-align: center;
+        font-weight: 600;
       }
 
-      .table-wrap {
-        overflow-x: auto;
-        border-radius: 18px;
-        border: 1px solid rgba(var(--primary-rgb), 0.12);
-        box-shadow: 0 15px 40px rgba(15, 40, 90, 0.12);
-        background: #ffffff;
+      /* ======== TABLE CARD ======== */
+      .table-card {
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 12px 48px rgba(20, 60, 20, 0.14), 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid var(--gray-border);
+        background: #fff;
       }
+      .table-scroll {
+        overflow-x: auto;
+      }
+
+      /* ======== TABLE ======== */
       table.weekly {
         width: 100%;
-        min-width: 760px;
+        min-width: 820px;
         border-collapse: collapse;
-        background: #ffffff;
-        color: #232a36;
+        background: #fff;
+        color: var(--text-dark);
         font-size: var(--font-size, 14px);
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
       }
-      table.weekly th,
-      table.weekly td {
-        border: 1px solid #e9ecf2;
-        padding: 12px 14px;
-        vertical-align: top;
+
+      /* --- HEADER ROW --- */
+      table.weekly thead tr {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
       }
       table.weekly thead th {
+        padding: 20px 16px;
         color: #fff;
-        font-weight: 700;
+        font-weight: 800;
         text-align: center;
-        min-width: 130px;
-        padding: 14px 12px;
-        font-size: 1.02em;
-        letter-spacing: 0.2px;
+        min-width: 140px;
+        font-size: 1.1em;
+        letter-spacing: 0.3px;
+        border: none;
+        border-bottom: 4px solid rgba(255,255,255,0.2);
+        position: relative;
       }
-      table.weekly tbody td {
-        color: #2a3242;
-        background: #ffffff;
+      table.weekly thead th:not(:first-child) {
+        border-left: 1px solid rgba(255,255,255,0.15);
       }
-      .day-col {
-        background: #f6f8fb !important;
-        color: #1d2b4f !important;
-        font-weight: 700;
-        text-align: center;
-        white-space: nowrap;
-        position: sticky;
-        inset-inline-start: 0;
-        z-index: 2;
-        font-size: 0.96em;
-        letter-spacing: 0.2px;
-        box-shadow: inset 0 0 0 1px #e9ecf2;
-      }
-      .day-col::before {
-        content: "";
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          var(--secondary-purple)
-        );
-        margin-inline-end: 7px;
-        vertical-align: middle;
-      }
-      .day-corner {
-        width: 95px;
-      }
-
       .col-head {
         display: flex;
         flex-direction: column;
-        gap: 9px;
+        gap: 8px;
         align-items: center;
         justify-content: center;
       }
+      .col-icon {
+        font-size: 1.8rem;
+        line-height: 1;
+        margin-bottom: 4px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        opacity: 0.95;
+      }
+      .col-name {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 800;
+        font-size: 1.1em;
+        letter-spacing: 0.3px;
+      }
       .col-actions {
         display: flex;
-        gap: 6px;
+        gap: 5px;
         align-items: center;
         justify-content: center;
       }
       .col-actions .icon-btn {
-        background: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.2);
         color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.28);
-        width: 27px;
-        height: 27px;
-        border-radius: 7px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 11px;
         display: inline-flex;
@@ -235,130 +284,258 @@
         transition: all 0.2s ease;
       }
       .col-actions .icon-btn:hover {
-        background: rgba(255, 255, 255, 0.45);
-        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
       }
       .col-color {
-        width: 28px;
-        height: 26px;
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        border-radius: 7px;
+        width: 26px;
+        height: 24px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 6px;
         padding: 0;
         background: transparent;
         cursor: pointer;
       }
 
+      /* --- DAY COLUMN --- */
+      .day-col {
+        background: var(--green-tint) !important;
+        color: var(--green-deep) !important;
+        font-weight: 700;
+        text-align: center;
+        white-space: nowrap;
+        position: sticky;
+        inset-inline-start: 0;
+        z-index: 2;
+        width: 120px;
+        min-width: 120px;
+        font-family: "Tajawal", sans-serif;
+        font-size: 1em;
+        border-left: 3px solid var(--green-light) !important;
+        border-right: none !important;
+      }
+      .day-col .day-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      .day-col .day-icon {
+        font-size: 1.5rem;
+        line-height: 1;
+        color: var(--green-main);
+      }
+      .day-col .day-name {
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        font-size: 1.05em;
+      }
+      .day-corner {
+        background: linear-gradient(135deg, var(--green-deep), var(--green-mid)) !important;
+        color: #fff !important;
+        font-size: 0.95em;
+        border-left: none !important;
+      }
+      .day-corner .day-icon {
+        filter: grayscale(1) brightness(2);
+      }
+
+      /* --- CELLS --- */
+      table.weekly tbody td {
+        background: #fff;
+        color: var(--text-dark);
+        padding: 14px 16px;
+        vertical-align: top;
+        border: 1px solid var(--gray-border);
+        transition: background 0.15s ease;
+      }
+      table.weekly tbody tr:nth-child(even) td:not(.day-col) {
+        background: #fafcfb;
+      }
       .lesson-cell {
         cursor: pointer;
         position: relative;
-        transition: box-shadow 0.2s ease, background 0.2s ease;
       }
       .lesson-cell:hover {
-        box-shadow: inset 0 0 0 2px rgba(var(--primary-rgb), 0.45);
+        background: var(--green-tint) !important;
       }
+
+      /* --- LESSON CARD --- */
       .lesson {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         margin-bottom: 8px;
-        border-right: 4px solid;
-        padding: 7px 12px;
-        border-radius: 10px;
-        line-height: 1.55;
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 1px 4px rgba(20, 40, 80, 0.08);
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
+        border-radius: 14px;
+        border-right: 4px solid var(--green-main);
+        box-shadow: 0 2px 10px rgba(20, 60, 20, 0.08);
+        transition: all 0.25s ease;
+      }
+      .lesson:hover {
+        box-shadow: 0 6px 20px rgba(20, 60, 20, 0.16);
+        transform: translateX(-4px);
       }
       .lesson:last-child {
         margin-bottom: 0;
       }
+      .lesson-icon {
+        font-size: 1.1rem;
+        line-height: 1;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--green-pale), #e8f5e9);
+        border-radius: 12px;
+        color: var(--green-main);
+        box-shadow: 0 2px 6px rgba(27, 94, 32, 0.12);
+      }
+      .lesson-info {
+        flex: 1;
+        min-width: 0;
+      }
       .lesson-subject {
-        font-weight: 600;
+        font-weight: 700;
         display: block;
-        color: #1a2130;
+        color: var(--text-dark);
+        font-size: 1em;
+        line-height: 1.4;
+        margin-bottom: 2px;
       }
-      .lesson-time {
-        font-size: 0.8em;
-        color: #667085;
+      .lesson-time-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: linear-gradient(135deg, var(--green-main), var(--green-deep));
+        color: #fff;
+        font-size: 0.72em;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(27, 94, 32, 0.3);
+        letter-spacing: 0.2px;
       }
+      .lesson-time-badge i {
+        font-size: 0.7em;
+      }
+
+      /* --- EMPTY CELL --- */
       .cell-empty {
-        color: #c6ccd6;
+        color: #c5d4c5;
         text-align: center;
         font-size: 18px;
-        padding: 12px;
+        padding: 22px 12px;
         transition: color 0.2s ease;
+        font-weight: 500;
+        opacity: 0.6;
       }
       .lesson-cell:hover .cell-empty {
-        color: var(--primary-color);
+        color: var(--green-main);
+        opacity: 1;
       }
+
+      /* --- MERGED BADGE --- */
       .merged-badge {
         position: absolute;
         top: 8px;
         left: 8px;
-        background: linear-gradient(
-          135deg,
-          var(--secondary-purple),
-          var(--primary-color)
-        );
+        background: linear-gradient(135deg, var(--green-light), var(--green-main));
         color: #fff;
-        font-size: 10px;
-        padding: 3px 9px;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 3px 10px;
         border-radius: 20px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+        box-shadow: 0 2px 8px rgba(27, 94, 32, 0.3);
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
 
+      /* --- FOOTER NOTE --- */
       .tool-note {
         text-align: center;
-        color: var(--text-color-light);
-        font-size: 0.9rem;
-        margin-top: 20px;
-        font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        color: var(--text-light);
+        font-size: 0.88rem;
+        margin-top: 22px;
+        font-weight: 500;
+        padding: 10px 20px;
+        background: var(--green-tint);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .tool-note i {
+        color: var(--green-main);
       }
 
-      /* Modal */
+      /* ======== MODAL ======== */
       .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(0, 20, 0, 0.55);
         z-index: 2000;
         display: none;
         align-items: center;
         justify-content: center;
         padding: 20px;
-        backdrop-filter: blur(3px);
+        backdrop-filter: blur(4px);
       }
       .modal-overlay.show {
         display: flex;
       }
       .modal {
-        background: var(--card-bg);
-        border-radius: 18px;
+        background: #fff;
+        border-radius: 20px;
         max-width: 540px;
         width: 100%;
         max-height: 85vh;
         overflow: auto;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+        border: 1px solid var(--gray-border);
       }
       .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 18px 22px;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 2px solid var(--green-pale);
         position: sticky;
         top: 0;
-        background: var(--card-bg);
+        background: #fff;
         z-index: 3;
       }
       .modal-header h3 {
-        font-size: 1.15rem;
-        color: var(--text-color);
+        font-size: 1.1rem;
+        color: var(--green-deep);
         margin: 0;
+        font-weight: 800;
+        font-family: "Tajawal", sans-serif;
       }
       .modal-close {
-        background: none;
+        background: var(--green-pale);
         border: none;
-        font-size: 20px;
-        color: var(--text-color-light);
+        font-size: 16px;
+        color: var(--green-deep);
         cursor: pointer;
         line-height: 1;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .modal-close:hover {
+        background: var(--green-main);
+        color: #fff;
       }
       .modal-body {
         padding: 20px 22px;
@@ -371,13 +548,19 @@
       }
       .lesson-row input {
         flex: 1;
-        padding: 10px 12px;
-        border: 1px solid var(--border-color);
+        padding: 10px 14px;
+        border: 2px solid var(--gray-border);
         border-radius: 10px;
-        background: var(--input-bg);
-        color: var(--text-color);
+        background: var(--gray-bg);
+        color: var(--text-dark);
         font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif;
         font-size: 14px;
+        transition: border-color 0.2s ease;
+      }
+      .lesson-row input:focus {
+        outline: none;
+        border-color: var(--green-main);
+        background: #fff;
       }
       .lesson-row input.time {
         flex: 0 0 130px;
@@ -387,46 +570,58 @@
         height: 38px;
         border-radius: 10px;
         border: none;
-        background: rgba(231, 76, 60, 0.15);
-        color: #e74c3c;
+        background: #fef2f2;
+        color: #e53935;
         cursor: pointer;
         font-size: 14px;
         flex: 0 0 auto;
+        transition: all 0.2s ease;
+      }
+      .icon-del:hover {
+        background: #e53935;
+        color: #fff;
       }
       .divider {
-        border-top: 1px dashed var(--border-color);
+        border-top: 2px dashed var(--gray-border);
         margin: 18px 0;
       }
       .merge-section h4 {
         margin-bottom: 10px;
-        color: var(--text-color);
+        color: var(--green-deep);
         font-size: 1rem;
+        font-weight: 700;
+        font-family: "Tajawal", sans-serif;
       }
       .merge-checks {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
         margin-bottom: 12px;
       }
       .merge-checks label {
         display: inline-flex;
         gap: 6px;
         align-items: center;
-        padding: 8px 12px;
-        border: 1px solid var(--border-color);
+        padding: 8px 14px;
+        border: 2px solid var(--gray-border);
         border-radius: 10px;
         cursor: pointer;
-        color: var(--text-color);
+        color: var(--text-dark);
         font-size: 14px;
-        background: var(--input-bg);
+        background: var(--gray-bg);
+        transition: all 0.2s ease;
+      }
+      .merge-checks label:hover {
+        border-color: var(--green-light);
+        background: var(--green-pale);
       }
       .merge-hint {
-        color: var(--text-color-light);
+        color: var(--text-light);
         font-size: 0.85rem;
         margin-bottom: 10px;
       }
 
-      /* Fix for 3D Background Overlap */
+      /* --- THEME TOGGLE FIX --- */
       #three-canvas-container {
         position: fixed;
         top: 0;
@@ -446,42 +641,12 @@
     <div class="grain-overlay"></div>
     <div id="three-canvas-container"></div>
     <div class="floating-background">
-      <div
-        class="floating-icon"
-        style="left: 10%; animation-duration: 8s; animation-delay: 0s"
-      >
-        🚀
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 25%; animation-duration: 10s; animation-delay: 2s"
-      >
-        ⭐
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 40%; animation-duration: 12s; animation-delay: 4s"
-      >
-        🔥
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 55%; animation-duration: 9s; animation-delay: 1s"
-      >
-        💎
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 70%; animation-duration: 11s; animation-delay: 3s"
-      >
-        🎯
-      </div>
-      <div
-        class="floating-icon"
-        style="left: 85%; animation-duration: 13s; animation-delay: 5s"
-      >
-        ⚡
-      </div>
+      <div class="floating-icon" style="left:10%;animation-duration:8s;animation-delay:0s">📚</div>
+      <div class="floating-icon" style="left:25%;animation-duration:10s;animation-delay:2s">⏰</div>
+      <div class="floating-icon" style="left:40%;animation-duration:12s;animation-delay:4s">✏️</div>
+      <div class="floating-icon" style="left:55%;animation-duration:9s;animation-delay:1s">🎒</div>
+      <div class="floating-icon" style="left:70%;animation-duration:11s;animation-delay:3s">🎓</div>
+      <div class="floating-icon" style="left:85%;animation-duration:13s;animation-delay:5s">📝</div>
     </div>
 
     <header class="header">
@@ -523,70 +688,63 @@
     <div class="tool-page-wrapper">
       <div class="container">
         <div class="lesson-tool">
-          <div class="tool-intro">
-            <h1>📅 جدول الدروس الأسبوعي التفاعلي</h1>
-            <p>
-              أنشئ جدول دروس أسبوعي لكل شخص، لوّن الأعمدة، ادمج الدروس
-              المشتركة، وصدّر الجدول بالشكل اللي يناسبك.
-            </p>
+
+          <!-- ======== HEADER ======== -->
+          <div class="schedule-header">
+            <div class="deco">
+              <span class="deco-icon"><i class="fas fa-book-open" style="color:rgba(255,255,255,0.9)"></i></span>
+              <span class="deco-icon"><i class="fas fa-calendar-check" style="color:#fff"></i></span>
+              <span class="deco-icon"><i class="fas fa-clock" style="color:rgba(255,255,255,0.9)"></i></span>
+            </div>
+            <h1>جدول الدروس</h1>
+            <p class="subtitle">نظّم أسبوعك بسهولة — أضف الدروس، لوّن الأعمدة، ادمج المشتركات</p>
+            <div class="line-deco"></div>
           </div>
 
+          <!-- ======== TOOLBAR ======== -->
           <div class="toolbar">
             <button class="btn" onclick="addColumn()">
-              <i class="fas fa-plus"></i> إضافة عمود / شخص
+              <i class="fas fa-user-plus"></i> إضافة شخص
             </button>
-            <button
-              class="btn ghost"
-              onclick="document.getElementById('jsonInput').click()"
-            >
-              <i class="fas fa-file-import"></i> استيراد JSON
+            <button class="btn ghost" onclick="document.getElementById('jsonInput').click()">
+              <i class="fas fa-file-import"></i> استيراد
             </button>
             <button class="btn ghost" onclick="exportJSON()">
               <i class="fas fa-file-export"></i> تصدير JSON
             </button>
             <button class="btn ghost" onclick="exportPDF()">
-              <i class="fas fa-file-pdf"></i> تصدير PDF
+              <i class="fas fa-file-pdf"></i> PDF
             </button>
             <button class="btn ghost" onclick="exportPNG()">
-              <i class="fas fa-image"></i> تصدير صورة
+              <i class="fas fa-image"></i> صورة
             </button>
             <div class="font-controls">
-              <button class="btn btn-sm" onclick="setFontSize(-1)" title="تصغير الخط">
-                A−
-              </button>
+              <button class="btn btn-sm" onclick="setFontSize(-1)" title="تصغير">A−</button>
               <span id="fontLabel">14px</span>
-              <button class="btn btn-sm" onclick="setFontSize(1)" title="تكبير الخط">
-                A+
-              </button>
+              <button class="btn btn-sm" onclick="setFontSize(1)" title="تكبير">A+</button>
+            </div>
+          </div>
+          <input type="file" id="jsonInput" accept=".json,application/json" style="display:none" onchange="handleImport(event)" />
+
+          <!-- ======== TABLE CARD ======== -->
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="weekly" id="weeklyTable">
+                <thead><tr id="weeklyHead"></tr></thead>
+                <tbody id="weeklyBody"></tbody>
+              </table>
             </div>
           </div>
 
-          <input
-            type="file"
-            id="jsonInput"
-            accept=".json,application/json"
-            style="display: none"
-            onchange="handleImport(event)"
-          />
-
-          <div class="table-wrap">
-            <table class="weekly" id="weeklyTable">
-              <thead>
-                <tr id="weeklyHead"></tr>
-              </thead>
-              <tbody id="weeklyBody"></tbody>
-            </table>
-          </div>
-
-          <p class="tool-note">
-            💡 اضغط على أي خلية لإضافة أو تعديل الدروس، أو لدمجها مع أعمدة
-            أخرى في نفس اليوم.
+          <p class="tool-note" style="display:flex;justify-content:center;">
+            <i class="fas fa-mouse-pointer"></i>
+            اضغط على أي خلية لتعديل الدروس أو دمج الأعمدة
           </p>
         </div>
       </div>
     </div>
 
-    <!-- نافذة تعديل الخلية -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="cellModal">
       <div class="modal">
         <div class="modal-header">
@@ -600,28 +758,21 @@
           </button>
           <div class="divider"></div>
           <div class="merge-section">
-            <h4><i class="fas fa-object-group"></i> دمج الخلية مع أعمدة أخرى</h4>
-            <p class="merge-hint">
-              اختر أعمدة أخرى لنفس اليوم لتجميع دروسهم في خلية واحدة مشتركة.
-            </p>
+            <h4><i class="fas fa-object-group"></i> دمج مع أعمدة أخرى</h4>
+            <p class="merge-hint">اختر أعمدة لنفس اليوم لتجميع الدروس في خلية واحدة.</p>
             <div class="merge-checks" id="mergeChecks"></div>
             <button class="btn btn-block" onclick="mergeSelected()">
-              دمج مع المحدد
+              <i class="fas fa-link"></i> دمج
             </button>
-            <button
-              class="btn btn-block danger"
-              id="unmergeBtn"
-              onclick="unmergeCell()"
-              style="display: none"
-            >
-              فك الدمج
+            <button class="btn btn-block danger" id="unmergeBtn" onclick="unmergeCell()" style="display:none">
+              <i class="fas fa-unlink"></i> فك الدمج
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- الفوتر -->
+    <!-- FOOTER -->
     <footer class="footer" id="footer_aboutus">
       <div class="container">
         <div class="footer-content">
@@ -642,7 +793,6 @@
             </div>
             <p class="footer-cr">Custom Css Salla zid</p>
           </div>
-
           <div class="footer-links">
             <h3>روابط سريعة</h3>
             <ul>
@@ -651,127 +801,85 @@
               <li><a href="../index.html#contact">تواصل معنا</a></li>
             </ul>
           </div>
-
           <div class="footer-contact">
             <h3>تواصل معنا</h3>
             <ul>
               <li>
-                <svg class="svg-icon" viewBox="0 0 384 512">
-                  <use
-                    href="../assets/images/icons.svg#icon-map-marker-alt"
-                  ></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 384 512"><use href="../assets/images/icons.svg#icon-map-marker-alt"></use></svg>
                 <span>مصر</span>
               </li>
               <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-phone"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-phone"></use></svg>
                 <span>+20 100 224 1591</span>
               </li>
               <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-envelope"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-envelope"></use></svg>
                 <span>salla1zid@gmail.com</span>
               </li>
             </ul>
             <div class="footer-social">
               <a href="https://wa.me/201002241591" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
               </a>
               <a href="https://www.instagram.com/salla1zid/" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-instagram"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-instagram"></use></svg>
               </a>
               <a href="https://twitter.com/salla1zid" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-twitter"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-twitter"></use></svg>
               </a>
               <a href="https://t.me/cssfree1" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 496 512">
-                  <use href="../assets/images/icons.svg#icon-telegram"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 496 512"><use href="../assets/images/icons.svg#icon-telegram"></use></svg>
               </a>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>
-            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
-            أدوات المطورين
-          </p>
+          <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | أدوات المطورين</p>
         </div>
       </div>
     </footer>
 
-    <!-- زر واتساب عائم -->
-    <a
-      href="https://wa.me/201002241591"
-      class="floating-whatsapp"
-      target="_blank"
-    >
-      <svg class="svg-icon" viewBox="0 0 448 512">
-        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-      </svg>
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
     </a>
 
     <script>
-      /* ============ الحالة (State) ============ */
-      const LS_KEY = "weekly-lessons-table-v1";
+      /* ============ ICON MAP ============ */
+      const ICON_MAP = {
+        "قرآن": "fa-book-quran", "قرآن كريم": "fa-book-quran", "تجويد": "fa-book-quran",
+        "إنجليزي": "fa-language", "english": "fa-language", "لغة انجليزية": "fa-language", "انجليزي": "fa-language",
+        "عربية": "fa-book", "عربي": "fa-book", "لغة عربية": "fa-book",
+        "رياضيات": "fa-square-root-variable", "رياضيات": "fa-square-root-variable", "math": "fa-square-root-variable",
+        "دراسات": "fa-globe-americas", "اجتماعيات": "fa-globe-americas", "جغرافيا": "fa-globe-americas", "تاريخ": "fa-landmark",
+        "فيزياء": "fa-bolt", "علوم": "fa-flask", "كيمياء": "fa-vial",
+        "رياضة": "fa-futbol", "تربية رياضية": "fa-futbol",
+        "موسيقى": "fa-music", "فنون": "fa-palette",
+        "مس بشرى": "fa-book-open", "مس دينا": "fa-book-open", "مس": "fa-book-open",
+      };
+      function lessonIcon(subj) {
+        const s = (subj || "").trim().toLowerCase();
+        for (const [k, v] of Object.entries(ICON_MAP)) {
+          if (s.includes(k.toLowerCase())) return '<i class="fas ' + v + '"></i>';
+        }
+        return '<i class="fas fa-book"></i>';
+      }
 
+      /* ============ STATE ============ */
+      const LS_KEY = "weekly-lessons-table-v1";
       const DEFAULT_STATE = {
         columns: [
-          { id: "col1", name: "العمود الاول", color: "#1a7f37" },
-          { id: "col2", name: "العمود الثانى ", color: "#1155cc" }
+          { id: "col1", name: "أحمد", color: "#1b5e20" },
+          { id: "col2", name: "أسر وتقى", color: "#1565c0" }
         ],
-        days: [
-          "السبت",
-          "الأحد",
-          "الاثنين",
-          "الثلاثاء",
-          "الأربعاء",
-          "الخميس",
-          "الجمعة"
-        ],
+        days: ["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"],
         cells: [
-          {
-            day: "السبت",
-            columnIds: ["col1", "col2"],
-            lessons: [{ subject: "قرآن", time: "الساعة 5" }]
-          },
-          {
-            day: "الأحد",
-            columnIds: ["col1"],
-            lessons: [
-              { subject: "مس بشرى", time: "الساعة 4" },
-              { subject: "رياضة", time: "الساعة 1.5" }
-            ]
-          },
-          {
-            day: "الأحد",
-            columnIds: ["col2"],
-            lessons: [{ subject: "مس دينا", time: "الساعة 3" }]
-          },
-          {
-            day: "الاثنين",
-            columnIds: ["col1"],
-            lessons: [{ subject: "مس بشرى", time: "الساعة 4" }]
-          },
-          {
-            day: "الثلاثاء",
-            columnIds: ["col2"],
-            lessons: [{ subject: "مس دينا", time: "الساعة 3" }]
-          },
-          {
-            day: "الخميس",
-            columnIds: ["col1", "col2"],
-            lessons: [{ subject: "قرآن", time: "الساعة 5" }]
-          }
+          { day:"السبت", columnIds:["col1","col2"], lessons:[{subject:"قرآن",time:"4:00"}] },
+          { day:"الأحد", columnIds:["col1"], lessons:[{subject:"مس بشرى",time:"8:00"},{subject:"رياضة",time:"9:00"}] },
+          { day:"الأحد", columnIds:["col2"], lessons:[{subject:"مس دينا",time:"10:00"}] },
+          { day:"الاثنين", columnIds:["col1"], lessons:[{subject:"إنجليزي",time:"4:00"}] },
+          { day:"الثلاثاء", columnIds:["col2"], lessons:[{subject:"دراسات",time:"10:00"}] },
+          { day:"الأربعاء", columnIds:["col1"], lessons:[{subject:"مس بشرى",time:"8:00"},{subject:"إنجليزي",time:"9:00"}] },
+          { day:"الخميس", columnIds:["col1","col2"], lessons:[{subject:"قرآن",time:"4:00"}] },
         ]
       };
 
@@ -785,76 +893,37 @@
       const fontLabel = document.getElementById("fontLabel");
       let fontSize = 14;
 
-      /* ============ أدوات مساعدة ============ */
-      function colPos(id) {
-        return state.columns.findIndex((c) => c.id === id);
-      }
-
-      function cellFor(day, colId) {
-        return state.cells.find(
-          (c) => c.day === day && c.columnIds.includes(colId)
-        );
-      }
-
+      /* ============ HELPERS ============ */
+      function colPos(id) { return state.columns.findIndex(c => c.id === id); }
+      function cellFor(day, colId) { return state.cells.find(c => c.day === day && c.columnIds.includes(colId)); }
       function findCell(day, colIds) {
-        const key = colIds.slice().sort().join(",");
-        return state.cells.find(
-          (c) => c.day === day && c.columnIds.slice().sort().join(",") === key
-        );
+        const k = colIds.slice().sort().join(",");
+        return state.cells.find(c => c.day === day && c.columnIds.slice().sort().join(",") === k);
       }
-
-      function colById(id) {
-        return state.columns.find((c) => c.id === id);
-      }
-
+      function colById(id) { return state.columns.find(c => c.id === id); }
       function colorOfCell(cell) {
         const first = cell && cell.columnIds.length ? colById(cell.columnIds[0]) : null;
         return first ? first.color : "#a0a6ad";
       }
-
       function hexToRgba(hex, a) {
         let h = String(hex || "").replace("#", "");
-        if (h.length === 3) h = h.split("").map((x) => x + x).join("");
+        if (h.length === 3) h = h.split("").map(x => x + x).join("");
         if (h.length !== 6) return `rgba(160,166,173,${a})`;
-        const r = parseInt(h.slice(0, 2), 16);
-        const g = parseInt(h.slice(2, 4), 16);
-        const b = parseInt(h.slice(4, 6), 16);
-        return `rgba(${r},${g},${b},${a})`;
+        return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;
       }
-
-      function escapeHtml(str) {
-        return String(str || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+      function escapeHtml(s) {
+        return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
       }
-
-      function save() {
-        try {
-          localStorage.setItem(LS_KEY, JSON.stringify(state));
-        } catch (e) {}
-      }
-
+      function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){} }
       function loadState() {
         try {
-          const raw = localStorage.getItem(LS_KEY);
-          if (raw) {
-            const d = JSON.parse(raw);
-            if (
-              d &&
-              Array.isArray(d.columns) &&
-              Array.isArray(d.days) &&
-              Array.isArray(d.cells)
-            ) {
-              return d;
-            }
-          }
-        } catch (e) {}
+          const r = localStorage.getItem(LS_KEY);
+          if (r) { const d = JSON.parse(r); if (d && Array.isArray(d.columns) && Array.isArray(d.days) && Array.isArray(d.cells)) return d; }
+        } catch(e){}
         return JSON.parse(JSON.stringify(DEFAULT_STATE));
       }
 
-      /* ============ العرض ============ */
+      /* ============ RENDER ============ */
       function render() {
         renderHead();
         renderBody();
@@ -865,56 +934,47 @@
         headEl.innerHTML = "";
         const corner = document.createElement("th");
         corner.className = "day-col day-corner";
-        corner.textContent = "اليوم";
+        corner.innerHTML = '<i class="fas fa-calendar-day" style="font-size:1.3rem"></i>';
         headEl.appendChild(corner);
-        state.columns.forEach((col) => {
+
+        state.columns.forEach((col, idx) => {
           const th = document.createElement("th");
           th.dataset.colId = col.id;
-          th.style.borderColor = col.color;
-          th.style.background =
-            "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.22) 100%), linear-gradient(180deg, " +
-            col.color +
-            ", " +
-            col.color +
-            ")";
+          const icons = ["fa-user-graduate","fa-user-tie","fa-user","fa-user-md"];
           th.innerHTML =
             '<div class="col-head">' +
-            '<span class="col-name">' +
-            escapeHtml(col.name) +
-            "</span>" +
-            '<div class="col-actions">' +
-            '<button class="icon-btn" title="إعادة تسمية" onclick="renameColumn(\'' +
-            col.id +
-            '\')"><i class="fas fa-pen"></i></button>' +
-            '<input type="color" class="col-color" value="' +
-            col.color +
-            '" title="لون العمود" onchange="setColumnColor(\'' +
-            col.id +
-            '\', this.value)">' +
-            '<button class="icon-btn" title="حذف العمود" onclick="deleteColumn(\'' +
-            col.id +
-            '\')"><i class="fas fa-trash"></i></button>' +
-            "</div></div>";
+              '<span class="col-icon"><i class="fas ' + icons[idx % icons.length] + '"></i></span>' +
+              '<span class="col-name">' + escapeHtml(col.name) + '</span>' +
+              '<div class="col-actions">' +
+                '<button class="icon-btn" title="إعادة تسمية" onclick="renameColumn(\'' + col.id + '\')"><i class="fas fa-pen"></i></button>' +
+                '<input type="color" class="col-color" value="' + col.color + '" title="لون العمود" onchange="setColumnColor(\'' + col.id + '\', this.value)">' +
+                '<button class="icon-btn" title="حذف" onclick="deleteColumn(\'' + col.id + '\')"><i class="fas fa-trash"></i></button>' +
+              '</div>' +
+            '</div>';
           headEl.appendChild(th);
         });
       }
 
       function renderBody() {
         bodyEl.innerHTML = "";
-        state.days.forEach((day) => {
+        state.days.forEach((day, dayIdx) => {
           const tr = document.createElement("tr");
           const th = document.createElement("th");
           th.className = "day-col";
-          th.textContent = day;
+          th.innerHTML =
+            '<div class="day-inner">' +
+              '<span class="day-icon"><i class="fas fa-calendar-day"></i></span>' +
+              '<span class="day-name">' + escapeHtml(day) + '</span>' +
+            '</div>';
           tr.appendChild(th);
 
           const covered = new Set();
-          state.columns.forEach((col) => {
+          state.columns.forEach(col => {
             if (covered.has(col.id)) return;
             const cell = cellFor(day, col.id);
             if (cell && cell.columnIds.length > 1) {
               tr.appendChild(makeCellTd(day, cell, cell.columnIds.length));
-              cell.columnIds.forEach((id) => covered.add(id));
+              cell.columnIds.forEach(id => covered.add(id));
             } else {
               tr.appendChild(makeCellTd(day, cell, 1, col.id));
               covered.add(col.id);
@@ -927,103 +987,75 @@
       function makeCellTd(day, cell, span, singleColId) {
         const td = document.createElement("td");
         td.colSpan = span;
-        const color = cell ? colorOfCell(cell) : singleColId ? (colById(singleColId) || {}).color || "#a0a6ad" : "#a0a6ad";
-        td.style.borderColor = hexToRgba(color, 0.45);
-        td.style.background = cell ? hexToRgba(color, 0.08) : "#ffffff";
+        const color = cell ? colorOfCell(cell) : (singleColId ? (colById(singleColId) || {}).color || "#a0a6ad" : "#a0a6ad");
+        td.style.borderColor = hexToRgba(color, 0.25);
         td.className = "lesson-cell";
 
         if (cell) {
-          cell.lessons.forEach((ls) => {
+          cell.lessons.forEach(ls => {
             const div = document.createElement("div");
             div.className = "lesson";
             div.style.borderColor = color;
-            const sub = document.createElement("span");
-            sub.className = "lesson-subject";
-            sub.textContent = ls.subject || "";
-            const t = document.createElement("span");
-            t.className = "lesson-time";
-            t.textContent = ls.time || "";
-            div.appendChild(sub);
-            div.appendChild(t);
+            const icon = document.createElement("span");
+            icon.className = "lesson-icon";
+            icon.style.color = color;
+            icon.innerHTML = lessonIcon(ls.subject);
+            const info = document.createElement("span");
+            info.className = "lesson-info";
+            info.innerHTML =
+              '<span class="lesson-subject">' + escapeHtml(ls.subject) + '</span>' +
+              (ls.time
+                ? '<span class="lesson-time-badge"><i class="fas fa-clock"></i> ' + escapeHtml(ls.time) + '</span>'
+                : "");
+            div.appendChild(icon);
+            div.appendChild(info);
             td.appendChild(div);
           });
           if (cell.columnIds.length > 1) {
             const badge = document.createElement("span");
             badge.className = "merged-badge";
-            badge.textContent = "مدمج";
+            badge.innerHTML = '<i class="fas fa-link"></i> مشترك';
             td.appendChild(badge);
           }
           if (!cell.lessons.length) {
-            const empty = document.createElement("div");
-            empty.className = "cell-empty";
-            empty.textContent = "+";
-            td.appendChild(empty);
+            td.innerHTML += '<div class="cell-empty">—</div>';
           }
         } else {
-          const empty = document.createElement("div");
-          empty.className = "cell-empty";
-          empty.textContent = "+";
-          td.appendChild(empty);
+          td.innerHTML = '<div class="cell-empty">—</div>';
         }
 
         td.onclick = () => openModal(day, cell ? cell.columnIds.slice() : [singleColId]);
         return td;
       }
 
-      /* ============ إدارة الأعمدة ============ */
+      /* ============ COLUMN MANAGEMENT ============ */
       function addColumn() {
-        const palette = [
-          "#1a7f37",
-          "#1155cc",
-          "#b45309",
-          "#9d174d",
-          "#0f766e",
-          "#7c3aed",
-          "#c2410c",
-          "#2563eb"
-        ];
         const name = prompt("اسم الشخص الجديد:", "شخص جديد");
         if (name === null) return;
-        const id = "col" + Date.now();
-        const color = palette[state.columns.length % palette.length];
-        state.columns.push({
-          id,
-          name: name.trim() || "شخص جديد",
-          color
-        });
+        const palette = ["#1b5e20","#1565c0","#b45309","#9d174d","#0f766e","#7c3aed","#c2410c","#2563eb"];
+        state.columns.push({ id: "col" + Date.now(), name: name.trim() || "شخص جديد", color: palette[state.columns.length % palette.length] });
         render();
       }
-
       function renameColumn(id) {
         const col = colById(id);
         if (!col) return;
-        const name = prompt("إعادة تسمية العمود:", col.name);
-        if (name !== null && name.trim()) {
-          col.name = name.trim();
-          render();
-        }
+        const name = prompt("إعادة تسمية:", col.name);
+        if (name !== null && name.trim()) { col.name = name.trim(); render(); }
       }
-
       function deleteColumn(id) {
-        if (!confirm("هل تريد حذف هذا العمود؟ سيتم حذف دروسه من الجدول.")) return;
-        state.columns = state.columns.filter((c) => c.id !== id);
-        state.cells.forEach((c) => {
-          c.columnIds = c.columnIds.filter((x) => x !== id);
-        });
-        state.cells = state.cells.filter((c) => c.columnIds.length > 0);
+        if (!confirm("حذف هذا العمود ودروسه؟")) return;
+        state.columns = state.columns.filter(c => c.id !== id);
+        state.cells.forEach(c => { c.columnIds = c.columnIds.filter(x => x !== id); });
+        state.cells = state.cells.filter(c => c.columnIds.length > 0);
         if (modal.columns.includes(id)) closeModal();
         render();
       }
-
       function setColumnColor(id, color) {
         const col = colById(id);
-        if (col) {
-          col.color = color;
-          render();
-        }
+        if (col) { col.color = color; render(); }
       }
 
-      /* ============ نافذة تعديل الخلية ============ */
+      /* ============ MODAL ============ */
       function openModal(day, colIds) {
         modal.day = day;
         modal.columns = colIds.slice().sort((a, b) => colPos(a) - colPos(b));
@@ -1032,57 +1064,38 @@
         overlay.classList.add("show");
         document.body.style.overflow = "hidden";
       }
-
       function closeModal() {
         overlay.classList.remove("show");
         document.body.style.overflow = "";
         modal = { day: null, columns: [] };
       }
-
       function ensureCell() {
         let cell = findCell(modal.day, modal.columns);
-        if (!cell) {
-          cell = { day: modal.day, columnIds: modal.columns.slice(), lessons: [] };
-          state.cells.push(cell);
-        }
+        if (!cell) { cell = { day: modal.day, columnIds: modal.columns.slice(), lessons: [] }; state.cells.push(cell); }
         return cell;
       }
-
-      function currentModalNames() {
-        return modal.columns.map((id) => (colById(id) || { name: "" }).name);
-      }
+      function currentModalNames() { return modal.columns.map(id => (colById(id) || { name: "" }).name); }
 
       function renderModal() {
-        document.getElementById(
-          "modalTitle"
-        ).textContent = modal.day + " — " + currentModalNames().join(" + ");
-
+        document.getElementById("modalTitle").textContent = modal.day + " — " + currentModalNames().join(" + ");
         const cell = ensureCell();
 
         const checks = document.getElementById("mergeChecks");
         checks.innerHTML = "";
-        const others = state.columns.filter((c) => !modal.columns.includes(c.id));
+        const others = state.columns.filter(c => !modal.columns.includes(c.id));
         if (others.length) {
-          others.forEach((c) => {
+          others.forEach(c => {
             const label = document.createElement("label");
             const input = document.createElement("input");
-            input.type = "checkbox";
-            input.value = c.id;
-            input.style.accentColor = c.color;
+            input.type = "checkbox"; input.value = c.id; input.style.accentColor = c.color;
             label.appendChild(input);
-            label.appendChild(document.createTextNode(c.name));
+            label.appendChild(document.createTextNode(" " + c.name));
             checks.appendChild(label);
           });
         } else {
-          const hint = document.createElement("p");
-          hint.className = "merge-hint";
-          hint.textContent = "لا توجد أعمدة أخرى متاحة للدمج.";
-          checks.appendChild(hint);
+          checks.innerHTML = '<p class="merge-hint">لا توجد أعمدة أخرى.</p>';
         }
-
-        document.getElementById("unmergeBtn").style.display =
-          modal.columns.length > 1 ? "inline-flex" : "none";
-
+        document.getElementById("unmergeBtn").style.display = modal.columns.length > 1 ? "inline-flex" : "none";
         renderLessonsList();
       }
 
@@ -1094,38 +1107,20 @@
           const row = document.createElement("div");
           row.className = "lesson-row";
           const sub = document.createElement("input");
-          sub.type = "text";
-          sub.placeholder = "اسم الدرس / المادة";
-          sub.value = ls.subject || "";
-          sub.oninput = () => updateLesson(i, "subject", sub.value);
+          sub.type = "text"; sub.placeholder = "اسم الدرس"; sub.value = ls.subject || "";
+          sub.oninput = () => { cell.lessons[i].subject = sub.value; save(); };
           const time = document.createElement("input");
-          time.type = "text";
-          time.className = "time";
-          time.placeholder = "الموعد";
-          time.value = ls.time || "";
-          time.oninput = () => updateLesson(i, "time", time.value);
+          time.type = "text"; time.className = "time"; time.placeholder = "الموعد"; time.value = ls.time || "";
+          time.oninput = () => { cell.lessons[i].time = time.value; save(); };
           const del = document.createElement("button");
-          del.className = "icon-del";
-          del.innerHTML = '<i class="fas fa-trash-alt"></i>';
-          del.title = "حذف الدرس";
-          del.onclick = () => removeLesson(i);
-          row.appendChild(sub);
-          row.appendChild(time);
-          row.appendChild(del);
+          del.className = "icon-del"; del.innerHTML = '<i class="fas fa-trash-alt"></i>';
+          del.onclick = () => { cell.lessons.splice(i, 1); renderLessonsList(); save(); };
+          row.appendChild(sub); row.appendChild(time); row.appendChild(del);
           wrap.appendChild(row);
         });
         if (!cell.lessons.length) {
-          const hint = document.createElement("p");
-          hint.className = "merge-hint";
-          hint.textContent = "لا توجد دروس بعد — أضف أول درس بالزر أدناه.";
-          wrap.appendChild(hint);
+          wrap.innerHTML += '<p class="merge-hint">لا توجد دروس — أضف أول درس.</p>';
         }
-      }
-
-      function updateLesson(idx, field, value) {
-        const cell = ensureCell();
-        if (cell.lessons[idx]) cell.lessons[idx][field] = value;
-        save();
       }
 
       function addLesson() {
@@ -1138,167 +1133,95 @@
         save();
       }
 
-      function removeLesson(idx) {
-        const cell = ensureCell();
-        cell.lessons.splice(idx, 1);
-        renderLessonsList();
-        save();
-      }
-
-      /* ============ الدمج والفك ============ */
+      /* ============ MERGE / UNMERGE ============ */
       function mergeSelected() {
-        const selected = Array.from(
-          document.querySelectorAll("#mergeChecks input:checked")
-        ).map((i) => i.value);
-        if (!selected.length) {
-          alert("اختر عموداً واحداً على الأقل للدمج.");
-          return;
-        }
+        const selected = Array.from(document.querySelectorAll("#mergeChecks input:checked")).map(i => i.value);
+        if (!selected.length) { alert("اختر عموداً على الأقل."); return; }
         const cell = ensureCell();
         const lessons = JSON.parse(JSON.stringify(cell.lessons));
-        const newCols = modal.columns
-          .concat(selected)
-          .sort((a, b) => colPos(a) - colPos(b));
-        state.cells = state.cells.filter(
-          (c) => !(c.day === modal.day && c.columnIds.some((id) => newCols.includes(id)))
-        );
+        const newCols = modal.columns.concat(selected).sort((a, b) => colPos(a) - colPos(b));
+        state.cells = state.cells.filter(c => !(c.day === modal.day && c.columnIds.some(id => newCols.includes(id))));
         state.cells.push({ day: modal.day, columnIds: newCols, lessons });
-        closeModal();
-        render();
+        closeModal(); render();
       }
-
       function unmergeCell() {
         const cell = findCell(modal.day, modal.columns);
         if (!cell || cell.columnIds.length < 2) return;
         const lessons = JSON.parse(JSON.stringify(cell.lessons));
-        state.cells = state.cells.filter((c) => c !== cell);
-        cell.columnIds.forEach((cid) => {
-          state.cells.push({
-            day: modal.day,
-            columnIds: [cid],
-            lessons: JSON.parse(JSON.stringify(lessons))
-          });
+        state.cells = state.cells.filter(c => c !== cell);
+        cell.columnIds.forEach(cid => {
+          state.cells.push({ day: modal.day, columnIds: [cid], lessons: JSON.parse(JSON.stringify(lessons)) });
         });
-        closeModal();
-        render();
+        closeModal(); render();
       }
 
-      /* ============ حجم الخط ============ */
+      /* ============ FONT SIZE ============ */
       function setFontSize(delta) {
         fontSize = Math.min(22, Math.max(10, fontSize + delta));
         tableEl.style.setProperty("--font-size", fontSize + "px");
         fontLabel.textContent = fontSize + "px";
       }
 
-      /* ============ الاستيراد والتصدير ============ */
+      /* ============ IMPORT / EXPORT ============ */
       function exportJSON() {
-        const blob = new Blob([JSON.stringify(state, null, 2)], {
-          type: "application/json"
-        });
-        const a = document.createElement("a");
-        a.download = "weekly-lessons.json";
-        a.href = URL.createObjectURL(blob);
-        a.click();
-        URL.revokeObjectURL(a.href);
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        const a = document.createElement("a"); a.download = "weekly-lessons.json"; a.href = URL.createObjectURL(blob);
+        a.click(); URL.revokeObjectURL(a.href);
       }
-
       function handleImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+        const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = () => {
           try {
             const data = JSON.parse(reader.result);
-            if (
-              !Array.isArray(data.columns) ||
-              !Array.isArray(data.days) ||
-              !Array.isArray(data.cells)
-            ) {
-              throw new Error("bad format");
-            }
-            data.columns = data.columns
-              .filter((c) => c && c.id && c.name)
-              .map((c) => ({
-                id: String(c.id),
-                name: String(c.name),
-                color: c.color || "#1a7f37"
-              }));
-            data.cells = data.cells.filter(
-              (c) =>
-                c &&
-                c.day &&
-                Array.isArray(c.columnIds) &&
-                c.columnIds.length
-            );
-            data.cells.forEach((c) => {
-              c.columnIds = c.columnIds.filter((id) =>
-                data.columns.some((x) => x.id === id)
-              );
-              c.lessons = Array.isArray(c.lessons) ? c.lessons : [];
-            });
-            data.cells = data.cells.filter((c) => c.columnIds.length);
-            state = data;
-            render();
-            alert("تم استيراد الجدول بنجاح");
-          } catch (e) {
-            alert("خطأ: ملف JSON غير صالح");
-          }
+            if (!Array.isArray(data.columns) || !Array.isArray(data.days) || !Array.isArray(data.cells)) throw 0;
+            data.columns = data.columns.filter(c => c && c.id && c.name).map(c => ({ id: String(c.id), name: String(c.name), color: c.color || "#1b5e20" }));
+            data.cells = data.cells.filter(c => c && c.day && Array.isArray(c.columnIds) && c.columnIds.length);
+            data.cells.forEach(c => { c.columnIds = c.columnIds.filter(id => data.columns.some(x => x.id === id)); c.lessons = Array.isArray(c.lessons) ? c.lessons : []; });
+            data.cells = data.cells.filter(c => c.columnIds.length);
+            state = data; render(); alert("تم الاستيراد بنجاح");
+          } catch(e) { alert("ملف JSON غير صالح"); }
         };
-        reader.readAsText(file);
-        event.target.value = "";
+        reader.readAsText(file); event.target.value = "";
       }
 
-      /* ============ جدول التصدير (نظيف للصورة و PDF) ============ */
+      /* ============ EXPORT (CLEAN) ============ */
       const exportHost = document.createElement("div");
-      exportHost.style.cssText =
-        "position:fixed;top:0;left:-99999px;background:#fff;padding:20px;z-index:-1;pointer-events:none;";
+      exportHost.style.cssText = "position:fixed;top:0;left:-99999px;background:#fff;padding:20px;z-index:-1;";
       document.body.appendChild(exportHost);
 
       function buildExportTable() {
         const t = document.createElement("table");
         t.dir = "rtl";
-        t.style.borderCollapse = "collapse";
-        t.style.width = "auto";
-        t.style.background = "#ffffff";
-        t.style.color = "#111111";
-        t.style.fontFamily = "'IBM Plex Sans Arabic', 'Tajawal', sans-serif";
-        t.style.fontSize = "14px";
-
+        t.style.cssText = "border-collapse:collapse;width:auto;background:#fff;color:#1a2e1a;font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;font-size:14px;";
         const thead = document.createElement("thead");
         const trH = document.createElement("tr");
         const corner = document.createElement("th");
         corner.textContent = "اليوم";
-        corner.style.cssText =
-          "background:#f1f3f5;color:#111;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;text-align:center;font-weight:700;white-space:nowrap;";
+        corner.style.cssText = "background:#1b5e20;color:#fff;padding:12px 16px;font-weight:800;white-space:nowrap;";
         trH.appendChild(corner);
-        state.columns.forEach((col) => {
+        const icons = ["📚","🎓","🎒","📖"];
+        state.columns.forEach((col, idx) => {
           const th = document.createElement("th");
-          th.textContent = col.name;
-          th.style.cssText =
-            "background:" +
-            col.color +
-            ";color:#fff;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;font-weight:700;text-align:center;white-space:nowrap;";
+          th.textContent = (icons[idx % icons.length]) + " " + col.name;
+          th.style.cssText = "background:" + col.color + ";color:#fff;padding:12px 16px;font-weight:800;white-space:nowrap;";
           trH.appendChild(th);
         });
-        thead.appendChild(trH);
-        t.appendChild(thead);
-
+        thead.appendChild(trH); t.appendChild(thead);
         const tbody = document.createElement("tbody");
-        state.days.forEach((day) => {
+        state.days.forEach(day => {
           const tr = document.createElement("tr");
           const th = document.createElement("th");
-          th.textContent = day;
-          th.style.cssText =
-            "background:#f8f9fa;color:#111;padding:10px 16px;border:1px solid #d0d5da;font-size:14px;font-weight:700;text-align:center;white-space:nowrap;vertical-align:top;";
+          th.textContent = "📅 " + day;
+          th.style.cssText = "background:#f1f8f2;color:#1b5e20;padding:10px 16px;font-weight:700;white-space:nowrap;vertical-align:top;border:1px solid #dce5de;";
           tr.appendChild(th);
-
           const covered = new Set();
-          state.columns.forEach((col) => {
+          state.columns.forEach(col => {
             if (covered.has(col.id)) return;
             const cell = cellFor(day, col.id);
             if (cell && cell.columnIds.length > 1) {
               tr.appendChild(buildExportTd(cell, cell.columnIds.length));
-              cell.columnIds.forEach((id) => covered.add(id));
+              cell.columnIds.forEach(id => covered.add(id));
             } else {
               tr.appendChild(buildExportTd(cell, 1, col.id));
               covered.add(col.id);
@@ -1306,49 +1229,26 @@
           });
           tbody.appendChild(tr);
         });
-        t.appendChild(tbody);
-        return t;
+        t.appendChild(tbody); return t;
       }
 
       function buildExportTd(cell, span, singleColId) {
         const td = document.createElement("td");
         td.colSpan = span;
-        let color = "#d0d5da";
-        if (cell && cell.columnIds.length) {
-          const first = colById(cell.columnIds[0]);
-          if (first) color = first.color;
-        } else if (singleColId) {
-          const c = colById(singleColId);
-          if (c) color = c.color;
-        }
-        td.style.border = "1px solid " + hexToRgba(color, 0.45);
-        td.style.background = cell ? hexToRgba(color, 0.08) : "#ffffff";
-        td.style.padding = "10px 16px";
-        td.style.fontSize = "14px";
-        td.style.verticalAlign = "top";
-        td.style.textAlign = "right";
-        td.style.minWidth = "150px";
-
+        let color = "#a0a6ad";
+        if (cell && cell.columnIds.length) { const f = colById(cell.columnIds[0]); if (f) color = f.color; }
+        else if (singleColId) { const c = colById(singleColId); if (c) color = c.color; }
+        td.style.cssText = "border:1px solid #dce5de;padding:10px 14px;vertical-align:top;min-width:150px;background:#fff;";
         if (!cell || !cell.lessons.length) {
-          td.textContent = "—";
-          td.style.textAlign = "center";
-          td.style.color = "#9aa0a6";
-          return td;
+          td.textContent = "—"; td.style.textAlign = "center"; td.style.color = "#aab8aa"; return td;
         }
-        cell.lessons.forEach((ls) => {
+        cell.lessons.forEach(ls => {
           const d = document.createElement("div");
-          d.style.marginBottom = "8px";
-          d.style.borderRight = "3px solid " + color;
-          d.style.paddingRight = "8px";
-          d.innerHTML =
-            '<div style="font-weight:600;line-height:1.5">' +
-            escapeHtml(ls.subject || "") +
-            "</div>" +
-            (ls.time
-              ? '<div style="font-size:12px;color:#555">' +
-                escapeHtml(ls.time) +
-                "</div>"
-              : "");
+          d.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px 10px;background:#f8fdf8;border-radius:8px;border-right:3px solid " + color + ";";
+          d.innerHTML = '<span style="font-size:1.1em">' + lessonIcon(ls.subject) + '</span>' +
+            '<div><div style="font-weight:700;color:#1a2e1a">' + escapeHtml(ls.subject) + '</div>' +
+            (ls.time ? '<span style="display:inline-block;background:' + color + ';color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;margin-top:2px">' + escapeHtml(ls.time) + '</span>' : '') +
+            '</div>';
           td.appendChild(d);
         });
         return td;
@@ -1357,54 +1257,27 @@
       function exportPNG() {
         exportHost.innerHTML = "";
         exportHost.appendChild(buildExportTable());
-        const el = exportHost.firstChild;
-        html2canvas(el, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff"
-        }).then((canvas) => {
-          const a = document.createElement("a");
-          a.download = "weekly-lessons.png";
-          a.href = canvas.toDataURL("image/png");
-          a.click();
+        html2canvas(exportHost.firstChild, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+          const a = document.createElement("a"); a.download = "weekly-lessons.png"; a.href = canvas.toDataURL("image/png"); a.click();
           exportHost.innerHTML = "";
         });
       }
-
       function exportPDF() {
         exportHost.innerHTML = "";
         exportHost.appendChild(buildExportTable());
         const el = exportHost.firstChild;
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
-        html2pdf()
-          .set({
-            margin: 8,
-            filename: "weekly-lessons.pdf",
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-            jsPDF: {
-              unit: "mm",
-              format: [((w * 25.4) / 96) + 16, ((h * 25.4) / 96) + 16],
-              orientation: "landscape"
-            }
-          })
-          .from(el)
-          .save()
-          .then(() => {
-            exportHost.innerHTML = "";
-          });
+        const w = el.offsetWidth, h = el.offsetHeight;
+        html2pdf().set({
+          margin: 8, filename: "weekly-lessons.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+          jsPDF: { unit: "mm", format: [((w * 25.4) / 96) + 16, ((h * 25.4) / 96) + 16], orientation: "landscape" }
+        }).from(el).save().then(() => { exportHost.innerHTML = ""; });
       }
 
-      /* ============ تشغيل ============ */
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeModal();
-      });
-
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) closeModal();
-      });
-
+      /* ============ INIT ============ */
+      document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+      overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
       render();
     </script>
   </body>
