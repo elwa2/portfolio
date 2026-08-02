@@ -203,11 +203,19 @@
               </label>
               <label class="action-radio">
                 <input type="radio" name="batchAction" value="convert" onchange="updateBatchAction()" />
-                <span><i class="fas fa-exchange-alt"></i> تحويل WebM + رفع</span>
+                <span><i class="fas fa-exchange-alt"></i> تحويل الصيغة</span>
               </label>
               <label class="action-radio">
                 <input type="radio" name="batchAction" value="compress" onchange="updateBatchAction()" />
                 <span><i class="fas fa-compress-alt"></i> ضغط + رفع</span>
+              </label>
+              <label class="action-radio">
+                <input type="radio" name="batchAction" value="extract_audio" onchange="updateBatchAction()" />
+                <span><i class="fas fa-file-audio"></i> استخراج الصوت</span>
+              </label>
+              <label class="action-radio">
+                <input type="radio" name="batchAction" value="remove_audio" onchange="updateBatchAction()" />
+                <span><i class="fas fa-volume-mute"></i> إزالة الصوت</span>
               </label>
             </div>
             <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center;">
@@ -229,8 +237,17 @@
           <div class="controls">
             <!-- Conversion -->
             <div class="card" style="padding:20px; margin-bottom:15px;">
-              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-exchange-alt" style="color:#5e3bee;"></i> تحويل إلى WebM</h4>
+              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-exchange-alt" style="color:#5e3bee;"></i> تحويل الصيغة</h4>
               <div class="control-row">
+                <div class="form-group"><label>الصيغة المطلوبة</label><select id="convertFormat">
+                  <option value="webm">WebM (VP9)</option>
+                  <option value="mp4">MP4 (H.264)</option>
+                  <option value="mkv">MKV</option>
+                  <option value="avi">AVI</option>
+                  <option value="mov">MOV</option>
+                  <option value="mpeg">MPEG</option>
+                  <option value="ogv">OGV (Theora)</option>
+                </select></div>
                 <div class="form-group"><label>جودة CRF</label><select id="crfQuality">
                   <option value="18">عالية جداً</option>
                   <option value="23" selected>عالية (موصى به)</option>
@@ -249,7 +266,7 @@
                   <option value="0.5">50%</option>
                 </select></div>
               </div>
-              <button class="btn btn-primary" id="btnConvert" onclick="convertVideo()" disabled><i class="fas fa-exchange-alt"></i> تحويل إلى WebM</button>
+              <button class="btn btn-primary" id="btnConvert" onclick="convertVideo()" disabled><i class="fas fa-exchange-alt"></i> تحويل الصيغة</button>
             </div>
 
             <!-- Compression -->
@@ -268,6 +285,37 @@
                 </select></div>
               </div>
               <button class="btn btn-warning" id="btnCompress" onclick="compressVideo()" disabled><i class="fas fa-compress-alt"></i> ضغط الفيديو</button>
+            </div>
+
+            <!-- Audio -->
+            <div class="card" style="padding:20px; margin-bottom:15px;">
+              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-headphones" style="color:#ec4899;"></i> الصوت</h4>
+              <div class="control-row">
+                <div class="form-group"><label>استخراج الصوت</label><select id="extractAudioFormat">
+                  <option value="mp3">MP3</option>
+                  <option value="m4a">M4A</option>
+                  <option value="ogg">OGG</option>
+                  <option value="wav">WAV</option>
+                  <option value="flac">FLAC</option>
+                </select></div>
+                <div class="form-group"><label>جودة الصوت</label><select id="extractAudioBitrate">
+                  <option value="64">64 kbps</option>
+                  <option value="128">128 kbps</option>
+                  <option value="192" selected>192 kbps</option>
+                  <option value="320">320 kbps</option>
+                </select></div>
+              </div>
+              <button class="btn btn-primary" id="btnExtractAudio" onclick="extractAudio()" disabled><i class="fas fa-file-audio"></i> استخراج الصوت</button>
+              <div style="margin-top:18px; padding-top:18px; border-top:1px solid #2a2a4a;">
+                <p style="color:#888; font-size:0.9rem; margin-bottom:10px;">إزالة الصوت من الفيديو (بدون مسح الفيديو) لتصغير الحجم:</p>
+                <div class="control-row" style="margin-bottom:10px;">
+                  <div class="form-group"><label>الصيغة بعد إزالة الصوت</label><select id="noAudioFormat">
+                    <option value="mp4">MP4</option>
+                    <option value="webm">WebM</option>
+                  </select></div>
+                </div>
+                <button class="btn btn-warning" id="btnRemoveAudio" onclick="removeAudio()" disabled><i class="fas fa-volume-mute"></i> إزالة الصوت (تصغير الحجم)</button>
+              </div>
             </div>
 
             <!-- Upload -->
@@ -375,6 +423,8 @@
           document.getElementById('sharedPanel').classList.add('show');
           document.getElementById('btnConvert').disabled = false;
           document.getElementById('btnCompress').disabled = false;
+          document.getElementById('btnExtractAudio').disabled = false;
+          document.getElementById('btnRemoveAudio').disabled = false;
           document.getElementById('btnUpload').disabled = false;
           document.getElementById('btnDownload').style.display = 'none';
           log('info', `تم اختيار: ${file.name} (${formatBytes(file.size)})`);
@@ -384,12 +434,13 @@
       async function convertVideo() {
         if (!currentFile) return;
         disableButtons(true);
-        showProgress('جاري التحويل إلى WebM...');
+        showProgress('جاري التحويل...');
 
         try {
           const crf = document.getElementById('crfQuality').value;
           const preset = document.getElementById('presetSpeed').value;
           const scale = document.getElementById('resolutionScale').value;
+          const format = document.getElementById('convertFormat').value;
 
           const formData = new FormData();
           formData.append('file', currentFile);
@@ -397,6 +448,7 @@
           formData.append('crf', crf);
           formData.append('preset', preset);
           formData.append('scale', scale);
+          formData.append('format', format);
 
           const resp = await fetch('/api/video', { method: 'POST', body: formData });
           const data = await resp.json();
@@ -451,6 +503,76 @@
         } catch (e) {
           log('err', 'خطأ في الضغط: ' + e.message);
           toast('فشل الضغط: ' + e.message, 'error');
+        }
+
+        disableButtons(false);
+        hideProgress();
+      }
+
+      async function extractAudio() {
+        if (!currentFile) return;
+        disableButtons(true);
+        showProgress('جاري استخراج الصوت...');
+
+        try {
+          const format = document.getElementById('extractAudioFormat').value;
+          const bitrate = document.getElementById('extractAudioBitrate').value;
+
+          const formData = new FormData();
+          formData.append('file', currentFile);
+          formData.append('action', 'extract_audio');
+          formData.append('format', format);
+          formData.append('audio_bitrate', bitrate);
+
+          const resp = await fetch('/api/video', { method: 'POST', body: formData });
+          const data = await resp.json();
+
+          if (!resp.ok) throw new Error(data.error || 'فشل استخراج الصوت');
+
+          currentBlob = base64ToBlob(data.data, data.mime);
+          currentResultName = data.name;
+
+          showResult(currentFile.size, currentBlob.size, data.name);
+          document.getElementById('btnDownload').style.display = 'inline-flex';
+          log('ok', `تم استخراج الصوت: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
+          toast('تم استخراج الصوت بنجاح!', 'success');
+        } catch (e) {
+          log('err', 'خطأ في استخراج الصوت: ' + e.message);
+          toast('فشل استخراج الصوت: ' + e.message, 'error');
+        }
+
+        disableButtons(false);
+        hideProgress();
+      }
+
+      async function removeAudio() {
+        if (!currentFile) return;
+        disableButtons(true);
+        showProgress('جاري إزالة الصوت...');
+
+        try {
+          const format = document.getElementById('noAudioFormat').value;
+
+          const formData = new FormData();
+          formData.append('file', currentFile);
+          formData.append('action', 'remove_audio');
+          formData.append('format', format);
+
+          const resp = await fetch('/api/video', { method: 'POST', body: formData });
+          const data = await resp.json();
+
+          if (!resp.ok) throw new Error(data.error || 'فشل إزالة الصوت');
+
+          currentBlob = base64ToBlob(data.data, data.mime);
+          currentResultName = data.name;
+
+          showResult(currentFile.size, currentBlob.size, data.name);
+          document.getElementById('btnDownload').style.display = 'inline-flex';
+          log('ok', `تمت إزالة الصوت: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
+          toast('تمت إزالة الصوت بنجاح!', 'success');
+        } catch (e) {
+          log('err', 'خطأ في إزالة الصوت: ' + e.message);
+          toast('فشل إزالة الصوت: ' + e.message, 'error');
         }
 
         disableButtons(false);
@@ -525,6 +647,8 @@
         fileInput.value = '';
         document.getElementById('btnConvert').disabled = true;
         document.getElementById('btnCompress').disabled = true;
+        document.getElementById('btnExtractAudio').disabled = true;
+        document.getElementById('btnRemoveAudio').disabled = true;
         document.getElementById('btnUpload').disabled = true;
         document.getElementById('btnBatchProcess').disabled = true;
         document.getElementById('logBox').innerHTML = '';
@@ -688,6 +812,26 @@
               file._statusText = autoUpload ? 'بانتظار الرفع' : 'تم الضغط';
               filesForUpload.push({ file: compressed.blob, name: compressed.name });
               log('ok', `تم ضغط: ${file.name} → ${compressed.name}`);
+            } else if (action === 'extract_audio') {
+              setProgress(Math.round((i / toProcess.length) * 60), `استخراج صوت ${file.name}...`);
+              const extracted = await extractAudioSingleFile(file);
+              file._blob = extracted.blob;
+              file._newSize = extracted.blob.size;
+              file._processedName = extracted.name;
+              file._status = autoUpload ? 'pending_upload' : 'done';
+              file._statusText = autoUpload ? 'بانتظار الرفع' : 'تم استخراج الصوت';
+              filesForUpload.push({ file: extracted.blob, name: extracted.name });
+              log('ok', `تم استخراج الصوت: ${file.name} → ${extracted.name}`);
+            } else if (action === 'remove_audio') {
+              setProgress(Math.round((i / toProcess.length) * 60), `إزالة الصوت من ${file.name}...`);
+              const silent = await removeAudioSingleFile(file);
+              file._blob = silent.blob;
+              file._newSize = silent.blob.size;
+              file._processedName = silent.name;
+              file._status = autoUpload ? 'pending_upload' : 'done';
+              file._statusText = autoUpload ? 'بانتظار الرفع' : 'تمت إزالة الصوت';
+              filesForUpload.push({ file: silent.blob, name: silent.name });
+              log('ok', `تمت إزالة الصوت: ${file.name} → ${silent.name}`);
             } else {
               // upload action
               file._status = 'pending_upload';
@@ -777,6 +921,7 @@
         formData.append('crf', document.getElementById('crfQuality').value);
         formData.append('preset', document.getElementById('presetSpeed').value);
         formData.append('scale', document.getElementById('resolutionScale').value);
+        formData.append('format', document.getElementById('convertFormat').value);
 
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
@@ -795,6 +940,31 @@
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'فشل الضغط');
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size };
+      }
+
+      async function extractAudioSingleFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'extract_audio');
+        formData.append('format', document.getElementById('extractAudioFormat').value);
+        formData.append('audio_bitrate', document.getElementById('extractAudioBitrate').value);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل استخراج الصوت');
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size };
+      }
+
+      async function removeAudioSingleFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'remove_audio');
+        formData.append('format', document.getElementById('noAudioFormat').value);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل إزالة الصوت');
         return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size };
       }
 
@@ -967,6 +1137,8 @@
       function disableButtons(disabled) {
         document.getElementById('btnConvert').disabled = disabled;
         document.getElementById('btnCompress').disabled = disabled;
+        document.getElementById('btnExtractAudio').disabled = disabled;
+        document.getElementById('btnRemoveAudio').disabled = disabled;
         document.getElementById('btnUpload').disabled = disabled;
         document.getElementById('btnBatchProcess').disabled = disabled;
         document.getElementById('btnUploadAll').disabled = disabled;

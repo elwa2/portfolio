@@ -244,6 +244,10 @@ def api_video():
             return handle_convert(request)
         elif action == "compress":
             return handle_compress(request)
+        elif action == "extract_audio":
+            return handle_extract_audio(request)
+        elif action == "remove_audio":
+            return handle_remove_audio(request)
         elif action == "upload":
             return handle_upload(request)
         elif action == "batch_upload":
@@ -271,6 +275,43 @@ def save_temp_file(f) -> Path:
 
 
 # ── Convert ────────────────────────────────────────────────────────────────
+_VIDEO_FORMATS = {
+    "webm": {"ext": "webm", "mime": "video/webm"},
+    "mp4": {"ext": "mp4", "mime": "video/mp4"},
+    "mkv": {"ext": "mkv", "mime": "video/x-matroska"},
+    "avi": {"ext": "avi", "mime": "video/x-msvideo"},
+    "mov": {"ext": "mov", "mime": "video/quicktime"},
+    "mpeg": {"ext": "mpg", "mime": "video/mpeg"},
+    "ogv": {"ext": "ogv", "mime": "video/ogg"},
+}
+
+
+def _video_codec_args(fmt: str, crf: str, preset: str) -> list[str]:
+    """Return codec args for converting video to the given container format."""
+    if fmt == "webm":
+        return ["-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset,
+                "-c:a", "libopus", "-b:a", "128k"]
+    if fmt == "mp4":
+        return ["-c:v", "libx264", "-crf", crf, "-preset", preset, "-pix_fmt", "yuv420p",
+                "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart"]
+    if fmt == "mkv":
+        return ["-c:v", "libx264", "-crf", crf, "-preset", preset, "-pix_fmt", "yuv420p",
+                "-c:a", "aac", "-b:a", "128k"]
+    if fmt == "avi":
+        return ["-c:v", "libx264", "-crf", crf, "-preset", preset, "-pix_fmt", "yuv420p",
+                "-c:a", "aac", "-b:a", "128k"]
+    if fmt == "mov":
+        return ["-c:v", "libx264", "-crf", crf, "-preset", preset, "-pix_fmt", "yuv420p",
+                "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart"]
+    if fmt == "mpeg":
+        return ["-c:v", "mpeg2video", "-q:v", "3", "-c:a", "mp2", "-b:a", "192k"]
+    if fmt == "ogv":
+        return ["-c:v", "libtheora", "-q:v", "7", "-c:a", "libvorbis", "-q:a", "5"]
+    # fallback → webm
+    return ["-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset,
+            "-c:a", "libopus", "-b:a", "128k"]
+
+
 def handle_convert(req):
     if not check_ffmpeg():
         return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
@@ -279,14 +320,16 @@ def handle_convert(req):
     crf = req.form.get("crf", "23")
     preset = req.form.get("preset", "medium")
     scale = req.form.get("scale", "1")
+    fmt = (req.form.get("format", "webm") or "webm").lower()
 
     tmp_input = save_temp_file(f)
     try:
         duration = get_video_duration(tmp_input)
-        output_name = Path(name).stem + ".webm"
+        cfg = _VIDEO_FORMATS.get(fmt, _VIDEO_FORMATS["webm"])
+        output_name = Path(name).stem + f".{cfg['ext']}"
         tmp_output = tmp_input.parent / output_name
 
-        args = ["-i", str(tmp_input), "-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset]
+        args = ["-i", str(tmp_input)] + _video_codec_args(fmt, crf, preset)
 
         if scale != "1":
             w, h = ffmpeg_probe_resolution(tmp_input)
@@ -298,10 +341,10 @@ def handle_convert(req):
                 new_h += 1
             args += ["-vf", f"scale={new_w}:{new_h}"]
 
-        args += ["-an", str(tmp_output)]
+        args += [str(tmp_output)]
 
         set_job("convert", name)
-        set_progress(0, "جاري التحويل إلى WebM...")
+        set_progress(0, f"جاري التحويل إلى {cfg['ext'].upper()}...")
         run_ffmpeg(args, duration)
 
         with open(tmp_output, "rb") as bf:
@@ -311,7 +354,7 @@ def handle_convert(req):
         clear_job()
         return jsonify({
             "data": b64,
-            "mime": "video/webm",
+            "mime": cfg["mime"],
             "name": output_name,
             "size": len(data),
         })
@@ -363,6 +406,96 @@ def handle_compress(req):
             b64 = base64.b64encode(data).decode()
 
         mime = "video/webm" if fmt == "webm" else "video/mp4"
+        clear_job()
+        return jsonify({"data": b64, "mime": mime, "name": output_name, "size": len(data)})
+    finally:
+        shutil.rmtree(tmp_input.parent, ignore_errors=True)
+
+
+# ── Extract Audio ──────────────────────────────────────────────────────────
+_AUDIO_FORMATS = {
+    "mp3": {"ext": "mp3", "mime": "audio/mpeg", "codec": ["-c:a", "libmp3lame"]},
+    "m4a": {"ext": "m4a", "mime": "audio/mp4", "codec": ["-c:a", "aac"]},
+    "ogg": {"ext": "ogg", "mime": "audio/ogg", "codec": ["-c:a", "libvorbis"]},
+    "wav": {"ext": "wav", "mime": "audio/wav", "codec": ["-c:a", "pcm_s16le"]},
+    "flac": {"ext": "flac", "mime": "audio/flac", "codec": ["-c:a", "flac"]},
+}
+
+
+def handle_extract_audio(req):
+    if not check_ffmpeg():
+        return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
+
+    f, name = get_uploaded_file(req)
+    fmt = (req.form.get("format", "mp3") or "mp3").lower()
+    audio_bitrate = req.form.get("audio_bitrate", "192")
+    cfg = _AUDIO_FORMATS.get(fmt, _AUDIO_FORMATS["mp3"])
+
+    tmp_input = save_temp_file(f)
+    try:
+        duration = get_video_duration(tmp_input)
+        output_name = Path(name).stem + f".{cfg['ext']}"
+        tmp_output = tmp_input.parent / output_name
+
+        args = ["-i", str(tmp_input), "-vn"] + cfg["codec"]
+        if fmt != "wav":
+            args += ["-b:a", f"{audio_bitrate}k"]
+        args += [str(tmp_output)]
+
+        set_job("extract_audio", name)
+        set_progress(0, "جاري استخراج الصوت...")
+        run_ffmpeg(args, duration)
+
+        with open(tmp_output, "rb") as bf:
+            data = bf.read()
+            b64 = base64.b64encode(data).decode()
+
+        clear_job()
+        return jsonify({
+            "data": b64,
+            "mime": cfg["mime"],
+            "name": output_name,
+            "size": len(data),
+        })
+    finally:
+        shutil.rmtree(tmp_input.parent, ignore_errors=True)
+
+
+# ── Remove Audio ───────────────────────────────────────────────────────────
+def handle_remove_audio(req):
+    if not check_ffmpeg():
+        return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
+
+    f, name = get_uploaded_file(req)
+    fmt = (req.form.get("format", "mp4") or "mp4").lower()
+    crf = req.form.get("crf", "23")
+    preset = req.form.get("preset", "medium")
+
+    tmp_input = save_temp_file(f)
+    try:
+        duration = get_video_duration(tmp_input)
+
+        if fmt == "webm":
+            ext, mime = "webm", "video/webm"
+            vargs = ["-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset]
+        else:
+            ext, mime = "mp4", "video/mp4"
+            vargs = ["-c:v", "libx264", "-crf", crf, "-preset", preset,
+                     "-pix_fmt", "yuv420p", "-movflags", "+faststart"]
+
+        output_name = Path(name).stem + f"_noaudio.{ext}"
+        tmp_output = tmp_input.parent / output_name
+
+        args = ["-i", str(tmp_input), "-an"] + vargs + [str(tmp_output)]
+
+        set_job("remove_audio", name)
+        set_progress(0, "جاري إزالة الصوت (تصغير الحجم)...")
+        run_ffmpeg(args, duration)
+
+        with open(tmp_output, "rb") as bf:
+            data = bf.read()
+            b64 = base64.b64encode(data).decode()
+
         clear_job()
         return jsonify({"data": b64, "mime": mime, "name": output_name, "size": len(data)})
     finally:
