@@ -655,6 +655,68 @@
     border-color: var(--accent);
   }
 
+  /* ===== CODE CONVERTER DASHBOARD ===== */
+  .filter-tag.cv-active {
+    background: var(--accent-warm); color: #fff; border-color: var(--accent-warm);
+    box-shadow: 0 2px 12px rgba(212,168,67,0.3);
+  }
+
+  .cv-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .cv-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .cv-builder-title i { color: var(--accent-warm); font-size: 18px; }
+
+  .cv-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
+  }
+
+  .cv-input {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm); background: var(--bg-elevated);
+    color: var(--text-1); font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; outline: none; direction: ltr; text-align: left;
+    resize: vertical; min-height: 160px;
+    transition: border-color 0.2s;
+  }
+  .cv-input:focus { border-color: var(--accent-warm); box-shadow: 0 0 0 3px rgba(212,168,67,0.12); }
+
+  .cv-results { display: grid; gap: 8px; margin: 12px 0; }
+  .cv-item {
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+  }
+  .cv-item-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    font-size: 11px; color: var(--text-3);
+  }
+  .cv-item-head code {
+    font-size: 10.5px; background: var(--bg-elevated); padding: 2px 6px;
+    border-radius: 4px; color: var(--accent-cool); font-family: 'JetBrains Mono', monospace;
+    direction: ltr; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cv-item-row { display: flex; align-items: center; gap: 8px; }
+  .cv-item-row label { font-size: 11px; color: var(--text-3); min-width: 70px; }
+  .cv-item-row .cv-input { min-height: 0; height: 32px; padding: 4px 10px; flex: 1; }
+  .cv-check { width: 16px; height: 16px; accent-color: var(--accent-warm); cursor: pointer; flex-shrink: 0; }
+
+  .cv-empty {
+    text-align: center; padding: 24px; color: var(--text-3);
+    border: 1px dashed var(--border-sub); border-radius: var(--radius-md);
+  }
+  .cv-empty i { font-size: 24px; display: block; margin-bottom: 6px; color: var(--text-4); }
+  .cv-empty p { font-size: 13px; }
+
+  @media (max-width: 820px) { .cv-grid { grid-template-columns: 1fr; } }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -728,6 +790,9 @@
     </button>
     <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار">
       <i class="ti ti-scroll" aria-hidden="true"></i> Scrollbar
+    </button>
+    <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="محول HTML/CSS إلى كود صحيح">
+      <i class="ti ti-arrows-shuffle" aria-hidden="true"></i> محول
     </button>
   </div>
 
@@ -1215,6 +1280,8 @@
       document.querySelectorAll('.filter-tag:not(#sbDashBtn)').forEach(b=>b.classList.remove('active'));
       showHasDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
+      showCvDash = false;
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
     }
     renderAll();
   }
@@ -1462,6 +1529,10 @@
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
     }
+    if(showCvDash){
+      showCvDash = false;
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -1489,6 +1560,8 @@
       document.querySelectorAll('.filter-tag:not(#hasDashBtn)').forEach(b=>b.classList.remove('active'));
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      showCvDash = false;
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
     }
     renderAll();
   }
@@ -1647,10 +1720,222 @@
     document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
   }
 
+  // ── CODE CONVERTER DASHBOARD ──
+  let showCvDash = false;
+  let cvImgs = [];
+
+  function toggleCvDash(){
+    showCvDash = !showCvDash;
+    document.getElementById('cvDashBtn').classList.toggle('cv-active', showCvDash);
+    if(showCvDash){
+      document.querySelectorAll('.filter-tag:not(#cvDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHasDash = false;
+      showScrollbarDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+    }
+    renderAll();
+  }
+
+  function uniqueKey(url){
+    if(!url) return '';
+    const clean = url.replace(/^https?:\/\//i,'').split('?')[0].split('#')[0];
+    const uuid = clean.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    if(uuid) return uuid[0];
+    const name = clean.split('/').pop() || clean;
+    const noExt = name.replace(/\.[a-z0-9]{2,6}$/i,'');
+    if(noExt && noExt.length > 2) return noExt;
+    return clean;
+  }
+
+  function extractImgsFromHtml(html){
+    const imgs = [];
+    const re = /<img\b[^>]*>/gi;
+    let m;
+    while((m = re.exec(html)) !== null){
+      const tag = m[0];
+      const src = (tag.match(/\bsrc\s*=\s*["']([^"']*?)["']/i)||[])[1] || '';
+      const dataSrc = (tag.match(/\bdata-src\s*=\s*["']([^"']*?)["']/i)||[])[1] || '';
+      if(src || dataSrc) imgs.push({ src, dataSrc, newUrl: '', enabled: true });
+    }
+    return imgs;
+  }
+
+  function parseCssRule(css){
+    const out = [];
+    const re = /([^{}]+)\{([^}]*)\}/g;
+    let m;
+    while((m = re.exec(css)) !== null){
+      const sel = m[1].trim();
+      const body = m[2];
+      const urlM = body.match(/content\s*:\s*url\(\s*["']?([^"')]*)["']?\s*\)/i);
+      if(urlM && /img/i.test(sel)){
+        const srcM = sel.match(/img\[src\*=\s*["']([^"']*)["']\]/i);
+        const dsM  = sel.match(/img\[data-src\*=\s*["']([^"']*)["']\]/i);
+        out.push({
+          src: srcM ? srcM[1] : '',
+          dataSrc: dsM ? dsM[1] : '',
+          newUrl: urlM[1] || '',
+          enabled: true
+        });
+      }
+    }
+    return out;
+  }
+
+  function analyzeCv(){
+    const html = document.getElementById('cvHtmlInput').value;
+    const css  = document.getElementById('cvCssInput').value;
+
+    const htmlImgs = html.trim() ? extractImgsFromHtml(html) : [];
+    const cssImgs  = css.trim()  ? parseCssRule(css) : [];
+
+    if(!htmlImgs.length && !cssImgs.length){
+      showToast('لم يتم العثور على صور — تحقق من الكود');
+      cvImgs = [];
+      renderCvDash();
+      return;
+    }
+
+    cvImgs = htmlImgs.length ? htmlImgs : cssImgs;
+    if(htmlImgs.length && cssImgs.length){
+      htmlImgs.forEach(im => {
+        const k = uniqueKey(im.src || im.dataSrc);
+        const match = cssImgs.find(c => uniqueKey(c.src || c.dataSrc) === k);
+        if(match){
+          if(!im.src && match.src) im.src = match.src;
+          if(!im.dataSrc && match.dataSrc) im.dataSrc = match.dataSrc;
+          if(match.newUrl) im.newUrl = match.newUrl;
+        }
+      });
+    }
+
+    renderCvDash();
+    showToast('تم استخراج ' + cvImgs.length + ' صورة');
+  }
+
+  function clearCv(){
+    cvImgs = [];
+    const h = document.getElementById('cvHtmlInput');
+    const c = document.getElementById('cvCssInput');
+    if(h) h.value = '';
+    if(c) c.value = '';
+    renderCvDash();
+  }
+
+  function generateCvCSS(){
+    const rules = [];
+    cvImgs.forEach((img, i) => {
+      if(!img.enabled) return;
+      const key = uniqueKey(img.src || img.dataSrc);
+      if(!key) return;
+      const newUrl = img.newUrl.trim() || 'NEW_IMAGE_URL';
+      const sels = [];
+      if(img.src) sels.push('img[src*="' + key + '"]');
+      if(img.dataSrc) sels.push('img[data-src*="' + key + '"]');
+      const sel = sels.length ? sels.join(',\n') : 'img[src*="' + key + '"]';
+      rules.push('/* استبدال الصورة ' + (i + 1) + ' */\n' + sel + ' {\n  content: url("' + newUrl + '");\n}');
+    });
+    return rules.join('\n\n');
+  }
+
+  function highlightCvCSS(css){
+    let s = escHtml(css);
+    s = s.replace(/(\/\*[\s\S]*?\*\/)/g, m => '<span class="sb-css-cmt">' + m + '</span>');
+    s = s.replace(/(img\[(?:src|data-src)\*=[^\n\]]*\](\s*,\s*\n\s*img\[(?:src|data-src)\*=[^\n\]]*\])*)/g, m => '<span class="sb-css-sel">' + m + '</span>');
+    s = s.replace(/(content)\s*:/g, (m, p) => '<span class="sb-css-prop">' + p + '</span> :');
+    s = s.replace(/:\s*([^;{}\n]+)(?=[;}\n])/g, (m, val) => {
+      if(val.trim().match(/^url\(/)) return ': <span class="sb-css-val">' + val + '</span>';
+      return m;
+    });
+    return s;
+  }
+
+  function renderCvPreview(){
+    const pre = document.getElementById('cvPreview');
+    if(pre) pre.innerHTML = highlightCvCSS(generateCvCSS());
+  }
+
+  function copyCvCSS(){
+    const css = generateCvCSS();
+    if(!css.trim()){ showToast('لا يوجد كود بعد'); return; }
+    navigator.clipboard.writeText(css).then(() => {
+      const btn = document.getElementById('cvCopyBtn');
+      btn.innerHTML = '<i class="ti ti-check"></i> تم النسخ';
+      showToast('تم نسخ كود CSS!');
+      setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy"></i> نسخ الكود'; }, 2000);
+    }).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function renderCvDash(){
+    document.getElementById('countBadge').textContent = 'محول الأكواد';
+
+    let resultsHtml = '';
+    if(cvImgs.length){
+      resultsHtml = '<div class="cv-results">' + cvImgs.map((img, i) => {
+        const src = img.src || img.dataSrc;
+        const short = src ? src.replace(/^https?:\/\//i, '') : '—';
+        return `<div class="cv-item">
+          <div class="cv-item-head">
+            <input type="checkbox" class="cv-check" id="cvChk_${i}" ${img.enabled ? 'checked' : ''} onchange="cvImgs[${i}].enabled=this.checked; renderCvPreview()">
+            <span>صورة ${i + 1}</span>
+            <code title="${escHtml(src || '')}">${escHtml(short)}</code>
+          </div>
+          <div class="cv-item-row">
+            <label>الصورة الجديدة</label>
+            <input class="cv-input" type="text" value="${escHtml(img.newUrl)}" placeholder="https://cdn.salla.sa/.../new-image.jpg" dir="ltr" oninput="cvImgs[${i}].newUrl=this.value; renderCvPreview()">
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    } else {
+      resultsHtml = '<div class="cv-empty"><i class="ti ti-photo-off"></i><p>لم يتم استخراج أي صور بعد — الصق كود HTML أو CSS واضغط "تحليل"</p></div>';
+    }
+
+    const css = generateCvCSS();
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="cv-builder">
+        <div class="cv-builder-title"><i class="ti ti-arrows-shuffle"></i> محول HTML/CSS إلى كود صحيح — استبدال الصور</div>
+
+        <div class="cv-grid">
+          <div class="form-group">
+            <label class="form-label" for="cvHtmlInput">كود HTML <code style="color:var(--accent-cool)">&lt;img&gt;</code></label>
+            <textarea class="cv-input" id="cvHtmlInput" placeholder='<div slot="items"><a href="..."><img src="https://old-url.com/741fba3d-b989-4f4d-8cb2-3cf4ba290b6d-original.webp" data-src="..." alt="Banner"></a></div>'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cvCssInput">كود CSS موجود <code style="color:var(--accent-cool)">اختياري</code></label>
+            <textarea class="cv-input" id="cvCssInput" placeholder='img[src*="741fba3d-b989-4f4d-8cb2-3cf4ba290b6d"] { content: url("https://cdn.salla.sa/.../new.jpg"); }'></textarea>
+          </div>
+        </div>
+
+        <div class="has-actions">
+          <button class="btn-primary" onclick="analyzeCv()"><i class="ti ti-wand"></i> تحليل واستخراج</button>
+          <button class="btn-cancel" onclick="clearCv()"><i class="ti ti-trash"></i> مسح</button>
+        </div>
+
+        <div class="has-section-title">
+          <i class="ti ti-photo" style="color:var(--accent-warm)"></i>
+          الصور المستخرجة
+          <span>(${cvImgs.length})</span>
+        </div>
+        ${resultsHtml}
+
+        <div class="sb-preview-wrap">
+          <div class="sb-preview-label">
+            <span>كود CSS الناتج</span>
+            <button class="copy-btn" onclick="copyCvCSS()" id="cvCopyBtn" style="font-size:10px;padding:3px 10px"><i class="ti ti-copy"></i> نسخ الكود</button>
+          </div>
+          <pre class="sb-preview" id="cvPreview">${highlightCvCSS(css)}</pre>
+        </div>
+      </div>
+    </div>`;
+  }
+
   // ── RENDER ──
   function renderAll(){
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
+    if(showCvDash) return renderCvDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
