@@ -3,23 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VideoToolkit - تحويل وضغط ورفع الفيديو | Ali Ahmed</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <title>VideoToolkit - تحويل وضغط واستخراج الصوت ورفع الفيديو | Ali Ahmed</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; }
-      .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-      h1 { text-align: center; margin: 30px 0 10px; font-size: 2rem; background: linear-gradient(135deg, #5e3bee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .container { max-width: 920px; margin: 0 auto; padding: 20px; }
+
+      header { text-align: center; margin: 30px 0 10px; }
+      header h1 { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 2rem; background: linear-gradient(135deg, #5e3bee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      header h1 svg { -webkit-text-fill-color: #5e3bee; }
       .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 0.95rem; }
 
-      .card { background: #1a1a2e; border-radius: 16px; padding: 30px; margin-bottom: 20px; border: 1px solid #2a2a4a; }
+      /* SVG icon base (feather-style) */
+      svg.ic { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.2em; flex-shrink: 0; }
+
+      .card { background: #1a1a2e; border-radius: 16px; padding: 26px; margin-bottom: 18px; border: 1px solid #2a2a4a; }
+
+      /* ── Steps ─────────────────────────────────────────────── */
+      .step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+      .step-num { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #5e3bee, #7c3aed); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(94,59,238,0.35); }
+      .step-head h2 { font-size: 1.15rem; font-weight: 700; }
+      .step-head .step-sub { color: #888; font-size: 0.8rem; font-weight: 400; }
 
       .drop-zone {
-        border: 3px dashed #5e3bee; border-radius: 16px; padding: 50px 20px; text-align: center;
+        border: 3px dashed #5e3bee; border-radius: 16px; padding: 46px 20px; text-align: center;
         cursor: pointer; transition: 0.3s; background: rgba(94, 59, 238, 0.05);
       }
       .drop-zone:hover, .drop-zone.drag-over { border-color: #a855f7; background: rgba(94, 59, 238, 0.1); transform: scale(1.01); }
-      .drop-zone i { font-size: 3.5rem; color: #5e3bee; margin-bottom: 15px; display: block; }
+      .drop-zone svg.ic { width: 3.2rem; height: 3.2rem; color: #5e3bee; margin-bottom: 14px; }
       .drop-zone h3 { font-size: 1.3rem; margin-bottom: 8px; }
       .drop-zone p { color: #888; font-size: 0.95rem; }
       .drop-zone input { display: none; }
@@ -64,19 +75,51 @@
       }
       .video-item-url:hover { text-decoration: underline; color: #a855f7; }
 
-      .action-radio {
-        cursor: pointer; display: inline-flex;
+      /* ── Operation selector ───────────────────────────────── */
+      .op-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+      .op-btn {
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+        padding: 18px 12px; border: 2px solid #2a2a4a; border-radius: 14px;
+        background: #16162a; color: #aaa; cursor: pointer; font-family: inherit;
+        font-weight: 700; font-size: 0.85rem; transition: 0.2s;
       }
-      .action-radio input { display: none; }
-      .action-radio span {
-        padding: 10px 18px; border: 2px solid #2a2a4a; border-radius: 10px;
-        background: #16162a; color: #aaa; font-size: 0.85rem; font-weight: 600;
-        transition: 0.2s; display: flex; align-items: center; gap: 6px;
+      .op-btn svg.ic { width: 26px; height: 26px; }
+      .op-btn:hover { border-color: #5e3bee; color: #e0e0e0; transform: translateY(-2px); }
+      .op-btn.active { border-color: #5e3bee; background: rgba(94,59,238,0.15); color: #fff; box-shadow: 0 4px 15px rgba(94,59,238,0.2); }
+
+      .op-panel { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #2a2a4a; }
+      .op-panel.show { display: block; }
+      .hint { color: #888; font-size: 0.9rem; margin-bottom: 14px; }
+
+      /* ── Format buttons ───────────────────────────────────── */
+      .fmt-group { display: flex; flex-wrap: wrap; gap: 8px; }
+      .fmt-btn {
+        padding: 8px 16px; border: 2px solid #2a2a4a; border-radius: 10px;
+        background: #16162a; color: #aaa; font-weight: 700; font-size: 0.85rem;
+        cursor: pointer; font-family: inherit; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
       }
-      .action-radio:hover span { border-color: #5e3bee; color: #e0e0e0; }
-      .action-radio.selected span, .action-radio input:checked + span {
-        border-color: #5e3bee; background: rgba(94,59,238,0.15); color: #fff;
-      }
+      .fmt-btn:hover { border-color: #5e3bee; color: #e0e0e0; }
+      .fmt-btn.active { border-color: #5e3bee; background: rgba(94,59,238,0.18); color: #fff; box-shadow: 0 0 0 1px rgba(94,59,238,0.5); }
+
+      /* ── Workflow builder ─────────────────────────────────── */
+      .wf-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+      .wf-step { background: rgba(255,255,255,0.03); border: 1px solid #2a2a4a; border-radius: 12px; padding: 14px; }
+      .wf-step-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .wf-step-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(94,59,238,0.2); color: #a78bfa; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+      .wf-step-ops { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+      .wf-op { padding: 6px 12px; border: 2px solid #2a2a4a; border-radius: 8px; background: #16162a; color: #aaa; cursor: pointer; font-family: inherit; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+      .wf-op:hover { border-color: #5e3bee; color: #e0e0e0; }
+      .wf-op.active { border-color: #5e3bee; background: rgba(94,59,238,0.18); color: #fff; }
+      .wf-op svg.ic { width: 14px; height: 14px; }
+      .wf-step-remove { width: 30px; height: 30px; border-radius: 8px; border: none; background: rgba(239,68,68,0.15); color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+      .wf-step-remove:hover { background: rgba(239,68,68,0.3); }
+      .wf-step-options { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #2a2a4a; }
+      .wf-auto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; margin-top: 6px; }
+      .wf-auto svg.ic { color: #10b981; }
+      .wf-auto label { color: #aaa; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+      .wf-auto input[type="number"] { width: 90px; padding: 8px 10px; border: 2px solid #2a2a4a; border-radius: 8px; background: #16162a; color: #e0e0e0; font-family: inherit; }
+      .wf-auto input[type="number"]:focus { outline: none; border-color: #5e3bee; }
+
       video { width: 100%; max-height: 400px; border-radius: 12px; background: #000; margin-bottom: 15px; }
       .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
       .info-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; text-align: center; }
@@ -86,7 +129,7 @@
       .controls { margin-top: 20px; }
       .control-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
       .form-group { flex: 1; min-width: 150px; }
-      .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #aaa; }
+      .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #aaa; }
       .form-group select, .form-group input {
         width: 100%; padding: 10px 12px; border: 2px solid #2a2a4a; border-radius: 10px;
         background: #16162a; color: #e0e0e0; font-size: 0.9rem; font-family: inherit;
@@ -127,8 +170,7 @@
 
       .result-box { display: none; margin-top: 20px; background: rgba(16,185,129,0.1); border: 2px solid #10b981; border-radius: 16px; padding: 25px; text-align: center; }
       .result-box.show { display: block; }
-      .result-box h4 { color: #10b981; font-size: 1.2rem; margin-bottom: 15px; }
-      .result-box h4 i { margin-left: 8px; }
+      .result-box h4 { color: #10b981; font-size: 1.2rem; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; }
       .result-stats { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin-bottom: 20px; }
       .result-stat { text-align: center; }
       .result-stat label { font-size: 0.8rem; color: #888; }
@@ -159,21 +201,55 @@
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1><i class="fas fa-video"></i> VideoToolkit</h1>
-      <p class="subtitle">تحويل، ضغط، ورفع الفيديو إلى GitHub Pages</p>
+    <!-- SVG icon sprite -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+      <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+      <symbol id="i-check-all" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+      <symbol id="i-convert" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+      <symbol id="i-compress" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></symbol>
+      <symbol id="i-audio" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></symbol>
+      <symbol id="i-mute" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+      <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+      <symbol id="i-close-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+      <symbol id="i-power" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></symbol>
+      <symbol id="i-workflow" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    </svg>
 
-      <!-- File Upload -->
-      <div class="card">
+    <div class="container">
+      <header>
+        <h1><svg class="ic"><use href="#i-video"/></svg> VideoToolkit</h1>
+        <p class="subtitle">تحويل، ضغط، استخراج الصوت، ورفع الفيديو إلى GitHub Pages</p>
+      </header>
+
+      <!-- ═══ STEP 1: اختر الفيديو ═══ -->
+      <div class="card step">
+        <div class="step-head">
+          <span class="step-num">1</span>
+          <div>
+            <h2>اختر الفيديو</h2>
+            <span class="step-sub">اسحب الملفات أو اخترها من جهازك</span>
+          </div>
+        </div>
+
         <div class="drop-zone" id="dropZone">
-          <i class="fas fa-cloud-upload-alt"></i>
+          <svg class="ic"><use href="#i-upload"/></svg>
           <h3>اسحب وأفلت الفيديوهات هنا</h3>
           <p>أو انقر لاختيار ملفات — MP4, MOV, MKV, AVI, WebM (حد أقصى 500MB لكل ملف)</p>
-          <p style="margin-top:8px; color:#5e3bee; font-size:0.85rem;"><i class="fas fa-folder-open"></i> يمكنك اختيار عدة ملفات أو فولدر كامل</p>
+          <p style="margin-top:8px; color:#5e3bee; font-size:0.85rem;"><svg class="ic"><use href="#i-folder"/></svg> يمكنك اختيار عدة ملفات أو فولدر كامل</p>
           <input type="file" id="fileInput" accept="video/*" multiple />
         </div>
 
-        <!-- Single Video Box -->
+        <!-- Single Video -->
         <div class="video-box" id="videoBox">
           <video id="videoPlayer" controls></video>
           <div class="info-grid">
@@ -184,186 +260,247 @@
           </div>
         </div>
 
-        <!-- Multiple Videos Box -->
+        <!-- Multiple Videos -->
         <div class="video-box" id="multiVideoBox">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h4 style="display:flex; align-items:center; gap:8px;"><i class="fas fa-list" style="color:#5e3bee;"></i> الفيديوهات المختارة (<span id="videoCount">0</span>)</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+            <h4 style="display:flex; align-items:center; gap:8px;"><svg class="ic" style="color:#5e3bee;"><use href="#i-list"/></svg> الفيديوهات المختارة (<span id="videoCount">0</span>)</h4>
             <div style="display:flex; gap:10px;">
-              <button class="btn btn-ghost" onclick="selectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><i class="fas fa-check-double"></i> تحديد الكل</button>
-              <button class="btn btn-ghost" onclick="deselectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><i class="fas fa-times"></i> إلغاء التحديد</button>
+              <button class="btn btn-ghost" onclick="selectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-check-all"/></svg> تحديد الكل</button>
+              <button class="btn btn-ghost" onclick="deselectAllVideos()" style="padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-close"/></svg> إلغاء التحديد</button>
             </div>
           </div>
           <div id="videoListContainer" style="max-height:400px; overflow-y:auto;"></div>
-          <div style="margin-top:15px;">
-            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:8px; color:#aaa;">الإجراء المطلوب</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;" id="actionRadios">
-              <label class="action-radio selected">
-                <input type="radio" name="batchAction" value="upload" checked onchange="updateBatchAction()" />
-                <span><i class="fas fa-upload"></i> رفع إلى GitHub</span>
-              </label>
-              <label class="action-radio">
-                <input type="radio" name="batchAction" value="convert" onchange="updateBatchAction()" />
-                <span><i class="fas fa-exchange-alt"></i> تحويل الصيغة</span>
-              </label>
-              <label class="action-radio">
-                <input type="radio" name="batchAction" value="compress" onchange="updateBatchAction()" />
-                <span><i class="fas fa-compress-alt"></i> ضغط + رفع</span>
-              </label>
-              <label class="action-radio">
-                <input type="radio" name="batchAction" value="extract_audio" onchange="updateBatchAction()" />
-                <span><i class="fas fa-file-audio"></i> استخراج الصوت</span>
-              </label>
-              <label class="action-radio">
-                <input type="radio" name="batchAction" value="remove_audio" onchange="updateBatchAction()" />
-                <span><i class="fas fa-volume-mute"></i> إزالة الصوت</span>
-              </label>
+          <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap; align-items:center;">
+            <button class="btn btn-primary" id="btnBatchProcess" onclick="batchProcess()" disabled><svg class="ic"><use href="#i-play"/></svg> تنفيذ للتحديد</button>
+            <button class="btn btn-ghost" onclick="resetAll()"><svg class="ic"><use href="#i-reset"/></svg> إعادة</button>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#aaa; font-size:0.85rem;">
+              <input type="checkbox" id="autoUpload" checked style="accent-color:#10b981; width:16px; height:16px;" />
+              <svg class="ic"><use href="#i-upload"/></svg> رفع تلقائي بعد المعالجة
+            </label>
+            <button class="btn btn-ghost" id="btnDownloadAll" onclick="downloadAllVideos()" style="display:none; padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-download"/></svg> تحميل الكل</button>
+            <button class="btn btn-success" id="btnUploadAll" onclick="batchUploadProcessed()" style="display:none; padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-upload"/></svg> رفع الكل إلى GitHub</button>
+            <button class="btn btn-ghost" id="btnCopyAllUrls" onclick="copyAllUrls()" style="display:none; padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-copy"/></svg> نسخ جميع الروابط</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STEP 2: اختر العملية ═══ -->
+      <div class="video-box" id="sharedPanel">
+        <div class="card step">
+          <div class="step-head">
+            <span class="step-num">2</span>
+            <div>
+              <h2>اختر العملية</h2>
+              <span class="step-sub">حدد العملية ثم عدّل الإعدادات واضغط تشغيل</span>
             </div>
-            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center;">
-              <button class="btn btn-primary" id="btnBatchProcess" onclick="batchProcess()" disabled><i class="fas fa-play"></i> تنفيذ للتحديد</button>
-              <button class="btn btn-ghost" onclick="resetAll()"><i class="fas fa-redo"></i> إعادة</button>
-              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#aaa; font-size:0.85rem;">
-                <input type="checkbox" id="autoUpload" checked style="accent-color:#10b981; width:16px; height:16px;" />
-                <i class="fas fa-upload"></i> رفع تلقائي بعد المعالجة
-              </label>
-              <button class="btn btn-ghost" id="btnDownloadAll" onclick="downloadAllVideos()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-download"></i> تحميل الكل</button>
-              <button class="btn btn-success" id="btnUploadAll" onclick="batchUploadProcessed()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-upload"></i> رفع الكل إلى GitHub</button>
-              <button class="btn btn-ghost" id="btnCopyAllUrls" onclick="copyAllUrls()" style="display:none; padding:8px 16px; font-size:0.85rem;"><i class="fas fa-copy"></i> نسخ جميع الروابط</button>
+          </div>
+
+          <div class="op-grid" id="opSelector">
+            <button type="button" class="op-btn" data-op="convert" onclick="selectOperation('convert')">
+              <svg class="ic"><use href="#i-convert"/></svg><span>تحويل الصيغة</span>
+            </button>
+            <button type="button" class="op-btn" data-op="compress" onclick="selectOperation('compress')">
+              <svg class="ic"><use href="#i-compress"/></svg><span>ضغط الفيديو</span>
+            </button>
+            <button type="button" class="op-btn" data-op="extract_audio" onclick="selectOperation('extract_audio')">
+              <svg class="ic"><use href="#i-audio"/></svg><span>استخراج الصوت</span>
+            </button>
+            <button type="button" class="op-btn" data-op="remove_audio" onclick="selectOperation('remove_audio')">
+              <svg class="ic"><use href="#i-mute"/></svg><span>إزالة الصوت</span>
+            </button>
+            <button type="button" class="op-btn" data-op="upload" onclick="selectOperation('upload')">
+              <svg class="ic"><use href="#i-upload"/></svg><span>رفع فقط</span>
+            </button>
+            <button type="button" class="op-btn" data-op="workflow" onclick="selectOperation('workflow')">
+              <svg class="ic"><use href="#i-workflow"/></svg><span>سير العمل</span>
+            </button>
+          </div>
+
+          <!-- Convert -->
+          <div class="op-panel show" id="panel_convert">
+            <div class="control-row">
+              <div class="form-group" style="min-width:220px;">
+                <label>الصيغة المطلوبة</label>
+                <div class="fmt-group" id="convertFormats">
+                  <button type="button" class="fmt-btn active" data-value="webm" onclick="setFmt('convertFormats', this)">WebM</button>
+                  <button type="button" class="fmt-btn" data-value="mp4" onclick="setFmt('convertFormats', this)">MP4</button>
+                  <button type="button" class="fmt-btn" data-value="mkv" onclick="setFmt('convertFormats', this)">MKV</button>
+                  <button type="button" class="fmt-btn" data-value="avi" onclick="setFmt('convertFormats', this)">AVI</button>
+                  <button type="button" class="fmt-btn" data-value="mov" onclick="setFmt('convertFormats', this)">MOV</button>
+                  <button type="button" class="fmt-btn" data-value="mpeg" onclick="setFmt('convertFormats', this)">MPEG</button>
+                  <button type="button" class="fmt-btn" data-value="ogv" onclick="setFmt('convertFormats', this)">OGV</button>
+                </div>
+              </div>
+              <div class="form-group"><label>جودة CRF</label><select id="crfQuality">
+                <option value="18">عالية جداً</option>
+                <option value="23" selected>عالية (موصى به)</option>
+                <option value="28">متوسطة</option>
+                <option value="35">منخفضة</option>
+              </select></div>
+              <div class="form-group"><label>سرعة التحويل</label><select id="presetSpeed">
+                <option value="ultrafast">فائق السرعة</option>
+                <option value="fast">سريع</option>
+                <option value="medium" selected>متوسط</option>
+                <option value="slow">بطيء (جودة أفضل)</option>
+              </select></div>
+              <div class="form-group"><label>مقاس المنصة</label><select id="platformSize">
+                <option value="">الأبعاد الأصلية</option>
+                <option value="1920x1080">يوتيوب 1080p (1920×1080)</option>
+                <option value="1280x720">يوتيوب 720p (1280×720)</option>
+                <option value="854x480">يوتيوب 480p (854×480)</option>
+                <option value="1080x1920">شورتس / ريلز / تيك توك (1080×1920)</option>
+                <option value="1280x720">تويتر X (1280×720)</option>
+                <option value="1080x1080">إنستغرام مربع (1080×1080)</option>
+                <option value="1080x1350">إنستغرام عمودي (1080×1350)</option>
+              </select></div>
+              <div class="form-group"><label>التعبئة</label><select id="sizeFit">
+                <option value="fit">ملاءمة (أشرطة سوداء)</option>
+                <option value="fill">قص وملء الشاشة</option>
+              </select></div>
+              <div class="form-group"><label>الدقة</label><select id="resolutionScale">
+                <option value="1">الأصلية</option>
+                <option value="0.75">75%</option>
+                <option value="0.5">50%</option>
+              </select></div>
             </div>
+            <button class="btn btn-primary" id="btnConvert" onclick="convertVideo()" disabled><svg class="ic"><use href="#i-convert"/></svg> تشغيل التحويل</button>
+          </div>
+
+          <!-- Compress -->
+          <div class="op-panel" id="panel_compress">
+            <p class="hint">ضغط الفيديو للوصول لحجم مستهدف مع الحفاظ على الصوت.</p>
+            <div class="control-row">
+              <div class="form-group"><label>الحجم المستهدف (MB)</label><input type="number" id="targetSize" min="1" max="500" value="10" /></div>
+              <div class="form-group">
+                <label>الصيغة</label>
+                <div class="fmt-group" id="compressFormats">
+                  <button type="button" class="fmt-btn active" data-value="webm" onclick="setFmt('compressFormats', this)">WebM</button>
+                  <button type="button" class="fmt-btn" data-value="mp4" onclick="setFmt('compressFormats', this)">MP4</button>
+                </div>
+              </div>
+              <div class="form-group"><label>جودة الصوت</label><select id="audioBitrate">
+                <option value="64">64 kbps</option>
+                <option value="128" selected>128 kbps</option>
+                <option value="192">192 kbps</option>
+              </select></div>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; margin:6px 0 16px; color:#aaa; cursor:pointer; font-size:0.9rem;">
+              <input type="checkbox" id="compressRemoveAudio" style="accent-color:#ef4444; width:16px; height:16px;" />
+              <svg class="ic" style="width:16px; height:16px; color:#ef4444;"><use href="#i-mute"/></svg>
+              إزالة الصوت من الفيديو
+            </label>
+            <button class="btn btn-warning" id="btnCompress" onclick="compressVideo()" disabled><svg class="ic"><use href="#i-compress"/></svg> تشغيل الضغط</button>
+          </div>
+
+          <!-- Extract Audio -->
+          <div class="op-panel" id="panel_extract_audio">
+            <p class="hint">استخراج الصوت من الفيديو كملف صوتي منفصل.</p>
+            <div class="control-row">
+              <div class="form-group">
+                <label>صيغة الصوت</label>
+                <div class="fmt-group" id="extractAudioFormats">
+                  <button type="button" class="fmt-btn active" data-value="mp3" onclick="setFmt('extractAudioFormats', this)">MP3</button>
+                  <button type="button" class="fmt-btn" data-value="m4a" onclick="setFmt('extractAudioFormats', this)">M4A</button>
+                  <button type="button" class="fmt-btn" data-value="ogg" onclick="setFmt('extractAudioFormats', this)">OGG</button>
+                  <button type="button" class="fmt-btn" data-value="wav" onclick="setFmt('extractAudioFormats', this)">WAV</button>
+                  <button type="button" class="fmt-btn" data-value="flac" onclick="setFmt('extractAudioFormats', this)">FLAC</button>
+                </div>
+              </div>
+              <div class="form-group"><label>جودة الصوت</label><select id="extractAudioBitrate">
+                <option value="64">64 kbps</option>
+                <option value="128">128 kbps</option>
+                <option value="192" selected>192 kbps</option>
+                <option value="320">320 kbps</option>
+              </select></div>
+            </div>
+            <button class="btn btn-primary" id="btnExtractAudio" onclick="extractAudio()" disabled><svg class="ic"><use href="#i-audio"/></svg> تشغيل استخراج الصوت</button>
+          </div>
+
+          <!-- Remove Audio -->
+          <div class="op-panel" id="panel_remove_audio">
+            <p class="hint">إزالة الصوت من الفيديو مع بقاء الفيديو — حجم أصغر بكثير.</p>
+            <div class="control-row">
+              <div class="form-group">
+                <label>الصيغة بعد الإزالة</label>
+                <div class="fmt-group" id="noAudioFormats">
+                  <button type="button" class="fmt-btn active" data-value="mp4" onclick="setFmt('noAudioFormats', this)">MP4</button>
+                  <button type="button" class="fmt-btn" data-value="webm" onclick="setFmt('noAudioFormats', this)">WebM</button>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-warning" id="btnRemoveAudio" onclick="removeAudio()" disabled><svg class="ic"><use href="#i-mute"/></svg> تشغيل إزالة الصوت</button>
+          </div>
+
+          <!-- Upload only -->
+          <div class="op-panel" id="panel_upload">
+            <p class="hint">رفع الملف مباشرة إلى GitHub بدون أي معالجة.</p>
+            <button class="btn btn-success" id="btnUpload" onclick="uploadVideo()" disabled><svg class="ic"><use href="#i-upload"/></svg> رفع الفيديو إلى GitHub</button>
+          </div>
+
+          <!-- Workflow -->
+          <div class="op-panel" id="panel_workflow">
+            <p class="hint">أنشئ سلسلة خطوات تُنفَّذ بالترتيب على الملف، ثم اختر شرط الرفع التلقائي إلى GitHub.</p>
+            <div class="wf-steps" id="workflowSteps"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+              <button class="btn btn-ghost" onclick="addWorkflowStep()" style="padding:8px 16px; font-size:0.85rem;"><svg class="ic"><use href="#i-check-circle"/></svg> إضافة خطوة</button>
+            </div>
+            <div class="wf-auto">
+              <svg class="ic"><use href="#i-upload"/></svg>
+              <label>
+                <input type="checkbox" id="wfAutoUpload" checked style="accent-color:#10b981; width:16px; height:16px;" />
+                ارفع تلقائياً إلى GitHub إذا كان الحجم النهائي أقل من
+              </label>
+              <input type="number" id="wfThreshold" min="1" max="500" value="10" />
+              <span style="color:#aaa; font-size:0.9rem;">MB</span>
+            </div>
+            <button class="btn btn-primary" id="btnWorkflow" onclick="runWorkflow()" disabled style="margin-top:16px;"><svg class="ic"><use href="#i-workflow"/></svg> تشغيل سير العمل</button>
           </div>
         </div>
 
-        <!-- Shared controls (appear with single or multi video) -->
-        <div class="video-box" id="sharedPanel">
-          <div class="controls">
-            <!-- Conversion -->
-            <div class="card" style="padding:20px; margin-bottom:15px;">
-              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-exchange-alt" style="color:#5e3bee;"></i> تحويل الصيغة</h4>
-              <div class="control-row">
-                <div class="form-group"><label>الصيغة المطلوبة</label><select id="convertFormat">
-                  <option value="webm">WebM (VP9)</option>
-                  <option value="mp4">MP4 (H.264)</option>
-                  <option value="mkv">MKV</option>
-                  <option value="avi">AVI</option>
-                  <option value="mov">MOV</option>
-                  <option value="mpeg">MPEG</option>
-                  <option value="ogv">OGV (Theora)</option>
-                </select></div>
-                <div class="form-group"><label>جودة CRF</label><select id="crfQuality">
-                  <option value="18">عالية جداً</option>
-                  <option value="23" selected>عالية (موصى به)</option>
-                  <option value="28">متوسطة</option>
-                  <option value="35">منخفضة</option>
-                </select></div>
-                <div class="form-group"><label>سرعة التحويل</label><select id="presetSpeed">
-                  <option value="ultrafast">فائق السرعة</option>
-                  <option value="fast">سريع</option>
-                  <option value="medium" selected>متوسط</option>
-                  <option value="slow">بطيء (جودة أفضل)</option>
-                </select></div>
-                <div class="form-group"><label>الدقة</label><select id="resolutionScale">
-                  <option value="1">الأصلية</option>
-                  <option value="0.75">75%</option>
-                  <option value="0.5">50%</option>
-                </select></div>
-              </div>
-              <button class="btn btn-primary" id="btnConvert" onclick="convertVideo()" disabled><i class="fas fa-exchange-alt"></i> تحويل الصيغة</button>
-            </div>
-
-            <!-- Compression -->
-            <div class="card" style="padding:20px; margin-bottom:15px;">
-              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-compress-alt" style="color:#f59e0b;"></i> ضغط الفيديو</h4>
-              <div class="control-row">
-                <div class="form-group"><label>الحجم المستهدف (MB)</label><input type="number" id="targetSize" min="1" max="500" value="10" /></div>
-                <div class="form-group"><label>الصيغة</label><select id="compressFormat">
-                  <option value="webm">WebM</option>
-                  <option value="mp4">MP4</option>
-                </select></div>
-                <div class="form-group"><label>جودة الصوت</label><select id="audioBitrate">
-                  <option value="64">64 kbps</option>
-                  <option value="128" selected>128 kbps</option>
-                  <option value="192">192 kbps</option>
-                </select></div>
-              </div>
-              <button class="btn btn-warning" id="btnCompress" onclick="compressVideo()" disabled><i class="fas fa-compress-alt"></i> ضغط الفيديو</button>
-            </div>
-
-            <!-- Audio -->
-            <div class="card" style="padding:20px; margin-bottom:15px;">
-              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-headphones" style="color:#ec4899;"></i> الصوت</h4>
-              <div class="control-row">
-                <div class="form-group"><label>استخراج الصوت</label><select id="extractAudioFormat">
-                  <option value="mp3">MP3</option>
-                  <option value="m4a">M4A</option>
-                  <option value="ogg">OGG</option>
-                  <option value="wav">WAV</option>
-                  <option value="flac">FLAC</option>
-                </select></div>
-                <div class="form-group"><label>جودة الصوت</label><select id="extractAudioBitrate">
-                  <option value="64">64 kbps</option>
-                  <option value="128">128 kbps</option>
-                  <option value="192" selected>192 kbps</option>
-                  <option value="320">320 kbps</option>
-                </select></div>
-              </div>
-              <button class="btn btn-primary" id="btnExtractAudio" onclick="extractAudio()" disabled><i class="fas fa-file-audio"></i> استخراج الصوت</button>
-              <div style="margin-top:18px; padding-top:18px; border-top:1px solid #2a2a4a;">
-                <p style="color:#888; font-size:0.9rem; margin-bottom:10px;">إزالة الصوت من الفيديو (بدون مسح الفيديو) لتصغير الحجم:</p>
-                <div class="control-row" style="margin-bottom:10px;">
-                  <div class="form-group"><label>الصيغة بعد إزالة الصوت</label><select id="noAudioFormat">
-                    <option value="mp4">MP4</option>
-                    <option value="webm">WebM</option>
-                  </select></div>
-                </div>
-                <button class="btn btn-warning" id="btnRemoveAudio" onclick="removeAudio()" disabled><i class="fas fa-volume-mute"></i> إزالة الصوت (تصغير الحجم)</button>
-              </div>
-            </div>
-
-            <!-- Upload -->
-            <div class="card" style="padding:20px;">
-              <h4 style="margin-bottom:15px; display:flex; align-items:center; gap:8px;"><i class="fas fa-upload" style="color:#10b981;"></i> رفع إلى GitHub</h4>
-              <p style="color:#888; font-size:0.9rem; margin-bottom:15px;">سيتم نسخ الفيديو إلى <code>assets/video/work/</code> ورفعه إلى GitHub تلقائياً.</p>
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn btn-success" id="btnUpload" onclick="uploadVideo()" disabled><i class="fas fa-upload"></i> رفع الفيديو إلى GitHub</button>
-                <button class="btn btn-ghost" onclick="resetAll()"><i class="fas fa-redo"></i> اختيار فيديو آخر</button>
-              </div>
+        <!-- ═══ STEP 3: التقدم والنتيجة ═══ -->
+        <div class="card step" id="flowCard" style="display:none;">
+          <div class="step-head">
+            <span class="step-num">3</span>
+            <div>
+              <h2>التقدم والنتيجة</h2>
+              <span class="step-sub">راقب الحالة ثم حمّل أو ارفع النتيجة</span>
             </div>
           </div>
 
-          <!-- Progress -->
           <div class="progress-box" id="progressBox">
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
             <div class="progress-text"><span id="progressLabel">جاري...</span><span id="progressPercent">0%</span></div>
             <div style="text-align:center; margin-top:10px;">
-              <button class="btn btn-danger" id="btnCancel" onclick="cancelOperation()" style="display:none; padding:8px 20px; font-size:0.85rem;"><i class="fas fa-stop"></i> إلغاء التحويل</button>
+              <button class="btn btn-danger" id="btnCancel" onclick="cancelOperation()" style="display:none; padding:8px 20px; font-size:0.85rem;"><svg class="ic"><use href="#i-stop"/></svg> إلغاء العملية</button>
             </div>
           </div>
 
-          <!-- Result -->
           <div class="result-box" id="resultBox">
-            <h4><i class="fas fa-check-circle"></i> تم بنجاح!</h4>
+            <h4><svg class="ic"><use href="#i-check-circle"/></svg> تم بنجاح!</h4>
             <div class="result-stats">
               <div class="result-stat"><label>الحجم الأصلي</label><span id="resOriginal">—</span></div>
               <div class="result-stat"><label>الحجم الجديد</label><span id="resNew" class="green">—</span></div>
               <div class="result-stat"><label>التوفير</label><span id="resSavings" class="blue">—</span></div>
             </div>
             <div id="urlSection" style="display:none;">
-              <p style="color:#888; font-size:0.9rem;">رابط الفيديو بعد الرفع:</p>
+              <p style="color:#888; font-size:0.9rem;">رابط الملف بعد الرفع:</p>
               <div class="url-box"><a id="videoUrl" href="#" target="_blank"></a></div>
-              <button class="btn btn-ghost" onclick="copyUrl()"><i class="fas fa-copy"></i> نسخ الرابط</button>
+              <button class="btn btn-ghost" onclick="copyUrl()"><svg class="ic"><use href="#i-copy"/></svg> نسخ الرابط</button>
             </div>
             <div class="btn-group" style="justify-content:center;">
-              <button class="btn btn-success" id="btnDownload" onclick="downloadResult()" style="display:none;"><i class="fas fa-download"></i> تحميل الملف</button>
+              <button class="btn btn-success" id="btnDownload" onclick="downloadResult()" style="display:none;"><svg class="ic"><use href="#i-download"/></svg> تحميل الملف</button>
+              <button class="btn btn-success" id="btnUploadResult" onclick="uploadVideo()" style="display:none;"><svg class="ic"><use href="#i-upload"/></svg> رفع النتيجة إلى GitHub</button>
+              <button class="btn btn-ghost" onclick="resetAll()"><svg class="ic"><use href="#i-reset"/></svg> اختيار فيديو آخر</button>
             </div>
           </div>
 
-          <!-- Log -->
           <div class="log-box" id="logBox"></div>
         </div>
       </div>
 
       <p style="text-align:center; color:#555; font-size:0.8rem; margin:30px 0;">Ali Ahmed &copy; 2026 — VideoToolkit</p>
       <div style="text-align:center; margin-top:10px;">
-        <button class="btn btn-danger" onclick="shutdownServer()" style="font-size:0.8rem; padding:8px 16px;"><i class="fas fa-power-off"></i> إيقاف السيرفر</button>
+        <button class="btn btn-danger" onclick="shutdownServer()" style="font-size:0.8rem; padding:8px 16px;"><svg class="ic"><use href="#i-power"/></svg> إيقاف السيرفر</button>
       </div>
     </div>
 
@@ -377,6 +514,18 @@
       let selectedFiles = [];
       let processingResults = [];
       let batchCancelled = false;
+      let currentOperation = 'convert';
+      let workflowSteps = [];
+
+      const WF_OP_LABELS = { convert: 'تحويل', compress: 'ضغط', extract_audio: 'صوت', remove_audio: 'بدون صوت' };
+      const WF_OP_ICONS = { convert: 'i-convert', compress: 'i-compress', extract_audio: 'i-audio', remove_audio: 'i-mute' };
+      const WF_FORMATS = {
+        convert: ['webm','mp4','mkv','avi','mov','mpeg','ogv'],
+        compress: ['webm','mp4'],
+        extract_audio: ['mp3','m4a','ogg','wav','flac'],
+        remove_audio: ['mp4','webm']
+      };
+      const WF_DEFAULT = { convert: 'webm', compress: 'mp4', extract_audio: 'mp3', remove_audio: 'mp4' };
 
       // Setup upload zone
       const dropZone = document.getElementById('dropZone');
@@ -402,6 +551,170 @@
         else { handleMultipleFiles(files); }
       });
 
+      // ── Operation selection & format buttons ──────────────────
+      function selectOperation(op) {
+        currentOperation = op;
+        document.querySelectorAll('.op-btn').forEach(b => b.classList.toggle('active', b.dataset.op === op));
+        document.querySelectorAll('.op-panel').forEach(p => p.classList.toggle('show', p.id === 'panel_' + op));
+        if (op === 'workflow' && workflowSteps.length === 0) addWorkflowStep();
+      }
+
+      function setFmt(groupId, el) {
+        document.querySelectorAll('#' + groupId + ' .fmt-btn').forEach(b => b.classList.toggle('active', b === el));
+      }
+
+      function getFmt(groupId) {
+        const active = document.querySelector('#' + groupId + ' .fmt-btn.active');
+        if (active) return active.dataset.value;
+        return document.querySelector('#' + groupId + ' .fmt-btn').dataset.value;
+      }
+
+      // ── Workflow builder ──────────────────────────────────────
+      function addWorkflowStep() {
+        workflowSteps.push({ op: 'compress', format: 'mp4', crf: '23', preset: 'medium', scale: '1', target: 10, audio_bitrate: 128, remove_audio: '0' });
+        renderWorkflowSteps();
+      }
+
+      function removeWorkflowStep(idx) {
+        workflowSteps.splice(idx, 1);
+        renderWorkflowSteps();
+      }
+
+      function setWfOp(idx, op) {
+        workflowSteps[idx].op = op;
+        workflowSteps[idx].format = WF_DEFAULT[op];
+        renderWorkflowSteps();
+      }
+
+      function setWfFmt(idx, value) {
+        workflowSteps[idx].format = value;
+        renderWorkflowSteps();
+      }
+
+      function setWfOpt(idx, key, value) {
+        workflowSteps[idx][key] = value;
+      }
+
+      function getWorkflowSteps() {
+        return workflowSteps.map(s => Object.assign({}, s));
+      }
+
+      function renderWorkflowSteps() {
+        const container = document.getElementById('workflowSteps');
+        container.innerHTML = '';
+
+        workflowSteps.forEach((step, idx) => {
+          const opsHtml = Object.keys(WF_OP_LABELS).map(op => `
+            <button type="button" class="wf-op${step.op === op ? ' active' : ''}" onclick="setWfOp(${idx}, '${op}')">
+              <svg class="ic"><use href="#${WF_OP_ICONS[op]}"/></svg> ${WF_OP_LABELS[op]}
+            </button>`).join('');
+
+          const fmtHtml = WF_FORMATS[step.op].map(f => `
+            <button type="button" class="fmt-btn${step.format === f ? ' active' : ''}" onclick="setWfFmt(${idx}, '${f}')">${f.toUpperCase()}</button>`).join('');
+
+          let optionsHtml = `<div class="form-group" style="min-width:200px;"><label>الصيغة</label><div class="fmt-group">${fmtHtml}</div></div>`;
+
+          if (step.op === 'convert') {
+            const crfs = [[18,'عالية جداً'],[23,'عالية'],[28,'متوسطة'],[35,'منخفضة']];
+            optionsHtml += `<div class="form-group"><label>جودة CRF</label><select onchange="setWfOpt(${idx}, 'crf', this.value)">` +
+              crfs.map(([v, l]) => `<option value="${v}"${String(step.crf) === String(v) ? ' selected' : ''}>${l}</option>`).join('') + `</select></div>`;
+            const sizes = [['','الأبعاد الأصلية'],['1920x1080','يوتيوب 1080p'],['1280x720','يوتيوب 720p / تويتر'],['854x480','يوتيوب 480p'],['1080x1920','شورتس / ريلز'],['1080x1080','إنستغرام مربع'],['1080x1350','إنستغرام عمودي']];
+            optionsHtml += `<div class="form-group"><label>مقاس المنصة</label><select onchange="setWfOpt(${idx}, 'size', this.value)">` +
+              sizes.map(([v, l]) => `<option value="${v}"${String(step.size || '') === v ? ' selected' : ''}>${l}</option>`).join('') + `</select></div>`;
+            optionsHtml += `<div class="form-group"><label>التعبئة</label><select onchange="setWfOpt(${idx}, 'size_fit', this.value)">` +
+              [['fit','ملاءمة (أشرطة سوداء)'],['fill','قص وملء الشاشة']].map(([v, l]) => `<option value="${v}"${String(step.size_fit || 'fit') === v ? ' selected' : ''}>${l}</option>`).join('') + `</select></div>`;
+            optionsHtml += `<div class="form-group"><label>الدقة</label><select onchange="setWfOpt(${idx}, 'scale', this.value)">` +
+              [['1','الأصلية'],['0.75','75%'],['0.5','50%']].map(([v, l]) => `<option value="${v}"${String(step.scale) === v ? ' selected' : ''}>${l}</option>`).join('') + `</select></div>`;
+          } else if (step.op === 'compress') {
+            optionsHtml += `<div class="form-group"><label>الحجم المستهدف (MB)</label><input type="number" min="1" max="500" value="${step.target}" onchange="setWfOpt(${idx}, 'target', this.value)" /></div>`;
+            optionsHtml += `<div class="form-group" style="align-self:flex-end;"><label>&nbsp;</label><label style="display:flex; align-items:center; gap:6px; color:#aaa; font-size:0.85rem; cursor:pointer;"><input type="checkbox" ${step.remove_audio === '1' ? 'checked' : ''} onchange="setWfOpt(${idx}, 'remove_audio', this.checked ? '1' : '0')" style="accent-color:#ef4444;" /> إزالة الصوت</label></div>`;
+          }
+
+          if (step.op === 'compress' || step.op === 'extract_audio') {
+            optionsHtml += `<div class="form-group"><label>جودة الصوت</label><select onchange="setWfOpt(${idx}, 'audio_bitrate', this.value)">` +
+              [64,128,192,320].map(v => `<option value="${v}"${String(step.audio_bitrate) === String(v) ? ' selected' : ''}>${v} kbps</option>`).join('') + `</select></div>`;
+          }
+
+          const row = document.createElement('div');
+          row.className = 'wf-step';
+          row.innerHTML = `
+            <div class="wf-step-head">
+              <span class="wf-step-num">${idx + 1}</span>
+              <div class="wf-step-ops">${opsHtml}</div>
+              <button type="button" class="wf-step-remove" onclick="removeWorkflowStep(${idx})"><svg class="ic"><use href="#i-close"/></svg></button>
+            </div>
+            <div class="wf-step-options"><div class="control-row" style="margin-bottom:0;">${optionsHtml}</div></div>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      async function runWorkflow() {
+        if (!currentFile) return;
+        const steps = getWorkflowSteps();
+        if (steps.length === 0) { toast('أضف خطوة واحدة على الأقل', 'error'); return; }
+        disableButtons(true);
+        showProgress('جاري تنفيذ سير العمل...');
+
+        try {
+          const formData = new FormData();
+          formData.append('file', currentFile);
+          formData.append('action', 'workflow');
+          formData.append('steps', JSON.stringify(steps));
+          formData.append('auto_upload', document.getElementById('wfAutoUpload').checked ? '1' : '0');
+          formData.append('size_threshold', document.getElementById('wfThreshold').value);
+
+          const resp = await fetch('/api/video', { method: 'POST', body: formData });
+          const data = await resp.json();
+
+          if (!resp.ok) throw new Error(data.error || 'فشل سير العمل');
+
+          currentBlob = base64ToBlob(data.data, data.mime);
+          currentResultName = data.name;
+
+          showResult(currentFile.size, currentBlob.size, data.name);
+          if (data.uploaded) {
+            uploadUrl = data.url;
+            document.getElementById('videoUrl').textContent = uploadUrl;
+            document.getElementById('videoUrl').href = uploadUrl;
+            document.getElementById('urlSection').style.display = 'block';
+            log('ok', `تم الرفع التلقائي: ${uploadUrl}`);
+            toast('اكتمل سير العمل وتم الرفع تلقائياً!', 'success');
+          } else if (data.upload_skipped) {
+            log('warn', 'الحجم النهائي أكبر من الحد المحدد — لم يتم الرفع التلقائي');
+            toast('الحجم أكبر من الحد — لم يتم الرفع التلقائي', 'info');
+          } else if (data.upload_error) {
+            log('err', 'فشل الرفع التلقائي: ' + data.upload_error);
+            toast('اكتمل سير العمل لكن فشل الرفع: ' + data.upload_error, 'error');
+          } else {
+            log('ok', 'اكتمل سير العمل');
+            toast('اكتمل سير العمل بنجاح!', 'success');
+          }
+        } catch (e) {
+          log('err', 'خطأ في سير العمل: ' + e.message);
+          toast('فشل سير العمل: ' + e.message, 'error');
+        }
+
+        disableButtons(false);
+        hideProgress();
+      }
+
+      async function workflowSingleFile(file) {
+        const steps = getWorkflowSteps();
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('action', 'workflow');
+        formData.append('steps', JSON.stringify(steps));
+        formData.append('auto_upload', document.getElementById('wfAutoUpload').checked ? '1' : '0');
+        formData.append('size_threshold', document.getElementById('wfThreshold').value);
+
+        const resp = await fetch('/api/video', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'فشل سير العمل');
+        return { blob: base64ToBlob(data.data, data.mime), name: data.name, size: data.size, url: data.uploaded ? data.url : null };
+      }
+
+      // ── Single file flow ───────────────────────────────────────
       function handleFile(file) {
         if (file.size > 500 * 1024 * 1024) { toast('أقصى حجم 500MB', 'error'); return; }
         currentFile = file;
@@ -421,12 +734,10 @@
           document.getElementById('videoBox').classList.add('show');
           document.getElementById('multiVideoBox').classList.remove('show');
           document.getElementById('sharedPanel').classList.add('show');
-          document.getElementById('btnConvert').disabled = false;
-          document.getElementById('btnCompress').disabled = false;
-          document.getElementById('btnExtractAudio').disabled = false;
-          document.getElementById('btnRemoveAudio').disabled = false;
-          document.getElementById('btnUpload').disabled = false;
+          enableButtons();
           document.getElementById('btnDownload').style.display = 'none';
+          document.getElementById('btnUploadResult').style.display = 'none';
+          selectOperation(currentOperation);
           log('info', `تم اختيار: ${file.name} (${formatBytes(file.size)})`);
         };
       }
@@ -440,7 +751,9 @@
           const crf = document.getElementById('crfQuality').value;
           const preset = document.getElementById('presetSpeed').value;
           const scale = document.getElementById('resolutionScale').value;
-          const format = document.getElementById('convertFormat').value;
+          const format = getFmt('convertFormats');
+          const size = document.getElementById('platformSize').value;
+          const sizeFit = document.getElementById('sizeFit').value;
 
           const formData = new FormData();
           formData.append('file', currentFile);
@@ -449,6 +762,8 @@
           formData.append('preset', preset);
           formData.append('scale', scale);
           formData.append('format', format);
+          formData.append('size', size);
+          formData.append('size_fit', sizeFit);
 
           const resp = await fetch('/api/video', { method: 'POST', body: formData });
           const data = await resp.json();
@@ -459,7 +774,6 @@
           currentResultName = data.name;
 
           showResult(currentFile.size, currentBlob.size, data.name);
-          document.getElementById('btnDownload').style.display = 'inline-flex';
           log('ok', `تم التحويل: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
           toast('تم تحويل الفيديو بنجاح!', 'success');
         } catch (e) {
@@ -478,8 +792,9 @@
 
         try {
           const target = document.getElementById('targetSize').value;
-          const format = document.getElementById('compressFormat').value;
+          const format = getFmt('compressFormats');
           const audio = document.getElementById('audioBitrate').value;
+          const removeAudio = document.getElementById('compressRemoveAudio').checked ? '1' : '0';
 
           const formData = new FormData();
           formData.append('file', currentFile);
@@ -487,6 +802,7 @@
           formData.append('target', target);
           formData.append('format', format);
           formData.append('audio_bitrate', audio);
+          formData.append('remove_audio', removeAudio);
 
           const resp = await fetch('/api/video', { method: 'POST', body: formData });
           const data = await resp.json();
@@ -497,7 +813,6 @@
           currentResultName = data.name;
 
           showResult(currentFile.size, currentBlob.size, data.name);
-          document.getElementById('btnDownload').style.display = 'inline-flex';
           log('ok', `تم الضغط: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
           toast('تم ضغط الفيديو بنجاح!', 'success');
         } catch (e) {
@@ -515,7 +830,7 @@
         showProgress('جاري استخراج الصوت...');
 
         try {
-          const format = document.getElementById('extractAudioFormat').value;
+          const format = getFmt('extractAudioFormats');
           const bitrate = document.getElementById('extractAudioBitrate').value;
 
           const formData = new FormData();
@@ -533,7 +848,6 @@
           currentResultName = data.name;
 
           showResult(currentFile.size, currentBlob.size, data.name);
-          document.getElementById('btnDownload').style.display = 'inline-flex';
           log('ok', `تم استخراج الصوت: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
           toast('تم استخراج الصوت بنجاح!', 'success');
         } catch (e) {
@@ -551,7 +865,7 @@
         showProgress('جاري إزالة الصوت...');
 
         try {
-          const format = document.getElementById('noAudioFormat').value;
+          const format = getFmt('noAudioFormats');
 
           const formData = new FormData();
           formData.append('file', currentFile);
@@ -567,7 +881,6 @@
           currentResultName = data.name;
 
           showResult(currentFile.size, currentBlob.size, data.name);
-          document.getElementById('btnDownload').style.display = 'inline-flex';
           log('ok', `تمت إزالة الصوت: ${formatBytes(currentFile.size)} → ${formatBytes(currentBlob.size)}`);
           toast('تمت إزالة الصوت بنجاح!', 'success');
         } catch (e) {
@@ -644,16 +957,17 @@
         document.getElementById('resultBox').classList.remove('show');
         document.getElementById('urlSection').style.display = 'none';
         document.getElementById('progressBox').classList.remove('show');
+        document.getElementById('flowCard').style.display = 'none';
         fileInput.value = '';
-        document.getElementById('btnConvert').disabled = true;
-        document.getElementById('btnCompress').disabled = true;
-        document.getElementById('btnExtractAudio').disabled = true;
-        document.getElementById('btnRemoveAudio').disabled = true;
-        document.getElementById('btnUpload').disabled = true;
+        disableButtons(true);
         document.getElementById('btnBatchProcess').disabled = true;
+        document.getElementById('btnDownload').style.display = 'none';
+        document.getElementById('btnUploadResult').style.display = 'none';
         document.getElementById('logBox').innerHTML = '';
+        selectOperation('convert');
       }
 
+      // ── Multi file flow ────────────────────────────────────────
       function handleMultipleFiles(files) {
         selectedFiles = files.filter(f => f.size <= 500 * 1024 * 1024);
         const tooLarge = files.length - selectedFiles.length;
@@ -668,6 +982,7 @@
         document.getElementById('multiVideoBox').classList.add('show');
         document.getElementById('sharedPanel').classList.add('show');
         document.getElementById('btnBatchProcess').disabled = selectedFiles.length === 0;
+        selectOperation(currentOperation);
         log('info', `تم اختيار ${selectedFiles.length} فيديو`);
       }
 
@@ -704,11 +1019,11 @@
           if (hasActions) {
             actionsHtml = '<div class="video-item-actions">';
             if (file._blob) {
-              actionsHtml += `<button class="btn-sm btn-sm-download" onclick="downloadSingleVideo(${idx})"><i class="fas fa-download"></i> تحميل</button>`;
+              actionsHtml += `<button class="btn-sm btn-sm-download" onclick="downloadSingleVideo(${idx})"><svg class="ic"><use href="#i-download"/></svg> تحميل</button>`;
             }
             if (file._url) {
               actionsHtml += `<a href="${file._url}" target="_blank" class="video-item-url" title="${file._url}">${file._url}</a>`;
-              actionsHtml += `<button class="btn-sm btn-sm-copy" onclick="copyVideoUrl(${idx})"><i class="fas fa-copy"></i> نسخ الرابط</button>`;
+              actionsHtml += `<button class="btn-sm btn-sm-copy" onclick="copyVideoUrl(${idx})"><svg class="ic"><use href="#i-copy"/></svg> نسخ الرابط</button>`;
             }
             actionsHtml += '</div>';
           }
@@ -768,7 +1083,7 @@
         const toProcess = selectedFiles.filter(f => f._selected !== false && f._status !== 'done');
         if (toProcess.length === 0) { toast('لا يوجد فيديوهات للمعالجة', 'info'); return; }
 
-        const action = document.querySelector('input[name="batchAction"]:checked').value;
+        const action = currentOperation;
         const autoUpload = document.getElementById('autoUpload').checked;
         disableButtons(true);
         batchCancelled = false;
@@ -832,6 +1147,16 @@
               file._statusText = autoUpload ? 'بانتظار الرفع' : 'تمت إزالة الصوت';
               filesForUpload.push({ file: silent.blob, name: silent.name });
               log('ok', `تمت إزالة الصوت: ${file.name} → ${silent.name}`);
+            } else if (action === 'workflow') {
+              setProgress(Math.round((i / toProcess.length) * 60), `تنفيذ سير العمل على ${file.name}...`);
+              const wf = await workflowSingleFile(file);
+              file._blob = wf.blob;
+              file._newSize = wf.blob.size;
+              file._processedName = wf.name;
+              file._status = autoUpload ? 'pending_upload' : 'done';
+              file._statusText = autoUpload ? 'بانتظار الرفع' : 'تم تنفيذ سير العمل';
+              filesForUpload.push({ file: wf.blob, name: wf.name });
+              log('ok', `تم سير العمل: ${file.name} → ${wf.name}`);
             } else {
               // upload action
               file._status = 'pending_upload';
@@ -921,7 +1246,9 @@
         formData.append('crf', document.getElementById('crfQuality').value);
         formData.append('preset', document.getElementById('presetSpeed').value);
         formData.append('scale', document.getElementById('resolutionScale').value);
-        formData.append('format', document.getElementById('convertFormat').value);
+        formData.append('format', getFmt('convertFormats'));
+        formData.append('size', document.getElementById('platformSize').value);
+        formData.append('size_fit', document.getElementById('sizeFit').value);
 
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
@@ -934,8 +1261,9 @@
         formData.append('file', file);
         formData.append('action', 'compress');
         formData.append('target', document.getElementById('targetSize').value);
-        formData.append('format', document.getElementById('compressFormat').value);
+        formData.append('format', getFmt('compressFormats'));
         formData.append('audio_bitrate', document.getElementById('audioBitrate').value);
+        formData.append('remove_audio', document.getElementById('compressRemoveAudio').checked ? '1' : '0');
 
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
@@ -947,7 +1275,7 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('action', 'extract_audio');
-        formData.append('format', document.getElementById('extractAudioFormat').value);
+        formData.append('format', getFmt('extractAudioFormats'));
         formData.append('audio_bitrate', document.getElementById('extractAudioBitrate').value);
 
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
@@ -960,7 +1288,7 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('action', 'remove_audio');
-        formData.append('format', document.getElementById('noAudioFormat').value);
+        formData.append('format', getFmt('noAudioFormats'));
 
         const resp = await fetch('/api/video', { method: 'POST', body: formData });
         const data = await resp.json();
@@ -1006,11 +1334,11 @@
 
       function downloadAllVideos() {
         const doneFiles = selectedFiles.filter(f => f._status === 'done' && f._blob);
-        if (doneFiles.length === 0) { toast('لا يوجد فيديوهات محولة للتحميل', 'info'); return; }
+        if (doneFiles.length === 0) { toast('لا يوجد ملفات محولة للتحميل', 'info'); return; }
         doneFiles.forEach((file, i) => {
           setTimeout(() => downloadSingleVideo(selectedFiles.indexOf(file)), i * 500);
         });
-        toast(`جاري تحميل ${doneFiles.length} فيديو...`, 'info');
+        toast(`جاري تحميل ${doneFiles.length} ملف...`, 'info');
       }
 
       function copyVideoUrl(idx) {
@@ -1035,10 +1363,10 @@
 
       async function batchUploadProcessed() {
         const toUpload = selectedFiles.filter(f => (f._status === 'done' || f._status === 'pending_upload') && !f._url);
-        if (toUpload.length === 0) { toast('لا يوجد فيديوهات للرفع', 'info'); return; }
+        if (toUpload.length === 0) { toast('لا يوجد ملفات للرفع', 'info'); return; }
 
         disableButtons(true);
-        showProgress(`جاري رفع ${toUpload.length} فيديو...`);
+        showProgress(`جاري رفع ${toUpload.length} ملف...`);
 
         try {
           const formData = new FormData();
@@ -1062,8 +1390,8 @@
           });
           renderVideoList();
           const ok = data.results.filter(r => r.success).length;
-          toast(`تم رفع ${ok} فيديو بنجاح`, ok > 0 ? 'success' : 'error');
-          log('ok', `رفع ${ok}/${data.total} فيديو`);
+          toast(`تم رفع ${ok} ملف بنجاح`, ok > 0 ? 'success' : 'error');
+          log('ok', `رفع ${ok}/${data.total} ملف`);
         } catch (e) {
           toast('فشل الرفع: ' + e.message, 'error');
           log('err', 'خطأ في الرفع: ' + e.message);
@@ -1079,12 +1407,8 @@
         document.getElementById('resNew').textContent = formatBytes(newSize);
         document.getElementById('resSavings').textContent = savings + '%';
         document.getElementById('resultBox').classList.add('show');
-      }
-
-      function updateBatchAction() {
-        document.querySelectorAll('#actionRadios .action-radio').forEach(l => {
-          l.classList.toggle('selected', l.querySelector('input').checked);
-        });
+        document.getElementById('btnDownload').style.display = 'inline-flex';
+        document.getElementById('btnUploadResult').style.display = 'inline-flex';
       }
 
       async function cancelOperation() {
@@ -1120,6 +1444,7 @@
         document.getElementById('progressPercent').textContent = '0%';
         document.getElementById('progressFill').style.width = '0%';
         document.getElementById('progressBox').classList.add('show');
+        document.getElementById('flowCard').style.display = 'block';
         document.getElementById('btnCancel').style.display = 'inline-flex';
       }
 
@@ -1134,12 +1459,22 @@
         document.getElementById('btnCancel').style.display = 'none';
       }
 
+      function enableButtons() {
+        document.getElementById('btnConvert').disabled = false;
+        document.getElementById('btnCompress').disabled = false;
+        document.getElementById('btnExtractAudio').disabled = false;
+        document.getElementById('btnRemoveAudio').disabled = false;
+        document.getElementById('btnUpload').disabled = false;
+        document.getElementById('btnWorkflow').disabled = false;
+      }
+
       function disableButtons(disabled) {
         document.getElementById('btnConvert').disabled = disabled;
         document.getElementById('btnCompress').disabled = disabled;
         document.getElementById('btnExtractAudio').disabled = disabled;
         document.getElementById('btnRemoveAudio').disabled = disabled;
         document.getElementById('btnUpload').disabled = disabled;
+        document.getElementById('btnWorkflow').disabled = disabled;
         document.getElementById('btnBatchProcess').disabled = disabled;
         document.getElementById('btnUploadAll').disabled = disabled;
       }
@@ -1153,8 +1488,9 @@
 
       function toast(msg, type) {
         const t = document.getElementById('toast');
+        const icon = type === 'success' ? 'i-check-circle' : type === 'error' ? 'i-close-circle' : 'i-info';
         t.className = 'toast show ' + (type || 'info');
-        t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> ${msg}`;
+        t.innerHTML = `<svg class="ic"><use href="#${icon}"/></svg> ${msg}`;
         clearTimeout(t._timeout);
         t._timeout = setTimeout(() => t.classList.remove('show'), 4000);
       }
@@ -1219,7 +1555,8 @@
         document.getElementById('progressPercent').textContent = '100%';
       };
 
-      // Check server status on page load
+      // Init
+      selectOperation('convert');
       checkServerStatus();
     </script>
   </body>

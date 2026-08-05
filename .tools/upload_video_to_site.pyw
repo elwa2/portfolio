@@ -248,6 +248,8 @@ def api_video():
             return handle_extract_audio(request)
         elif action == "remove_audio":
             return handle_remove_audio(request)
+        elif action == "workflow":
+            return handle_workflow(request)
         elif action == "upload":
             return handle_upload(request)
         elif action == "batch_upload":
@@ -317,45 +319,29 @@ def handle_convert(req):
         return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
 
     f, name = get_uploaded_file(req)
-    crf = req.form.get("crf", "23")
-    preset = req.form.get("preset", "medium")
-    scale = req.form.get("scale", "1")
     fmt = (req.form.get("format", "webm") or "webm").lower()
+    cfg = _VIDEO_FORMATS.get(fmt, _VIDEO_FORMATS["webm"])
 
     tmp_input = save_temp_file(f)
     try:
-        duration = get_video_duration(tmp_input)
-        cfg = _VIDEO_FORMATS.get(fmt, _VIDEO_FORMATS["webm"])
-        output_name = Path(name).stem + f".{cfg['ext']}"
-        tmp_output = tmp_input.parent / output_name
-
-        args = ["-i", str(tmp_input)] + _video_codec_args(fmt, crf, preset)
-
-        if scale != "1":
-            w, h = ffmpeg_probe_resolution(tmp_input)
-            new_w = int(w * float(scale))
-            new_h = int(h * float(scale))
-            if new_w % 2:
-                new_w += 1
-            if new_h % 2:
-                new_h += 1
-            args += ["-vf", f"scale={new_w}:{new_h}"]
-
-        args += [str(tmp_output)]
-
         set_job("convert", name)
-        set_progress(0, f"جاري التحويل إلى {cfg['ext'].upper()}...")
-        run_ffmpeg(args, duration)
-
-        with open(tmp_output, "rb") as bf:
+        out = _apply_operation(tmp_input, {
+            "op": "convert",
+            "format": fmt,
+            "crf": req.form.get("crf", "23"),
+            "preset": req.form.get("preset", "medium"),
+            "scale": req.form.get("scale", "1"),
+            "size": req.form.get("size", ""),
+            "size_fit": req.form.get("size_fit", "fit"),
+        })
+        with open(out, "rb") as bf:
             data = bf.read()
-            b64 = base64.b64encode(data).decode()
 
         clear_job()
         return jsonify({
-            "data": b64,
+            "data": base64.b64encode(data).decode(),
             "mime": cfg["mime"],
-            "name": output_name,
+            "name": out.name,
             "size": len(data),
         })
     finally:
@@ -368,46 +354,24 @@ def handle_compress(req):
         return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
 
     f, name = get_uploaded_file(req)
-    target_mb = int(req.form.get("target", "10"))
-    fmt = req.form.get("format", "webm")
-    audio_bitrate = req.form.get("audio_bitrate", "128")
+    fmt = (req.form.get("format", "webm") or "webm").lower()
 
     tmp_input = save_temp_file(f)
     try:
-        duration = get_video_duration(tmp_input)
-        ext = "webm" if fmt == "webm" else "mp4"
-        output_name = Path(name).stem + f"_compressed.{ext}"
-        tmp_output = tmp_input.parent / output_name
-
-        target_bits = target_mb * 8 * 1024 * 1024
-        audio_bits = int(audio_bitrate) * 1000 * duration
-        video_bitrate = max(50000, int((target_bits - audio_bits) / duration))
-
-        vcodec = "libvpx-vp9" if fmt == "webm" else "libx264"
-        acodec = "libopus" if fmt == "webm" else "aac"
-
-        args = [
-            "-i", str(tmp_input),
-            "-c:v", vcodec,
-            "-b:v", str(video_bitrate),
-            "-maxrate", str(int(video_bitrate * 1.5)),
-            "-bufsize", str(video_bitrate * 2),
-            "-c:a", acodec,
-            "-b:a", f"{audio_bitrate}k",
-            str(tmp_output),
-        ]
-
         set_job("compress", name)
-        set_progress(0, "جاري ضغط الفيديو...")
-        run_ffmpeg(args, duration)
-
-        with open(tmp_output, "rb") as bf:
+        out = _apply_operation(tmp_input, {
+            "op": "compress",
+            "format": fmt,
+            "target": req.form.get("target", "10"),
+            "audio_bitrate": req.form.get("audio_bitrate", "128"),
+            "remove_audio": req.form.get("remove_audio", "0"),
+        })
+        with open(out, "rb") as bf:
             data = bf.read()
-            b64 = base64.b64encode(data).decode()
 
         mime = "video/webm" if fmt == "webm" else "video/mp4"
         clear_job()
-        return jsonify({"data": b64, "mime": mime, "name": output_name, "size": len(data)})
+        return jsonify({"data": base64.b64encode(data).decode(), "mime": mime, "name": out.name, "size": len(data)})
     finally:
         shutil.rmtree(tmp_input.parent, ignore_errors=True)
 
@@ -422,39 +386,157 @@ _AUDIO_FORMATS = {
 }
 
 
+def _mime_for_suffix(suffix: str) -> str:
+    """Guess a MIME type from a file extension."""
+    s = suffix.lower().lstrip(".")
+    for cfg in _VIDEO_FORMATS.values():
+        if cfg["ext"] == s:
+            return cfg["mime"]
+    for cfg in _AUDIO_FORMATS.values():
+        if cfg["ext"] == s:
+            return cfg["mime"]
+    if s == "mp4":
+        return "video/mp4"
+    return "application/octet-stream"
+
+
+def _apply_operation(tmp_input: Path, step: dict) -> Path:
+    """Apply a single processing step to tmp_input and return the output path."""
+    op = step.get("op", "")
+    tmp_dir = tmp_input.parent
+    stem = tmp_input.stem
+    duration = get_video_duration(tmp_input)
+
+    if op == "convert":
+        fmt = (step.get("format") or "webm").lower()
+        cfg = _VIDEO_FORMATS.get(fmt, _VIDEO_FORMATS["webm"])
+        out = tmp_dir / f"{stem}.{cfg['ext']}"
+        args = ["-i", str(tmp_input)] + _video_codec_args(
+            fmt, str(step.get("crf", "23")), str(step.get("preset", "medium")))
+        size = str(step.get("size", "") or "").strip().lower()
+        scale = str(step.get("scale", "1"))
+        if size and "x" in size:
+            try:
+                tw, th = (int(v) for v in size.split("x"))
+                if tw % 2:
+                    tw += 1
+                if th % 2:
+                    th += 1
+                w, h = ffmpeg_probe_resolution(tmp_input)
+                if w and h:
+                    fit = str(step.get("size_fit", "fit")) in ("fit", "letterbox", "pad")
+                    if fit:
+                        s = min(tw / w, th / h)
+                        nw = max(2, int(round(w * s)) & ~1)
+                        nh = max(2, int(round(h * s)) & ~1)
+                        args += ["-vf", f"scale={nw}:{nh},pad={tw}:{th}:(ow-iw)/2:(oh-ih)/2"]
+                    else:
+                        s = max(tw / w, th / h)
+                        nw = max(2, int(round(w * s)) & ~1)
+                        nh = max(2, int(round(h * s)) & ~1)
+                        args += ["-vf", f"scale={nw}:{nh},crop={tw}:{th}:(iw-ow)/2:(ih-oh)/2"]
+                    set_progress(0, f"الخطوة: تغيير المقاس إلى {tw}x{th}")
+            except ValueError:
+                pass
+        elif scale != "1":
+            w, h = ffmpeg_probe_resolution(tmp_input)
+            new_w = int(w * float(scale))
+            new_h = int(h * float(scale))
+            if new_w % 2:
+                new_w += 1
+            if new_h % 2:
+                new_h += 1
+            args += ["-vf", f"scale={new_w}:{new_h}"]
+        args += [str(out)]
+        set_progress(0, f"الخطوة: تحويل إلى {cfg['ext'].upper()}")
+        run_ffmpeg(args, duration)
+        return out
+
+    if op == "compress":
+        fmt = (step.get("format") or "webm").lower()
+        ext = "webm" if fmt == "webm" else "mp4"
+        out = tmp_dir / f"{stem}.{ext}"
+        target_mb = int(step.get("target", "10"))
+        audio_bitrate = str(step.get("audio_bitrate", "128"))
+        remove_audio = step.get("remove_audio", "0") in ("1", "true", "yes", "on")
+        target_bits = target_mb * 8 * 1024 * 1024
+        audio_bits = 0 if remove_audio else int(audio_bitrate) * 1000 * duration
+        video_bitrate = max(50000, int((target_bits - audio_bits) / duration))
+        vcodec = "libvpx-vp9" if fmt == "webm" else "libx264"
+        args = [
+            "-i", str(tmp_input),
+            "-c:v", vcodec,
+            "-b:v", str(video_bitrate),
+            "-maxrate", str(int(video_bitrate * 1.5)),
+            "-bufsize", str(video_bitrate * 2),
+        ]
+        if remove_audio:
+            args += ["-an"]
+        else:
+            acodec = "libopus" if fmt == "webm" else "aac"
+            args += ["-c:a", acodec, "-b:a", f"{audio_bitrate}k"]
+        args += [str(out)]
+        set_progress(0, "الخطوة: ضغط الفيديو")
+        run_ffmpeg(args, duration)
+        return out
+
+    if op == "extract_audio":
+        fmt = (step.get("format") or "mp3").lower()
+        cfg = _AUDIO_FORMATS.get(fmt, _AUDIO_FORMATS["mp3"])
+        audio_bitrate = str(step.get("audio_bitrate", "192"))
+        out = tmp_dir / f"{stem}.{cfg['ext']}"
+        args = ["-i", str(tmp_input), "-vn"] + cfg["codec"]
+        if fmt != "wav":
+            args += ["-b:a", f"{audio_bitrate}k"]
+        args += [str(out)]
+        set_progress(0, "الخطوة: استخراج الصوت")
+        run_ffmpeg(args, duration)
+        return out
+
+    if op == "remove_audio":
+        fmt = (step.get("format") or "mp4").lower()
+        crf = str(step.get("crf", "23"))
+        preset = str(step.get("preset", "medium"))
+        if fmt == "webm":
+            ext = "webm"
+            vargs = ["-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset]
+        else:
+            ext = "mp4"
+            vargs = ["-c:v", "libx264", "-crf", crf, "-preset", preset,
+                     "-pix_fmt", "yuv420p", "-movflags", "+faststart"]
+        out = tmp_dir / f"{stem}.{ext}"
+        args = ["-i", str(tmp_input), "-an"] + vargs + [str(out)]
+        set_progress(0, "الخطوة: إزالة الصوت")
+        run_ffmpeg(args, duration)
+        return out
+
+    raise RuntimeError(f"عملية غير معروفة: {op}")
+
+
 def handle_extract_audio(req):
     if not check_ffmpeg():
         return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
 
     f, name = get_uploaded_file(req)
     fmt = (req.form.get("format", "mp3") or "mp3").lower()
-    audio_bitrate = req.form.get("audio_bitrate", "192")
     cfg = _AUDIO_FORMATS.get(fmt, _AUDIO_FORMATS["mp3"])
 
     tmp_input = save_temp_file(f)
     try:
-        duration = get_video_duration(tmp_input)
-        output_name = Path(name).stem + f".{cfg['ext']}"
-        tmp_output = tmp_input.parent / output_name
-
-        args = ["-i", str(tmp_input), "-vn"] + cfg["codec"]
-        if fmt != "wav":
-            args += ["-b:a", f"{audio_bitrate}k"]
-        args += [str(tmp_output)]
-
         set_job("extract_audio", name)
-        set_progress(0, "جاري استخراج الصوت...")
-        run_ffmpeg(args, duration)
-
-        with open(tmp_output, "rb") as bf:
+        out = _apply_operation(tmp_input, {
+            "op": "extract_audio",
+            "format": fmt,
+            "audio_bitrate": req.form.get("audio_bitrate", "192"),
+        })
+        with open(out, "rb") as bf:
             data = bf.read()
-            b64 = base64.b64encode(data).decode()
 
         clear_job()
         return jsonify({
-            "data": b64,
+            "data": base64.b64encode(data).decode(),
             "mime": cfg["mime"],
-            "name": output_name,
+            "name": out.name,
             "size": len(data),
         })
     finally:
@@ -468,41 +550,123 @@ def handle_remove_audio(req):
 
     f, name = get_uploaded_file(req)
     fmt = (req.form.get("format", "mp4") or "mp4").lower()
-    crf = req.form.get("crf", "23")
-    preset = req.form.get("preset", "medium")
 
     tmp_input = save_temp_file(f)
     try:
-        duration = get_video_duration(tmp_input)
-
-        if fmt == "webm":
-            ext, mime = "webm", "video/webm"
-            vargs = ["-c:v", "libvpx-vp9", "-crf", crf, "-b:v", "0", "-preset", preset]
-        else:
-            ext, mime = "mp4", "video/mp4"
-            vargs = ["-c:v", "libx264", "-crf", crf, "-preset", preset,
-                     "-pix_fmt", "yuv420p", "-movflags", "+faststart"]
-
-        output_name = Path(name).stem + f"_noaudio.{ext}"
-        tmp_output = tmp_input.parent / output_name
-
-        args = ["-i", str(tmp_input), "-an"] + vargs + [str(tmp_output)]
-
         set_job("remove_audio", name)
-        set_progress(0, "جاري إزالة الصوت (تصغير الحجم)...")
-        run_ffmpeg(args, duration)
-
-        with open(tmp_output, "rb") as bf:
+        out = _apply_operation(tmp_input, {
+            "op": "remove_audio",
+            "format": fmt,
+            "crf": req.form.get("crf", "23"),
+            "preset": req.form.get("preset", "medium"),
+        })
+        with open(out, "rb") as bf:
             data = bf.read()
-            b64 = base64.b64encode(data).decode()
+
+        mime = "video/webm" if fmt == "webm" else "video/mp4"
+        clear_job()
+        return jsonify({"data": base64.b64encode(data).decode(), "mime": mime, "name": out.name, "size": len(data)})
+    finally:
+        shutil.rmtree(tmp_input.parent, ignore_errors=True)
+
+
+# ── Workflow (chain of steps + optional auto upload) ───────────────────────
+def handle_workflow(req):
+    if not check_ffmpeg():
+        return jsonify({"error": "ffmpeg غير مثبت. قم بتثبيته أولاً."}), 400
+
+    f, name = get_uploaded_file(req)
+
+    try:
+        steps = json.loads(req.form.get("steps", "[]") or "[]")
+    except Exception:
+        return jsonify({"error": "خطوات سير العمل غير صالحة"}), 400
+    if not steps:
+        return jsonify({"error": "لم يتم تحديد أي خطوات"}), 400
+
+    auto_upload = req.form.get("auto_upload", "0") == "1"
+    try:
+        size_threshold = float(req.form.get("size_threshold", "10"))
+    except ValueError:
+        size_threshold = 10
+
+    tmp_input = save_temp_file(f)
+    try:
+        stem = Path(name).stem
+        set_job("workflow", name)
+        set_progress(0, "جاري تنفيذ سير العمل...")
+
+        current = tmp_input
+        for i, step in enumerate(steps):
+            in_name = tmp_input.parent / f"_wf_{i}{current.suffix}"
+            if current != in_name:
+                os.replace(current, in_name)
+                current = in_name
+            set_progress(5, f"خطوة {i + 1}/{len(steps)} جارية...")
+            current = _apply_operation(current, step)
+
+        final_path = tmp_input.parent / f"{stem}_workflow{current.suffix}"
+        os.replace(current, final_path)
+
+        with open(final_path, "rb") as bf:
+            data = bf.read()
+
+        result = {
+            "data": base64.b64encode(data).decode(),
+            "mime": _mime_for_suffix(final_path.suffix),
+            "name": final_path.name,
+            "size": len(data),
+        }
+
+        if auto_upload:
+            if len(data) <= size_threshold * 1024 * 1024:
+                set_progress(90, "الحجم ضمن الحد — جاري الرفع إلى GitHub...")
+                try:
+                    dest = unique_destination(ASSETS_DIR, final_path.name)
+                    shutil.copyfile(final_path, dest)
+                    url = push_file_to_git(dest)
+                    result["url"] = url
+                    result["uploaded"] = True
+                    set_progress(100, "تم سير العمل والرفع!")
+                except (subprocess.CalledProcessError, RuntimeError) as exc:
+                    error_text = exc.stderr.strip() if isinstance(exc, subprocess.CalledProcessError) else str(exc)
+                    result["uploaded"] = False
+                    result["upload_error"] = error_text or "فشل git"
+            else:
+                result["uploaded"] = False
+                result["upload_skipped"] = True
+        else:
+            result["uploaded"] = False
 
         clear_job()
-        return jsonify({"data": b64, "mime": mime, "name": output_name, "size": len(data)})
+        return jsonify(result)
     finally:
         shutil.rmtree(tmp_input.parent, ignore_errors=True)
 
 
 # ── Upload ─────────────────────────────────────────────────────────────────
+def push_file_to_git(dest: Path) -> str:
+    """Commit and push a file to the repo. Returns the public URL."""
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    rel_path = dest.relative_to(REPO_ROOT).as_posix()
+    file_url = f"{BASE_URL}/{dest.name}"
+
+    run_git(["add", rel_path], REPO_ROOT)
+    try:
+        run_git(["commit", "-m", f"Add video {dest.name}"], REPO_ROOT)
+    except subprocess.CalledProcessError as exc:
+        if "nothing to commit" not in (exc.stderr or "") and "nothing to commit" not in (exc.stdout or ""):
+            raise
+
+    try:
+        run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(f"Git pull failed: {exc.stderr}") from exc
+
+    run_git(["push"], REPO_ROOT)
+    return file_url
+
+
 def handle_upload(req):
     f, name = get_uploaded_file(req)
 
@@ -520,25 +684,15 @@ def handle_upload(req):
     set_progress(40, "جاري رفع إلى GitHub...")
 
     try:
-        run_git(["add", rel_path], REPO_ROOT)
-        try:
-            run_git(["commit", "-m", f"Add video {dest.name}"], REPO_ROOT)
-        except subprocess.CalledProcessError as exc:
-            if "nothing to commit" not in (exc.stderr or "") and "nothing to commit" not in (exc.stdout or ""):
-                raise
-
-        try:
-            run_git(["pull", "--rebase", "--autostash"], REPO_ROOT)
-            set_progress(70)
-        except subprocess.CalledProcessError as exc:
-            return jsonify({"error": f"Git pull failed: {exc.stderr}"}), 500
-
-        run_git(["push"], REPO_ROOT)
+        file_url = push_file_to_git(dest)
         set_progress(100, "تم الرفع!")
     except subprocess.CalledProcessError as exc:
         error_text = exc.stderr.strip() or exc.stdout.strip() or "فشل git"
         logger.error("Git error: %s", error_text)
         return jsonify({"error": error_text}), 500
+    except RuntimeError as exc:
+        logger.error("Git error: %s", exc)
+        return jsonify({"error": str(exc)}), 500
 
     logger.info("Uploaded: %s", file_url)
     return jsonify({"url": file_url, "path": rel_path})
