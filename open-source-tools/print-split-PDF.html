@@ -1,131 +1,233 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>PDF Split Print</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
-body{
-    font-family: Arial;
-    text-align:center;
-    background:#111;
-    color:#fff;
-}
-button{padding:10px;margin:10px}
-canvas{
-    display:block;
-    margin:20px auto;
-    width:90%;
-    border:2px solid #333;
-    background:#fff;
-}
-</style>
-</head>
-
-<body>
-
-<h2>📄 تقسيم PDF وتكبيره للطباعة</h2>
-
-<input type="file" id="fileInput" accept="application/pdf"><br>
-
-<select id="splitCount">
-    <option value="2">نصين</option>
-    <option value="3">3 أجزاء</option>
-</select>
-
-<br>
-
-<button onclick="processPDF()">تحويل</button>
-<button onclick="window.print()">🖨️ طباعة</button>
-<button onclick="downloadPDF()">⬇️ تحميل PDF</button>
-
-<div id="preview"></div>
-
-<script>
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-let pagesData = [];
-
-async function processPDF(){
-    const file = document.getElementById('fileInput').files[0];
-    if(!file) return alert("اختار ملف");
-
-    const split = parseInt(document.getElementById('splitCount').value);
-    const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
-
-    const preview = document.getElementById('preview');
-    preview.innerHTML = "";
-    pagesData = [];
-
-    for(let i=1;i<=pdf.numPages;i++){
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({scale:2});
-
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        await page.render({canvasContext:ctx,viewport}).promise;
-
-        const partHeight = canvas.height / split;
-
-        for(let j=0;j<split;j++){
-            const partCanvas = document.createElement("canvas");
-            const partCtx = partCanvas.getContext("2d");
-
-            partCanvas.width = canvas.width;
-            partCanvas.height = partHeight;
-
-            partCtx.drawImage(
-                canvas,
-                0, j * partHeight,
-                canvas.width, partHeight,
-                0, 0,
-                canvas.width, partHeight
-            );
-
-            preview.appendChild(partCanvas);
-
-            pagesData.push(partCanvas);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Split Print</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0d0d1a;
+            --card: #1a1a2e;
+            --accent: #00d4ff;
+            --accent2: #ff0080;
+            --text: #e0e0e0;
+            --muted: #a0a0b0;
+            --border: #2a2a4a;
         }
-    }
-}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: radial(circle at top, #141432 0%, var(--bg) 70%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h2 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        header p { color: var(--muted); font-size: 0.9rem; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .file-input-wrapper input[type="file"] {
+            width: 100%; padding: 12px; border-radius: 8px;
+            border: 2px dashed var(--border); background: rgba(0,0,0,0.2);
+            color: var(--text); cursor: pointer; transition: border-color .3s;
+            font-size: 0.9rem;
+        }
+        .file-input-wrapper input[type="file"]:hover { border-color: var(--accent); }
+        select, button {
+            padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border);
+            background: rgba(0,0,0,0.3); color: var(--text); cursor: pointer;
+            font-size: 0.9rem; transition: all .2s;
+        }
+        select:focus, button:focus { outline: none; border-color: var(--accent); }
+        select:hover { background: rgba(10,10,30,0.4); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff; border: none; font-weight: bold; flex: 1;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,212,255,.4); }
+        .btn-secondary { background: rgba(0,0,0,0.4); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: rgba(10,10,30,0.5); }
+        .row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .row > * { flex: 1; min-width: 140px; }
+        .row > label { font-size: 0.85rem; color: var(--muted); }
+        .preview-section { margin-top: 16px; }
+        .preview-section h3 { margin-bottom: 12px; color: var(--accent); font-size: 1rem; }
+        .page-group {
+            border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+            background: rgba(255,255,255,0.02); margin-bottom: 16px;
+        }
+        .page-group .page-label {
+            text-align: center; font-size: 0.9rem; color: var(--muted); margin-bottom: 10px;
+        }
+        .preview-row { display: flex; gap: 12px; overflow-x: auto; padding: 4px 0; }
+        .preview-row canvas {
+            border: 1px solid var(--border); border-radius: 6px; background: #fff;
+            display: block; flex-shrink: 0;
+            image-rendering: -webkit-optimize-contrast;
+        }
+        .progress-bar {
+            height: 10px; border-radius: 5px; background: var(--border);
+            overflow: hidden; margin-top: 12px;
+        }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s; }
+        .pct { text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+        footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>📄 تقسيم PDF وتكبيره للطباعة</h2>
+            <p>قسم الصفحات إلى أجزاء وكبّر النص للوضوح عند الطباعة على ورق أكبر</p>
+        </header>
 
-async function downloadPDF(){
-    if(pagesData.length === 0) return alert("حول الملف الأول");
+        <div class="card">
+            <div style="margin-bottom:16px">
+                <input type="file" id="fileInput" accept="application/pdf">
+            </div>
 
-    const { jsPDF } = window.jspdf;
+            <div class="row">
+                <div><label for="splitCount">عدد الأجزاء</label><select id="splitCount">
+                    <option value="2">اثنان</option>
+                    <option value="3" selected">ثلاثة</option>
+                </select></div>
+                <div><label for="scale">زيادة الحجم</label><select id="scale">
+                    <option value="1.5">متوسط (1.5×)</option>
+                    <option value="2" selected>كبير (2×)</option>
+                    <option value="3">كبير جداً (3×)</option>
+                </select></div>
+            </div>
 
-    const doc = new jsPDF({
-        orientation:"landscape",
-        unit:"px",
-        format:"a4"
-    });
+            <div class="row" style="margin-top:16px">
+                <button class="btn-primary" onclick="processPDF()">🔄 تحويل</button>
+                <button class="btn-secondary" onclick="clearAll()">🗑️ مسح</button>
+                <button class="btn-secondary" onclick="window.print()">🖨️ طباعة</button>
+                <button class="btn-secondary" onclick="downloadPDF()">⬇️ تحميل PDF</button>
+            </div>
 
-    for(let i=0;i<pagesData.length;i++){
-        if(i>0) doc.addPage();
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="pct" id="progressText"></div>
+        </div>
 
-        const img = pagesData[i].toDataURL("image/jpeg",1.0);
+        <div id="preview"></div>
 
-        doc.addImage(
-            img,
-            "JPEG",
-            0,
-            0,
-            doc.internal.pageSize.getWidth(),
-            doc.internal.pageSize.getHeight()
-        );
-    }
+        <footer>
+            <p>بياناتك تُعالج محلياً — لا يتم رفعها أو مشاركتها</p>
+        </footer>
+    </div>
 
-    doc.save("output.pdf");
-}
-</script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+        let pagesData = [];
+        let baseScale = 2;
+
+        async function processPDF() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return alert("اختر ملف PDF");
+
+            const split = parseInt(document.getElementById('splitCount').value);
+            const scale = parseFloat(document.getElementById('scale').value);
+            baseScale = scale;
+
+            const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+
+            const preview = document.getElementById('preview');
+            preview.innerHTML = "";
+            pagesData = [];
+
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: scale * split });
+
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                const partHeight = canvas.height / split;
+
+                const pageGroup = document.createElement("div");
+                pageGroup.className = "page-group";
+                const pageLabel = document.createElement("div");
+                pageLabel.className = "page-label";
+                pageLabel.textContent = `صفحة ${i}`;
+                pageGroup.appendChild(pageLabel);
+
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "preview-row";
+
+                for (let j = 0; j < split; j++) {
+                    const partCanvas = document.createElement("canvas");
+                    const partCtx = partCanvas.getContext("2d");
+                    partCanvas.width = canvas.width;
+                    partCanvas.height = partHeight;
+
+                    partCtx.drawImage(
+                        canvas,
+                        0, j * partHeight,
+                        canvas.width, partHeight,
+                        0, 0,
+                        canvas.width, partHeight
+                    );
+
+                    rowDiv.appendChild(partCanvas);
+                    pagesData.push(partCanvas);
+                }
+                pageGroup.appendChild(rowDiv);
+                preview.appendChild(pageGroup);
+
+                const pct = Math.round((i / pdf.numPages) * 100);
+                progressFill.style.width = pct + '%';
+                progressText.textContent = `${pct}% مكتمل (${i}/${pdf.numPages})`;
+            }
+        }
+
+        async function downloadPDF() {
+            if (pagesData.length === 0) return alert("حوّل الملف أولاً");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+            const W = doc.internal.pageSize.getWidth();
+            const H = doc.internal.pageSize.getHeight();
+
+            for (let i = 0; i < pagesData.length; i++) {
+                if (i > 0) doc.addPage();
+                const img = pagesData[i].toDataURL("image/jpeg", 0.95);
+                doc.addImage(img, "JPEG", 0, 0, W, H);
+            }
+            doc.save("output.pdf");
+        }
+
+        function clearAll() {
+            pagesData = [];
+            document.getElementById('preview').innerHTML = "";
+            document.getElementById('fileInput').value = "";
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = "";
+        }
+    </script>
 </body>
 </html>
