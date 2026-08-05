@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>PDF Split Print</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    text-align:center;
+    background:#111;
+    color:#fff;
+}
+button{padding:10px;margin:10px}
+canvas{
+    display:block;
+    margin:20px auto;
+    width:90%;
+    border:2px solid #333;
+    background:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📄 تقسيم PDF وتكبيره للطباعة</h2>
+
+<input type="file" id="fileInput" accept="application/pdf"><br>
+
+<select id="splitCount">
+    <option value="2">نصين</option>
+    <option value="3">3 أجزاء</option>
+</select>
+
+<br>
+
+<button onclick="processPDF()">تحويل</button>
+<button onclick="window.print()">🖨️ طباعة</button>
+<button onclick="downloadPDF()">⬇️ تحميل PDF</button>
+
+<div id="preview"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+let pagesData = [];
+
+async function processPDF(){
+    const file = document.getElementById('fileInput').files[0];
+    if(!file) return alert("اختار ملف");
+
+    const split = parseInt(document.getElementById('splitCount').value);
+    const pdf = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+
+    const preview = document.getElementById('preview');
+    preview.innerHTML = "";
+    pagesData = [];
+
+    for(let i=1;i<=pdf.numPages;i++){
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({scale:2});
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({canvasContext:ctx,viewport}).promise;
+
+        const partHeight = canvas.height / split;
+
+        for(let j=0;j<split;j++){
+            const partCanvas = document.createElement("canvas");
+            const partCtx = partCanvas.getContext("2d");
+
+            partCanvas.width = canvas.width;
+            partCanvas.height = partHeight;
+
+            partCtx.drawImage(
+                canvas,
+                0, j * partHeight,
+                canvas.width, partHeight,
+                0, 0,
+                canvas.width, partHeight
+            );
+
+            preview.appendChild(partCanvas);
+
+            pagesData.push(partCanvas);
+        }
+    }
+}
+
+async function downloadPDF(){
+    if(pagesData.length === 0) return alert("حول الملف الأول");
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+        orientation:"landscape",
+        unit:"px",
+        format:"a4"
+    });
+
+    for(let i=0;i<pagesData.length;i++){
+        if(i>0) doc.addPage();
+
+        const img = pagesData[i].toDataURL("image/jpeg",1.0);
+
+        doc.addImage(
+            img,
+            "JPEG",
+            0,
+            0,
+            doc.internal.pageSize.getWidth(),
+            doc.internal.pageSize.getHeight()
+        );
+    }
+
+    doc.save("output.pdf");
+}
+</script>
+
+</body>
+</html>
