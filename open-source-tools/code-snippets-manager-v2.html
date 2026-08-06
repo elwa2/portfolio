@@ -808,6 +808,24 @@
 
   .vd-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
+  .vd-base { display: flex; align-items: center; gap: 5px; cursor: pointer; flex-shrink: 0; }
+  .vd-base input { display: none; }
+  .vd-base-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border-str); background: transparent;
+    position: relative; transition: all 0.15s; flex-shrink: 0;
+  }
+  .vd-base:hover .vd-base-radio { border-color: #14b8a6; }
+  .vd-base input:checked + .vd-base-radio { border-color: #14b8a6; background: rgba(20,184,166,0.15); }
+  .vd-base input:checked + .vd-base-radio::after {
+    content: ''; position: absolute; inset: 4px; border-radius: 50%; background: #14b8a6;
+  }
+  .vd-base input:disabled + .vd-base-radio { opacity: 0.3; cursor: not-allowed; }
+  .vd-base-label { font-size: 10px; color: var(--text-3); font-weight: 600; white-space: nowrap; }
+  .vd-base input:checked + .vd-base-radio + .vd-base-label { color: #14b8a6; }
+  .vd-legend { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-3); }
+  .vd-legend .vd-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
   .vd-compare {
     margin-top: 18px; border: 1px solid var(--border-def); border-radius: var(--radius-md);
     background: var(--bg-overlay); padding: 16px;
@@ -2178,19 +2196,29 @@
     renderVdDash();
   }
 
-  function vdSaveVersion(){
+  function vdSaveVersion(opts){
+    const silent = !!(opts && opts.silent);
     const sn = activeVdSnippet();
     const ed = document.getElementById('vdEditor');
     const content = ed ? ed.value : (sn.draft || '');
-    if (!content.trim()) { showToast('المربع فارغ — الصق كود أولاً'); return; }
+    if (!content.trim()) { if (!silent) showToast('المربع فارغ — الصق كود أولاً'); return false; }
     const last = sn.versions[sn.versions.length - 1];
-    if (last && last.content === content) { showToast('لا تغيير عن النسخة الأخيرة'); return; }
-    const v = { id: 'vv_' + Date.now() + Math.random().toString(36).slice(2,5), n: sn.versions.length + 1, time: Date.now(), content };
+    if (last && last.content === content) {
+      if (silent) showToast('تم اللصق — لا تغيير عن آخر نسخة');
+      else showToast('لا تغيير عن النسخة الأخيرة');
+      return false;
+    }
+    const had = sn.versions.length;
+    const v = { id: 'vv_' + Date.now() + Math.random().toString(36).slice(2,5), n: had + 1, time: Date.now(), content };
     sn.versions.push(v);
     sn.draft = content;
-    if (!saveVd()) { sn.versions.pop(); showToast('مساحة التخزين ممتلئة'); return; }
+    const prevId = had ? sn.versions[had - 1].id : null;
+    const wasDefaultBase = had >= 2 && sn.baseId === sn.versions[had - 2].id;
+    if (sn.baseId == null || wasDefaultBase) sn.baseId = prevId;
+    if (!saveVd()) { sn.versions.pop(); showToast('مساحة التخزين ممتلئة'); return false; }
     renderVdDash();
-    showToast('تم حفظ نسخة V' + v.n);
+    showToast('تم حفظ نسخة V' + v.n + (silent ? ' تلقائيًا' : ''));
+    return true;
   }
 
   function vdRestore(id){
@@ -2206,6 +2234,7 @@
   function vdDelete(id){
     const sn = activeVdSnippet();
     sn.versions = sn.versions.filter(x => x.id !== id);
+    if (sn.baseId === id) sn.baseId = null;
     sn.versions.forEach((x, i) => x.n = i + 1);
     saveVd();
     renderVdDash();
@@ -2237,7 +2266,7 @@
       return `<option value="${v.id}">V${v.n} · ${t}</option>`;
     }).join('');
     oldSel.innerHTML = opts;
-    newSel.innerHTML = opts;
+    newSel.innerHTML = opts + `<option value="__editor__">المحرر (الحالي)</option>`;
     if (sn.versions.length >= 2) {
       oldSel.value = sn.versions[sn.versions.length - 2].id;
       newSel.value = sn.versions[sn.versions.length - 1].id;
@@ -2246,15 +2275,15 @@
     }
   }
 
-  function vdToggleCompare(){
-    const wrap = document.getElementById('vdCompareWrap');
-    const btn = document.getElementById('vdCompareToggleBtn');
+  function vdToggleCustomCompare(){
+    const wrap = document.getElementById('vdCustomCompare');
+    const btn = document.getElementById('vdCustomToggleBtn');
     if (!wrap || !btn) return;
     const open = wrap.style.display === 'none';
     wrap.style.display = open ? 'block' : 'none';
     btn.innerHTML = open
-      ? '<i class="ti ti-git-compare"></i> إخفاء المقارنة'
-      : '<i class="ti ti-git-compare"></i> مقارنة نسختين';
+      ? '<i class="ti ti-arrows-left-right"></i> إخفاء المخصصة'
+      : '<i class="ti ti-arrows-left-right"></i> مقارنة مخصصة';
     if (open) fillVdCompareSelects(activeVdSnippet());
   }
 
@@ -2264,22 +2293,58 @@
     const bId = document.getElementById('vdNewSel').value;
     if (!aId || !bId) { showToast('اختر نسختين'); return; }
     const a = sn.versions.find(v => v.id === aId);
+    if (!a) return;
+    if (bId === '__editor__') {
+      const ed = document.getElementById('vdEditor');
+      const current = ed ? ed.value : (sn.draft || '');
+      if (!current.trim()) { showToast('المربع فارغ'); return; }
+      document.getElementById('vdCustomOut').innerHTML = vdDiffHTML(a.content, current, 'V' + a.n + ' (قاعدة)', 'المحرر (الحالي)');
+      return;
+    }
     const b = sn.versions.find(v => v.id === bId);
-    if (!a || !b) return;
-    document.getElementById('vdCompareOut').innerHTML = vdDiffHTML(a.content, b.content, 'V' + a.n + ' (قبل)', 'V' + b.n + ' (بعد)');
+    if (!b) return;
+    document.getElementById('vdCustomOut').innerHTML = vdDiffHTML(a.content, b.content, 'V' + a.n + ' (قبل)', 'V' + b.n + ' (بعد)');
   }
 
-  function vdCompareEditor(id){
+  function vdSetBase(id){
+    const sn = activeVdSnippet();
+    const latest = sn.versions[sn.versions.length - 1];
+    if (latest && id === latest.id) { showToast('اختر قاعدة أقدم من الأحدث'); renderVdDash(); return; }
+    sn.baseId = id;
+    saveVd();
+    renderVdDash();
+    showToast('تم تحديد القاعدة للمقارنة');
+  }
+
+  function resolveVdBase(sn){
+    const latest = sn.versions[sn.versions.length - 1];
+    let base = null;
+    if (sn.baseId) base = sn.versions.find(v => v.id === sn.baseId) || null;
+    if (!base && sn.versions.length >= 2) base = sn.versions[sn.versions.length - 2];
+    if (base && latest && base.id === latest.id && sn.versions.length >= 2) base = sn.versions[sn.versions.length - 2];
+    return base;
+  }
+
+  function vdOpen(id){
     const sn = activeVdSnippet();
     const v = sn.versions.find(x => x.id === id);
-    const ed = document.getElementById('vdEditor');
-    const current = ed ? ed.value : (sn.draft || '');
-    if (!current.trim()) { showToast('المربع فارغ'); return; }
-    const wrap = document.getElementById('vdCompareWrap');
-    if (wrap) wrap.style.display = 'block';
-    const btn = document.getElementById('vdCompareToggleBtn');
-    if (btn) btn.innerHTML = '<i class="ti ti-git-compare"></i> إخفاء المقارنة';
-    document.getElementById('vdCompareOut').innerHTML = vdDiffHTML(v.content, current, 'V' + v.n + ' (النسخة)', 'المحرر (الحالي)');
+    if (!v) return;
+    const url = URL.createObjectURL(new Blob([v.content], { type: 'text/plain;charset=utf-8' }));
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  function vdDownload(id){
+    const sn = activeVdSnippet();
+    const v = sn.versions.find(x => x.id === id);
+    if (!v) return;
+    const url = URL.createObjectURL(new Blob([v.content], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (sn.name || 'snippet').replace(/[\\/:*?"<>|]/g, '_') + '-V' + v.n + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('تم تحميل V' + v.n);
   }
 
   function vdLineDiff(aLines, bLines){
@@ -2390,12 +2455,20 @@
 
     let versionsHtml;
     if (sn.versions.length) {
+      const lastId = sn.versions[sn.versions.length - 1].id;
       versionsHtml = sn.versions.map(v => {
         const lines = v.content.split('\n').length;
         const t = new Date(v.time);
         const timeStr = t.toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' })
           + ' ' + t.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const isBase = sn.baseId === v.id;
+        const isLast = v.id === lastId;
         return `<div class="vd-version">
+          <label class="vd-base" title="${isLast ? 'النسخة الأحدث لا تصلح كقاعدة للمقارنة' : 'اضغط لتجعل هذه النسخة هي «قاعدة» المقارنة تلقائيًا'}">
+            <input type="radio" name="vdBase_${sn.id}" ${isBase ? 'checked' : ''} ${isLast ? 'disabled' : ''} onchange="vdSetBase('${v.id}')">
+            <span class="vd-base-radio"></span>
+            <span class="vd-base-label">قاعدة</span>
+          </label>
           <span class="vd-vnum">V${v.n}</span>
           <div class="vd-vmeta">
             <span class="vd-vtime">${timeStr}</span>
@@ -2403,14 +2476,27 @@
           </div>
           <div class="vd-vactions">
             <button class="vd-mini-btn vd-restore" onclick="vdRestore('${v.id}')" title="نسخ الكود في المربع"><i class="ti ti-corner-up-left"></i> استرجاع</button>
-            <button class="vd-mini-btn vd-compare-btn" onclick="vdCompareEditor('${v.id}')" title="عرض الفرق بين هذه النسخة والمحرر"><i class="ti ti-git-compare"></i> قارن مع المحرر</button>
+            <button class="vd-mini-btn" onclick="vdOpen('${v.id}')" title="فتح النسخة في صفحة جديدة"><i class="ti ti-external-link"></i> فتح</button>
+            <button class="vd-mini-btn" onclick="vdDownload('${v.id}')" title="تحميل الكود كملف txt"><i class="ti ti-download"></i> تحميل</button>
             <button class="vd-mini-btn" onclick="vdCopy('${v.id}')" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
             <button class="vd-mini-btn vd-del" onclick="vdDelete('${v.id}')" title="حذف النسخة"><i class="ti ti-trash"></i> حذف</button>
           </div>
         </div>`;
       }).join('');
     } else {
-      versionsHtml = `<div class="vd-empty"><i class="ti ti-history"></i><p>لا توجد نسخ محفوظة بعد — الصق كودك في المربع واضغط «حفظ نسخة»</p></div>`;
+      versionsHtml = `<div class="vd-empty"><i class="ti ti-history"></i><p>لا توجد نسخ محفوظة بعد — الصق كودك في المربع وسيُحفظ تلقائيًا</p></div>`;
+    }
+
+    const base = resolveVdBase(sn);
+    const latest = sn.versions[sn.versions.length - 1];
+
+    let autoCompareHtml;
+    if (sn.versions.length >= 2 && base && latest) {
+      autoCompareHtml = vdDiffHTML(base.content, latest.content, 'V' + base.n + ' (القاعدة)', 'V' + latest.n + ' (الأحدث)');
+    } else if (sn.versions.length >= 2) {
+      autoCompareHtml = '<div class="vd-empty"><i class="ti ti-git-compare"></i><p>حدد قاعدة للمقارنة بالضغط على «قاعدة» جنب أي نسخة أقدم من الأحدث</p></div>';
+    } else {
+      autoCompareHtml = '<div class="vd-empty"><i class="ti ti-history"></i><p>بمجرد حفظ نسختين أو أكثر ستظهر المقارنة تلقائيًا هنا — الأخضر مضاف، الأحمر محذوف</p></div>';
     }
 
     document.getElementById('mainBody').innerHTML = `<div class="has-dash">
@@ -2425,31 +2511,40 @@
         <div class="vd-section-title"><i class="ti ti-history" style="color:var(--accent-cool)"></i> نسخ «${escHtml(sn.name)}» المحفوظة <span>(${sn.versions.length})</span></div>
         <div class="vd-versions" id="vdVersions">${versionsHtml}</div>
 
-        <div class="vd-editor-label"><i class="ti ti-code" style="color:#14b8a6"></i> مربع الكود — الصق كودك هنا، عدّله، ثم اضغط «حفظ نسخة جديدة» <code>Ctrl + S</code></div>
-        <textarea class="vd-editor" id="vdEditor" spellcheck="false" placeholder="/* الصق الكود هنا... */">${escHtml(sn.draft || '')}</textarea>
+        <div class="vd-editor-label"><i class="ti ti-code" style="color:#14b8a6"></i> مربع الكود — الصق كودك هنا فيُحفظ نسخة تلقائيًا وتظهر المقارنة فورًا <code>Ctrl + S</code></div>
+        <textarea class="vd-editor" id="vdEditor" spellcheck="false" placeholder="/* الصق الكود هنا وسيُحفظ تلقائيًا... */">${escHtml(sn.draft || '')}</textarea>
 
         <div class="vd-actions">
           <button class="btn-primary" onclick="vdSaveVersion()"><i class="ti ti-plus"></i> حفظ نسخة جديدة</button>
-          <button class="btn-cancel" onclick="vdToggleCompare()" id="vdCompareToggleBtn"><i class="ti ti-git-compare"></i> مقارنة نسختين</button>
           <button class="btn-cancel" onclick="vdClearEditor()"><i class="ti ti-trash"></i> مسح المربع</button>
           <button class="btn-cancel" onclick="vdRename()"><i class="ti ti-pencil"></i> إعادة تسمية</button>
           <button class="btn-cancel" onclick="vdDeleteSnippet()"><i class="ti ti-folder-minus"></i> حذف المربع</button>
         </div>
 
-        <div class="vd-compare" id="vdCompareWrap" style="display:none">
-          <div class="vd-section-title" style="margin-top:0"><i class="ti ti-git-compare" style="color:var(--success)"></i> مقارنة نسختين</div>
-          <div class="vd-compare-row">
-            <div class="form-group">
-              <label class="form-label">النسخة القديمة (قبل)</label>
-              <select class="form-select" id="vdOldSel"></select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">النسخة الجديدة (بعد)</label>
-              <select class="form-select" id="vdNewSel"></select>
-            </div>
-            <button class="btn-primary" onclick="vdRunCompare()"><i class="ti ti-arrows-left-right"></i> عرض الفرق</button>
+        <div class="vd-compare">
+          <div class="vd-section-title" style="margin-top:0">
+            <i class="ti ti-git-compare" style="color:var(--success)"></i>
+            مقارنة تلقائية
+            <span style="font-weight:400;font-size:11px">من النسخة المحددة «قاعدة» إلى الأحدث</span>
+            <span class="vd-legend"><span class="vd-dot" style="background:#22c55e"></span> مضاف</span>
+            <span class="vd-legend"><span class="vd-dot" style="background:#ef4444"></span> محذوف</span>
+            <button class="vd-mini-btn" onclick="vdToggleCustomCompare()" id="vdCustomToggleBtn" style="margin-inline-start:auto"><i class="ti ti-arrows-left-right"></i> مقارنة مخصصة</button>
           </div>
-          <div id="vdCompareOut"></div>
+          <div id="vdAutoCompareOut">${autoCompareHtml}</div>
+          <div id="vdCustomCompare" style="display:none">
+            <div class="vd-compare-row" style="margin-top:12px">
+              <div class="form-group">
+                <label class="form-label">النسخة القديمة (قبل)</label>
+                <select class="form-select" id="vdOldSel"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">النسخة الجديدة (بعد)</label>
+                <select class="form-select" id="vdNewSel"></select>
+              </div>
+              <button class="btn-primary" onclick="vdRunCompare()"><i class="ti ti-arrows-left-right"></i> عرض الفرق</button>
+            </div>
+            <div id="vdCustomOut"></div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -2459,6 +2554,9 @@
     const ed = document.getElementById('vdEditor');
     if (ed) {
       ed.addEventListener('input', () => { const s = activeVdSnippet(); s.draft = ed.value; saveVd(); });
+      ed.addEventListener('paste', () => {
+        setTimeout(() => { vdSaveVersion({ silent: true }); }, 0);
+      });
       ed.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); vdSaveVersion(); }
       });
