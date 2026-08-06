@@ -717,6 +717,151 @@
 
   @media (max-width: 820px) { .cv-grid { grid-template-columns: 1fr; } }
 
+  /* ===== VERSIONS & DIFF DASHBOARD ===== */
+  .filter-tag.vd-active {
+    background: #14b8a6; color: #fff; border-color: #14b8a6;
+    box-shadow: 0 2px 12px rgba(20,184,166,0.3);
+  }
+
+  .vd-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .vd-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .vd-builder-title i { color: #14b8a6; font-size: 18px; }
+  .vd-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .vd-section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-2);
+    margin: 16px 0 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vd-section-title span { color: var(--text-3); font-weight: 400; }
+
+  .vd-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .vd-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-sub); background: var(--bg-overlay);
+    color: var(--text-2); font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Cairo', sans-serif; transition: all 0.15s;
+  }
+  .vd-tab:hover { border-color: var(--border-def); color: var(--text-1); }
+  .vd-tab.active { background: #14b8a6; color: #fff; border-color: #14b8a6; box-shadow: 0 2px 10px rgba(20,184,166,0.25); }
+  .vd-tab .vd-tab-num { font-size: 10px; opacity: 0.8; font-family: 'JetBrains Mono', monospace; }
+  .vd-tab-add { border-style: dashed; }
+  .vd-tab-add:hover { background: var(--glass-mod); }
+
+  .vd-versions { display: flex; flex-direction: column; gap: 6px; }
+  .vd-version {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 8px 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-overlay); transition: border-color 0.15s;
+  }
+  .vd-version:hover { border-color: var(--border-def); }
+  .vd-vnum {
+    font-size: 11px; font-weight: 700; color: #14b8a6;
+    font-family: 'JetBrains Mono', monospace; min-width: 30px;
+  }
+  .vd-vmeta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .vd-vtime { font-size: 10.5px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; direction: ltr; text-align: left; }
+  .vd-vinfo { font-size: 11px; color: var(--text-3); }
+  .vd-vactions { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .vd-mini-btn {
+    display: flex; align-items: center; gap: 4px; padding: 4px 10px;
+    border: 1px solid var(--border-sub); border-radius: 6px; background: transparent;
+    color: var(--text-2); font-size: 10.5px; font-weight: 500; cursor: pointer;
+    font-family: 'Cairo', sans-serif; transition: all 0.15s;
+  }
+  .vd-mini-btn:hover { background: var(--glass-mod); color: var(--text-1); border-color: var(--border-str); }
+  .vd-mini-btn i { font-size: 12px; }
+  .vd-mini-btn.vd-restore { color: var(--accent-cool); border-color: rgba(107,155,210,0.3); }
+  .vd-mini-btn.vd-compare-btn { color: var(--success); border-color: rgba(74,222,128,0.3); }
+  .vd-mini-btn.vd-del { color: var(--danger); border-color: rgba(248,113,113,0.25); }
+  .vd-mini-btn.vd-del:hover { background: rgba(248,113,113,0.12); }
+
+  .vd-editor-label {
+    font-size: 11px; font-weight: 600; color: var(--text-2); margin: 18px 0 6px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .vd-editor-label code {
+    font-size: 10px; background: var(--bg-overlay); padding: 1px 6px;
+    border-radius: 4px; color: #14b8a6; font-family: 'JetBrains Mono', monospace;
+  }
+  .vd-editor {
+    width: 100%; min-height: 220px; padding: 12px 14px; resize: vertical;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    direction: ltr; text-align: left; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .vd-editor:focus { border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,0.15); }
+  .vd-editor::placeholder { color: var(--text-3); }
+
+  .vd-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  .vd-compare {
+    margin-top: 18px; border: 1px solid var(--border-def); border-radius: var(--radius-md);
+    background: var(--bg-overlay); padding: 16px;
+  }
+  .vd-compare-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .vd-compare-row .form-group { margin-bottom: 0; }
+  .vd-compare .form-select { min-width: 170px; }
+
+  .vd-summary { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .vd-stat {
+    font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--border-sub);
+  }
+  .vd-stat.added { color: var(--success); border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.08); }
+  .vd-stat.removed { color: var(--danger); border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.08); }
+  .vd-stat.same { color: var(--text-2); }
+
+  .vd-diff {
+    border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    overflow: hidden; margin-top: 10px;
+  }
+  .vd-diff-head {
+    display: flex; align-items: center; gap: 14px; padding: 8px 12px;
+    background: var(--bg-raised); border-bottom: 1px solid var(--border-sub);
+    font-size: 11px; font-family: 'JetBrains Mono', monospace;
+    direction: ltr; text-align: left; flex-wrap: wrap;
+  }
+  .vd-diff-head .vd-file-old { color: var(--danger); }
+  .vd-diff-head .vd-file-new { color: var(--success); }
+  .vd-diff-body {
+    max-height: 460px; overflow: auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.55; direction: ltr; text-align: left;
+  }
+  .vd-dl { display: flex; align-items: flex-start; padding: 1px 10px; white-space: pre; min-height: 21px; }
+  .vd-dl-add { background: rgba(74,222,128,0.10); color: #86efac; }
+  .vd-dl-del { background: rgba(248,113,113,0.10); color: #fca5a5; }
+  .vd-dl-ctx { color: var(--text-3); }
+  .vd-dl-mark { flex-shrink: 0; width: 22px; text-align: center; color: inherit; opacity: 0.75; user-select: none; }
+  .vd-fold {
+    text-align: center; padding: 3px 10px; font-size: 10.5px; color: var(--text-4);
+    font-family: 'JetBrains Mono', monospace; background: var(--bg-raised);
+  }
+  .vd-empty {
+    text-align: center; padding: 26px 20px; color: var(--text-3);
+    border: 1px dashed var(--border-sub); border-radius: var(--radius-md);
+  }
+  .vd-empty i { font-size: 26px; display: block; margin-bottom: 6px; color: var(--text-4); }
+  .vd-empty p { font-size: 13px; }
+
+  @media (max-width: 820px) {
+    .vd-compare-row { flex-direction: column; align-items: stretch; }
+    .vd-compare .form-select { width: 100%; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -793,6 +938,9 @@
     </button>
     <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="محول HTML/CSS إلى كود صحيح">
       <i class="ti ti-arrows-shuffle" aria-hidden="true"></i> محول
+    </button>
+    <button class="filter-tag" id="vdDashBtn" onclick="toggleVdDash()" title="نسخ ومقارنة الأكواد">
+      <i class="ti ti-versions" aria-hidden="true"></i> النسخ
     </button>
   </div>
 
@@ -968,6 +1116,7 @@
   let _initDone = false;
   let varValues = new Map();
   let showHasDash = false;
+  let showVdDash = false;
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -1282,6 +1431,8 @@
       document.getElementById('hasDashBtn').classList.remove('has-active');
       showCvDash = false;
       document.getElementById('cvDashBtn').classList.remove('cv-active');
+      showVdDash = false;
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
     }
     renderAll();
   }
@@ -1533,6 +1684,10 @@
       showCvDash = false;
       document.getElementById('cvDashBtn').classList.remove('cv-active');
     }
+    if(showVdDash){
+      showVdDash = false;
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -1562,6 +1717,8 @@
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       showCvDash = false;
       document.getElementById('cvDashBtn').classList.remove('cv-active');
+      showVdDash = false;
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
     }
     renderAll();
   }
@@ -1733,6 +1890,8 @@
       showScrollbarDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      showVdDash = false;
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
     }
     renderAll();
   }
@@ -1931,11 +2090,388 @@
     </div>`;
   }
 
+  // ── VERSIONS & DIFF DASHBOARD ──
+  const VD_KEY = 'csman_v2_versions_v1';
+
+  function defaultVdStore(){
+    return { snippets: [], activeSnippetId: null };
+  }
+
+  let vdStore = loadVd();
+  let vdActiveSnippetId = vdStore.activeSnippetId || null;
+
+  function loadVd(){
+    try {
+      const d = JSON.parse(localStorage.getItem(VD_KEY));
+      if (d && Array.isArray(d.snippets)) return d;
+    } catch (e) {}
+    return defaultVdStore();
+  }
+
+  function saveVd(){
+    vdStore.activeSnippetId = vdActiveSnippetId;
+    try { localStorage.setItem(VD_KEY, JSON.stringify(vdStore)); return true; }
+    catch (e) { return false; }
+  }
+
+  function newVdSnippet(name){
+    const id = 'vd_' + Date.now() + Math.random().toString(36).slice(2,5);
+    const sn = { id, name: name || ('مربع ' + (vdStore.snippets.length + 1)), versions: [], draft: '' };
+    vdStore.snippets.unshift(sn);
+    vdActiveSnippetId = id;
+    return sn;
+  }
+
+  function activeVdSnippet(){
+    let sn = vdStore.snippets.find(s => s.id === vdActiveSnippetId);
+    if (!sn) {
+      if (vdStore.snippets.length) { sn = vdStore.snippets[0]; vdActiveSnippetId = sn.id; }
+      else sn = newVdSnippet();
+    }
+    return sn;
+  }
+
+  function toggleVdDash(){
+    showVdDash = !showVdDash;
+    document.getElementById('vdDashBtn').classList.toggle('vd-active', showVdDash);
+    if(showVdDash){
+      document.querySelectorAll('.filter-tag:not(#vdDashBtn)').forEach(b => b.classList.remove('active'));
+      showHasDash = false;
+      showScrollbarDash = false;
+      showCvDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+    }
+    renderAll();
+  }
+
+  function vdSelectSnippet(id){
+    vdActiveSnippetId = id;
+    saveVd();
+    renderVdDash();
+  }
+
+  function vdAddSnippet(){
+    newVdSnippet();
+    saveVd();
+    renderVdDash();
+    vdRename();
+  }
+
+  function vdDeleteSnippet(){
+    if (vdStore.snippets.length <= 1) { showToast('لا يمكن حذف آخر مربع'); return; }
+    const sn = activeVdSnippet();
+    vdStore.snippets = vdStore.snippets.filter(s => s.id !== sn.id);
+    vdActiveSnippetId = vdStore.snippets[0].id;
+    saveVd();
+    renderVdDash();
+    showToast('تم حذف المربع');
+  }
+
+  function vdRename(){
+    const sn = activeVdSnippet();
+    const name = prompt('اسم المربع:', sn.name);
+    if (name === null) return;
+    sn.name = name.trim() || sn.name;
+    saveVd();
+    renderVdDash();
+  }
+
+  function vdSaveVersion(){
+    const sn = activeVdSnippet();
+    const ed = document.getElementById('vdEditor');
+    const content = ed ? ed.value : (sn.draft || '');
+    if (!content.trim()) { showToast('المربع فارغ — الصق كود أولاً'); return; }
+    const last = sn.versions[sn.versions.length - 1];
+    if (last && last.content === content) { showToast('لا تغيير عن النسخة الأخيرة'); return; }
+    const v = { id: 'vv_' + Date.now() + Math.random().toString(36).slice(2,5), n: sn.versions.length + 1, time: Date.now(), content };
+    sn.versions.push(v);
+    sn.draft = content;
+    if (!saveVd()) { sn.versions.pop(); showToast('مساحة التخزين ممتلئة'); return; }
+    renderVdDash();
+    showToast('تم حفظ نسخة V' + v.n);
+  }
+
+  function vdRestore(id){
+    const sn = activeVdSnippet();
+    const v = sn.versions.find(x => x.id === id);
+    if (!v) return;
+    sn.draft = v.content;
+    saveVd();
+    renderVdDash();
+    showToast('تم استرجاع V' + v.n + ' في المربع');
+  }
+
+  function vdDelete(id){
+    const sn = activeVdSnippet();
+    sn.versions = sn.versions.filter(x => x.id !== id);
+    sn.versions.forEach((x, i) => x.n = i + 1);
+    saveVd();
+    renderVdDash();
+    showToast('تم حذف النسخة');
+  }
+
+  function vdCopy(id){
+    const sn = activeVdSnippet();
+    const v = sn.versions.find(x => x.id === id);
+    if (!v) return;
+    navigator.clipboard.writeText(v.content).then(() => showToast('تم نسخ V' + v.n + '!')).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function vdClearEditor(){
+    const sn = activeVdSnippet();
+    sn.draft = '';
+    saveVd();
+    const ed = document.getElementById('vdEditor');
+    if (ed) ed.value = '';
+    showToast('تم مسح المربع');
+  }
+
+  function fillVdCompareSelects(sn){
+    const oldSel = document.getElementById('vdOldSel');
+    const newSel = document.getElementById('vdNewSel');
+    if (!oldSel || !newSel) return;
+    const opts = sn.versions.map(v => {
+      const t = new Date(v.time).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      return `<option value="${v.id}">V${v.n} · ${t}</option>`;
+    }).join('');
+    oldSel.innerHTML = opts;
+    newSel.innerHTML = opts;
+    if (sn.versions.length >= 2) {
+      oldSel.value = sn.versions[sn.versions.length - 2].id;
+      newSel.value = sn.versions[sn.versions.length - 1].id;
+    } else if (sn.versions.length === 1) {
+      newSel.value = sn.versions[0].id;
+    }
+  }
+
+  function vdToggleCompare(){
+    const wrap = document.getElementById('vdCompareWrap');
+    const btn = document.getElementById('vdCompareToggleBtn');
+    if (!wrap || !btn) return;
+    const open = wrap.style.display === 'none';
+    wrap.style.display = open ? 'block' : 'none';
+    btn.innerHTML = open
+      ? '<i class="ti ti-git-compare"></i> إخفاء المقارنة'
+      : '<i class="ti ti-git-compare"></i> مقارنة نسختين';
+    if (open) fillVdCompareSelects(activeVdSnippet());
+  }
+
+  function vdRunCompare(){
+    const sn = activeVdSnippet();
+    const aId = document.getElementById('vdOldSel').value;
+    const bId = document.getElementById('vdNewSel').value;
+    if (!aId || !bId) { showToast('اختر نسختين'); return; }
+    const a = sn.versions.find(v => v.id === aId);
+    const b = sn.versions.find(v => v.id === bId);
+    if (!a || !b) return;
+    document.getElementById('vdCompareOut').innerHTML = vdDiffHTML(a.content, b.content, 'V' + a.n + ' (قبل)', 'V' + b.n + ' (بعد)');
+  }
+
+  function vdCompareEditor(id){
+    const sn = activeVdSnippet();
+    const v = sn.versions.find(x => x.id === id);
+    const ed = document.getElementById('vdEditor');
+    const current = ed ? ed.value : (sn.draft || '');
+    if (!current.trim()) { showToast('المربع فارغ'); return; }
+    const wrap = document.getElementById('vdCompareWrap');
+    if (wrap) wrap.style.display = 'block';
+    const btn = document.getElementById('vdCompareToggleBtn');
+    if (btn) btn.innerHTML = '<i class="ti ti-git-compare"></i> إخفاء المقارنة';
+    document.getElementById('vdCompareOut').innerHTML = vdDiffHTML(v.content, current, 'V' + v.n + ' (النسخة)', 'المحرر (الحالي)');
+  }
+
+  function vdLineDiff(aLines, bLines){
+    const n = aLines.length, m = bLines.length;
+    if (n * m <= 4000000) {
+      const dp = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
+      for (let i = n - 1; i >= 0; i--) {
+        for (let j = m - 1; j >= 0; j--) {
+          if (aLines[i] === bLines[j]) dp[i][j] = dp[i + 1][j + 1] + 1;
+          else dp[i][j] = dp[i + 1][j] > dp[i][j + 1] ? dp[i + 1][j] : dp[i][j + 1];
+        }
+      }
+      const ops = []; let i = 0, j = 0;
+      while (i < n && j < m) {
+        if (aLines[i] === bLines[j]) { ops.push([0, i, j]); i++; j++; }
+        else if (dp[i + 1][j] >= dp[i][j + 1]) { ops.push([-1, i, -1]); i++; }
+        else { ops.push([1, -1, j]); j++; }
+      }
+      while (i < n) { ops.push([-1, i, -1]); i++; }
+      while (j < m) { ops.push([1, -1, j]); j++; }
+      return ops;
+    }
+    let start = 0;
+    while (start < n && start < m && aLines[start] === bLines[start]) start++;
+    let endA = n, endB = m;
+    while (endA > start && endB > start && aLines[endA - 1] === bLines[endB - 1]) { endA--; endB--; }
+    const ops = [];
+    for (let i = 0; i < start; i++) ops.push([0, i, i]);
+    for (let i = start; i < endA; i++) ops.push([-1, i, -1]);
+    for (let j = start; j < endB; j++) ops.push([1, -1, j]);
+    for (let i = endA; i < n; i++) ops.push([0, i, i]);
+    return ops;
+  }
+
+  function vdDiffHTML(a, b, aName, bName){
+    const aLines = a.split('\n');
+    const bLines = b.split('\n');
+    const ops = vdLineDiff(aLines, bLines);
+
+    const rows = [];
+    const changeSet = [];
+    for (let i = 0; i < ops.length; i++) if (ops[i][0] !== 0) changeSet.push(i);
+
+    if (!changeSet.length) {
+      rows.push({ t: 'fold', text: 'لا تغيير بين النسختين — الأكواد متطابقة' });
+    } else {
+      const CONTEXT = 2;
+      const showIdx = new Set(changeSet);
+      changeSet.forEach(idx => {
+        for (let k = 1; k <= CONTEXT; k++) {
+          if (idx - k >= 0 && ops[idx - k][0] === 0) showIdx.add(idx - k);
+          if (idx + k < ops.length && ops[idx + k][0] === 0) showIdx.add(idx + k);
+        }
+      });
+      const sorted = Array.from(showIdx).sort((x, y) => x - y);
+      let prevShown = -1;
+      sorted.forEach(idx => {
+        if (prevShown !== -1 && idx > prevShown + 1) {
+          let count = 0;
+          for (let k = prevShown + 1; k < idx; k++) if (ops[k][0] === 0) count++;
+          if (count > 0) rows.push({ t: 'fold', text: count + ' سطر متطابق مخفي' });
+        }
+        const op = ops[idx];
+        if (op[0] === 0) rows.push({ t: 'eq', text: aLines[op[1]] });
+        else if (op[0] === -1) rows.push({ t: 'del', text: aLines[op[1]] });
+        else rows.push({ t: 'add', text: bLines[op[2]] });
+        prevShown = idx;
+      });
+    }
+
+    let added = 0, removed = 0, same = 0;
+    ops.forEach(op => { if (op[0] === 1) added++; else if (op[0] === -1) removed++; else same++; });
+
+    const rowsHtml = rows.map(r => {
+      if (r.t === 'fold') return `<div class="vd-fold">${escHtml(r.text)}</div>`;
+      if (r.t === 'del') return `<div class="vd-dl vd-dl-del"><span class="vd-dl-mark">−</span><span class="vd-dl-code">${escHtml(r.text) || ' '}</span></div>`;
+      if (r.t === 'add') return `<div class="vd-dl vd-dl-add"><span class="vd-dl-mark">+</span><span class="vd-dl-code">${escHtml(r.text) || ' '}</span></div>`;
+      return `<div class="vd-dl vd-dl-ctx"><span class="vd-dl-mark"> </span><span class="vd-dl-code">${escHtml(r.text) || ' '}</span></div>`;
+    }).join('');
+
+    const statHtml = `<div class="vd-summary">
+      <span class="vd-stat added">+ ${added} مضافة</span>
+      <span class="vd-stat removed">− ${removed} محذوفة</span>
+      <span class="vd-stat same">${same} متطابقة</span>
+    </div>`;
+
+    return statHtml + `<div class="vd-diff">
+      <div class="vd-diff-head">
+        <span class="vd-file-old">— ${escHtml(aName)}</span>
+        <span class="vd-file-new">+ ${escHtml(bName)}</span>
+      </div>
+      <div class="vd-diff-body">${rowsHtml}</div>
+    </div>`;
+  }
+
+  function renderVdDash(){
+    const sn = activeVdSnippet();
+    const totalVersions = vdStore.snippets.reduce((a, s) => a + s.versions.length, 0);
+    document.getElementById('countBadge').textContent = totalVersions + ' نسخة';
+
+    const tabsHtml = vdStore.snippets.map(s => `
+      <div class="vd-tab${s.id === sn.id ? ' active' : ''}" onclick="vdSelectSnippet('${s.id}')">
+        <i class="ti ti-file-code"></i>
+        <span>${escHtml(s.name)}</span>
+        <span class="vd-tab-num">${s.versions.length}</span>
+      </div>`).join('') + `
+      <div class="vd-tab vd-tab-add" onclick="vdAddSnippet()"><i class="ti ti-plus"></i> جديد</div>`;
+
+    let versionsHtml;
+    if (sn.versions.length) {
+      versionsHtml = sn.versions.map(v => {
+        const lines = v.content.split('\n').length;
+        const t = new Date(v.time);
+        const timeStr = t.toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' })
+          + ' ' + t.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `<div class="vd-version">
+          <span class="vd-vnum">V${v.n}</span>
+          <div class="vd-vmeta">
+            <span class="vd-vtime">${timeStr}</span>
+            <span class="vd-vinfo">${lines} سطر</span>
+          </div>
+          <div class="vd-vactions">
+            <button class="vd-mini-btn vd-restore" onclick="vdRestore('${v.id}')" title="نسخ الكود في المربع"><i class="ti ti-corner-up-left"></i> استرجاع</button>
+            <button class="vd-mini-btn vd-compare-btn" onclick="vdCompareEditor('${v.id}')" title="عرض الفرق بين هذه النسخة والمحرر"><i class="ti ti-git-compare"></i> قارن مع المحرر</button>
+            <button class="vd-mini-btn" onclick="vdCopy('${v.id}')" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
+            <button class="vd-mini-btn vd-del" onclick="vdDelete('${v.id}')" title="حذف النسخة"><i class="ti ti-trash"></i> حذف</button>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      versionsHtml = `<div class="vd-empty"><i class="ti ti-history"></i><p>لا توجد نسخ محفوظة بعد — الصق كودك في المربع واضغط «حفظ نسخة»</p></div>`;
+    }
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="vd-builder">
+        <div class="vd-builder-title"><i class="ti ti-versions"></i> النسخ ومقارنة الأكواد
+          <span>احفظ نسخ كودك، شاهد الفروق بالأخضر والأحمر، واسترجع أي نسخة — كل شيء محفوظ في متصفحك</span>
+        </div>
+
+        <div class="vd-section-title" style="margin-top:0"><i class="ti ti-folders" style="color:var(--accent-warm)"></i> المربعات (السنيبتات)</div>
+        <div class="vd-tabs" id="vdTabs">${tabsHtml}</div>
+
+        <div class="vd-section-title"><i class="ti ti-history" style="color:var(--accent-cool)"></i> نسخ «${escHtml(sn.name)}» المحفوظة <span>(${sn.versions.length})</span></div>
+        <div class="vd-versions" id="vdVersions">${versionsHtml}</div>
+
+        <div class="vd-editor-label"><i class="ti ti-code" style="color:#14b8a6"></i> مربع الكود — الصق كودك هنا، عدّله، ثم اضغط «حفظ نسخة جديدة» <code>Ctrl + S</code></div>
+        <textarea class="vd-editor" id="vdEditor" spellcheck="false" placeholder="/* الصق الكود هنا... */">${escHtml(sn.draft || '')}</textarea>
+
+        <div class="vd-actions">
+          <button class="btn-primary" onclick="vdSaveVersion()"><i class="ti ti-plus"></i> حفظ نسخة جديدة</button>
+          <button class="btn-cancel" onclick="vdToggleCompare()" id="vdCompareToggleBtn"><i class="ti ti-git-compare"></i> مقارنة نسختين</button>
+          <button class="btn-cancel" onclick="vdClearEditor()"><i class="ti ti-trash"></i> مسح المربع</button>
+          <button class="btn-cancel" onclick="vdRename()"><i class="ti ti-pencil"></i> إعادة تسمية</button>
+          <button class="btn-cancel" onclick="vdDeleteSnippet()"><i class="ti ti-folder-minus"></i> حذف المربع</button>
+        </div>
+
+        <div class="vd-compare" id="vdCompareWrap" style="display:none">
+          <div class="vd-section-title" style="margin-top:0"><i class="ti ti-git-compare" style="color:var(--success)"></i> مقارنة نسختين</div>
+          <div class="vd-compare-row">
+            <div class="form-group">
+              <label class="form-label">النسخة القديمة (قبل)</label>
+              <select class="form-select" id="vdOldSel"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">النسخة الجديدة (بعد)</label>
+              <select class="form-select" id="vdNewSel"></select>
+            </div>
+            <button class="btn-primary" onclick="vdRunCompare()"><i class="ti ti-arrows-left-right"></i> عرض الفرق</button>
+          </div>
+          <div id="vdCompareOut"></div>
+        </div>
+      </div>
+    </div>`;
+
+    document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
+
+    const ed = document.getElementById('vdEditor');
+    if (ed) {
+      ed.addEventListener('input', () => { const s = activeVdSnippet(); s.draft = ed.value; saveVd(); });
+      ed.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); vdSaveVersion(); }
+      });
+    }
+    fillVdCompareSelects(sn);
+  }
+
   // ── RENDER ──
   function renderAll(){
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
+    if(showVdDash) return renderVdDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
