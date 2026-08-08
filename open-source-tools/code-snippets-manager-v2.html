@@ -995,6 +995,106 @@
     body.editor-active .ed-wrap { height: calc(100vh - 360px); min-height: 300px; max-height: none; }
   }
 
+  /* ===== DEV TOOLS DASHBOARD ===== */
+  .filter-tag.dev-active {
+    background: #8b5cf6; color: #fff; border-color: #8b5cf6;
+    box-shadow: 0 2px 12px rgba(139,92,246,0.35);
+  }
+
+  .dt-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .dt-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .dt-builder-title i { color: #8b5cf6; font-size: 18px; }
+  .dt-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .dt-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 18px;
+    padding: 6px; background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+  }
+  .dt-tab {
+    flex: 1 1 150px; display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 12px; border: none; border-radius: var(--radius-sm);
+    background: transparent; color: var(--text-2); font-size: 12px; font-weight: 600;
+    font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.18s;
+  }
+  .dt-tab:hover { color: var(--text-1); background: var(--glass-mod); }
+  .dt-tab.active { background: #8b5cf6; color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.35); }
+  .dt-tab i { font-size: 15px; }
+
+  .dt-hidden { display: none !important; }
+
+  .dt-head { font-size: 13px; font-weight: 700; color: var(--text-2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .dt-head i { font-size: 14px; }
+
+  .dt-textarea {
+    width: 100%; min-height: 190px; padding: 12px 14px; resize: vertical;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    direction: ltr; text-align: left; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .dt-textarea:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+  .dt-textarea::placeholder { color: var(--text-3); }
+
+  .dt-options {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px; margin: 14px 0;
+    padding: 12px; background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+  }
+  .dt-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); cursor: pointer; transition: border-color 0.15s;
+    font-size: 12px; color: var(--text-2);
+  }
+  .dt-option:hover { border-color: var(--border-def); }
+  .dt-option input { accent-color: #8b5cf6; cursor: pointer; width: 15px; height: 15px; flex-shrink: 0; }
+
+  .dt-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .dt-actions .btn-primary { background: #8b5cf6; }
+  .dt-actions .btn-primary:hover { box-shadow: 0 4px 16px rgba(139,92,246,0.4); }
+
+  .dt-mode {
+    display: flex; max-width: 340px; margin: 0 0 16px;
+    background: var(--bg-overlay); padding: 5px; border-radius: var(--radius-md);
+    border: 1px solid var(--border-sub);
+  }
+  .dt-mode-btn {
+    flex: 1; padding: 9px 10px; border: none; border-radius: var(--radius-sm);
+    background: transparent; color: var(--text-2); cursor: pointer;
+    font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.18s;
+  }
+  .dt-mode-btn.active { background: #8b5cf6; color: #fff; box-shadow: 0 3px 12px rgba(139,92,246,0.35); }
+
+  .dt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .dt-demo {
+    border: 2px dashed var(--border-def); border-radius: var(--radius-md);
+    min-height: 170px; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-elevated); padding: 16px; transition: background 0.2s;
+  }
+  .dt-demo-bg { width: 100%; height: 140px; background-repeat: no-repeat; background-position: center; background-size: contain; }
+  .dt-contrast { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; color: var(--text-3); }
+  .dt-contrast-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-str); cursor: pointer; transition: all 0.15s; padding: 0; }
+  .dt-contrast-btn.current { border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139,92,246,0.3); }
+  .dt-quotes { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-2); margin-bottom: 12px; flex-wrap: wrap; }
+  .dt-quotes label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .dt-quotes input { accent-color: #8b5cf6; }
+
+  @media (max-width: 820px) { .dt-grid2 { grid-template-columns: 1fr; } }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -1077,6 +1177,9 @@
     </button>
     <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> المحرر
+    </button>
+    <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG">
+      <i class="ti ti-tools" aria-hidden="true"></i> أدوات
     </button>
   </div>
 
@@ -1579,6 +1682,8 @@
       document.getElementById('vdDashBtn').classList.remove('vd-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
+      showDevDash = false;
+      document.getElementById('devDashBtn').classList.remove('dev-active');
     }
     renderAll();
   }
@@ -1838,6 +1943,10 @@
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
     }
+    if(showDevDash){
+      showDevDash = false;
+      document.getElementById('devDashBtn').classList.remove('dev-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -1871,6 +1980,8 @@
       document.getElementById('vdDashBtn').classList.remove('vd-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
+      showDevDash = false;
+      document.getElementById('devDashBtn').classList.remove('dev-active');
     }
     renderAll();
   }
@@ -2046,6 +2157,8 @@
       document.getElementById('vdDashBtn').classList.remove('vd-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
+      showDevDash = false;
+      document.getElementById('devDashBtn').classList.remove('dev-active');
     }
     renderAll();
   }
@@ -2298,6 +2411,8 @@
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
+      showDevDash = false;
+      document.getElementById('devDashBtn').classList.remove('dev-active');
     }
     renderAll();
   }
@@ -2751,11 +2866,12 @@
     document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
     if(showEdDash){
       document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
-      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false;
+      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       document.getElementById('vdDashBtn').classList.remove('vd-active');
+      document.getElementById('devDashBtn').classList.remove('dev-active');
     }
     renderAll();
   }
@@ -2765,6 +2881,8 @@
     document.getElementById('edDashBtn').classList.remove('ed-active');
     showVdDash = true;
     document.getElementById('vdDashBtn').classList.add('vd-active');
+    showDevDash = false;
+    document.getElementById('devDashBtn').classList.remove('dev-active');
     document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
     renderAll();
   }
@@ -2774,6 +2892,8 @@
     document.getElementById('vdDashBtn').classList.remove('vd-active');
     showEdDash = true;
     document.getElementById('edDashBtn').classList.add('ed-active');
+    showDevDash = false;
+    document.getElementById('devDashBtn').classList.remove('dev-active');
     document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
     renderAll();
   }
@@ -2974,11 +3094,13 @@
   // ── RENDER ──
   function renderAll(){
     document.body.classList.toggle('editor-active', !!showEdDash);
+    persistDashState();
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
     if(showVdDash) return renderVdDash();
     if(showEdDash) return renderEdDash();
+    if(showDevDash) return renderDevDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
@@ -3166,11 +3288,447 @@
     e.target.value = '';
   }
 
+  // ── DEV TOOLS DASHBOARD ──
+  let showDevDash = false;
+  let dtActiveTool = 'css';
+  let dtSvgQuotes = 'double';
+
+  function toggleDevDash(){
+    showDevDash = !showDevDash;
+    document.getElementById('devDashBtn').classList.toggle('dev-active', showDevDash);
+    if(showDevDash){
+      document.querySelectorAll('.filter-tag:not(#devDashBtn)').forEach(b => b.classList.remove('active'));
+      showHasDash = false;
+      showScrollbarDash = false;
+      showCvDash = false;
+      showVdDash = false;
+      showEdDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
+      document.getElementById('edDashBtn').classList.remove('ed-active');
+    }
+    renderAll();
+  }
+
+  function dtShow(tool){
+    dtActiveTool = tool;
+    const map = { css:'dtCss', jsmin:'dtJsMin', jsenc:'dtJsEnc', svg:'dtSvg' };
+    const btns = { css:'dtTabCss', jsmin:'dtTabJsMin', jsenc:'dtTabJsEnc', svg:'dtTabSvg' };
+    Object.keys(map).forEach(k => {
+      const p = document.getElementById(map[k]);
+      if (p) p.classList.toggle('dt-hidden', k !== tool);
+      const b = document.getElementById(btns[k]);
+      if (b) b.classList.toggle('active', k === tool);
+    });
+    persistDashState();
+    if (tool === 'svg') dtSvgUpdate();
+  }
+
+  function renderDevDash(){
+    const badge = document.getElementById('countBadge');
+    if (badge) badge.textContent = 'أدوات المطورين';
+    const valid = { css:1, jsmin:1, jsenc:1, svg:1 };
+    const active = valid[dtActiveTool] ? dtActiveTool : 'css';
+    const tabCls = t => t === active ? 'dt-tab active' : 'dt-tab';
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="dt-builder">
+        <div class="dt-builder-title"><i class="ti ti-tools"></i> مجموعة أدوات المطورين
+          <span>ضغط CSS و JavaScript، تعمية JS، وتحويل SVG إلى URL — بضغطة واحدة</span>
+        </div>
+
+        <div class="dt-tabs">
+          <button class="${tabCls('css')}" id="dtTabCss" onclick="dtShow('css')"><i class="ti ti-file-css"></i> ضاغط CSS</button>
+          <button class="${tabCls('jsmin')}" id="dtTabJsMin" onclick="dtShow('jsmin')"><i class="ti ti-brand-javascript"></i> ضاغط JS</button>
+          <button class="${tabCls('jsenc')}" id="dtTabJsEnc" onclick="dtShow('jsenc')"><i class="ti ti-lock"></i> تعمية JS</button>
+          <button class="${tabCls('svg')}" id="dtTabSvg" onclick="dtShow('svg')"><i class="ti ti-vector-triangle"></i> تشفير SVG</button>
+        </div>
+
+        <div class="dt-panel" id="dtCss">
+          <div class="dt-head"><i class="ti ti-file-css" style="color:#8b5cf6"></i> الصق كود CSS هنا</div>
+          <textarea class="dt-textarea" id="dtCssInput" spellcheck="false" placeholder="/* مثال */
+body {
+  color: #333;
+  font-size: 16px;
+}"></textarea>
+
+          <div class="dt-options">
+            <label class="dt-option"><input type="checkbox" id="dtCssStripAll" checked> إزالة كل التعليقات</label>
+            <label class="dt-option"><input type="checkbox" id="dtCssStripCustom" checked> إزالة تعليقات الكود المخصصة</label>
+            <label class="dt-option"><input type="checkbox" id="dtCssSuperCompact" checked> ضغط مدمج للغاية</label>
+            <label class="dt-option"><input type="checkbox" id="dtCssIndent"> الحفاظ على المسافة البادئة</label>
+            <label class="dt-option"><input type="checkbox" id="dtCssNoLastSemi" checked> إزالة الفاصلة المنقوطة الأخيرة</label>
+          </div>
+
+          <div class="dt-actions">
+            <button class="btn-primary" onclick="dtCompressCSS()"><i class="ti ti-compress"></i> ضغط CSS</button>
+            <button class="btn-cancel" onclick="dtClearCss()"><i class="ti ti-eraser"></i> مسح</button>
+            <button class="btn-cancel" onclick="dtCopy('dtCssOutput')"><i class="ti ti-copy"></i> نسخ النتيجة</button>
+          </div>
+
+          <div class="dt-head"><i class="ti ti-file-css" style="color:#8b5cf6"></i> كود CSS المضغوط</div>
+          <textarea class="dt-textarea" id="dtCssOutput" spellcheck="false" readonly onclick="dtCopy('dtCssOutput')" placeholder="النتيجة المضغوطة ستظهر هنا..."></textarea>
+        </div>
+
+        <div class="dt-panel dt-hidden" id="dtJsMin">
+          <div class="dt-head"><i class="ti ti-brand-javascript" style="color:#e7c23b"></i> الصق كود JavaScript هنا</div>
+          <textarea class="dt-textarea" id="dtJsMinInput" spellcheck="false" placeholder="// مثال
+function greet(name) {
+  console.log('Hello ' + name);
+}
+greet('Ali');"></textarea>
+
+          <div class="dt-options">
+            <label class="dt-option"><input type="checkbox" id="dtJsKeepComments" checked> الحفاظ على التعليقات</label>
+            <label class="dt-option"><input type="checkbox" id="dtJsDropConsole" checked> إزالة console.log</label>
+            <label class="dt-option"><input type="checkbox" id="dtJsDropDebugger" checked> إزالة debugger</label>
+            <label class="dt-option"><input type="checkbox" id="dtJsMangle" checked> اختصار أسماء المتغيرات</label>
+            <label class="dt-option"><input type="checkbox" id="dtJsSuperCompact" checked> ضغط إضافي (passes)</label>
+          </div>
+
+          <div class="dt-actions">
+            <button class="btn-primary" onclick="dtMinifyJS()"><i class="ti ti-compress"></i> ضغط JS</button>
+            <button class="btn-cancel" onclick="dtClear('dtJsMinInput','dtJsMinOutput')"><i class="ti ti-eraser"></i> مسح</button>
+            <button class="btn-cancel" onclick="dtCopy('dtJsMinOutput')"><i class="ti ti-copy"></i> نسخ النتيجة</button>
+          </div>
+
+          <div class="dt-head"><i class="ti ti-brand-javascript" style="color:#e7c23b"></i> كود JavaScript المضغوط</div>
+          <textarea class="dt-textarea" id="dtJsMinOutput" spellcheck="false" readonly onclick="dtCopy('dtJsMinOutput')" placeholder="النتيجة المضغوطة ستظهر هنا..."></textarea>
+        </div>
+
+        <div class="dt-panel dt-hidden" id="dtJsEnc">
+          <div class="dt-head"><i class="ti ti-lock" style="color:#e8734a"></i> تعمية / فك تعمية JavaScript</div>
+          <div class="dt-mode">
+            <button class="dt-mode-btn active" id="dtModeEncodeBtn" onclick="dtSwitchJsMode('encode')"><i class="ti ti-lock"></i> تعمية</button>
+            <button class="dt-mode-btn" id="dtModeDecodeBtn" onclick="dtSwitchJsMode('decode')"><i class="ti ti-unlock"></i> فك التعمية</button>
+          </div>
+
+          <div id="dtJsEncodeMode">
+            <div class="dt-head"><i class="ti ti-code" style="color:#e8734a"></i> أدخل كود JavaScript للتعمية</div>
+            <textarea class="dt-textarea" id="dtJsEncodeInput" spellcheck="false" placeholder="// اكتب كودك هنا...
+function hello() {
+  console.log('Hello, World!');
+}"></textarea>
+            <div class="dt-actions">
+              <button class="btn-primary" onclick="dtEncodeJS()"><i class="ti ti-lock"></i> تعمية الكود</button>
+              <button class="btn-cancel" onclick="dtClear('dtJsEncodeInput','dtJsEncodeOutput')"><i class="ti ti-eraser"></i> مسح</button>
+            </div>
+            <div class="dt-head"><i class="ti ti-code" style="color:#e8734a"></i> النتيجة المعماة</div>
+            <textarea class="dt-textarea" id="dtJsEncodeOutput" spellcheck="false" readonly onclick="dtCopy('dtJsEncodeOutput')" placeholder="النتيجة ستظهر هنا..."></textarea>
+          </div>
+
+          <div id="dtJsDecodeMode" class="dt-hidden">
+            <div class="dt-head"><i class="ti ti-unlock" style="color:#4ade80"></i> أدخل الكود المعمّى لفك تعميته</div>
+            <textarea class="dt-textarea" id="dtJsDecodeInput" spellcheck="false" placeholder='eval(decodeURIComponent(escape(atob("..."))));'></textarea>
+            <div class="dt-actions">
+              <button class="btn-primary" onclick="dtDecodeJS()" style="background:var(--success)"><i class="ti ti-unlock"></i> فك تعمية الكود</button>
+              <button class="btn-cancel" onclick="dtClear('dtJsDecodeInput','dtJsDecodeOutput')"><i class="ti ti-eraser"></i> مسح</button>
+            </div>
+            <div class="dt-head"><i class="ti ti-unlock" style="color:#4ade80"></i> الكود الأصلي المسترجع</div>
+            <textarea class="dt-textarea" id="dtJsDecodeOutput" spellcheck="false" readonly onclick="dtCopy('dtJsDecodeOutput')" placeholder="النتيجة ستظهر هنا..."></textarea>
+          </div>
+        </div>
+
+        <div class="dt-panel dt-hidden" id="dtSvg">
+          <div class="dt-head"><i class="ti ti-vector-triangle" style="color:#38bdf8"></i> تحويل SVG إلى URL جاهز للاستخدام في CSS</div>
+
+          <div class="dt-quotes">
+            <span>علامات التنصيص:</span>
+            <label><input type="radio" name="dtSvgQuotes" value="single"> 'Single'</label>
+            <label><input type="radio" name="dtSvgQuotes" value="double" checked> "Double"</label>
+          </div>
+
+          <div class="dt-grid2">
+            <div>
+              <div class="dt-head"><i class="ti ti-paste" style="color:#38bdf8"></i> أدخل كود SVG
+                <button class="btn-cancel" onclick="dtSvgExample()" style="padding:2px 10px;font-size:11px;margin-inline-start:auto">مثال</button>
+              </div>
+              <textarea class="dt-textarea" id="dtSvgInput" spellcheck="false" placeholder="<svg width='100' height='100' ...></svg>"></textarea>
+            </div>
+            <div>
+              <div class="dt-head"><i class="ti ti-eye" style="color:#38bdf8"></i> معاينة</div>
+              <div class="dt-demo" id="dtSvgDemo" style="background:#fff"><div class="dt-demo-bg" id="dtSvgDemoBg"></div></div>
+              <div class="dt-contrast">الخلفية:
+                <button class="dt-contrast-btn current" data-color="white" style="background:#fff" title="أبيض"></button>
+                <button class="dt-contrast-btn" data-color="silver" style="background:#c0c0c0" title="فضي"></button>
+                <button class="dt-contrast-btn" data-color="black" style="background:#000" title="أسود"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dt-grid2" style="margin-top:14px">
+            <div>
+              <div class="dt-head"><i class="ti ti-link" style="color:#38bdf8"></i> النتيجة (Encoded URL)</div>
+              <textarea class="dt-textarea" id="dtSvgResult" spellcheck="false" readonly onclick="dtCopy('dtSvgResult')"></textarea>
+            </div>
+            <div>
+              <div class="dt-head"><i class="ti ti-file-css" style="color:#38bdf8"></i> كود CSS جاهز</div>
+              <textarea class="dt-textarea" id="dtSvgCss" spellcheck="false" readonly onclick="dtCopy('dtSvgCss')"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    const svgInput = document.getElementById('dtSvgInput');
+    if (svgInput) {
+      svgInput.addEventListener('input', dtSvgUpdate);
+      document.querySelectorAll('input[name="dtSvgQuotes"]').forEach(r => {
+        r.addEventListener('change', () => { dtSvgQuotes = r.value === 'double' ? 'double' : 'single'; dtSvgUpdate(); });
+      });
+      document.querySelectorAll('.dt-contrast-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.dt-contrast-btn').forEach(x => x.classList.remove('current'));
+          b.classList.add('current');
+          const demo = document.getElementById('dtSvgDemo');
+          if (demo) demo.style.background = b.dataset.color;
+        });
+      });
+    }
+  }
+
+  function dtCopy(id){
+    const el = document.getElementById(id);
+    if (!el || !el.value || !el.value.trim()) { showToast('لا يوجد شيء لنسخه'); return; }
+    navigator.clipboard.writeText(el.value).then(() => showToast('تم النسخ!')).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function dtClear(inId, outId){
+    const i = document.getElementById(inId);
+    if (i) i.value = '';
+    const o = document.getElementById(outId);
+    if (o) o.value = '';
+  }
+
+  function dtClearCss(){
+    dtClear('dtCssInput', 'dtCssOutput');
+  }
+
+  // ── CSS Minifier ──
+  function dtCompressCSS(){
+    const input = document.getElementById('dtCssInput');
+    const output = document.getElementById('dtCssOutput');
+    if (!input || !output || !input.value.trim()) return;
+    let n = input.value;
+    const stripCustom = document.getElementById('dtCssStripCustom').checked;
+    const stripAll = document.getElementById('dtCssStripAll').checked;
+    const superCompact = document.getElementById('dtCssSuperCompact').checked;
+    const betterIndentation = document.getElementById('dtCssIndent').checked;
+    const removeLastSemi = document.getElementById('dtCssNoLastSemi').checked;
+
+    if (stripCustom) n = n.replace(/\/\*\/\/\*[\s\S]*?\/\*\/\//g, '');
+    if (stripAll || superCompact) n = n.replace(/\/\*[\w\W]*?\*\//gm, '');
+    else n = n.replace(/(\n+)?(\/\*[\w\W]*?\*\/)(\n+)?/gm, '\n$2\n');
+    n = n.replace(/([\n\r\t\s ]+)?([,\:;\{\}]+?)([\n\r\t\s ]+)?/g, '$2');
+    if (!superCompact) n = n.replace(/\}(?!\})/g, '}\n');
+    const mediaKeyframesRegex = /@(media|-w|-m|-o|keyframes|page)(.*?)\{([\s\S]+?)?\}\}/gi;
+    if (betterIndentation) {
+      n = n.replace(mediaKeyframesRegex, (e) => e.replace(/\n+/g, '\n  '));
+      if (!superCompact) {
+        n = n.replace(/\}\}/g, '}\n}');
+        n = n.replace(/@(media|-w|-m|-o|keyframes)(.*?)\{/g, '@$1$2{\n  ');
+      }
+    } else {
+      n = n.replace(mediaKeyframesRegex, (e) => e.replace(/\n+/g, ''));
+    }
+    if (removeLastSemi) n = n.replace(/;\}/g, '}');
+    else n = n.replace(/\}/g, ';}').replace(/;+\}/g, ';}').replace(/\};\}/g, '}}');
+    n = n.replace(/\:0(px|em|pt)/gi, ':0').replace(/ 0(px|em|pt)/gi, ' 0');
+    n = n.replace(/\s+\!important/gi, '!important').replace(/(^\n+|\n+$)/, '');
+    output.value = n;
+    showToast('تم ضغط CSS');
+  }
+
+  // ── JS Minifier ──
+  function dtFallbackMinifyJS(code, keepComments){
+    let minified = code;
+    if (!keepComments) {
+      minified = minified
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    }
+    return minified
+      .replace(/\s+/g, ' ')
+      .replace(/\s*([{}();,:=<>+\-*\/])\s*/g, '$1')
+      .trim();
+  }
+
+  async function dtMinifyJS(){
+    const input = document.getElementById('dtJsMinInput');
+    const output = document.getElementById('dtJsMinOutput');
+    if (!input || !output || !input.value.trim()) return;
+
+    const keepComments = document.getElementById('dtJsKeepComments').checked;
+    const dropConsole = document.getElementById('dtJsDropConsole').checked;
+    const dropDebugger = document.getElementById('dtJsDropDebugger').checked;
+    const mangleNames = document.getElementById('dtJsMangle').checked;
+    const superCompact = document.getElementById('dtJsSuperCompact').checked;
+
+    const minifyOptions = {
+      compress: { drop_console: !!dropConsole, drop_debugger: !!dropDebugger, passes: superCompact ? 2 : 1 },
+      mangle: !!mangleNames,
+      format: { comments: keepComments ? 'some' : false }
+    };
+
+    try {
+      if (window.Terser && typeof window.Terser.minify === 'function') {
+        const result = await window.Terser.minify(input.value, minifyOptions);
+        if (result.error) throw result.error;
+        output.value = result.code || '';
+      } else {
+        output.value = dtFallbackMinifyJS(input.value, !!keepComments);
+        showToast('تم الضغط ببساطة — مكتبة الضغط غير متاحة');
+        return;
+      }
+      showToast('تم ضغط JS');
+    } catch (err) {
+      console.error('JS minify failed:', err);
+      showToast('حدث خطأ — تأكد من صحة الكود');
+    }
+  }
+
+  // ── JS Encoder/Decoder ──
+  function dtSwitchJsMode(mode){
+    const enc = document.getElementById('dtJsEncodeMode');
+    const dec = document.getElementById('dtJsDecodeMode');
+    const encBtn = document.getElementById('dtModeEncodeBtn');
+    const decBtn = document.getElementById('dtModeDecodeBtn');
+    if (!enc || !dec) return;
+    enc.classList.toggle('dt-hidden', mode !== 'encode');
+    dec.classList.toggle('dt-hidden', mode !== 'decode');
+    encBtn.classList.toggle('active', mode === 'encode');
+    decBtn.classList.toggle('active', mode === 'decode');
+  }
+
+  function dtEncodeJS(){
+    const input = document.getElementById('dtJsEncodeInput');
+    const output = document.getElementById('dtJsEncodeOutput');
+    if (!input.value.trim()) return;
+    try {
+      let encoded = btoa(unescape(encodeURIComponent(input.value)));
+      output.value = 'eval(decodeURIComponent(escape(atob("' + encoded + '"))));';
+      showToast('تمت التعمية');
+    } catch (e) {
+      console.error(e);
+      showToast('خطأ في عملية التعمية');
+    }
+  }
+
+  function dtDecodeJS(){
+    const input = document.getElementById('dtJsDecodeInput');
+    const output = document.getElementById('dtJsDecodeOutput');
+    if (!input.value.trim()) return;
+    try {
+      const match = input.value.match(/atob\("(.+?)"\)/);
+      if (match && match[1]) {
+        output.value = decodeURIComponent(escape(atob(match[1])));
+        showToast('تم فك التعمية');
+      } else {
+        showToast('لم يتم العثور على نمط تعمية متوافق (atob)');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('خطأ في فك التعمية');
+    }
+  }
+
+  // ── SVG Encoder ──
+  function dtSvgExample(){
+    const input = document.getElementById('dtSvgInput');
+    if (!input) return;
+    input.value = '<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">\n  <circle cx="50" cy="50" r="40" fill="#8b5cf6" />\n</svg>';
+    dtSvgUpdate();
+  }
+
+  function dtSvgQuotesObj(){
+    return {
+      level1: dtSvgQuotes === 'double' ? '"' : "'",
+      level2: dtSvgQuotes === 'double' ? "'" : '"'
+    };
+  }
+
+  function dtSvgUpdate(){
+    const input = document.getElementById('dtSvgInput');
+    const result = document.getElementById('dtSvgResult');
+    const cssOut = document.getElementById('dtSvgCss');
+    const demo = document.getElementById('dtSvgDemoBg');
+    if (!input || !result || !cssOut || !demo) return;
+    if (!input.value.trim()) {
+      result.value = cssOut.value = '';
+      demo.style.backgroundImage = '';
+      return;
+    }
+    let data = input.value;
+    const q = dtSvgQuotesObj();
+    if (data.indexOf('http://www.w3.org/2000/svg') < 0) {
+      data = data.replace(/<svg/g, '<svg xmlns=' + q.level2 + 'http://www.w3.org/2000/svg' + q.level2);
+    }
+    const symbols = /[\r\n#()<>?\[\\\]^`{|}]/g;
+    if (dtSvgQuotes === 'double') data = data.replace(/"/g, "'");
+    else data = data.replace(/'/g, '"');
+    data = data.replace(/>\s{1,}</g, '><').replace(/\s{2,}/g, ' ');
+    const escaped = data.replace(symbols, encodeURIComponent);
+    result.value = escaped;
+    cssOut.value = 'background-image: url(' + q.level1 + 'data:image/svg+xml,' + escaped + q.level1 + ');';
+    demo.style.backgroundImage = 'url("data:image/svg+xml,' + escaped + '")';
+  }
+
+  // ── ACTIVE DASHBOARD PERSISTENCE ──
+  const DASH_KEY = 'csman_v2_dash_v1';
+  const DASH_SUB_KEY = 'csman_v2_dash_sub_v1';
+
+  function currentDashId(){
+    if(showHasDash) return 'has';
+    if(showScrollbarDash) return 'sb';
+    if(showCvDash) return 'cv';
+    if(showVdDash) return 'vd';
+    if(showEdDash) return 'ed';
+    if(showDevDash) return 'dev';
+    return 'main';
+  }
+
+  function persistDashState(){
+    try {
+      localStorage.setItem(DASH_KEY, currentDashId());
+      localStorage.setItem(DASH_SUB_KEY, JSON.stringify({ tool: dtActiveTool }));
+    } catch (e) {}
+  }
+
+  function restoreDashState(){
+    let id = 'main';
+    try { id = localStorage.getItem(DASH_KEY) || 'main'; } catch (e) {}
+    if (!['has','sb','cv','vd','ed','dev'].includes(id)) id = 'main';
+    try {
+      const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
+      if (sub && sub.tool) dtActiveTool = sub.tool;
+    } catch (e) {}
+    showHasDash = id === 'has';
+    showScrollbarDash = id === 'sb';
+    showCvDash = id === 'cv';
+    showVdDash = id === 'vd';
+    showEdDash = id === 'ed';
+    showDevDash = id === 'dev';
+    const mark = (btnId, cls, on) => {
+      const b = document.getElementById(btnId);
+      if (b) b.classList.toggle(cls, on);
+    };
+    mark('hasDashBtn', 'has-active', showHasDash);
+    mark('sbDashBtn', 'scrollbar-active', showScrollbarDash);
+    mark('cvDashBtn', 'cv-active', showCvDash);
+    mark('vdDashBtn', 'vd-active', showVdDash);
+    mark('edDashBtn', 'ed-active', showEdDash);
+    mark('devDashBtn', 'dev-active', showDevDash);
+  }
+
   // ── INIT ──
   DATA.forEach(s => openIds.add(s.id));
+  restoreDashState();
   renderAll();
   document.getElementById('wrapBtn').classList.add('active');
   document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
 </script>
+<script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
 </body>
 </html>
