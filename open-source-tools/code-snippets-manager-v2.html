@@ -1095,6 +1095,210 @@
 
   @media (max-width: 820px) { .dt-grid2 { grid-template-columns: 1fr; } }
 
+  /* ===== BASE64 DASHBOARD ===== */
+  .filter-tag.b64-active {
+    background: #10b981; color: #fff; border-color: #10b981;
+    box-shadow: 0 2px 12px rgba(16,185,129,0.35);
+  }
+  .dt-builder.b64 .dt-builder-title i { color: #10b981; }
+  .dt-builder.b64 .dt-tab.active {
+    background: #10b981; box-shadow: 0 4px 14px rgba(16,185,129,0.35);
+  }
+  .dt-builder.b64 .dt-textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+  .dt-builder.b64 .dt-option input,
+  .dt-builder.b64 .dt-quotes input { accent-color: #10b981; }
+  .dt-builder.b64 .dt-actions .btn-primary { background: #10b981; }
+  .dt-builder.b64 .dt-actions .btn-primary:hover { box-shadow: 0 4px 16px rgba(16,185,129,0.4); }
+
+  .b64-live {
+    display: flex; align-items: center; gap: 10px; margin: 12px 0;
+    color: var(--text-2); font-size: 12.5px; cursor: pointer; user-select: none;
+  }
+  .b64-live i { color: #10b981; }
+  .b64-switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+  .b64-switch input { opacity: 0; width: 0; height: 0; }
+  .b64-slider {
+    position: absolute; cursor: pointer; inset: 0; border-radius: 20px;
+    background: var(--border-str); transition: 0.25s;
+  }
+  .b64-slider::before {
+    content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; top: 3px; inset-inline-start: 3px; transition: 0.25s;
+  }
+  .b64-switch input:checked + .b64-slider { background: #10b981; }
+  .b64-switch input:checked + .b64-slider::before { transform: translateX(18px); }
+
+  .b64-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .b64-upload {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 22px 16px; margin-top: 14px; border: 2px dashed var(--border-def);
+    border-radius: var(--radius-md); cursor: pointer; text-align: center;
+    background: rgba(16,185,129,0.04); transition: 0.2s;
+  }
+  .b64-upload:hover, .b64-upload.drag { border-color: #10b981; background: rgba(16,185,129,0.09); }
+  .b64-upload i { font-size: 26px; color: #10b981; }
+  .b64-upload p { color: var(--text-3); font-size: 12.5px; margin: 0; }
+  .b64-upload strong { color: var(--text-1); }
+
+  .b64-fileinfo {
+    display: none; align-items: center; gap: 10px; margin-top: 12px;
+    padding: 10px 14px; background: var(--bg-overlay); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md);
+  }
+  .b64-fileinfo.show { display: flex; }
+  .b64-fileinfo i { color: #10b981; font-size: 18px; }
+  .b64-fileinfo .name { font-weight: 600; font-size: 13px; color: var(--text-1); }
+  .b64-fileinfo .size { font-size: 11.5px; color: var(--text-3); }
+  .b64-fileinfo .clear { margin-inline-start: auto; }
+
+  .b64-preview {
+    max-width: 160px; max-height: 140px; border-radius: var(--radius-sm);
+    margin-top: 12px; display: none; border: 1px solid var(--border-def);
+  }
+  .b64-preview.show { display: block; }
+
+  .b64-dropzone {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 34px 20px; margin-top: 14px; border: 2px dashed var(--border-def);
+    border-radius: var(--radius-md); cursor: pointer; text-align: center;
+    background: rgba(16,185,129,0.04); transition: 0.2s;
+  }
+  .b64-dropzone:hover, .b64-dropzone.drag { border-color: #10b981; background: rgba(16,185,129,0.09); }
+  .b64-dropzone > i { font-size: 34px; color: #10b981; }
+  .b64-dropzone h4 { margin: 4px 0 0; color: var(--text-1); font-size: 15px; }
+  .b64-dropzone p { color: var(--text-3); font-size: 12.5px; margin: 0; }
+  .b64-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .b64-badge {
+    padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3);
+  }
+
+  .b64-results { display: none; margin-top: 16px; }
+  .b64-results.show { display: block; }
+  .b64-results-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .b64-results-head h4 { margin: 0; font-size: 14px; color: var(--text-1); }
+  .b64-stat {
+    font-size: 12px; color: #10b981; background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25); padding: 4px 12px; border-radius: 999px;
+    font-weight: 600;
+  }
+  .b64-item {
+    background: var(--bg-overlay); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden;
+  }
+  .b64-item-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; }
+  .b64-item-num {
+    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(16,185,129,0.15); color: #10b981; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .b64-item-info { flex: 1; min-width: 0; }
+  .b64-item-name {
+    font-weight: 600; font-size: 13px; color: var(--text-1);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .b64-item-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+  .b64-item-meta i { color: #10b981; }
+  .b64-item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+  .b64-mini {
+    padding: 5px 10px; border-radius: 8px; font-size: 11.5px; cursor: pointer;
+    border: 1px solid var(--border-def); background: var(--bg-elevated); color: var(--text-2);
+    transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .b64-mini:hover { border-color: #10b981; color: #10b981; }
+  .b64-mini.primary { background: #10b981; border-color: #10b981; color: #fff; }
+  .b64-mini.primary:hover { box-shadow: 0 3px 12px rgba(16,185,129,0.35); color: #fff; }
+  .b64-mini.danger:hover { border-color: #ef4444; color: #ef4444; }
+  .b64-mini.processing { border-color: #f59e0b; color: #f59e0b; cursor: default; }
+  .b64-mini.error { border-color: #ef4444; color: #ef4444; cursor: default; }
+
+  .b64-details { display: none; padding: 0 14px 14px; }
+  .b64-details.show { display: block; }
+  .b64-thumbwrap { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .b64-thumb {
+    width: 120px; height: 100px; object-fit: contain; border-radius: var(--radius-sm);
+    background: rgba(0,0,0,0.15); border: 1px solid var(--border-def); flex-shrink: 0;
+  }
+  .b64-codepanels { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 10px; }
+  .b64-codepanel { background: var(--bg-elevated); border: 1px solid var(--border-def); border-radius: var(--radius-sm); overflow: hidden; }
+  .b64-codepanel-head {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    background: rgba(16,185,129,0.08); font-size: 12px; color: var(--text-1); font-weight: 600;
+  }
+  .b64-codepanel-head .spacer { flex: 1; }
+  .b64-codearea {
+    padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    line-height: 1.6; word-break: break-all; max-height: 130px; overflow: auto;
+    direction: ltr; text-align: left; white-space: pre-wrap;
+  }
+
+  @media (max-width: 820px) {
+    .b64-grid { grid-template-columns: 1fr; }
+    .b64-item-head { flex-direction: column; align-items: flex-start; }
+    .b64-item-actions { width: 100%; }
+  }
+
+  /* ===== QR CODE DASHBOARD ===== */
+  .filter-tag.qr-active {
+    background: #f97316; color: #fff; border-color: #f97316;
+    box-shadow: 0 2px 12px rgba(249,115,22,0.35);
+  }
+  .dt-builder.qr .dt-builder-title i { color: #f97316; }
+  .dt-builder.qr .dt-tab.active,
+  .dt-builder.qr .dt-mode-btn.active {
+    background: #f97316; box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+  }
+  .dt-builder.qr .dt-textarea:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.15); }
+  .dt-builder.qr .dt-actions .btn-primary { background: #f97316; }
+  .dt-builder.qr .dt-actions .btn-primary:hover { box-shadow: 0 4px 16px rgba(249,115,22,0.4); }
+
+  .qr-grid { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 20px; align-items: start; }
+  .qr-stage {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 18px; background: var(--bg-overlay);
+    border: 1px solid var(--border-def); border-radius: var(--radius-md);
+  }
+  .qr-frame {
+    width: 100%; max-width: 280px; aspect-ratio: 1/1; background: #fff;
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    padding: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  .qr-frame img, .qr-frame canvas { max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: 4px; }
+  .qr-hint { color: var(--text-3); font-size: 12px; text-align: center; }
+  .qr-hint.hide { display: none; }
+  .qr-controls { min-width: 0; }
+
+  .qr-options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0;
+    padding: 12px; background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+  }
+  .qr-opt {
+    display: flex; flex-direction: column; gap: 6px; padding: 8px 12px;
+    border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); font-size: 12px; color: var(--text-2);
+  }
+  .qr-opt > span { font-weight: 600; }
+  .qr-opt input[type="range"] { width: 100%; accent-color: #f97316; cursor: pointer; }
+  .qr-opt input[type="color"] {
+    width: 100%; height: 32px; border: none; border-radius: 6px;
+    background: transparent; cursor: pointer; padding: 0;
+  }
+  .qr-opt output { color: #f97316; font-weight: 700; font-size: 12px; }
+  .qr-select {
+    background: var(--bg-elevated); color: var(--text-1);
+    border: 1px solid var(--border-def); border-radius: 8px;
+    padding: 6px 10px; font-size: 12.5px; cursor: pointer;
+  }
+
+  @media (max-width: 820px) {
+    .qr-grid { grid-template-columns: 1fr; }
+    .qr-frame { max-width: 240px; margin-inline: auto; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -1180,6 +1384,12 @@
     </button>
     <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG">
       <i class="ti ti-tools" aria-hidden="true"></i> أدوات
+    </button>
+    <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64">
+      <i class="ti ti-binary" aria-hidden="true"></i> Base64
+    </button>
+    <button class="filter-tag" id="qrDashBtn" onclick="toggleQrDash()" title="مولد رموز QR">
+      <i class="ti ti-qrcode" aria-hidden="true"></i> QR
     </button>
   </div>
 
@@ -1684,6 +1894,10 @@
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
       document.getElementById('devDashBtn').classList.remove('dev-active');
+      showB64Dash = false;
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+      showQrDash = false;
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
     renderAll();
   }
@@ -1947,6 +2161,14 @@
       showDevDash = false;
       document.getElementById('devDashBtn').classList.remove('dev-active');
     }
+    if(showB64Dash){
+      showB64Dash = false;
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+    }
+    if(showQrDash){
+      showQrDash = false;
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -1982,6 +2204,10 @@
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
       document.getElementById('devDashBtn').classList.remove('dev-active');
+      showB64Dash = false;
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+      showQrDash = false;
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
     renderAll();
   }
@@ -2159,6 +2385,10 @@
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
       document.getElementById('devDashBtn').classList.remove('dev-active');
+      showB64Dash = false;
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+      showQrDash = false;
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
     renderAll();
   }
@@ -2413,6 +2643,10 @@
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
       document.getElementById('devDashBtn').classList.remove('dev-active');
+      showB64Dash = false;
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+      showQrDash = false;
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
     renderAll();
   }
@@ -2866,12 +3100,14 @@
     document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
     if(showEdDash){
       document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
-      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false;
+      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       document.getElementById('vdDashBtn').classList.remove('vd-active');
       document.getElementById('devDashBtn').classList.remove('dev-active');
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
     renderAll();
   }
@@ -2883,6 +3119,10 @@
     document.getElementById('vdDashBtn').classList.add('vd-active');
     showDevDash = false;
     document.getElementById('devDashBtn').classList.remove('dev-active');
+    showB64Dash = false;
+    document.getElementById('b64DashBtn').classList.remove('b64-active');
+    showQrDash = false;
+    document.getElementById('qrDashBtn').classList.remove('qr-active');
     document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
     renderAll();
   }
@@ -2894,6 +3134,10 @@
     document.getElementById('edDashBtn').classList.add('ed-active');
     showDevDash = false;
     document.getElementById('devDashBtn').classList.remove('dev-active');
+    showB64Dash = false;
+    document.getElementById('b64DashBtn').classList.remove('b64-active');
+    showQrDash = false;
+    document.getElementById('qrDashBtn').classList.remove('qr-active');
     document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
     renderAll();
   }
@@ -3101,6 +3345,8 @@
     if(showVdDash) return renderVdDash();
     if(showEdDash) return renderEdDash();
     if(showDevDash) return renderDevDash();
+    if(showB64Dash) return renderB64Dash();
+    if(showQrDash) return renderQrDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
@@ -3303,11 +3549,13 @@
       showCvDash = false;
       showVdDash = false;
       showEdDash = false;
+      showB64Dash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       document.getElementById('vdDashBtn').classList.remove('vd-active');
       document.getElementById('edDashBtn').classList.remove('ed-active');
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
     }
     renderAll();
   }
@@ -3346,7 +3594,7 @@
           <button class="${tabCls('svg')}" id="dtTabSvg" onclick="dtShow('svg')"><i class="ti ti-vector-triangle"></i> تشفير SVG</button>
         </div>
 
-        <div class="dt-panel" id="dtCss">
+        <div class="dt-panel${active === 'css' ? '' : ' dt-hidden'}" id="dtCss">
           <div class="dt-head"><i class="ti ti-file-css" style="color:#8b5cf6"></i> الصق كود CSS هنا</div>
           <textarea class="dt-textarea" id="dtCssInput" spellcheck="false" placeholder="/* مثال */
 body {
@@ -3372,7 +3620,7 @@ body {
           <textarea class="dt-textarea" id="dtCssOutput" spellcheck="false" readonly onclick="dtCopy('dtCssOutput')" placeholder="النتيجة المضغوطة ستظهر هنا..."></textarea>
         </div>
 
-        <div class="dt-panel dt-hidden" id="dtJsMin">
+        <div class="dt-panel${active === 'jsmin' ? '' : ' dt-hidden'}" id="dtJsMin">
           <div class="dt-head"><i class="ti ti-brand-javascript" style="color:#e7c23b"></i> الصق كود JavaScript هنا</div>
           <textarea class="dt-textarea" id="dtJsMinInput" spellcheck="false" placeholder="// مثال
 function greet(name) {
@@ -3398,7 +3646,7 @@ greet('Ali');"></textarea>
           <textarea class="dt-textarea" id="dtJsMinOutput" spellcheck="false" readonly onclick="dtCopy('dtJsMinOutput')" placeholder="النتيجة المضغوطة ستظهر هنا..."></textarea>
         </div>
 
-        <div class="dt-panel dt-hidden" id="dtJsEnc">
+        <div class="dt-panel${active === 'jsenc' ? '' : ' dt-hidden'}" id="dtJsEnc">
           <div class="dt-head"><i class="ti ti-lock" style="color:#e8734a"></i> تعمية / فك تعمية JavaScript</div>
           <div class="dt-mode">
             <button class="dt-mode-btn active" id="dtModeEncodeBtn" onclick="dtSwitchJsMode('encode')"><i class="ti ti-lock"></i> تعمية</button>
@@ -3431,7 +3679,7 @@ function hello() {
           </div>
         </div>
 
-        <div class="dt-panel dt-hidden" id="dtSvg">
+        <div class="dt-panel${active === 'svg' ? '' : ' dt-hidden'}" id="dtSvg">
           <div class="dt-head"><i class="ti ti-vector-triangle" style="color:#38bdf8"></i> تحويل SVG إلى URL جاهز للاستخدام في CSS</div>
 
           <div class="dt-quotes">
@@ -3675,6 +3923,793 @@ function hello() {
     demo.style.backgroundImage = 'url("data:image/svg+xml,' + escaped + '")';
   }
 
+  // ── BASE64 DASHBOARD ──
+  let showB64Dash = false;
+  let b64ActiveTab = 'encode';
+  let b64EncodeFile = null;
+  let b64ImageFiles = [];
+  let b64ImageCounter = 0;
+  let showQrDash = false;
+  let qrSize = 280;
+  let qrDark = '#1a1a2e';
+  let qrLight = '#ffffff';
+  let qrECC = 'M';
+  let qrMargin = 1;
+  let qrCache = null;
+
+  function toggleB64Dash(){
+    showB64Dash = !showB64Dash;
+    document.getElementById('b64DashBtn').classList.toggle('b64-active', showB64Dash);
+    if(showB64Dash){
+      document.querySelectorAll('.filter-tag:not(#b64DashBtn)').forEach(b => b.classList.remove('active'));
+      showHasDash = false;
+      showScrollbarDash = false;
+      showCvDash = false;
+      showVdDash = false;
+      showEdDash = false;
+      showDevDash = false;
+      showQrDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
+      document.getElementById('edDashBtn').classList.remove('ed-active');
+      document.getElementById('devDashBtn').classList.remove('dev-active');
+      document.getElementById('qrDashBtn').classList.remove('qr-active');
+    }
+    renderAll();
+  }
+
+  function toggleQrDash(){
+    showQrDash = !showQrDash;
+    document.getElementById('qrDashBtn').classList.toggle('qr-active', showQrDash);
+    if(showQrDash){
+      document.querySelectorAll('.filter-tag:not(#qrDashBtn)').forEach(b => b.classList.remove('active'));
+      showHasDash = false;
+      showScrollbarDash = false;
+      showCvDash = false;
+      showVdDash = false;
+      showEdDash = false;
+      showDevDash = false;
+      showB64Dash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
+      document.getElementById('edDashBtn').classList.remove('ed-active');
+      document.getElementById('devDashBtn').classList.remove('dev-active');
+      document.getElementById('b64DashBtn').classList.remove('b64-active');
+    }
+    renderAll();
+  }
+
+  function b64Show(tab){
+    b64ActiveTab = tab;
+    const panels = { encode:'b64EncodePanel', decode:'b64DecodePanel', image:'b64ImagePanel' };
+    const btns   = { encode:'b64TabEncode',  decode:'b64TabDecode',  image:'b64TabImage' };
+    Object.keys(panels).forEach(k => {
+      const p = document.getElementById(panels[k]);
+      if (p) p.classList.toggle('dt-hidden', k !== tab);
+      const b = document.getElementById(btns[k]);
+      if (b) b.classList.toggle('active', k === tab);
+    });
+    persistDashState();
+  }
+
+  function renderB64Dash(){
+    const badge = document.getElementById('countBadge');
+    if (badge) badge.textContent = 'أداة Base64';
+    const valid = { encode:1, decode:1, image:1 };
+    const active = valid[b64ActiveTab] ? b64ActiveTab : 'encode';
+    const tabCls = t => t === active ? 'dt-tab active' : 'dt-tab';
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="dt-builder b64">
+        <div class="dt-builder-title"><i class="ti ti-binary"></i> أداة Base64
+          <span>ترميز النصوص والملفات، فك الترميز، وتحويل الصور إلى Base64 جاهز للاستخدام</span>
+        </div>
+
+        <div class="dt-tabs">
+          <button class="${tabCls('encode')}" id="b64TabEncode" onclick="b64Show('encode')"><i class="ti ti-lock"></i> Encode</button>
+          <button class="${tabCls('decode')}" id="b64TabDecode" onclick="b64Show('decode')"><i class="ti ti-unlock"></i> Decode</button>
+          <button class="${tabCls('image')}" id="b64TabImage" onclick="b64Show('image')"><i class="ti ti-photo"></i> صورة إلى Base64</button>
+        </div>
+
+        <div class="dt-panel${active === 'encode' ? '' : ' dt-hidden'}" id="b64EncodePanel">
+          <div class="dt-head"><i class="ti ti-keyboard" style="color:#10b981"></i> النص للترميز</div>
+          <textarea class="dt-textarea" id="b64EncodeInput" spellcheck="false" placeholder="اكتب أو الصق النص هنا..."></textarea>
+          <div class="b64-live">
+            <label class="b64-switch"><input type="checkbox" id="b64EncodeLive"><span class="b64-slider"></span></label>
+            <span><i class="ti ti-bolt"></i> ترميز مباشر أثناء الكتابة</span>
+          </div>
+
+          <div class="dt-options">
+            <label class="dt-option"><span>Chart:</span>
+              <select class="b64-select" id="b64EncodeCharset">
+                <optgroup label="Popular">
+                  <option value="UTF-8" selected>UTF-8</option>
+                  <option value="ASCII">ASCII</option>
+                  <option value="ISO-8859-1">ISO-8859-1</option>
+                  <option value="Windows-1252">Windows-1252</option>
+                </optgroup>
+              </select>
+            </label>
+            <label class="dt-option"><span>فاصل الأسطر:</span>
+              <select class="b64-select" id="b64EncodeSep">
+                <option value="lf">LF (Unix)</option>
+                <option value="crlf">CRLF (Windows)</option>
+              </select>
+            </label>
+            <label class="dt-option"><input type="checkbox" id="b64EncodeSplit"> تقسيم الأسطر (76 حرفًا - MIME)</label>
+            <label class="dt-option"><input type="checkbox" id="b64EncodeUrlSafe"> ترميز آمن للروابط (Base64URL)</label>
+          </div>
+
+          <div class="b64-upload" id="b64EncodeUpload">
+            <i class="ti ti-cloud-upload"></i>
+            <p><strong>اضغط للرفع</strong> أو اسحب وأفلت ملفًا</p>
+            <p>يدعم الصور والمستندات وأي ملفات ثنائية</p>
+            <input type="file" id="b64EncodeFileInput" style="display:none">
+          </div>
+          <div class="b64-fileinfo" id="b64EncodeFileInfo">
+            <i class="ti ti-file"></i>
+            <div>
+              <div class="name" id="b64EncodeFileName">-</div>
+              <div class="size" id="b64EncodeFileSize">-</div>
+            </div>
+            <button class="b64-mini danger clear" onclick="b64ClearEncodeFile()"><i class="ti ti-x"></i></button>
+          </div>
+
+          <div class="dt-actions">
+            <button class="btn-primary" onclick="b64Encode()"><i class="ti ti-lock"></i> ترميز</button>
+            <button class="btn-cancel" onclick="dtCopy('b64EncodeOutput')"><i class="ti ti-copy"></i> نسخ النتيجة</button>
+            <button class="btn-cancel" onclick="b64ClearEncode()"><i class="ti ti-eraser"></i> مسح</button>
+          </div>
+
+          <div class="dt-head"><i class="ti ti-file-code" style="color:#10b981"></i> النتيجة المشفرة</div>
+          <textarea class="dt-textarea" id="b64EncodeOutput" spellcheck="false" readonly onclick="dtCopy('b64EncodeOutput')" placeholder="ستظهر النتيجة المشفرة هنا..."></textarea>
+          <img class="b64-preview" id="b64EncodePreview" alt="معاينة">
+        </div>
+
+        <div class="dt-panel${active === 'decode' ? '' : ' dt-hidden'}" id="b64DecodePanel">
+          <div class="dt-head"><i class="ti ti-file-code" style="color:#10b981"></i> النص المشفر لفك ترميزه</div>
+          <textarea class="dt-textarea" id="b64DecodeInput" spellcheck="false" placeholder="الصق النص المشفر هنا..."></textarea>
+          <div class="b64-live">
+            <label class="b64-switch"><input type="checkbox" id="b64DecodeLive"><span class="b64-slider"></span></label>
+            <span><i class="ti ti-bolt"></i> فك ترميز مباشر أثناء الكتابة</span>
+          </div>
+
+          <div class="dt-options">
+            <label class="dt-option"><span>Chart:</span>
+              <select class="b64-select" id="b64DecodeCharset">
+                <optgroup label="Popular">
+                  <option value="UTF-8" selected>UTF-8</option>
+                  <option value="ASCII">ASCII</option>
+                  <option value="ISO-8859-1">ISO-8859-1</option>
+                  <option value="Windows-1252">Windows-1252</option>
+                </optgroup>
+              </select>
+            </label>
+            <label class="dt-option"><input type="checkbox" id="b64DecodeUrlSafe"> الإدخال آمن للروابط (Base64URL)</label>
+          </div>
+
+          <div class="dt-actions">
+            <button class="btn-primary" onclick="b64Decode()"><i class="ti ti-unlock"></i> فك الترميز</button>
+            <button class="btn-cancel" onclick="dtCopy('b64DecodeOutput')"><i class="ti ti-copy"></i> نسخ النتيجة</button>
+            <button class="btn-cancel" onclick="b64DownloadDecoded()"><i class="ti ti-download"></i> تنزيل كملف</button>
+            <button class="btn-cancel" onclick="b64ClearDecode()"><i class="ti ti-eraser"></i> مسح</button>
+          </div>
+
+          <div class="dt-head"><i class="ti ti-file-text" style="color:#10b981"></i> النتيجة بعد فك الترميز</div>
+          <textarea class="dt-textarea" id="b64DecodeOutput" spellcheck="false" readonly onclick="dtCopy('b64DecodeOutput')" placeholder="ستظهر النتيجة هنا..."></textarea>
+          <img class="b64-preview" id="b64DecodePreview" alt="معاينة">
+        </div>
+
+        <div class="dt-panel${active === 'image' ? '' : ' dt-hidden'}" id="b64ImagePanel">
+          <div class="dt-head"><i class="ti ti-photo" style="color:#10b981"></i> تحويل الصور إلى Base64 لاستخدامها في HTML و CSS والبريد الإلكتروني</div>
+
+          <div class="b64-dropzone" id="b64ImageDropzone">
+            <i class="ti ti-cloud-upload"></i>
+            <h4>اسحب وأفلت صورك هنا</h4>
+            <p>أو اضغط لاختيار الملفات</p>
+            <div class="b64-badges">
+              <span class="b64-badge">JPG</span>
+              <span class="b64-badge">PNG</span>
+              <span class="b64-badge">GIF</span>
+              <span class="b64-badge">WebP</span>
+              <span class="b64-badge">SVG</span>
+              <span class="b64-badge">BMP</span>
+            </div>
+            <p>الحد الأقصى 10 ملفات، 5MB لكل ملف</p>
+            <input type="file" id="b64ImageFileInput" style="display:none" multiple accept=".jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,image/*">
+          </div>
+
+          <div class="b64-results" id="b64ResultsContainer">
+            <div class="b64-results-head">
+              <h4><i class="ti ti-file-code"></i> نتائج الترميز</h4>
+              <span class="b64-stat"><i class="ti ti-check"></i> <span id="b64CompletedCount">0</span> ملف محوّل</span>
+            </div>
+            <div id="b64ImageResultsList"></div>
+            <div class="dt-actions">
+              <button class="btn-cancel" onclick="b64ClearAllImages()"><i class="ti ti-trash"></i> مسح الكل</button>
+              <button class="btn-primary" onclick="document.getElementById('b64ImageFileInput').click()"><i class="ti ti-plus"></i> إضافة المزيد من الصور</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    const encInput = document.getElementById('b64EncodeInput');
+    const encLive = document.getElementById('b64EncodeLive');
+    if (encInput && encLive) {
+      encInput.addEventListener('input', () => { if (encLive.checked) b64Encode(); });
+      const encUpload = document.getElementById('b64EncodeUpload');
+      const encFileInput = document.getElementById('b64EncodeFileInput');
+      if (encUpload && encFileInput) {
+        encUpload.addEventListener('click', () => encFileInput.click());
+        encFileInput.addEventListener('change', e => { if (e.target.files[0]) b64SetEncodeFile(e.target.files[0]); });
+        encUpload.addEventListener('dragover', e => { e.preventDefault(); encUpload.classList.add('drag'); });
+        encUpload.addEventListener('dragleave', () => encUpload.classList.remove('drag'));
+        encUpload.addEventListener('drop', e => {
+          e.preventDefault();
+          encUpload.classList.remove('drag');
+          if (e.dataTransfer.files.length) b64SetEncodeFile(e.dataTransfer.files[0]);
+        });
+      }
+    }
+    const decInput = document.getElementById('b64DecodeInput');
+    const decLive = document.getElementById('b64DecodeLive');
+    if (decInput && decLive) {
+      decInput.addEventListener('input', () => { if (decLive.checked) b64Decode(); });
+    }
+    const imgDrop = document.getElementById('b64ImageDropzone');
+    const imgInput = document.getElementById('b64ImageFileInput');
+    if (imgDrop && imgInput) {
+      imgDrop.addEventListener('click', () => imgInput.click());
+      imgInput.addEventListener('change', e => b64HandleImageFiles(e.target.files));
+      imgDrop.addEventListener('dragover', e => { e.preventDefault(); imgDrop.classList.add('drag'); });
+      imgDrop.addEventListener('dragleave', () => imgDrop.classList.remove('drag'));
+      imgDrop.addEventListener('drop', e => {
+        e.preventDefault();
+        imgDrop.classList.remove('drag');
+        b64HandleImageFiles(e.dataTransfer.files);
+      });
+    }
+  }
+
+  function b64FormatBytes(bytes, decimals = 2){
+    if (!+bytes) return '0 Bytes';
+    const k = 1024, dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  function b64ChunkString(str, length, sep){
+    if (!length) return str;
+    const regex = new RegExp('.{1,' + length + '}', 'g');
+    return (str.match(regex) || []).join(sep);
+  }
+
+  function b64EncodeBase64(input, urlSafe){
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      let binary = '';
+      for (let i = 0; i < data.length; i++) binary += String.fromCharCode(data[i]);
+      let encoded = btoa(binary);
+      if (urlSafe) encoded = encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      return encoded;
+    } catch (e) { return 'Error encoding data'; }
+  }
+
+  function b64DecodeBase64(input, urlSafe){
+    try {
+      let str = input.trim();
+      if (urlSafe) str = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (str.length % 4) str += '=';
+      const binary = atob(str);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const decoder = new TextDecoder();
+      return decoder.decode(bytes);
+    } catch (e) { return 'Error decoding data - Invalid Base64'; }
+  }
+
+  function b64IsImageBase64(str){
+    try {
+      const decoded = atob(str.substring(0, 20));
+      return decoded.indexOf('\x89PNG') === 0 || decoded.indexOf('\xFF\xD8\xFF') === 0 || decoded.indexOf('GIF8') === 0;
+    } catch (e) { return false; }
+  }
+
+  function b64SetEncodeFile(file){
+    if (!file) return;
+    b64EncodeFile = file;
+    document.getElementById('b64EncodeFileName').textContent = file.name;
+    document.getElementById('b64EncodeFileSize').textContent = b64FormatBytes(file.size) + (file.type ? ' - ' + file.type : '');
+    document.getElementById('b64EncodeFileInfo').classList.add('show');
+  }
+
+  function b64Encode(){
+    const urlSafe = document.getElementById('b64EncodeUrlSafe').checked;
+    const splitLines = document.getElementById('b64EncodeSplit').checked;
+    const separator = document.getElementById('b64EncodeSep').value === 'crlf' ? '\r\n' : '\n';
+    const output = document.getElementById('b64EncodeOutput');
+    const preview = document.getElementById('b64EncodePreview');
+    if (!output || !preview) return;
+    const file = b64EncodeFile;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e){
+        let base64 = e.target.result.split(',')[1];
+        if (urlSafe) base64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        if (splitLines) base64 = b64ChunkString(base64, 76, separator);
+        output.value = base64;
+        if (file.type && file.type.indexOf('image/') === 0) {
+          preview.src = e.target.result;
+          preview.classList.add('show');
+        } else {
+          preview.classList.remove('show');
+        }
+        showToast('تم الترميز');
+      };
+      reader.onerror = function(){ showToast('فشل قراءة الملف'); };
+      reader.readAsDataURL(file);
+    } else {
+      const text = document.getElementById('b64EncodeInput').value;
+      let result = b64EncodeBase64(text, urlSafe);
+      if (splitLines) result = b64ChunkString(result, 76, separator);
+      output.value = result;
+      preview.classList.remove('show');
+      showToast('تم الترميز');
+    }
+  }
+
+  function b64ClearEncode(){
+    document.getElementById('b64EncodeInput').value = '';
+    document.getElementById('b64EncodeOutput').value = '';
+    b64ClearEncodeFile();
+  }
+
+  function b64ClearEncodeFile(){
+    b64EncodeFile = null;
+    document.getElementById('b64EncodeFileInfo').classList.remove('show');
+    const fileInput = document.getElementById('b64EncodeFileInput');
+    if (fileInput) fileInput.value = '';
+    const preview = document.getElementById('b64EncodePreview');
+    if (preview) preview.classList.remove('show');
+  }
+
+  function b64Decode(){
+    const input = document.getElementById('b64DecodeInput');
+    const output = document.getElementById('b64DecodeOutput');
+    const preview = document.getElementById('b64DecodePreview');
+    if (!input || !output || !preview) return;
+    const urlSafe = document.getElementById('b64DecodeUrlSafe').checked;
+    output.value = b64DecodeBase64(input.value, urlSafe);
+    try {
+      const trimmed = input.value.trim();
+      if (trimmed.indexOf('data:image') === 0 || b64IsImageBase64(trimmed)) {
+        const src = trimmed.indexOf('data:') === 0 ? trimmed : 'data:image/png;base64,' + trimmed;
+        preview.src = src;
+        preview.classList.add('show');
+      } else {
+        preview.classList.remove('show');
+      }
+    } catch (e) { preview.classList.remove('show'); }
+    showToast('تم فك الترميز');
+  }
+
+  function b64ClearDecode(){
+    document.getElementById('b64DecodeInput').value = '';
+    document.getElementById('b64DecodeOutput').value = '';
+    document.getElementById('b64DecodePreview').classList.remove('show');
+  }
+
+  function b64DownloadDecoded(){
+    const content = document.getElementById('b64DecodeOutput').value;
+    if (!content) { showToast('لا يوجد شيء لتنزيله'); return; }
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'decoded_file.txt';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  }
+
+  function b64HandleImageFiles(files){
+    const validFiles = Array.prototype.slice.call(files).filter(file => {
+      if (!(file.type && file.type.indexOf('image/') === 0) && !file.name.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('الملف "' + file.name + '" كبير جدًا (الحد الأقصى 5MB)');
+        return false;
+      }
+      return true;
+    });
+    if (validFiles.length + b64ImageFiles.length > 10) {
+      showToast('الحد الأقصى 10 ملفات');
+      return;
+    }
+    validFiles.forEach(file => b64ProcessImageFile(file));
+    b64UpdateImageStats();
+  }
+
+  function b64ProcessImageFile(file){
+    const reader = new FileReader();
+    const fileId = ++b64ImageCounter;
+    b64ImageFiles.push({ id: fileId, file: file, status: 'processing', detailsRendered: false });
+    const container = document.getElementById('b64ResultsContainer');
+    const list = document.getElementById('b64ImageResultsList');
+    if (container) container.classList.add('show');
+    if (list) list.insertAdjacentHTML('beforeend', b64CreateImageResultItem(fileId, file.name, b64FormatBytes(file.size)));
+
+    reader.onload = function(e){
+      const base64Data = e.target.result;
+      const base64Only = base64Data.split(',')[1];
+      const encodedSize = b64FormatBytes(base64Only.length);
+      const img = new Image();
+      img.onload = function(){
+        const dims = img.width + '×' + img.height;
+        const fileIndex = b64ImageFiles.findIndex(f => f.id === fileId);
+        if (fileIndex !== -1) {
+          b64ImageFiles[fileIndex].status = 'success';
+          b64ImageFiles[fileIndex].base64 = base64Data;
+          b64ImageFiles[fileIndex].base64Only = base64Only;
+          b64ImageFiles[fileIndex].encodedSize = encodedSize;
+          b64ImageFiles[fileIndex].dimensions = dims;
+        }
+        b64UpdateImageResultItem(fileId, file.name, b64FormatBytes(file.size), encodedSize, dims, base64Data);
+        b64UpdateImageStats();
+      };
+      img.onerror = function(){ b64MarkImageError(fileId); };
+      img.src = base64Data;
+    };
+    reader.onerror = function(){ b64MarkImageError(fileId); };
+    reader.readAsDataURL(file);
+  }
+
+  function b64MarkImageError(fileId){
+    const fileIndex = b64ImageFiles.findIndex(f => f.id === fileId);
+    if (fileIndex !== -1) b64ImageFiles[fileIndex].status = 'error';
+    b64UpdateImageResultItemError(fileId);
+    b64UpdateImageStats();
+  }
+
+  function b64CreateImageResultItem(id, name, size){
+    return `
+      <div class="b64-item" id="b64ImageResult-${id}">
+        <div class="b64-item-head" onclick="b64ToggleImageDetails(${id})">
+          <div class="b64-item-num">${b64ImageFiles.findIndex(f => f.id === id) + 1}</div>
+          <div class="b64-item-info">
+            <div class="b64-item-name">${escHtml(name)}</div>
+            <div class="b64-item-meta"><span><i class="ti ti-hdd"></i> ${size}</span><span><i class="ti ti-refresh ti-spin"></i> جارٍ التحويل...</span></div>
+          </div>
+          <div class="b64-item-actions"><span class="b64-mini processing"><i class="ti ti-refresh ti-spin"></i> جارٍ التحويل</span></div>
+        </div>
+        <div class="b64-details" id="b64ImageDetails-${id}"></div>
+      </div>`;
+  }
+
+  function b64UpdateImageResultItem(id, name, size, encodedSize, dimensions){
+    const item = document.getElementById('b64ImageResult-' + id);
+    if (!item) return;
+    item.innerHTML = `
+      <div class="b64-item-head" onclick="b64ToggleImageDetails(${id})">
+        <div class="b64-item-num">${b64ImageFiles.findIndex(f => f.id === id) + 1}</div>
+        <div class="b64-item-info">
+          <div class="b64-item-name">${escHtml(name)}</div>
+          <div class="b64-item-meta">
+            <span><i class="ti ti-hdd"></i> ${size}</span>
+            <span><i class="ti ti-arrow-big-left"></i> ${encodedSize}</span>
+            <span><i class="ti ti-maximize"></i> ${dimensions}</span>
+          </div>
+        </div>
+        <div class="b64-item-actions">
+          <button class="b64-mini" onclick="event.stopPropagation(); b64ToggleImageDetails(${id})"><i class="ti ti-code"></i> الكود</button>
+          <button class="b64-mini primary" onclick="event.stopPropagation(); b64CopyImageCode(${id}, 'data')"><i class="ti ti-copy"></i> نسخ</button>
+          <button class="b64-mini danger" onclick="event.stopPropagation(); b64RemoveImageItem(${id})" title="حذف"><i class="ti ti-x"></i></button>
+        </div>
+      </div>
+      <div class="b64-details" id="b64ImageDetails-${id}"></div>`;
+  }
+
+  function b64UpdateImageResultItemError(id){
+    const item = document.getElementById('b64ImageResult-' + id);
+    if (!item) return;
+    const actions = item.querySelector('.b64-item-actions');
+    if (actions) {
+      actions.innerHTML = '<span class="b64-mini error"><i class="ti ti-alert-circle"></i> فشل القراءة</span>';
+    }
+  }
+
+  function b64ToggleImageDetails(id){
+    const details = document.getElementById('b64ImageDetails-' + id);
+    if (!details) return;
+    if (!details.dataset.rendered) b64RenderImageDetails(id);
+    details.classList.toggle('show');
+  }
+
+  function b64RenderImageDetails(id){
+    const file = b64ImageFiles.find(f => f.id === id);
+    const details = document.getElementById('b64ImageDetails-' + id);
+    if (!file || !details || file.status !== 'success' || file.detailsRendered) return;
+    details.innerHTML = `
+      <div class="b64-thumbwrap">
+        <img src="${file.base64}" alt="${escHtml(file.file.name)}" class="b64-thumb">
+        <div class="b64-codepanels">
+          <div class="b64-codepanel">
+            <div class="b64-codepanel-head"><i class="ti ti-code"></i> لوسم &lt;img&gt;
+              <span class="spacer"></span>
+              <button class="b64-mini" onclick="b64SelectCodeText(this)"><i class="ti ti-select-all"></i> تحديد</button>
+              <button class="b64-mini primary" onclick="b64CopyImageCode(${id}, 'data')"><i class="ti ti-copy"></i> نسخ</button>
+            </div>
+            <div class="b64-codearea" id="b64CodeData-${id}">${escHtml(file.base64)}</div>
+          </div>
+          <div class="b64-codepanel">
+            <div class="b64-codepanel-head"><i class="ti ti-palette"></i> لخلفية CSS
+              <span class="spacer"></span>
+              <button class="b64-mini" onclick="b64SelectCodeText(this)"><i class="ti ti-select-all"></i> تحديد</button>
+              <button class="b64-mini primary" onclick="b64CopyImageCode(${id}, 'css')"><i class="ti ti-copy"></i> نسخ</button>
+            </div>
+            <div class="b64-codearea" id="b64CodeCss-${id}">background-image: url(${escHtml(file.base64)});</div>
+          </div>
+        </div>
+      </div>`;
+    details.dataset.rendered = 'true';
+    file.detailsRendered = true;
+  }
+
+  function b64CopyImageCode(id, type){
+    const file = b64ImageFiles.find(f => f.id === id);
+    if (!file || file.status !== 'success') return;
+    const text = type === 'css' ? 'background-image: url(' + file.base64 + ');' : file.base64;
+    navigator.clipboard.writeText(text).then(() => showToast('تم النسخ!')).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('تم النسخ!');
+    });
+  }
+
+  function b64SelectCodeText(btn){
+    const area = btn.closest('.b64-codepanel').querySelector('.b64-codearea');
+    if (area) {
+      const range = document.createRange();
+      range.selectNodeContents(area);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  function b64RemoveImageItem(id){
+    const index = b64ImageFiles.findIndex(f => f.id === id);
+    if (index !== -1) b64ImageFiles.splice(index, 1);
+    const item = document.getElementById('b64ImageResult-' + id);
+    if (item) item.remove();
+    b64UpdateImageStats();
+    document.querySelectorAll('.b64-item').forEach((el, idx) => {
+      const num = el.querySelector('.b64-item-num');
+      if (num) num.textContent = idx + 1;
+    });
+    if (!b64ImageFiles.length) {
+      const container = document.getElementById('b64ResultsContainer');
+      if (container) container.classList.remove('show');
+    }
+  }
+
+  function b64ClearAllImages(){
+    b64ImageFiles = [];
+    const list = document.getElementById('b64ImageResultsList');
+    if (list) list.innerHTML = '';
+    const container = document.getElementById('b64ResultsContainer');
+    if (container) container.classList.remove('show');
+    const input = document.getElementById('b64ImageFileInput');
+    if (input) input.value = '';
+    b64UpdateImageStats();
+  }
+
+  function b64UpdateImageStats(){
+    const completed = b64ImageFiles.filter(f => f.status === 'success').length;
+    const el = document.getElementById('b64CompletedCount');
+    if (el) el.textContent = completed;
+  }
+
+  // ── QR CODE DASHBOARD ──
+  function renderQrDash(){
+    const badge = document.getElementById('countBadge');
+    if (badge) badge.textContent = 'أداة QR';
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="dt-builder qr">
+        <div class="dt-builder-title"><i class="ti ti-qrcode"></i> مولد رموز QR
+          <span>حوّل الروابط والنصوص وأي بيانات إلى رمز QR احترافي بألوان وأحجام مخصصة</span>
+        </div>
+
+        <div class="qr-grid">
+          <div class="qr-stage">
+            <div class="qr-frame" id="qrFrame"></div>
+            <p class="qr-hint" id="qrHint">أدخل نصاً أو رابطاً ثم اضغط "توليد الرمز"</p>
+          </div>
+
+          <div class="qr-controls">
+            <div class="dt-head"><i class="ti ti-keyboard" style="color:#f97316"></i> المحتوى</div>
+            <textarea class="dt-textarea" id="qrInput" spellcheck="false" placeholder="أدخل الرابط أو النص أو البيانات هنا..."></textarea>
+            <div class="b64-live">
+              <label class="b64-switch"><input type="checkbox" id="qrLive"><span class="b64-slider"></span></label>
+              <span><i class="ti ti-bolt"></i> توليد مباشر أثناء الكتابة</span>
+            </div>
+
+            <div class="qr-options">
+              <label class="qr-opt">
+                <span>الحجم <output id="qrSizeOut">280</output>px</span>
+                <input type="range" id="qrSizeRange" min="180" max="600" step="20" value="280">
+              </label>
+              <label class="qr-opt">
+                <span>تصحيح الخطأ</span>
+                <select class="qr-select" id="qrEcc">
+                  <option value="L">L — منخفض</option>
+                  <option value="M" selected>M — متوسط</option>
+                  <option value="Q">Q — مرتفع</option>
+                  <option value="H">H — أعلى</option>
+                </select>
+              </label>
+              <label class="qr-opt">
+                <span>لون الرمز</span>
+                <input type="color" id="qrDark" value="#1a1a2e">
+              </label>
+              <label class="qr-opt">
+                <span>لون الخلفية</span>
+                <input type="color" id="qrLight" value="#ffffff">
+              </label>
+            </div>
+
+            <div class="dt-actions">
+              <button class="btn-primary" onclick="qrGenerate()"><i class="ti ti-qrcode"></i> توليد الرمز</button>
+              <button class="btn-cancel" id="qrDownloadBtn" onclick="qrDownload()"><i class="ti ti-download"></i> تحميل PNG</button>
+              <button class="btn-cancel" onclick="qrClear()"><i class="ti ti-eraser"></i> مسح</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    const inp = document.getElementById('qrInput');
+    const live = document.getElementById('qrLive');
+    if (inp && live) inp.addEventListener('input', () => { if (live.checked) qrGenerate(); });
+    const size = document.getElementById('qrSizeRange');
+    const sizeOut = document.getElementById('qrSizeOut');
+    if (size && sizeOut) size.addEventListener('input', () => { sizeOut.textContent = size.value; });
+    ['qrSizeRange','qrEcc','qrDark','qrLight'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', qrRefresh);
+    });
+    qrDownloadBtnState();
+  }
+
+  function qrCorrectLevel(level){
+    if (typeof QRCode === 'undefined') return 0;
+    const map = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+    return map[level] !== undefined ? map[level] : QRCode.CorrectLevel.M;
+  }
+
+  function qrDataUrlOf(qr, wrap){
+    return new Promise(resolve => {
+      const read = () => {
+        try {
+          if (qr && qr._oDrawing && qr._oDrawing._elImage && qr._oDrawing._elImage.src) { resolve(qr._oDrawing._elImage.src); return; }
+          if (qr && qr._oDrawing && qr._oDrawing._elCanvas) {
+            const u = qr._oDrawing._elCanvas.toDataURL('image/png');
+            if (u) { resolve(u); return; }
+          }
+        } catch (e) {}
+        if (wrap && typeof wrap.querySelector === 'function') {
+          const img = wrap.querySelector('img');
+          if (img && img.src) { resolve(img.src); return; }
+          const cv = wrap.querySelector('canvas');
+          if (cv) { try { const u = cv.toDataURL('image/png'); if (u) { resolve(u); return; } } catch (e) {} }
+        }
+        resolve(null);
+      };
+      setTimeout(read, 0);
+    });
+  }
+
+  function qrGenerate(){
+    const hint = document.getElementById('qrHint');
+    const frame = document.getElementById('qrFrame');
+    const inp = document.getElementById('qrInput');
+    const text = (inp && inp.value) ? inp.value.trim() : '';
+    if (!text) {
+      qrCache = null;
+      if (frame) frame.innerHTML = '';
+      if (hint) { hint.textContent = 'أدخل نصاً أو رابطاً أولاً ثم اضغط توليد الرمز'; hint.classList.remove('hide'); }
+      qrDownloadBtnState();
+      return;
+    }
+    if (typeof QRCode === 'undefined') {
+      qrCache = null;
+      if (frame) frame.innerHTML = '';
+      if (hint) { hint.textContent = 'تعذر تحميل مكتبة QRCode — تحقق من الاتصال بالإنترنت وأعد المحاولة'; hint.classList.remove('hide'); }
+      qrDownloadBtnState();
+      return;
+    }
+    const sizeEl = document.getElementById('qrSizeRange');
+    const eccEl = document.getElementById('qrEcc');
+    const darkEl = document.getElementById('qrDark');
+    const lightEl = document.getElementById('qrLight');
+    if (sizeEl) qrSize = parseInt(sizeEl.value, 10) || qrSize;
+    if (eccEl) qrECC = eccEl.value;
+    if (darkEl) qrDark = darkEl.value;
+    if (lightEl) qrLight = lightEl.value;
+
+    if (frame) frame.innerHTML = '';
+    const wrap = document.createElement('div');
+    if (frame) frame.appendChild(wrap);
+    try {
+      const qr = new QRCode(wrap, {
+        text,
+        width: qrSize,
+        height: qrSize,
+        colorDark: qrDark,
+        colorLight: qrLight,
+        correctLevel: qrCorrectLevel(qrECC)
+      });
+      qrDataUrlOf(qr, wrap).then(dataUrl => {
+        if (dataUrl) {
+          qrCache = { text, dataUrl, size: qrSize };
+          if (hint) { hint.textContent = 'تم توليد الرمز بنجاح'; hint.classList.add('hide'); }
+        } else {
+          qrCache = null;
+          if (hint) { hint.textContent = 'تعذر قراءة الرمز المُولّد — حاول مرة أخرى'; hint.classList.remove('hide'); }
+        }
+        qrDownloadBtnState();
+      });
+    } catch (e) {
+      qrCache = null;
+      if (hint) { hint.textContent = 'حدث خطأ أثناء التوليد: ' + e.message; hint.classList.remove('hide'); }
+      qrDownloadBtnState();
+    }
+  }
+
+  function qrRefresh(){
+    const inp = document.getElementById('qrInput');
+    if (qrCache && inp && !inp.value.trim()) inp.value = qrCache.text;
+    qrGenerate();
+  }
+
+  function qrDownload(){
+    if (!qrCache || !qrCache.dataUrl) return;
+    const a = document.createElement('a');
+    a.href = qrCache.dataUrl;
+    a.download = 'qr-code.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function qrClear(){
+    qrCache = null;
+    const frame = document.getElementById('qrFrame');
+    if (frame) frame.innerHTML = '';
+    const hint = document.getElementById('qrHint');
+    if (hint) { hint.textContent = 'أدخل نصاً أو رابطاً ثم اضغط "توليد الرمز"'; hint.classList.remove('hide'); }
+    qrDownloadBtnState();
+  }
+
+  function qrDownloadBtnState(){
+    const btn = document.getElementById('qrDownloadBtn');
+    if (!btn) return;
+    const has = !!(qrCache && qrCache.dataUrl);
+    btn.disabled = !has;
+    btn.style.opacity = has ? '' : '0.5';
+  }
+
   // ── ACTIVE DASHBOARD PERSISTENCE ──
   const DASH_KEY = 'csman_v2_dash_v1';
   const DASH_SUB_KEY = 'csman_v2_dash_sub_v1';
@@ -3686,23 +4721,26 @@ function hello() {
     if(showVdDash) return 'vd';
     if(showEdDash) return 'ed';
     if(showDevDash) return 'dev';
+    if(showB64Dash) return 'b64';
+    if(showQrDash) return 'qr';
     return 'main';
   }
 
   function persistDashState(){
     try {
       localStorage.setItem(DASH_KEY, currentDashId());
-      localStorage.setItem(DASH_SUB_KEY, JSON.stringify({ tool: dtActiveTool }));
+      localStorage.setItem(DASH_SUB_KEY, JSON.stringify({ tool: dtActiveTool, b64: b64ActiveTab }));
     } catch (e) {}
   }
 
   function restoreDashState(){
     let id = 'main';
     try { id = localStorage.getItem(DASH_KEY) || 'main'; } catch (e) {}
-    if (!['has','sb','cv','vd','ed','dev'].includes(id)) id = 'main';
+    if (!['has','sb','cv','vd','ed','dev','b64','qr'].includes(id)) id = 'main';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
+      if (sub && sub.b64) b64ActiveTab = sub.b64;
     } catch (e) {}
     showHasDash = id === 'has';
     showScrollbarDash = id === 'sb';
@@ -3710,6 +4748,8 @@ function hello() {
     showVdDash = id === 'vd';
     showEdDash = id === 'ed';
     showDevDash = id === 'dev';
+    showB64Dash = id === 'b64';
+    showQrDash = id === 'qr';
     const mark = (btnId, cls, on) => {
       const b = document.getElementById(btnId);
       if (b) b.classList.toggle(cls, on);
@@ -3720,15 +4760,61 @@ function hello() {
     mark('vdDashBtn', 'vd-active', showVdDash);
     mark('edDashBtn', 'ed-active', showEdDash);
     mark('devDashBtn', 'dev-active', showDevDash);
+    mark('b64DashBtn', 'b64-active', showB64Dash);
+    mark('qrDashBtn', 'qr-active', showQrDash);
   }
+
+  // ── HASH DEEP-LINKS ──
+  function currentHash(){
+    try {
+      return (typeof location !== 'undefined' && location.hash ? String(location.hash) : '').replace(/^#/, '').toLowerCase();
+    } catch (e) { return ''; }
+  }
+  function clearDashFlags(){
+    showHasDash = false; showScrollbarDash = false; showCvDash = false;
+    showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
+    const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+      vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
+      b64DashBtn:'b64-active', qrDashBtn:'qr-active' };
+    Object.keys(map).forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.classList.remove(map[id]);
+    });
+    const tags = document.querySelectorAll('.filter-tag');
+    if (tags && tags.forEach) tags.forEach(b => b.classList.remove('active'));
+  }
+  function hashGo(){
+    const h = currentHash();
+    const ids = ['has','sb','cv','vd','ed','dev','b64','qr'];
+    clearDashFlags();
+    if (h && ids.includes(h)) {
+      const map = { has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
+        vd:['vdDashBtn','vd-active'], ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
+        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'] };
+      const btn = map[h];
+      if (h === 'has') showHasDash = true;
+      else if (h === 'sb') showScrollbarDash = true;
+      else if (h === 'cv') showCvDash = true;
+      else if (h === 'vd') showVdDash = true;
+      else if (h === 'ed') showEdDash = true;
+      else if (h === 'dev') showDevDash = true;
+      else if (h === 'b64') showB64Dash = true;
+      else if (h === 'qr') showQrDash = true;
+      const b = document.getElementById(btn[0]);
+      if (b) b.classList.add(btn[1]);
+    }
+    renderAll();
+  }
+  window.onhashchange = hashGo;
 
   // ── INIT ──
   DATA.forEach(s => openIds.add(s.id));
-  restoreDashState();
-  renderAll();
+  if (currentHash()) { hashGo(); }
+  else { restoreDashState(); renderAll(); }
   document.getElementById('wrapBtn').classList.add('active');
   document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
