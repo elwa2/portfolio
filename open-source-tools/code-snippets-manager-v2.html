@@ -133,6 +133,7 @@
     box-shadow: 0 2px 12px rgba(232,115,74,0.3);
   }
   .filter-tag.starred-btn { display: flex; align-items: center; gap: 5px; }
+  .filter-tag svg { vertical-align: -2px; margin-inline-end: 5px; }
 
   /* ===== MAIN BODY ===== */
   .main-body {
@@ -756,8 +757,27 @@
   .vd-tab:hover { border-color: var(--border-def); color: var(--text-1); }
   .vd-tab.active { background: #14b8a6; color: #fff; border-color: #14b8a6; box-shadow: 0 2px 10px rgba(20,184,166,0.25); }
   .vd-tab .vd-tab-num { font-size: 10px; opacity: 0.8; font-family: 'JetBrains Mono', monospace; }
+  .vd-tab .vd-tab-name { cursor: text; border-radius: 3px; padding: 0 3px; transition: background 0.15s; }
+  .vd-tab .vd-tab-name:hover { background: rgba(255,255,255,0.18); }
+  .vd-tab .vd-tab-name::after { content: '✎'; font-size: 9px; opacity: 0; margin-inline-start: 4px; transition: opacity 0.15s; }
+  .vd-tab .vd-tab-name:hover::after { opacity: 0.9; }
+  .vd-tab-input {
+    font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 600;
+    background: #0c0e10; color: var(--text-1); border: 1px solid #14b8a6;
+    border-radius: 4px; padding: 1px 6px; width: 160px; outline: none;
+    box-shadow: 0 0 0 2px rgba(20,184,166,0.2);
+  }
   .vd-tab-add { border-style: dashed; }
   .vd-tab-add:hover { background: var(--glass-mod); }
+  .vd-tab-del {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border: none; border-radius: 4px;
+    background: transparent; color: inherit; opacity: 0;
+    cursor: pointer; margin-inline-start: 3px; transition: all 0.15s; flex-shrink: 0; padding: 0;
+  }
+  .vd-tab:hover .vd-tab-del, .vd-tab-del:focus-visible { opacity: 0.85; }
+  .vd-tab-del:hover { background: rgba(248,113,113,0.85); color: #fff; opacity: 1; }
+  .vd-tab-del svg { width: 12px; height: 12px; }
 
   .vd-versions { display: flex; flex-direction: column; gap: 6px; }
   .vd-version {
@@ -880,6 +900,101 @@
     .vd-compare .form-select { width: 100%; }
   }
 
+  /* ===== EDITOR DASHBOARD (VS Code-like) ===== */
+  .filter-tag.ed-active {
+    background: #38bdf8; color: #0e0e10; border-color: #38bdf8;
+    box-shadow: 0 2px 12px rgba(56,189,248,0.3);
+  }
+
+  .ed-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .ed-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .ed-builder-title i { color: #38bdf8; font-size: 18px; }
+  .ed-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .ed-toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin: 14px 0 8px; padding: 8px 12px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+  }
+  .ed-file { font-size: 13px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 6px; }
+  .ed-toolbar-actions { margin-inline-start: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .ed-wrap {
+    direction: ltr; display: flex; height: 440px;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); overflow: hidden;
+  }
+  .ed-gutter {
+    width: auto; min-width: 44px; padding: 12px 8px; text-align: right;
+    direction: ltr; white-space: pre; overflow: hidden; flex-shrink: 0;
+    background: var(--bg-overlay); color: var(--text-4);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    user-select: none; border-right: 1px solid var(--border-sub);
+  }
+  .ed-body { position: relative; flex: 1; overflow: hidden; }
+  .ed-highlight {
+    position: absolute; inset: 0; margin: 0; padding: 12px 14px; overflow: hidden;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    white-space: pre; color: var(--text-2); pointer-events: none;
+  }
+  .ed-input {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    margin: 0; padding: 12px 14px; border: none; outline: none; resize: none;
+    background: transparent; color: transparent; caret-color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    white-space: pre; overflow: auto; direction: ltr; text-align: left;
+    tab-size: 2; -webkit-tap-highlight-color: transparent;
+  }
+  .ed-input::placeholder { color: var(--text-4); }
+  .ed-input::selection { background: rgba(56,189,248,0.28); }
+
+  .ed-status {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 8px; padding: 6px 12px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+    font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace;
+  }
+
+  body.editor-active .main-body {
+    max-width: none; padding: 14px 20px 40px;
+  }
+  body.editor-active .ed-builder { border-radius: var(--radius-md); }
+  body.editor-active .ed-wrap {
+    height: calc(100vh - 320px); min-height: 380px; max-height: calc(100vh - 320px);
+  }
+  body.editor-active .ed-input,
+  body.editor-active .ed-highlight,
+  body.editor-active .ed-gutter { font-size: 13px; line-height: 1.65; }
+
+  .ed-ibtn {
+    width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-overlay); color: var(--text-2); cursor: pointer;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .ed-ibtn:hover { background: var(--glass-str); color: var(--text-1); border-color: var(--border-str); }
+  .ed-ibtn svg { width: 17px; height: 17px; }
+  .ed-ibtn.primary { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
+  .ed-ibtn.primary:hover { filter: brightness(1.08); box-shadow: 0 2px 10px rgba(56,189,248,0.35); color: #0e0e10; }
+  .ed-ibtn.danger:hover { background: rgba(248,113,113,0.15); color: var(--danger); border-color: rgba(248,113,113,0.4); }
+
+  @media (max-width: 820px) {
+    .ed-toolbar-actions { margin-inline-start: 0; }
+    .ed-wrap { height: 360px; max-height: none; }
+    body.editor-active .ed-wrap { height: calc(100vh - 360px); min-height: 300px; max-height: none; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -959,6 +1074,9 @@
     </button>
     <button class="filter-tag" id="vdDashBtn" onclick="toggleVdDash()" title="نسخ ومقارنة الأكواد">
       <i class="ti ti-versions" aria-hidden="true"></i> النسخ
+    </button>
+    <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> المحرر
     </button>
   </div>
 
@@ -1131,10 +1249,12 @@
   let activeTag = 'all';
   let wrapMode = true;
   let _deleteTargetId = null;
+  let _deleteSnippetId = null;
   let _initDone = false;
   let varValues = new Map();
   let showHasDash = false;
   let showVdDash = false;
+  let showEdDash = false;
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -1413,6 +1533,12 @@
     document.getElementById('confirmOverlay').classList.add('open');
   }
   function executeDelete(){
+    if(_deleteSnippetId !== null){
+      doDeleteSnippet(_deleteSnippetId);
+      _deleteSnippetId = null;
+      closeConfirm();
+      return;
+    }
     if(_deleteTargetId !== null){
       DATA = DATA.filter(s => s.id !== _deleteTargetId);
       starredIds.delete(_deleteTargetId);
@@ -1423,7 +1549,7 @@
       showToast('تم الحذف');
     }
   }
-  function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('open'); _deleteTargetId = null; }
+  function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('open'); _deleteTargetId = null; _deleteSnippetId = null; }
   function closeConfirmOutside(e){ if(e.target===document.getElementById('confirmOverlay')) closeConfirm(); }
   document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeConfirm(); });
@@ -1451,6 +1577,8 @@
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       showVdDash = false;
       document.getElementById('vdDashBtn').classList.remove('vd-active');
+      showEdDash = false;
+      document.getElementById('edDashBtn').classList.remove('ed-active');
     }
     renderAll();
   }
@@ -1706,6 +1834,10 @@
       showVdDash = false;
       document.getElementById('vdDashBtn').classList.remove('vd-active');
     }
+    if(showEdDash){
+      showEdDash = false;
+      document.getElementById('edDashBtn').classList.remove('ed-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -1737,6 +1869,8 @@
       document.getElementById('cvDashBtn').classList.remove('cv-active');
       showVdDash = false;
       document.getElementById('vdDashBtn').classList.remove('vd-active');
+      showEdDash = false;
+      document.getElementById('edDashBtn').classList.remove('ed-active');
     }
     renderAll();
   }
@@ -1910,6 +2044,8 @@
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       showVdDash = false;
       document.getElementById('vdDashBtn').classList.remove('vd-active');
+      showEdDash = false;
+      document.getElementById('edDashBtn').classList.remove('ed-active');
     }
     renderAll();
   }
@@ -2160,6 +2296,8 @@
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
+      showEdDash = false;
+      document.getElementById('edDashBtn').classList.remove('ed-active');
     }
     renderAll();
   }
@@ -2173,27 +2311,68 @@
   function vdAddSnippet(){
     newVdSnippet();
     saveVd();
-    renderVdDash();
-    vdRename();
+    renderAll();
+    inlineRenameSnippet();
   }
 
-  function vdDeleteSnippet(){
+  function vdDeleteSnippet(id){
+    confirmDeleteSnippet(id || activeVdSnippet().id);
+  }
+
+  function confirmDeleteSnippet(id){
+    const sn = vdStore.snippets.find(s => s.id === id);
+    if (!sn) return;
     if (vdStore.snippets.length <= 1) { showToast('لا يمكن حذف آخر مربع'); return; }
-    const sn = activeVdSnippet();
-    vdStore.snippets = vdStore.snippets.filter(s => s.id !== sn.id);
-    vdActiveSnippetId = vdStore.snippets[0].id;
+    _deleteSnippetId = id;
+    document.getElementById('confirmText').textContent = 'حذف مربع "' + sn.name + '" وكل نسخه؟';
+    document.getElementById('confirmOverlay').classList.add('open');
+  }
+
+  function doDeleteSnippet(id){
+    vdStore.snippets = vdStore.snippets.filter(s => s.id !== id);
+    if (vdActiveSnippetId === id) vdActiveSnippetId = vdStore.snippets[0].id;
     saveVd();
-    renderVdDash();
+    renderAll();
     showToast('تم حذف المربع');
   }
 
-  function vdRename(){
+  function inlineRenameSnippet(){
+    const el = document.querySelector('.vd-tab.active .vd-tab-name');
     const sn = activeVdSnippet();
-    const name = prompt('اسم المربع:', sn.name);
-    if (name === null) return;
-    sn.name = name.trim() || sn.name;
+    if (!el || !sn) return;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = sn.name;
+    input.className = 'vd-tab-input';
+    input.setAttribute('aria-label', 'اسم المربع');
+    el.replaceWith(input);
+    input.focus();
+    input.select();
+    let done = false;
+    const commit = () => {
+      if (done) return; done = true;
+      const v = input.value.trim();
+      if (v) { sn.name = v; saveVd(); }
+      renderAll();
+    };
+    const cancel = () => {
+      if (done) return; done = true;
+      renderAll();
+    };
+    input.addEventListener('click', e => e.stopPropagation());
+    input.addEventListener('keydown', e => {
+      e.stopPropagation();
+      if (e.key === 'Enter') commit();
+      else if (e.key === 'Escape') cancel();
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  function renameSnippetOnClick(id){
+    vdActiveSnippetId = id;
     saveVd();
-    renderVdDash();
+    renderAll();
+    inlineRenameSnippet();
   }
 
   function vdSaveVersion(opts){
@@ -2448,8 +2627,9 @@
     const tabsHtml = vdStore.snippets.map(s => `
       <div class="vd-tab${s.id === sn.id ? ' active' : ''}" onclick="vdSelectSnippet('${s.id}')">
         <i class="ti ti-file-code"></i>
-        <span>${escHtml(s.name)}</span>
+        <span class="vd-tab-name" onclick="event.stopPropagation(); renameSnippetOnClick('${s.id}')" title="اضغط لتعديل الاسم">${escHtml(s.name)}</span>
         <span class="vd-tab-num">${s.versions.length}</span>
+        <button class="vd-tab-del" onclick="event.stopPropagation(); vdDeleteSnippet('${s.id}')" title="حذف المربع" aria-label="حذف المربع">${svgIcon('trash', 12)}</button>
       </div>`).join('') + `
       <div class="vd-tab vd-tab-add" onclick="vdAddSnippet()"><i class="ti ti-plus"></i> جديد</div>`;
 
@@ -2516,8 +2696,9 @@
 
         <div class="vd-actions">
           <button class="btn-primary" onclick="vdSaveVersion()"><i class="ti ti-plus"></i> حفظ نسخة جديدة</button>
+          <button class="btn-cancel" onclick="goToEd()" title="فتح الكود في المحرر"><i class="ti ti-terminal-2"></i> فتح في المحرر</button>
           <button class="btn-cancel" onclick="vdClearEditor()"><i class="ti ti-trash"></i> مسح المربع</button>
-          <button class="btn-cancel" onclick="vdRename()"><i class="ti ti-pencil"></i> إعادة تسمية</button>
+          <button class="btn-cancel" onclick="inlineRenameSnippet()"><i class="ti ti-pencil"></i> إعادة تسمية</button>
           <button class="btn-cancel" onclick="vdDeleteSnippet()"><i class="ti ti-folder-minus"></i> حذف المربع</button>
         </div>
 
@@ -2564,12 +2745,240 @@
     fillVdCompareSelects(sn);
   }
 
+  // ── EDITOR DASHBOARD (VS Code-like) ──
+  function toggleEdDash(){
+    showEdDash = !showEdDash;
+    document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
+    if(showEdDash){
+      document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
+      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false;
+      document.getElementById('hasDashBtn').classList.remove('has-active');
+      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
+      document.getElementById('cvDashBtn').classList.remove('cv-active');
+      document.getElementById('vdDashBtn').classList.remove('vd-active');
+    }
+    renderAll();
+  }
+
+  function goToVd(){
+    showEdDash = false;
+    document.getElementById('edDashBtn').classList.remove('ed-active');
+    showVdDash = true;
+    document.getElementById('vdDashBtn').classList.add('vd-active');
+    document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+    renderAll();
+  }
+
+  function goToEd(){
+    showVdDash = false;
+    document.getElementById('vdDashBtn').classList.remove('vd-active');
+    showEdDash = true;
+    document.getElementById('edDashBtn').classList.add('ed-active');
+    document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+    renderAll();
+  }
+
+  function edSelectSnippet(id){
+    vdActiveSnippetId = id;
+    saveVd();
+    renderEdDash();
+  }
+
+  function edAddSnippet(){
+    newVdSnippet();
+    saveVd();
+    renderAll();
+    inlineRenameSnippet();
+  }
+
+  function edSync(){
+    const input = document.getElementById('edInput');
+    const pre = document.getElementById('edHigh');
+    const gut = document.getElementById('edGutter');
+    if (!input || !pre || !gut) return;
+    pre.innerHTML = (syntaxHL(input.value) || '') + '\n';
+    const lines = input.value.split('\n').length;
+    const nums = [];
+    for (let i = 1; i <= lines; i++) nums.push(i);
+    gut.textContent = nums.join('\n');
+    gut.style.minWidth = (String(lines).length * 9 + 22) + 'px';
+    pre.scrollTop = input.scrollTop;
+    pre.scrollLeft = input.scrollLeft;
+    gut.scrollTop = input.scrollTop;
+  }
+
+  function edStatus(){
+    const input = document.getElementById('edInput');
+    if (!input) return;
+    const pos = document.getElementById('edPos');
+    const count = document.getElementById('edCount');
+    const before = input.value.slice(0, input.selectionStart);
+    const line = before.split('\n').length;
+    const col = before.length - before.lastIndexOf('\n');
+    if (pos) pos.textContent = 'السطر ' + line + ' · العمود ' + col;
+    if (count) count.textContent = input.value.length + ' حرف';
+  }
+
+  function edSaveVersion(opts){
+    const silent = !!(opts && opts.silent);
+    const sn = activeVdSnippet();
+    const input = document.getElementById('edInput');
+    const content = input ? input.value : (sn.draft || '');
+    if (!content.trim()) { if (!silent) showToast('المحرر فارغ — اكتب أو الصق كود أولاً'); return false; }
+    const last = sn.versions[sn.versions.length - 1];
+    if (last && last.content === content) {
+      if (silent) showToast('تم اللصق — لا تغيير عن آخر نسخة');
+      else showToast('لا تغيير عن النسخة الأخيرة');
+      return false;
+    }
+    const had = sn.versions.length;
+    const v = { id: 'vv_' + Date.now() + Math.random().toString(36).slice(2,5), n: had + 1, time: Date.now(), content };
+    sn.versions.push(v);
+    sn.draft = content;
+    const prevId = had ? sn.versions[had - 1].id : null;
+    const wasDefaultBase = had >= 2 && sn.baseId === sn.versions[had - 2].id;
+    if (sn.baseId == null || wasDefaultBase) sn.baseId = prevId;
+    if (!saveVd()) { sn.versions.pop(); showToast('مساحة التخزين ممتلئة'); return false; }
+    const totalVersions = vdStore.snippets.reduce((a, s) => a + s.versions.length, 0);
+    document.getElementById('countBadge').textContent = totalVersions + ' نسخة · محرر';
+    const tabNum = document.querySelector('.vd-tab.active .vd-tab-num');
+    if (tabNum) tabNum.textContent = sn.versions.length;
+    showToast('تم حفظ نسخة V' + v.n + (silent ? ' تلقائيًا' : ''));
+    return true;
+  }
+
+  function edCopyAll(){
+    const sn = activeVdSnippet();
+    navigator.clipboard.writeText(sn.draft || '').then(() => showToast('تم نسخ الكود!')).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function edDownload(){
+    const sn = activeVdSnippet();
+    const content = sn.draft || '';
+    if (!content.trim()) { showToast('المحرر فارغ'); return; }
+    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (sn.name || 'snippet').replace(/[\\/:*?"<>|]/g, '_') + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('تم التحميل');
+  }
+
+  const ED_ICONS = {
+    save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+    copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    compare: '<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/>',
+    code: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+    clipboard: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>',
+    trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    restore: '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+    open: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>'
+  };
+  function svgIcon(name, size){
+    const s = size || 17;
+    return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ED_ICONS[name] || '') + '</svg>';
+  }
+
+  function renderEdDash(){
+    const sn = activeVdSnippet();
+    const totalVersions = vdStore.snippets.reduce((a, s) => a + s.versions.length, 0);
+    document.getElementById('countBadge').textContent = totalVersions + ' نسخة · محرر';
+
+    const tabsHtml = vdStore.snippets.map(s => `
+      <div class="vd-tab${s.id === sn.id ? ' active' : ''}" onclick="edSelectSnippet('${s.id}')">
+        <span style="display:inline-flex;color:var(--accent-warm)">${svgIcon('file', 14)}</span>
+        <span class="vd-tab-name" onclick="event.stopPropagation(); renameSnippetOnClick('${s.id}')" title="اضغط لتعديل الاسم">${escHtml(s.name)}</span>
+        <span class="vd-tab-num">${s.versions.length}</span>
+        <button class="vd-tab-del" onclick="event.stopPropagation(); vdDeleteSnippet('${s.id}')" title="حذف المربع" aria-label="حذف المربع">${svgIcon('trash', 12)}</button>
+      </div>`).join('') + `
+      <div class="vd-tab vd-tab-add" onclick="edAddSnippet()"><span style="display:inline-flex">${svgIcon('plus', 13)}</span> جديد</div>`;
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="ed-builder">
+        <div class="ed-builder-title"><span style="display:inline-flex;color:#38bdf8">${svgIcon('code', 18)}</span> محرر الأكواد — تعديل سريع
+          <span>كود ملون ومرقّم الأسطر، مرتبط بمربعات أداة «النسخ» — أي لصق أو حفظ ينشئ نسخة وترجع للمقارنة وقت ما تحب</span>
+        </div>
+
+        <div class="vd-section-title" style="margin-top:0"><i class="ti ti-folders" style="color:var(--accent-warm)"></i> المربعات (السنيبتات)</div>
+        <div class="vd-tabs">${tabsHtml}</div>
+
+        <div class="ed-toolbar">
+          <span class="ed-file"><span style="display:inline-flex;color:#38bdf8">${svgIcon('file', 15)}</span> ${escHtml(sn.name)}</span>
+          <div class="ed-toolbar-actions">
+            <button class="ed-ibtn primary" onclick="edSaveVersion()" title="حفظ نسخة (Ctrl+S)" aria-label="حفظ نسخة">${svgIcon('save')}</button>
+            <button class="ed-ibtn" onclick="goToVd()" title="النسخ والمقارنة" aria-label="النسخ والمقارنة">${svgIcon('compare')}</button>
+            <button class="ed-ibtn" onclick="edCopyAll()" title="نسخ الكل" aria-label="نسخ الكل">${svgIcon('copy')}</button>
+            <button class="ed-ibtn" onclick="edDownload()" title="تحميل كملف txt" aria-label="تحميل">${svgIcon('download')}</button>
+            <button class="ed-ibtn danger" onclick="vdDeleteSnippet()" title="حذف المربع الحالي" aria-label="حذف المربع الحالي">${svgIcon('trash')}</button>
+          </div>
+        </div>
+
+        <div class="ed-wrap" id="edWrap">
+          <div class="ed-gutter" id="edGutter"></div>
+          <div class="ed-body">
+            <pre class="ed-highlight" id="edHigh"></pre>
+            <textarea class="ed-input" id="edInput" spellcheck="false" wrap="off" placeholder="/* الصق أو اكتب الكود هنا... */"></textarea>
+          </div>
+        </div>
+
+        <div class="ed-status">
+          <span id="edPos">السطر 1 · العمود 1</span>
+          <span id="edCount">0 حرف</span>
+          <span style="margin-inline-start:auto;color:var(--text-3)"><span style="display:inline-flex">${svgIcon('clipboard', 13)}</span> لصق = نسخة تلقائيًا · Ctrl+S = حفظ</span>
+        </div>
+      </div>
+    </div>`;
+
+    const input = document.getElementById('edInput');
+    if (input) {
+      input.value = sn.draft || '';
+      edSync();
+      edStatus();
+      input.addEventListener('input', () => {
+        const s = activeVdSnippet();
+        s.draft = input.value;
+        saveVd();
+        edSync();
+        edStatus();
+      });
+      input.addEventListener('scroll', () => {
+        const pre = document.getElementById('edHigh');
+        const gut = document.getElementById('edGutter');
+        if (pre) { pre.scrollTop = input.scrollTop; pre.scrollLeft = input.scrollLeft; }
+        if (gut) gut.scrollTop = input.scrollTop;
+      });
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const st = input.selectionStart, en = input.selectionEnd;
+          input.value = input.value.slice(0, st) + '  ' + input.value.slice(en);
+          input.selectionStart = input.selectionEnd = st + 2;
+          input.dispatchEvent(new Event('input'));
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); edSaveVersion(); }
+      });
+      input.addEventListener('paste', () => {
+        setTimeout(() => edSaveVersion({ silent: true }), 0);
+      });
+      input.addEventListener('keyup', edStatus);
+      input.addEventListener('click', edStatus);
+      input.focus();
+    }
+    document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
+  }
+
   // ── RENDER ──
   function renderAll(){
+    document.body.classList.toggle('editor-active', !!showEdDash);
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
     if(showVdDash) return renderVdDash();
+    if(showEdDash) return renderEdDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
