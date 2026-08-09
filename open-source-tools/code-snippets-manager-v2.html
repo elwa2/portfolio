@@ -3339,6 +3339,7 @@
   function renderAll(){
     document.body.classList.toggle('editor-active', !!showEdDash);
     persistDashState();
+    setDashHash(currentDashId());
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
@@ -4782,6 +4783,18 @@ function hello() {
     });
     const tags = document.querySelectorAll('.filter-tag');
     if (tags && tags.forEach) tags.forEach(b => b.classList.remove('active'));
+  }
+  function setDashHash(id){
+    try {
+      const target = (id && id !== 'main') ? '#' + id : '#tool';
+      const cur = (typeof location !== 'undefined' && location) ? location.hash : '';
+      if (cur === target) return;
+      if (typeof history !== 'undefined' && history.replaceState) {
+        history.replaceState(null, '', target);
+      } else if (typeof location !== 'undefined' && location) {
+        location.hash = target;
+      }
+    } catch (e) {}
   }
   function hashGo(){
     const h = currentHash();
