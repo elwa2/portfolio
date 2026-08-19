@@ -3717,6 +3717,15 @@ function hello() {
               <textarea class="dt-textarea" id="dtSvgCss" spellcheck="false" readonly onclick="dtCopy('dtSvgCss')"></textarea>
             </div>
           </div>
+          <div style="margin-top:14px">
+            <div class="dt-head"><i class="ti ti-braces" style="color:#38bdf8"></i> متغير CSS جاهز (:root)
+              <div style="display:flex;align-items:center;gap:6px;margin-inline-start:auto">
+                <span style="font-size:11px;color:var(--text-3)">--</span>
+                <input type="text" id="dtSvgVarName" value="logo" class="dt-textarea" style="width:120px;min-height:0;height:28px;padding:2px 8px;font-size:12px" spellcheck="false" oninput="dtSvgUpdate()">
+              </div>
+            </div>
+            <textarea class="dt-textarea" id="dtSvgVar" spellcheck="false" readonly onclick="dtCopy('dtSvgVar')"></textarea>
+          </div>
         </div>
       </div>
     </div>`;
@@ -3902,10 +3911,12 @@ function hello() {
     const input = document.getElementById('dtSvgInput');
     const result = document.getElementById('dtSvgResult');
     const cssOut = document.getElementById('dtSvgCss');
+    const varOut = document.getElementById('dtSvgVar');
     const demo = document.getElementById('dtSvgDemoBg');
     if (!input || !result || !cssOut || !demo) return;
     if (!input.value.trim()) {
       result.value = cssOut.value = '';
+      if (varOut) varOut.value = '';
       demo.style.backgroundImage = '';
       return;
     }
@@ -3921,6 +3932,10 @@ function hello() {
     const escaped = data.replace(symbols, encodeURIComponent);
     result.value = escaped;
     cssOut.value = 'background-image: url(' + q.level1 + 'data:image/svg+xml,' + escaped + q.level1 + ');';
+    if (varOut) {
+      const varName = (document.getElementById('dtSvgVarName').value || 'logo').trim();
+      varOut.value = ':root {\n  --' + varName + ': url(' + q.level1 + 'data:image/svg+xml,' + escaped + q.level1 + ');\n}';
+    }
     demo.style.backgroundImage = 'url("data:image/svg+xml,' + escaped + '")';
   }
 
