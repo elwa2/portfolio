@@ -1552,6 +1552,104 @@
     .cf-image-canvas, .cf-preview-filtered { max-width: 100%; }
   }
 
+  /* ===== ROUTE CONTROL PANEL DASHBOARD ===== */
+  .filter-tag.rt-active {
+    background: #ec4899; color: #fff; border-color: #ec4899;
+    box-shadow: 0 2px 12px rgba(236,72,153,0.35);
+  }
+
+  .rt-builder {
+    background: var(--bg-raised); border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 20px;
+  }
+  .rt-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .rt-builder-title i { color: #ec4899; font-size: 18px; }
+  .rt-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .rt-section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-2);
+    margin: 18px 0 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .rt-section-title span { color: var(--text-3); font-weight: 400; }
+
+  .rt-palette-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+    gap: 8px;
+  }
+  .rt-var-row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-overlay);
+  }
+  .rt-var-name {
+    font-size: 11px; color: var(--accent-cool); min-width: 56px;
+    font-family: 'JetBrains Mono', monospace; direction: ltr;
+  }
+  .rt-swatch {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid var(--border-def); transition: background 0.15s;
+  }
+  .rt-input {
+    width: 100%; padding: 7px 11px; border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm); background: var(--bg-elevated);
+    color: var(--text-1); font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; outline: none; direction: ltr; text-align: left;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .rt-input:focus { border-color: #ec4899; box-shadow: 0 0 0 3px rgba(236,72,153,0.14); }
+  .rt-input[type="color"] { width: 44px; height: 34px; padding: 2px; cursor: pointer; flex: none; }
+  .rt-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .rt-input[type="color"]::-webkit-color-swatch { border: 1px solid var(--border-def); border-radius: 3px; }
+
+  .rt-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .rt-chip {
+    font-family: 'Cairo', sans-serif; font-size: 11px; font-weight: 600;
+    padding: 5px 12px; border-radius: 16px; border: 1px dashed var(--border-def);
+    background: transparent; color: var(--text-2); cursor: pointer;
+    transition: all 0.15s; direction: ltr; white-space: nowrap;
+  }
+  .rt-chip:hover { border-color: #ec4899; color: #ec4899; background: rgba(236,72,153,0.07); border-style: solid; }
+
+  .rt-preview-wrap {
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px;
+  }
+  .rt-preview-label {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin-bottom: 8px; font-size: 10px; font-weight: 600; color: var(--text-3);
+    letter-spacing: 0.06em;
+  }
+  .rt-preview {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-2);
+    direction: ltr; text-align: left; white-space: pre; overflow: auto;
+    max-height: 300px; line-height: 1.7; min-height: 20px;
+  }
+  .rt-preview .sel { color: #ec4899; }
+  .rt-preview .var { color: #c084fc; }
+  .rt-preview .val { color: var(--accent-warm); }
+  .rt-preview .cmt { color: var(--text-3); font-style: italic; }
+
+  .rt-textarea {
+    width: 100%; min-height: 140px; padding: 12px 14px; resize: vertical;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    direction: ltr; text-align: left; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .rt-textarea:focus { border-color: #ec4899; box-shadow: 0 0 0 3px rgba(236,72,153,0.14); }
+  .rt-textarea::placeholder { color: var(--text-4); }
+
+  .rt-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .rt-actions .btn-primary { background: #ec4899; }
+  .rt-actions .btn-primary:hover { box-shadow: 0 4px 16px rgba(236,72,153,0.4); }
+
+  .rt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .rt-grid2 { grid-template-columns: 1fr; } }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -1647,6 +1745,9 @@
     <button class="filter-tag" id="cpDashBtn" onclick="toggleCpDash()" title="مولد لوحة الألوان والتدرجات ومتغيرات CSS">
       <i class="ti ti-palette" aria-hidden="true"></i> الألوان
     </button>
+    <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص">
+      <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> التحكم
+    </button>
   </div>
 
 <!-- MAIN BODY -->
@@ -1713,6 +1814,8 @@
 
 <script>
   const SRC = [
+    {t:"لوحة البالتة الداخلية - Palette body:not(.index)",c:"body:not(.index){\n  /* Base Palette - الألوان الأساسية */\n  --1:#023202;\n  --2:#023202;\n  --2-2:#02320240;\n  --3:#edf5ff;\n  --4:#3b3b39;\n  --4-4:#3131309c;\n  --4-4-4:#20201f;\n  --00:#2d2d2d;\n  --bg:#fff3ce;\n  --ff:#ffffff;\n\n  /* Semantic Variables - المتغيرات الوظيفية */\n  --color-primary:var(--1);\n  --color-primary-dark:var(--4);\n  --color-primary-light:var(--2-2);\n  --color-main:var(--1);\n  --color-primary-reverse:var(--3);\n\n  /* Gradients & Shadows - التدرجات والظلال */\n  --gr:linear-gradient(45deg,var(--color-primary) 0%,var(--color-primary) 39%,var(--color-primary-dark) 100%);\n  --gr2:linear-gradient(45deg,var(--1) 0%,var(--2) 100%);\n  --sh:-8px 10px 15px -3px rgba(0,0,0,.1);\n}",g:["variables","palette","root","brand"]},
+    {t:"لوحة البالتة الجذر - Palette :root",c:":root{\n  --color-primary:var(--1);\n  --color-primary-dark:var(--4);\n  --color-main:var(--1);\n  --color-primary-light:var(--2-2);\n  --color-primary-reverse:#edf5ff;\n  --gr:linear-gradient(45deg,var(--color-primary) 0,var(--color-primary) 0,var(--color-primary) 39%,var(--color-primary-dark) 100%);\n  --gr2:linear-gradient(45deg,var(--1) 0,var(--2) 100%);\n  --1:#023202;\n  --2:#fef0ca;\n  --2-2:#9865266e;\n  --3:#edf5ff;\n  --4:#3b3b39;\n  --4-4-4:#20201f;\n  --4-4:#3131309c;\n  --bg:#fff3ce;\n  --ff:#ffffff;\n  --00:#2d2d2d;\n  --sh:0 0 transparent,0 0 transparent,0 3px 16px rgba(47,83,109,.12157);\n  --sh:-8px 10px 15px -3px rgba(0,0,0,.1);\n}",g:["variables","palette","root","brand"]},
     {t:"تصفير الهوامش - General Reset",c:"*{margin:0;padding:0;box-sizing:border-box}",g:["reset","base"]},
     {t:"لغة المحتوى - Language Selector",c:":lang(en){}\n:lang(ar){}",g:["i18n","lang"]},
     {t:"تغيير اللوجو - Custom Logo",c:":root{--logo:url(\"\")}\n.navbar-brand img,.store-footer .footer-container .logo-footer .foo{max-height:3rem!important;content:var(--logo)!important}",g:["logo","brand","salla"]},
@@ -1825,6 +1928,7 @@
   let showVdDash = false;
   let showEdDash = false;
   let showCpDash = false;
+  let showRtDash = false;
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -2157,6 +2261,8 @@
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      showRtDash = false;
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -2428,6 +2534,14 @@
       showQrDash = false;
       document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
+    if(showCpDash){
+      showCpDash = false;
+      document.getElementById('cpDashBtn').classList.remove('cp-active');
+    }
+    if(showRtDash){
+      showRtDash = false;
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
+    }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
@@ -2469,6 +2583,8 @@
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      showRtDash = false;
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -2652,6 +2768,8 @@
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      showRtDash = false;
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -2912,6 +3030,8 @@
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      showRtDash = false;
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -3365,7 +3485,7 @@
     document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
     if(showEdDash){
       document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
-      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false;
+      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false; showRtDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
@@ -3374,6 +3494,7 @@
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -3615,6 +3736,7 @@
     if(showB64Dash) return renderB64Dash();
     if(showQrDash) return renderQrDash();
     if(showCpDash) return renderCpDash();
+    if(showRtDash) return renderRtDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
@@ -3820,6 +3942,7 @@
       showB64Dash = false;
       showQrDash = false;
       showCpDash = false;
+      showRtDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
@@ -3828,6 +3951,7 @@
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -4237,6 +4361,7 @@ function hello() {
       showDevDash = false;
       showQrDash = false;
       showCpDash = false;
+      showRtDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
@@ -4245,6 +4370,7 @@ function hello() {
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -4269,7 +4395,9 @@ function hello() {
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       showCpDash = false;
+      showRtDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -4287,6 +4415,7 @@ function hello() {
       showDevDash = false;
       showB64Dash = false;
       showQrDash = false;
+      showRtDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       document.getElementById('cvDashBtn').classList.remove('cv-active');
@@ -4295,6 +4424,7 @@ function hello() {
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
   }
@@ -6401,6 +6531,284 @@ function hello() {
     btn.style.opacity = has ? '' : '0.5';
   }
 
+  // ── ROUTE CONTROL PANEL DASHBOARD ──
+  let rtConfig = {
+    route: 'body:not(.index)',
+    pos: 'afterbegin',
+    sel: '',
+    vars: {
+      '--1':'#023202', '--2':'#023202', '--2-2':'#02320240', '--3':'#edf5ff',
+      '--4':'#3b3b39', '--4-4':'#3131309c', '--4-4-4':'#20201f', '--00':'#2d2d2d',
+      '--bg':'#fff3ce', '--ff':'#ffffff'
+    }
+  };
+  const RT_VARS = [
+    ['--1','الأساسي'], ['--2','الثانوي'], ['--2-2','ثانوي شفاف'],
+    ['--3','نص عكسي'], ['--4','داكن'], ['--4-4','داكن شفاف'],
+    ['--4-4-4','الأغمق'], ['--00','رمادي غامق'], ['--bg','الخلفية'], ['--ff','أبيض نقي']
+  ];
+  const RT_PRESETS = [
+    ['body:not(.index)','كل الصفحات ما عدا الرئيسية'],
+    ['body.index','الصفحة الرئيسية'],
+    ['body.product-single','صفحة المنتج'],
+    ['body.cart','صفحة السلة'],
+    ['body.checkout','صفحة الدفع'],
+    [':root','عام — كل الصفحات']
+  ];
+
+  function toggleRtDash(){
+    showRtDash = !showRtDash;
+    document.getElementById('rtDashBtn').classList.toggle('rt-active', showRtDash);
+    if(showRtDash){
+      document.querySelectorAll('.filter-tag:not(#rtDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHasDash=false; showScrollbarDash=false; showCvDash=false; showVdDash=false;
+      showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false;
+      [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
+       ['vdDashBtn','vd-active'],['edDashBtn','ed-active'],['devDashBtn','dev-active'],
+       ['b64DashBtn','b64-active'],['qrDashBtn','qr-active'],['cpDashBtn','cp-active']
+      ].forEach(p => { const el=document.getElementById(p[0]); if(el) el.classList.remove(p[1]); });
+    }
+    renderAll();
+  }
+
+  function rtToPickerVal(v){
+    v = String(v||'').trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) return v;
+    if (/^#[0-9a-fA-F]{8}$/.test(v)) return v.slice(0,7);
+    if (/^#[0-9a-fA-F]{3}$/.test(v)) return '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+    return '#000000';
+  }
+
+  function rtSet(key, value){ rtConfig[key] = value; rtRefresh(); }
+
+  function rtSetVar(name, value, fromPicker){
+    rtConfig.vars[name] = value;
+    const sw = document.getElementById('rtSw_' + name);
+    if (sw) sw.style.background = value || 'transparent';
+    if (fromPicker){
+      const txt = document.getElementById('rtTxt_' + name);
+      if (txt) txt.value = value;
+    }
+    rtRefresh();
+  }
+
+  function rtGenerateCSS(){
+    const v = rtConfig.vars;
+    const r = (rtConfig.route || '').trim() || 'body:not(.index)';
+    return r + ' {\n'
+      + '  /* Base Palette - الألوان الأساسية */\n'
+      + '  --1:' + v['--1'] + ';\n'
+      + '  --2:' + v['--2'] + ';\n'
+      + '  --2-2:' + v['--2-2'] + ';\n'
+      + '  --3:' + v['--3'] + ';\n'
+      + '  --4:' + v['--4'] + ';\n'
+      + '  --4-4:' + v['--4-4'] + ';\n'
+      + '  --4-4-4:' + v['--4-4-4'] + ';\n'
+      + '  --00:' + v['--00'] + ';\n'
+      + '  --bg:' + v['--bg'] + ';\n'
+      + '  --ff:' + v['--ff'] + ';\n'
+      + '\n  /* Semantic Variables - المتغيرات الوظيفية */\n'
+      + '  --color-primary:var(--1);\n'
+      + '  --color-primary-dark:var(--4);\n'
+      + '  --color-primary-light:var(--2-2);\n'
+      + '  --color-main:var(--1);\n'
+      + '  --color-primary-reverse:var(--3);\n'
+      + '\n  /* Gradients & Shadows - التدرجات والظلال */\n'
+      + '  --gr:linear-gradient(45deg,var(--color-primary) 0%,var(--color-primary) 39%,var(--color-primary-dark) 100%);\n'
+      + '  --gr2:linear-gradient(45deg,var(--1) 0%,var(--2) 100%);\n'
+      + '  --sh:-8px 10px 15px -3px rgba(0,0,0,.1);\n'
+      + '}';
+  }
+
+  function rtHtmlValue(){
+    const ta = document.getElementById('rtHtmlCode');
+    return ta ? ta.value : '';
+  }
+
+  function rtGenerateJS(){
+    const html   = rtHtmlValue().trim();
+    const route  = (rtConfig.route || ':root').trim();
+    const sel    = (rtConfig.sel || '').trim();
+    const target = sel || 'body';
+    const pos    = rtConfig.pos === 'beforeend' ? 'beforeend' : 'afterbegin';
+    const lit    = html
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .split('\n').join('\\n\\\n');
+    return "<!-- ضع هذا الكود في حقول أكواد JS المخصصة بالمتجر -->\n<script>\n"
+      + "(function () {\n"
+      + "  var ROUTE    = '" + route + "';\n"
+      + "  var TARGET   = '" + target + "';\n"
+      + "  var POSITION = '" + pos + "';\n"
+      + "  var HTML     = '" + lit + "';\n\n"
+      + "  function run() {\n"
+      + "    try {\n"
+      + "      if (!document.querySelector(ROUTE)) return;\n"
+      + "      var host = document.querySelector(TARGET);\n"
+      + "      if (!host) return;\n"
+      + "      host.insertAdjacentHTML(POSITION, HTML);\n"
+      + "    } catch (e) {}\n"
+      + "  }\n\n"
+      + "  if (document.readyState === 'loading') {\n"
+      + "    document.addEventListener('DOMContentLoaded', run);\n"
+      + "  } else { run(); }\n"
+      + "})();\n<\/script>";
+  }
+
+  function rtHL(css){
+    let s = escHtml(css);
+    s = s.replace(/(\/\*[\s\S]*?\*\/)/g, m => '<span class="cmt">' + m + '</span>');
+    s = s.replace(/^([^\{\n][^\{\n]*)(\{)/gm, (m, a) => '<span class="sel">' + a + '</span>{');
+    s = s.replace(/(linear-gradient\([^)]*\)|rgba?\([^)]*\)|#[0-9a-fA-F]{3,8}|var\([^)]*\))/g, m => '<span class="val">' + m + '</span>');
+    s = s.replace(/(--[\w-]+)(\s*:)/g, '<span class="var">$1</span>$2');
+    return s;
+  }
+
+  function rtRefresh(){
+    const cssEl = document.getElementById('rtCssPreview');
+    if (cssEl) cssEl.innerHTML = rtHL(rtGenerateCSS());
+    const jsEl = document.getElementById('rtJsPreview');
+    if (jsEl) jsEl.innerHTML = escHtml(rtGenerateJS());
+    const routeOut = document.getElementById('rtRouteEcho');
+    if (routeOut) routeOut.textContent = (rtConfig.route || '').trim() || 'body:not(.index)';
+  }
+
+  function rtCopy(btn, kind){
+    const text = kind === 'js' ? rtGenerateJS() : rtGenerateCSS();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="ti ti-check"></i> تم النسخ';
+      showToast(kind === 'js' ? 'تم نسخ كود الـHTML!' : 'تم نسخ كود البالتة!');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="ti ti-copy"></i> نسخ الكود';
+      }, 2000);
+    }).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function rtSavePalette(){
+    const nameEl = document.getElementById('rtName');
+    const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : 'بالتة الثيم - ' + rtConfig.route;
+    DATA.unshift({
+      id: 'rt_' + Date.now(),
+      title: name,
+      desc: 'لوحة متغيرات الثيم على روت مخصص (' + rtConfig.route + ')',
+      tags: ['variables','palette','css','brand'],
+      starred: false,
+      codes: [{ lang: 'CSS', code: rtGenerateCSS() }]
+    });
+    showToast('تم حفظ البالتة في المكتبة!');
+  }
+
+  function rtSaveHtml(){
+    const html = rtHtmlValue().trim();
+    if (!html){ showToast('الصق كود الـHTML أولاً'); return; }
+    const nameEl = document.getElementById('rtName');
+    const name = nameEl && nameEl.value.trim() ? nameEl.value.trim() : 'HTML بروت مخصص - ' + rtConfig.route;
+    DATA.unshift({
+      id: 'rt_' + Date.now(),
+      title: name,
+      desc: 'حقن HTML على روت مخصص (' + rtConfig.route + ')',
+      tags: ['html','javascript','route','salla'],
+      starred: false,
+      codes: [
+        { lang: 'HTML', code: html },
+        { lang: 'JS', code: rtGenerateJS() }
+      ]
+    });
+    openIds.add(DATA[0].id);
+    showToast('تم حفظ كود الـHTML في المكتبة!');
+  }
+
+  function renderRtDash(){
+    document.getElementById('countBadge').textContent = 'لوحة التحكم';
+
+    const varRows = RT_VARS.map(v => {
+      const key = v[0], label = v[1];
+      const val = rtConfig.vars[key];
+      return `<div class="rt-var-row">
+        <span class="rt-swatch" id="rtSw_${key}" style="background:${escHtml(val)}"></span>
+        <span class="rt-var-name" title="${label}">${key}</span>
+        <input type="color" class="rt-input" id="rtPick_${key}" value="${rtToPickerVal(val)}"
+          oninput="rtSetVar('${key}', this.value, true)">
+        <input type="text" class="rt-input" id="rtTxt_${key}" value="${escHtml(val)}" style="max-width:98px"
+          oninput="rtSetVar('${key}', this.value)">
+      </div>`;
+    }).join('');
+
+    const presetChips = RT_PRESETS.map(p =>
+      `<button class="rt-chip" onclick="rtSet('route','${p[0]}'); document.getElementById('rtRoute').value='${p[0]}'">${escHtml(p[0])} · ${p[1]}</button>`
+    ).join('');
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash"><div class="rt-builder">
+      <div class="rt-builder-title"><i class="ti ti-adjustments-horizontal"></i> لوحة التحكم
+        <span>عدّل باقة الثيم واختر الروت المخصص — ثم انسخ الكود أو احفظه في المكتبة</span>
+      </div>
+
+      <div class="form-group" style="max-width:420px">
+        <label class="form-label" for="rtName">اسم المقطع عند الحفظ (اختياري)</label>
+        <input class="form-input" id="rtName" type="text" placeholder="مثال: ثيم الصفحات الداخلية">
+      </div>
+
+      <div class="rt-section-title"><i class="ti ti-route" style="color:#ec4899"></i> الروت المخصص <span>— المحدد الذي تُطبَّق عليه الأكواد</span></div>
+      <input class="rt-input" id="rtRoute" style="max-width:420px" value="${escHtml(rtConfig.route)}"
+        placeholder="body:not(.index)" oninput="rtSet('route', this.value)">
+      <div class="rt-chips">${presetChips}</div>
+
+      <div class="rt-section-title"><i class="ti ti-palette" style="color:#ec4899"></i> ألوان البالتة <span>— عدّل أي لون ويتحدّث الكود فوراً</span></div>
+      <div class="rt-palette-grid">${varRows}</div>
+
+      <div class="rt-preview-wrap">
+        <div class="rt-preview-label">
+          <span>كود CSS النهائي — <span id="rtRouteEcho" style="direction:ltr;color:#ec4899">${escHtml(rtConfig.route)}</span></span>
+          <button class="copy-btn" id="rtCopyCssBtn" onclick="rtCopy(this,'css')" style="font-size:10px;padding:3px 10px"><i class="ti ti-copy"></i> نسخ الكود</button>
+        </div>
+        <pre class="rt-preview" id="rtCssPreview"></pre>
+      </div>
+
+      <div class="rt-actions">
+        <button class="btn-primary" onclick="rtSavePalette()"><i class="ti ti-device-floppy"></i> حفظ البالتة في المكتبة</button>
+      </div>
+
+      <div class="rt-section-title"><i class="ti ti-code" style="color:#ec4899"></i> إضافة HTML بروت مخصص <span>— يُحقن الكود فقط في الصفحات المطابقة للروت</span></div>
+
+      <div class="rt-grid2">
+        <div>
+          <textarea class="rt-textarea" id="rtHtmlCode" placeholder="&lt;div class=&quot;my-banner&quot;&gt;...&lt;/div&gt;" oninput="rtRefresh()"></textarea>
+          <div class="rt-grid2" style="margin-top:10px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">موضع الحقن</label>
+              <select class="form-select" id="rtPos" onchange="rtSet('pos', this.value)">
+                <option value="afterbegin">بداية الصفحة — بعد body</option>
+                <option value="beforeend">نهاية الصفحة — قبل إغلاق body</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">مستضيف مخصص <code style="font-size:10px">اختياري</code></label>
+              <input class="rt-input" id="rtSel" value="" placeholder="footer.store-footer" oninput="rtSet('sel', this.value)">
+            </div>
+          </div>
+          <div class="rt-actions">
+            <button class="btn-primary" onclick="rtSaveHtml()"><i class="ti ti-device-floppy"></i> حفظ في المكتبة</button>
+            <button class="btn-cancel" onclick="document.getElementById('rtHtmlCode').value=''; rtRefresh()">تفريغ</button>
+          </div>
+        </div>
+        <div>
+          <div class="rt-preview-wrap" style="margin-top:0">
+            <div class="rt-preview-label">
+              <span>كود JS الجاهز — يضمن ظهور الـHTML في الروت فقط</span>
+              <button class="copy-btn" id="rtCopyJsBtn" onclick="rtCopy(this,'js')" style="font-size:10px;padding:3px 10px"><i class="ti ti-copy"></i> نسخ الكود</button>
+            </div>
+            <pre class="rt-preview" id="rtJsPreview"></pre>
+          </div>
+        </div>
+      </div>
+    </div></div>`;
+
+    rtRefresh();
+    document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
+  }
+
   // ── ACTIVE DASHBOARD PERSISTENCE ──
   const DASH_KEY = 'csman_v2_dash_v1';
   const DASH_SUB_KEY = 'csman_v2_dash_sub_v1';
@@ -6415,6 +6823,7 @@ function hello() {
     if(showB64Dash) return 'b64';
     if(showQrDash) return 'qr';
     if(showCpDash) return 'cp';
+    if(showRtDash) return 'rt';
     return 'main';
   }
 
@@ -6428,7 +6837,7 @@ function hello() {
   function restoreDashState(){
     let id = 'main';
     try { id = localStorage.getItem(DASH_KEY) || 'main'; } catch (e) {}
-    if (!['has','sb','cv','vd','ed','dev','b64','qr','cp'].includes(id)) id = 'main';
+    if (!['has','sb','cv','vd','ed','dev','b64','qr','cp','rt'].includes(id)) id = 'main';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -6443,6 +6852,7 @@ function hello() {
     showB64Dash = id === 'b64';
     showQrDash = id === 'qr';
     showCpDash = id === 'cp';
+    showRtDash = id === 'rt';
     const mark = (btnId, cls, on) => {
       const b = document.getElementById(btnId);
       if (b) b.classList.toggle(cls, on);
@@ -6456,6 +6866,7 @@ function hello() {
     mark('b64DashBtn', 'b64-active', showB64Dash);
     mark('qrDashBtn', 'qr-active', showQrDash);
     mark('cpDashBtn', 'cp-active', showCpDash);
+    mark('rtDashBtn', 'rt-active', showRtDash);
   }
 
   // ── HASH DEEP-LINKS ──
@@ -6467,10 +6878,10 @@ function hello() {
   function clearDashFlags(){
     showHasDash = false; showScrollbarDash = false; showCvDash = false;
     showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
-    showCpDash = false;
+    showCpDash = false; showRtDash = false;
     const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
       vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
-      b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active' };
+      b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
     Object.keys(map).forEach(id => {
       const b = document.getElementById(id);
       if (b) b.classList.remove(map[id]);
@@ -6492,12 +6903,12 @@ function hello() {
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp'];
+    const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp','rt'];
     clearDashFlags();
     if (h && ids.includes(h)) {
       const map = { has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
         vd:['vdDashBtn','vd-active'], ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
-        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'] };
+        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'], rt:['rtDashBtn','rt-active'] };
       const btn = map[h];
       if (h === 'has') showHasDash = true;
       else if (h === 'sb') showScrollbarDash = true;
@@ -6508,6 +6919,7 @@ function hello() {
       else if (h === 'b64') showB64Dash = true;
       else if (h === 'qr') showQrDash = true;
       else if (h === 'cp') showCpDash = true;
+      else if (h === 'rt') showRtDash = true;
       const b = document.getElementById(btn[0]);
       if (b) b.classList.add(btn[1]);
     }
