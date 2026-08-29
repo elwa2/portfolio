@@ -1713,6 +1713,21 @@
 
   .pv-sync-wrap { font-size: 12px; color: var(--text-2); font-weight: 600; }
 
+  .pv-mode-group {
+    display: flex; gap: 4px; padding: 4px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+  }
+  .pv-mode-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 26px; padding: 0 12px; border: none; border-radius: 6px;
+    background: transparent; color: var(--text-3); font-size: 11.5px; font-weight: 600;
+    font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .pv-mode-btn:hover { color: var(--text-1); }
+  .pv-mode-btn.active { background: #38bdf8; color: #0e0e10; box-shadow: 0 2px 8px rgba(56,189,248,0.3); }
+  .pv-mode-btn i { font-size: 13px; }
+
   .pv-frames {
     display: grid; grid-template-columns: minmax(0,4fr) minmax(0,1fr);
     gap: 16px; align-items: start;
@@ -6954,6 +6969,8 @@ function hello() {
   let pvAutoTimer = null;
   let pvAutoDir = 1;
   let pvAutoY = 0;
+  let pvMode = 'direct';
+  let pvProxyCache = '';
 
   function pvNormalizeUrl(raw){
     raw = String(raw || '').trim();
@@ -6962,18 +6979,80 @@ function hello() {
     return raw;
   }
 
+  function pvSetMode(mode){
+    pvMode = mode === 'proxy' ? 'proxy' : 'direct';
+    const bd = document.getElementById('pvModeDirect');
+    const bp = document.getElementById('pvModeProxy');
+    if(bd) bd.classList.toggle('active', pvMode === 'direct');
+    if(bp) bp.classList.toggle('active', pvMode === 'proxy');
+    if(pvUrl) pvReload();
+  }
+
+  function pvCurrentlyLoading(raw){
+    const inp = document.getElementById('pvUrlInput');
+    pvUrl = pvNormalizeUrl(raw || (inp && inp.value));
+    if(!pvUrl) return false;
+    const lp = document.getElementById('pvLoading');
+    if(lp){ lp.style.display = 'flex'; lp.textContent = 'يتم تحميل الموقع...'; }
+    return true;
+  }
+
   function pvLoad(){
     const inp = document.getElementById('pvUrlInput');
     const raw = pvNormalizeUrl(inp && inp.value);
     if(!raw){ showToast('أدخل رابط الموقع أولاً'); return; }
     pvUrl = raw;
+    if(pvMode === 'proxy'){ pvLoadProxy(raw); }
+    else { pvLoadDirect(raw); }
+  }
+
+  function pvReload(){
+    if(!pvUrl) return;
+    if(pvMode === 'proxy'){ pvLoadProxy(pvUrl); }
+    else { pvLoadDirect(pvUrl); }
+  }
+
+  function pvLoadDirect(raw){
+    if(!pvCurrentlyLoading(raw)) return;
+    const desk = document.getElementById('pvFrameDesk');
+    const mob  = document.getElementById('pvFrameMob');
+    pvProxyCache = '';
+    if(desk){ desk.removeAttribute('srcdoc'); desk.src = raw; }
+    if(mob){  mob.removeAttribute('srcdoc');  mob.src  = raw; }
+    const lp = document.getElementById('pvLoading');
+    if(lp) setTimeout(()=>{ lp.style.display = 'none'; }, 2500);
+    showToast('تم تحميل الموقع (وضع مباشر)');
+  }
+
+  function pvLoadProxy(raw){
+    if(!pvCurrentlyLoading(raw)) return;
     const desk = document.getElementById('pvFrameDesk');
     const mob  = document.getElementById('pvFrameMob');
     const lp   = document.getElementById('pvLoading');
-    if(desk) desk.src = raw;
-    if(mob)  mob.src  = raw;
-    if(lp){ lp.style.display = 'flex'; setTimeout(()=>{ lp.style.display = 'none'; }, 2500); }
-    showToast('تم تحميل الموقع في النسختين');
+    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(raw))
+      .then(r => {
+        if(!r.ok) throw new Error('proxy-fail: ' + r.status);
+        return r.text();
+      })
+      .then(html => {
+        if(!html || !html.length) throw new Error('empty');
+        pvProxyCache = html;
+        let withBase = html;
+        if(/<base\b/i.test(withBase) === false){
+          const baseTag = '<base href="' + raw.replace(/["<>]/g,'') + '">';
+          if(/<head[^>]*>/i.test(withBase)) withBase = withBase.replace(/<head([^>]*)>/i, '<head$1>' + baseTag);
+          else withBase = '<head>' + baseTag + '</head>' + withBase;
+        }
+        if(desk){ desk.removeAttribute('src'); desk.srcdoc = withBase; }
+        if(mob){  mob.removeAttribute('src');  mob.srcdoc  = withBase; }
+        if(lp) setTimeout(()=>{ lp.style.display = 'none'; }, 2500);
+        showToast('تم تحميل الموقع عبر البروكسي');
+      })
+      .catch(e => {
+        if(lp){ lp.style.display = 'none'; }
+        showToast('البروكسي لم يعمل — جرّب الوضع المباشر أو موقعاً أُخَر');
+        console.error('proxy', e);
+      });
   }
 
   function pvSyncScroll(source){
@@ -7112,6 +7191,10 @@ function hello() {
       </div>
 
       <div class="pv-controls">
+        <div class="pv-mode-group">
+          <button class="pv-mode-btn ${pvMode === 'direct' ? 'active' : ''}" id="pvModeDirect" onclick="pvSetMode('direct')"><i class="ti ti-world"></i> مباشر</button>
+          <button class="pv-mode-btn ${pvMode === 'proxy' ? 'active' : ''}" id="pvModeProxy" onclick="pvSetMode('proxy')"><i class="ti ti-shield"></i> بروكسي</button>
+        </div>
         <label class="pv-sync-wrap"><i class="ti ti-link"></i> سكرول متزامن</label>
         <button class="pv-ctl-btn pv-square" onclick="pvStep(-1)" title="سكرول لأعلى"><i class="ti ti-arrow-up"></i></button>
         <button class="pv-ctl-btn pv-square" onclick="pvStep(1)" title="سكرول لأسفل"><i class="ti ti-arrow-down"></i></button>
@@ -7152,7 +7235,7 @@ function hello() {
       </div>
 
       <div class="pv-note"><i class="ti ti-info-circle"></i>
-        ملاحظة: السكرول المتزامن والتحكم التلقائي يعملان بشكل كامل مع المواقع المتوافقة (مثل موقعك وملفاتك المحلية أو المواقع التي تسمح بالتضمين). بعض المواقع تمنع فتحها داخل iframe، وهنا يمكنك التمرير يدوياً داخل كل نافذة مباشرة. اكتب الرابط ثم اضغط "عرض" — وكل ما يتعلق بالتحكم يبدأ فوراً لتصوير فيديو للنسختين معاً.
+        <b>مباشر</b>: يفتح الموقع داخل إطار حقيقي — البعض يرفض (مثل sadayara.com) رسالة "refused to connect". <b>بروكسي</b>: يجلب كود الموقع عبر وسيط ويعرضه داخل الإطار فلا يستطيع الموقع منع ذلك — يعمل مع كل المواقع ومعظمها يُعرض بالكامل، والسكرول المتزامن والتلقائي يعمل هنا أيضاً لأنهما من نفس الأصل. ملاحظة: بعض المواقع سريعة الانغلاق (JS يتأكد من الأصل) قد لا تتفاعل بالكامل في وضع بروكسي، ويمكنك هنا التمرير يدوياً داخل النافذة. السكرول المتزامن/التلقائي يعمل كاملاً مع مواقعك وملفاتك المحلية. اكتب الرابط ثم اضغط "عرض".
       </div>
     </div></div>`;
 
