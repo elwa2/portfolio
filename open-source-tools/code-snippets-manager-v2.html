@@ -1702,6 +1702,8 @@
   .pv-ctl-btn i { font-size: 14px; }
   .pv-ctl-btn.pv-go { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
   .pv-ctl-btn.pv-go:hover { filter: brightness(1.08); box-shadow: 0 2px 10px rgba(56,189,248,0.35); color: #0e0e10; }
+  .pv-ctl-btn.pv-open { background: #64748b; color: #fff; border-color: #64748b; }
+  .pv-ctl-btn.pv-open:hover { filter: brightness(1.1); box-shadow: 0 2px 10px rgba(100,116,139,0.35); color: #fff; }
   .pv-ctl-btn.pv-auto { color: #38bdf8; border-color: rgba(56,189,248,0.35); }
   .pv-ctl-btn.pv-auto.running { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
   .pv-ctl-btn.pv-square { width: 34px; padding: 0; }
@@ -7029,30 +7031,60 @@ function hello() {
     const desk = document.getElementById('pvFrameDesk');
     const mob  = document.getElementById('pvFrameMob');
     const lp   = document.getElementById('pvLoading');
-    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(raw))
-      .then(r => {
-        if(!r.ok) throw new Error('proxy-fail: ' + r.status);
-        return r.text();
-      })
-      .then(html => {
-        if(!html || !html.length) throw new Error('empty');
-        pvProxyCache = html;
-        let withBase = html;
-        if(/<base\b/i.test(withBase) === false){
-          const baseTag = '<base href="' + raw.replace(/["<>]/g,'') + '">';
-          if(/<head[^>]*>/i.test(withBase)) withBase = withBase.replace(/<head([^>]*)>/i, '<head$1>' + baseTag);
-          else withBase = '<head>' + baseTag + '</head>' + withBase;
-        }
-        if(desk){ desk.removeAttribute('src'); desk.srcdoc = withBase; }
-        if(mob){  mob.removeAttribute('src');  mob.srcdoc  = withBase; }
-        if(lp) setTimeout(()=>{ lp.style.display = 'none'; }, 2500);
-        showToast('تم تحميل الموقع عبر البروكسي');
-      })
-      .catch(e => {
-        if(lp){ lp.style.display = 'none'; }
-        showToast('البروكسي لم يعمل — جرّب الوضع المباشر أو موقعاً أُخَر');
-        console.error('proxy', e);
-      });
+    const enc  = encodeURIComponent(raw);
+
+    const mirrors = [
+      // fastest first — racers run in parallel, first success wins
+      'https://api.allorigins.win/raw?url=' + enc,
+      'https://api.cors.lol/?url=' + enc,
+      'https://corsproxy.io/?url=' + enc,
+      'https://api.codetabs.com/v1/proxy?quest=' + enc,
+      'https://media.codetabs.com/cors-proxy/v1/proxy?url=' + enc,
+      'https://proxy.cors.sh/' + enc
+    ];
+
+    let winner = null;
+    const pending = mirrors.map((m, i) =>
+      fetch(m, { headers: { 'x-cors-api-key': 'temp' } })
+        .then(r => { if(!r.ok) throw new Error('http ' + r.status); return r.text(); })
+        .then(html => {
+          if(!html || !html.length) throw new Error('empty');
+          winner = { html, mirror: m };
+          return true;
+        })
+        .catch(e => { console.warn('pv mirror', i, 'failed', e.message); return false; })
+    );
+
+    Promise.all(pending).then(() => {
+      const lp2 = document.getElementById('pvLoading');
+      if(!winner){
+        if(lp2) lp2.style.display = 'none';
+        showToast('لا يمكن جلب الموقع — جرّب "فتح مباشر" بالأسفل');
+        return;
+      }
+      pvProxyCache = winner.html;
+      let withBase = winner.html;
+      if(/<base\b/i.test(withBase) === false){
+        const baseTag = '<base href="' + raw.replace(/["<>]/g,'') + '">';
+        if(/<head[^>]*>/i.test(withBase)) withBase = withBase.replace(/<head([^>]*)>/i, '<head$1>' + baseTag);
+        else withBase = '<head>' + baseTag + '</head>' + withBase;
+      }
+      const d2 = document.getElementById('pvFrameDesk');
+      const m2 = document.getElementById('pvFrameMob');
+      if(d2){ d2.removeAttribute('src'); d2.srcdoc = withBase; }
+      if(m2){  m2.removeAttribute('src');  m2.srcdoc  = withBase; }
+      if(lp2) setTimeout(()=>{ lp2.style.display = 'none'; }, 2000);
+      showToast('تم تحميل الموقع عبر أسرع بروكسي');
+    });
+  }
+
+  function pvOpenTab(){
+    const inp = document.getElementById('pvUrlInput');
+    const raw = pvNormalizeUrl(inp && inp.value) || pvUrl;
+    if(!raw){ showToast('أدخل رابط الموقع أولاً'); return; }
+    pvUrl = raw;
+    window.open(raw, '_blank', 'noopener');
+    showToast('تم فتح الموقع في تبويب جديد — استخدم سبليت المتصفح');
   }
 
   function pvSyncScroll(source){
@@ -7188,6 +7220,7 @@ function hello() {
         <input class="pv-url-input" id="pvUrlInput" type="text" placeholder="https://example.com" value="${escHtml(pvUrl)}"
           onkeydown="if(event.key==='Enter') pvLoad()" spellcheck="false" autocomplete="off">
         <button class="pv-ctl-btn pv-go" onclick="pvLoad()"><i class="ti ti-player-play"></i> عرض</button>
+        <button class="pv-ctl-btn pv-go pv-open" onclick="pvOpenTab()" title="يفتح الموقع في تبويب حقيقي — للمتجه أو استخدم سبليت المتصفح"><i class="ti ti-external-link"></i> فتح مباشر</button>
       </div>
 
       <div class="pv-controls">
@@ -7235,7 +7268,7 @@ function hello() {
       </div>
 
       <div class="pv-note"><i class="ti ti-info-circle"></i>
-        <b>مباشر</b>: يفتح الموقع داخل إطار حقيقي — البعض يرفض (مثل sadayara.com) رسالة "refused to connect". <b>بروكسي</b>: يجلب كود الموقع عبر وسيط ويعرضه داخل الإطار فلا يستطيع الموقع منع ذلك — يعمل مع كل المواقع ومعظمها يُعرض بالكامل، والسكرول المتزامن والتلقائي يعمل هنا أيضاً لأنهما من نفس الأصل. ملاحظة: بعض المواقع سريعة الانغلاق (JS يتأكد من الأصل) قد لا تتفاعل بالكامل في وضع بروكسي، ويمكنك هنا التمرير يدوياً داخل النافذة. السكرول المتزامن/التلقائي يعمل كاملاً مع مواقعك وملفاتك المحلية. اكتب الرابط ثم اضغط "عرض".
+        <b>مباشر</b>: يفتح الموقع داخل إطار حقيقي — البعض يرفض (مثل sadayara.com) رسالة "refused to connect". <b>بروكسي</b>: يجلب كود الموقع عبر أسرع وسيط ويعرضه داخل الإطار فلا يستطيع الموقع منعه. <b>فتح مباشر</b>: يفتح الموقع في تبويب حقيقي — أنسب للتصوير السريع، وعبره استخدم سبليت المتصفح: في Edge زر Split Screen أعلى المتصفح (أو Ctrl+Shift+2) لرؤيته بنصفين في نفس الوقت بسرعة أصلية وبدون أي بروكسي. السكرول المتزامن/التلقائي يعمل كاملاً مع مواقعك وملفاتك المحلية، ومع البروكسي لأغلب المواقع. اكتب الرابط ثم اضغط "عرض".
       </div>
     </div></div>`;
 
