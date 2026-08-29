@@ -1650,6 +1650,118 @@
   .rt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 820px) { .rt-grid2 { grid-template-columns: 1fr; } }
 
+  /* ===== RESPONSIVE PREVIEW DASHBOARD ===== */
+  .filter-tag.pv-active {
+    background: #38bdf8; color: #0e0e10; border-color: #38bdf8;
+    box-shadow: 0 2px 12px rgba(56,189,248,0.3);
+  }
+
+  body.pv-active .main-body { max-width: none; padding: 14px 20px 40px; }
+
+  .pv-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+
+  .pv-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .pv-builder-title i { color: #38bdf8; font-size: 18px; }
+  .pv-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .pv-url-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .pv-url-input {
+    flex: 1; min-width: 0; height: 40px; padding: 0 14px;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    outline: none; direction: ltr; text-align: left;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .pv-url-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.15); }
+  .pv-url-input::placeholder { color: var(--text-3); font-family: 'Cairo', sans-serif; }
+
+  .pv-controls {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 14px; padding: 10px 14px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+  }
+  .pv-ctl-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-def); background: var(--bg-elevated);
+    color: var(--text-2); font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Cairo', sans-serif; transition: all 0.15s; white-space: nowrap;
+  }
+  .pv-ctl-btn:hover { background: var(--glass-str); color: var(--text-1); border-color: var(--border-str); }
+  .pv-ctl-btn i { font-size: 14px; }
+  .pv-ctl-btn.pv-go { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
+  .pv-ctl-btn.pv-go:hover { filter: brightness(1.08); box-shadow: 0 2px 10px rgba(56,189,248,0.35); color: #0e0e10; }
+  .pv-ctl-btn.pv-auto { color: #38bdf8; border-color: rgba(56,189,248,0.35); }
+  .pv-ctl-btn.pv-auto.running { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
+  .pv-ctl-btn.pv-square { width: 34px; padding: 0; }
+
+  .pv-speed-row { display: flex; align-items: center; gap: 8px; margin-inline-start: auto; }
+  .pv-speed-row label { font-size: 11px; color: var(--text-3); font-weight: 600; }
+  .pv-speed-row output { font-size: 11px; color: #38bdf8; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 34px; text-align: center; }
+  .pv-speed { width: 130px; accent-color: #38bdf8; cursor: pointer; height: 4px; }
+
+  .pv-sync-wrap { font-size: 12px; color: var(--text-2); font-weight: 600; }
+
+  .pv-frames {
+    display: grid; grid-template-columns: minmax(0,4fr) minmax(0,1fr);
+    gap: 16px; align-items: start;
+  }
+
+  .pv-device {
+    border: 1px solid var(--border-def); border-radius: var(--radius-md);
+    background: var(--bg-elevated); overflow: hidden;
+  }
+  .pv-device-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-bottom: 1px solid var(--border-sub);
+    background: var(--bg-overlay);
+  }
+  .pv-device-dots { display: flex; gap: 5px; }
+  .pv-device-dots span { width: 9px; height: 9px; border-radius: 50%; }
+  .pv-device-dots span:nth-child(1) { background: #f87171; }
+  .pv-device-dots span:nth-child(2) { background: #facc15; }
+  .pv-device-dots span:nth-child(3) { background: #4ade80; }
+  .pv-device-label { font-size: 12px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 6px; }
+  .pv-device-label i { color: #38bdf8; }
+  .pv-device-res { font-size: 10px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; direction: ltr; }
+
+  .pv-iframe-zone {
+    position: relative; display: flex; justify-content: center; align-items: flex-start;
+    padding: 14px; background: var(--bg-base);
+    overflow-x: auto;
+  }
+  .pv-iframe { border: none; background: #fff; border-radius: 4px; box-shadow: var(--shadow-md); }
+  .pv-iframe.desk { width: 100%; height: 800px; }
+  .pv-iframe.mob { width: 375px; height: 812px; }
+
+  .pv-loading {
+    position: absolute; inset: 0; top: auto; height: 44px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--text-3); font-size: 12px; background: transparent; pointer-events: none;
+  }
+
+  .pv-note {
+    margin-top: 12px; border: 1px dashed var(--border-sub); border-radius: var(--radius-md);
+    padding: 10px 14px; font-size: 11.5px; color: var(--text-3); line-height: 1.7;
+  }
+  .pv-note i { color: #38bdf8; }
+
+  @media (max-width: 1100px) {
+    body.pv-active .pv-frames { grid-template-columns: 1fr; }
+    body.pv-active .pv-iframe.desk { width: 100%; max-width: 1280px; height: 700px; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
@@ -1747,6 +1859,9 @@
     </button>
     <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص">
       <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> التحكم
+    </button>
+    <button class="filter-tag" id="pvDashBtn" onclick="togglePvDash()" title="معاينة الموقع للكمبيوتر والموبايل جنباً إلى جنب مع سكرول متزامن وتلقائي">
+      <i class="ti ti-device-mobile-desktop" aria-hidden="true"></i> معاينة
     </button>
   </div>
 
@@ -1929,6 +2044,7 @@
   let showEdDash = false;
   let showCpDash = false;
   let showRtDash = false;
+  let showPvDash = false;
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -3724,7 +3840,13 @@
 
   // ── RENDER ──
   function renderAll(){
+    if(showPvDash && (showHasDash || showScrollbarDash || showCvDash || showVdDash || showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash || showRtDash)){
+      showPvDash = false;
+      const b = document.getElementById('pvDashBtn');
+      if (b) b.classList.remove('pv-active');
+    }
     document.body.classList.toggle('editor-active', !!showEdDash);
+    document.body.classList.toggle('pv-active', !!showPvDash);
     persistDashState();
     setDashHash(currentDashId());
     if(showHasDash) return renderHasDashboard();
@@ -3737,6 +3859,7 @@
     if(showQrDash) return renderQrDash();
     if(showCpDash) return renderCpDash();
     if(showRtDash) return renderRtDash();
+    if(showPvDash) return renderPvDash();
     const body  = document.getElementById('mainBody');
     const badge = document.getElementById('countBadge');
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
@@ -6809,6 +6932,234 @@ function hello() {
     document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
   }
 
+  function togglePvDash(){
+    showPvDash = !showPvDash;
+    document.getElementById('pvDashBtn').classList.toggle('pv-active', showPvDash);
+    if(showPvDash){
+      document.querySelectorAll('.filter-tag:not(#pvDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHasDash=false; showScrollbarDash=false; showCvDash=false; showVdDash=false;
+      showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false; showRtDash=false;
+      [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
+       ['vdDashBtn','vd-active'],['edDashBtn','ed-active'],['devDashBtn','dev-active'],
+       ['b64DashBtn','b64-active'],['qrDashBtn','qr-active'],['cpDashBtn','cp-active'],['rtDashBtn','rt-active']
+      ].forEach(p => { const el=document.getElementById(p[0]); if(el) el.classList.remove(p[1]); });
+      pvStopAuto();
+    }
+    renderAll();
+  }
+
+  // ── PREVIEW STATE ──
+  let pvUrl = '';
+  let pvSyncLock = false;
+  let pvAutoTimer = null;
+  let pvAutoDir = 1;
+  let pvAutoY = 0;
+
+  function pvNormalizeUrl(raw){
+    raw = String(raw || '').trim();
+    if(!raw) return '';
+    if(!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+    return raw;
+  }
+
+  function pvLoad(){
+    const inp = document.getElementById('pvUrlInput');
+    const raw = pvNormalizeUrl(inp && inp.value);
+    if(!raw){ showToast('أدخل رابط الموقع أولاً'); return; }
+    pvUrl = raw;
+    const desk = document.getElementById('pvFrameDesk');
+    const mob  = document.getElementById('pvFrameMob');
+    const lp   = document.getElementById('pvLoading');
+    if(desk) desk.src = raw;
+    if(mob)  mob.src  = raw;
+    if(lp){ lp.style.display = 'flex'; setTimeout(()=>{ lp.style.display = 'none'; }, 2500); }
+    showToast('تم تحميل الموقع في النسختين');
+  }
+
+  function pvSyncScroll(source){
+    const desk = document.getElementById('pvFrameDesk');
+    const mob  = document.getElementById('pvFrameMob');
+    if(!desk || !mob) return;
+    if(pvSyncLock) return;
+    try {
+      const from = source;
+      const fromWin = from && from.contentWindow;
+      const fromDoc = fromWin && fromWin.document;
+      const fromEl  = fromDoc && fromDoc.documentElement;
+      if(!fromEl) return;
+      const fromMax = fromEl.scrollHeight - fromEl.clientHeight;
+      const fromY   = fromEl.scrollTop || 0;
+      if(fromMax <= 0) return;
+      pvSyncLock = true;
+      [desk, mob].forEach(to => {
+        if(to === from) return;
+        try {
+          const toWin = to.contentWindow, toDoc = toWin && toWin.document, toEl = toDoc && toDoc.documentElement;
+          if(!toEl) return;
+          const toMax = toEl.scrollHeight - toEl.clientHeight;
+          if(toMax <= 0) return;
+          toEl.scrollTop = (fromY / fromMax) * toMax;
+        } catch(e) {}
+      });
+      pvSyncLock = false;
+    } catch(e) {}
+  }
+
+  function pvStep(dir){
+    const step = Math.round(window.innerHeight * 0.6) * dir;
+    pvScrollBy(step);
+  }
+
+  function pvScrollBy(delta){
+    ['pvFrameDesk','pvFrameMob'].forEach(id => {
+      const f = document.getElementById(id);
+      if(!f) return;
+      try {
+        const w = f.contentWindow, d = w && w.document, el = d && d.documentElement;
+        if(!el) return;
+        el.scrollTop += delta;
+      } catch(e) {}
+    });
+    pvSyncAfter();
+  }
+
+  function pvSyncAfter(){
+    const desk = document.getElementById('pvFrameDesk');
+    if(desk) pvSyncScroll(desk);
+  }
+
+  function pvJumpTop(){
+    ['pvFrameDesk','pvFrameMob'].forEach(id => {
+      const f = document.getElementById(id);
+      if(!f) return;
+      try { const d = f.contentWindow && f.contentWindow.document, el = d && d.documentElement; if(el) el.scrollTop = 0; } catch(e) {}
+    });
+  }
+
+  function pvJumpBottom(){
+    ['pvFrameDesk','pvFrameMob'].forEach(id => {
+      const f = document.getElementById(id);
+      if(!f) return;
+      try {
+        const w = f.contentWindow, d = w && w.document, el = d && d.documentElement;
+        if(!el) return;
+        el.scrollTop = el.scrollHeight - el.clientHeight;
+      } catch(e) {}
+    });
+  }
+
+  function pvStartAuto(){
+    const btn = document.getElementById('pvAutoBtn');
+    pvJumpTop();
+    pvAutoY = 0;
+    pvAutoDir = 1;
+    const speedMs = Math.max(300, parseInt(document.getElementById('pvSpeed').value, 10)) * 1000;
+    if(btn){ btn.classList.add('running'); btn.innerHTML = '<i class="ti ti-player-stop"></i> إيقاف'; }
+    clearInterval(pvAutoTimer);
+    pvAutoTimer = setInterval(() => {
+      const frames = ['pvFrameDesk','pvFrameMob'].map(id => document.getElementById(id)).filter(Boolean);
+      let any = false, maxDown = 0;
+      frames.forEach(f => {
+        try {
+          const w = f.contentWindow, d = w && w.document, el = d && d.documentElement;
+          if(!el) return;
+          const max = el.scrollHeight - el.clientHeight;
+          if(max > 0){ any = true; maxDown = Math.max(maxDown, max); }
+        } catch(e) {}
+      });
+      if(!any){ pvStopAuto(); return; }
+      pvAutoY += pvAutoDir * (maxDown * 0.02);
+      if(pvAutoY >= maxDown){ pvAutoY = maxDown; pvAutoDir = -1; }
+      else if(pvAutoY <= 0){ pvAutoY = 0; pvAutoDir = 1; }
+      const y = pvAutoY;
+      frames.forEach(f => {
+        try {
+          const w = f.contentWindow, d = w && w.document, el = d && d.documentElement;
+          if(!el) return;
+          const max = el.scrollHeight - el.clientHeight;
+          if(max > 0) el.scrollTop = (y / maxDown) * max;
+        } catch(e) {}
+      });
+    }, Math.round(speedMs / 50));
+  }
+
+  function pvStopAuto(){
+    clearInterval(pvAutoTimer);
+    pvAutoTimer = null;
+    const btn = document.getElementById('pvAutoBtn');
+    if(btn){ btn.classList.remove('running'); btn.innerHTML = '<i class="ti ti-player-play"></i> سكرول تلقائي'; }
+  }
+
+  function pvToggleAuto(){
+    const running = !!pvAutoTimer;
+    if(running) pvStopAuto();
+    else pvStartAuto();
+  }
+
+  function renderPvDash(){
+    document.body.classList.add('pv-active');
+    document.getElementById('countBadge').textContent = 'معاينة الموقع';
+
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash"><div class="pv-builder">
+      <div class="pv-builder-title"><i class="ti ti-device-mobile-desktop"></i> معاينة الموقع
+        <span>اعرض الموقع للكمبيوتر والموبايل جنباً إلى جنب — تحكم في السكرول بنفس اللحظة أو دعهم يتحركون تلقائياً</span>
+      </div>
+
+      <div class="pv-url-row">
+        <input class="pv-url-input" id="pvUrlInput" type="text" placeholder="https://example.com" value="${escHtml(pvUrl)}"
+          onkeydown="if(event.key==='Enter') pvLoad()" spellcheck="false" autocomplete="off">
+        <button class="pv-ctl-btn pv-go" onclick="pvLoad()"><i class="ti ti-player-play"></i> عرض</button>
+      </div>
+
+      <div class="pv-controls">
+        <label class="pv-sync-wrap"><i class="ti ti-link"></i> سكرول متزامن</label>
+        <button class="pv-ctl-btn pv-square" onclick="pvStep(-1)" title="سكرول لأعلى"><i class="ti ti-arrow-up"></i></button>
+        <button class="pv-ctl-btn pv-square" onclick="pvStep(1)" title="سكرول لأسفل"><i class="ti ti-arrow-down"></i></button>
+        <button class="pv-ctl-btn pv-square" onclick="pvJumpTop()" title="الأعلى"><i class="ti ti-arrow-up-to-line"></i></button>
+        <button class="pv-ctl-btn pv-square" onclick="pvJumpBottom()" title="الأسفل"><i class="ti ti-arrow-down-to-line"></i></button>
+        <button class="pv-ctl-btn pv-auto" id="pvAutoBtn" onclick="pvToggleAuto()"><i class="ti ti-player-play"></i> سكرول تلقائي</button>
+        <div class="pv-speed-row">
+          <label for="pvSpeed">السرعة</label>
+          <input type="range" id="pvSpeed" class="pv-speed" min="10" max="60" step="5" value="30"
+            oninput="document.getElementById('pvSpeedVal').textContent=this.value+'s'">
+          <output id="pvSpeedVal">30s</output>
+        </div>
+      </div>
+
+      <div class="pv-frames">
+        <div class="pv-device">
+          <div class="pv-device-head">
+            <div class="pv-device-dots"><span></span><span></span><span></span></div>
+            <span class="pv-device-label"><i class="ti ti-monitor"></i> كمبيوتر</span>
+            <span class="pv-device-res">1280 × 800</span>
+          </div>
+          <div class="pv-iframe-zone">
+            <iframe class="pv-iframe desk" id="pvFrameDesk" src="${escHtml(pvUrl)}" onload="pvSyncAfter()" title="معاينة كمبيوتر" loading="lazy"></iframe>
+            <div class="pv-loading" id="pvLoading">يتم التحميل...</div>
+          </div>
+        </div>
+
+        <div class="pv-device">
+          <div class="pv-device-head">
+            <div class="pv-device-dots"><span></span><span></span><span></span></div>
+            <span class="pv-device-label"><i class="ti ti-device-mobile"></i> موبايل</span>
+            <span class="pv-device-res">375 × 812</span>
+          </div>
+          <div class="pv-iframe-zone">
+            <iframe class="pv-iframe mob" id="pvFrameMob" src="${escHtml(pvUrl)}" onload="pvSyncAfter()" title="معاينة موبايل" loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv-note"><i class="ti ti-info-circle"></i>
+        ملاحظة: السكرول المتزامن والتحكم التلقائي يعملان بشكل كامل مع المواقع المتوافقة (مثل موقعك وملفاتك المحلية أو المواقع التي تسمح بالتضمين). بعض المواقع تمنع فتحها داخل iframe، وهنا يمكنك التمرير يدوياً داخل كل نافذة مباشرة. اكتب الرابط ثم اضغط "عرض" — وكل ما يتعلق بالتحكم يبدأ فوراً لتصوير فيديو للنسختين معاً.
+      </div>
+    </div></div>`;
+
+    const inp = document.getElementById('pvUrlInput');
+    if(inp) inp.focus();
+  }
+
   // ── ACTIVE DASHBOARD PERSISTENCE ──
   const DASH_KEY = 'csman_v2_dash_v1';
   const DASH_SUB_KEY = 'csman_v2_dash_sub_v1';
@@ -6824,6 +7175,7 @@ function hello() {
     if(showQrDash) return 'qr';
     if(showCpDash) return 'cp';
     if(showRtDash) return 'rt';
+    if(showPvDash) return 'pv';
     return 'main';
   }
 
@@ -6837,7 +7189,7 @@ function hello() {
   function restoreDashState(){
     let id = 'main';
     try { id = localStorage.getItem(DASH_KEY) || 'main'; } catch (e) {}
-    if (!['has','sb','cv','vd','ed','dev','b64','qr','cp','rt'].includes(id)) id = 'main';
+    if (!['has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'].includes(id)) id = 'main';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -6853,6 +7205,7 @@ function hello() {
     showQrDash = id === 'qr';
     showCpDash = id === 'cp';
     showRtDash = id === 'rt';
+    showPvDash = id === 'pv';
     const mark = (btnId, cls, on) => {
       const b = document.getElementById(btnId);
       if (b) b.classList.toggle(cls, on);
@@ -6867,6 +7220,7 @@ function hello() {
     mark('qrDashBtn', 'qr-active', showQrDash);
     mark('cpDashBtn', 'cp-active', showCpDash);
     mark('rtDashBtn', 'rt-active', showRtDash);
+    mark('pvDashBtn', 'pv-active', showPvDash);
   }
 
   // ── HASH DEEP-LINKS ──
@@ -6878,10 +7232,11 @@ function hello() {
   function clearDashFlags(){
     showHasDash = false; showScrollbarDash = false; showCvDash = false;
     showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
-    showCpDash = false; showRtDash = false;
+    showCpDash = false; showRtDash = false; showPvDash = false;
     const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
       vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
-      b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
+      b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active',
+      pvDashBtn:'pv-active' };
     Object.keys(map).forEach(id => {
       const b = document.getElementById(id);
       if (b) b.classList.remove(map[id]);
@@ -6903,12 +7258,13 @@ function hello() {
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp','rt'];
+    const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
     clearDashFlags();
     if (h && ids.includes(h)) {
       const map = { has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
         vd:['vdDashBtn','vd-active'], ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
-        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'], rt:['rtDashBtn','rt-active'] };
+        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
+        rt:['rtDashBtn','rt-active'], pv:['pvDashBtn','pv-active'] };
       const btn = map[h];
       if (h === 'has') showHasDash = true;
       else if (h === 'sb') showScrollbarDash = true;
@@ -6920,6 +7276,7 @@ function hello() {
       else if (h === 'qr') showQrDash = true;
       else if (h === 'cp') showCpDash = true;
       else if (h === 'rt') showRtDash = true;
+      else if (h === 'pv') showPvDash = true;
       const b = document.getElementById(btn[0]);
       if (b) b.classList.add(btn[1]);
     }
