@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-1B3TL3YJ0J");
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أكواد CSS &amp; JavaScript المجانية | Ali Ahmed</title>
+    <meta
+      name="description"
+      content="مكتبة أكواد CSS و JavaScript مجانية ومفتوحة المصدر لمتاجر سلة وزد — انسخ واستخدم مباشرة."
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/fonts.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/animations.css" />
+    <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
+    <link
+      rel="icon"
+      href="../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+    <style>
+      /* ─── Page Layout ─── */
+      .snippets-hero {
+        padding: 100px 0 50px;
+        text-align: center;
+      }
+      .snippets-hero h1 {
+        font-size: 2.6rem;
+        color: var(--primary-color);
+        margin-bottom: 12px;
+      }
+      .snippets-hero p {
+        color: var(--text-color-light);
+        max-width: 620px;
+        margin: 0 auto;
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+      .snippets-hero .badge-row {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+      .snippets-hero .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: #fff;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+
+      /* ─── Tabs ─── */
+      .snippets-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 30px auto 0;
+        flex-wrap: wrap;
+      }
+      .snippets-tab {
+        padding: 10px 26px;
+        border-radius: 50px;
+        border: 2px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color-light);
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+      .snippets-tab:hover,
+      .snippets-tab.active {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.06);
+      }
+
+      /* ─── Snippet Cards ─── */
+      .snippets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 24px;
+        padding: 40px 0 20px;
+      }
+      .snippet-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        border-radius: 18px;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .snippet-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(var(--primary-rgb), 0.14);
+        border-color: var(--primary-color);
+      }
+      .snippet-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .snippet-card-header h3 {
+        font-size: 1.05rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+      }
+      .snippet-hash-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(var(--primary-rgb), 0.08);
+        border: 1px solid rgba(var(--primary-rgb), 0.15);
+        color: var(--text-color-light);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+        font-family: monospace, "Cascadia Code", Consolas;
+        white-space: nowrap;
+        text-decoration: none;
+        direction: ltr;
+      }
+      .snippet-hash-link:hover {
+        background: rgba(var(--primary-rgb), 0.15);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+      .snippet-hash-link.copied {
+        background: rgba(34, 197, 94, 0.12);
+        border-color: #22c55e;
+        color: #22c55e;
+      }
+      .snippet-hash-link i {
+        font-size: 0.7rem;
+      }
+      .snippet-card:target {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+      }
+      .snippet-lang {
+        font-size: 0.72rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+      .snippet-lang.css {
+        background: rgba(59, 130, 246, 0.12);
+        color: #3b82f6;
+      }
+      .snippet-lang.js {
+        background: rgba(250, 204, 21, 0.15);
+        color: #ca8a04;
+      }
+      .snippet-card pre {
+        margin: 0;
+        padding: 18px 22px;
+        overflow-x: auto;
+        font-size: 0.82rem;
+        line-height: 1.65;
+        background: var(--bg-color-alt);
+        font-family: "Cascadia Code", "Fira Code", "Consolas", monospace;
+        direction: ltr;
+        text-align: left;
+        max-height: 260px;
+        overflow-y: auto;
+      }
+      .snippet-card pre code {
+        color: var(--text-color);
+        white-space: pre;
+      }
+      .snippet-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 22px;
+      }
+      .snippet-card-footer .desc {
+        color: var(--text-color-light);
+        font-size: 0.85rem;
+        flex: 1;
+      }
+      .copy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--primary-gradient);
+        color: #fff;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: inherit;
+        flex-shrink: 0;
+      }
+      .copy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(var(--primary-rgb), 0.3);
+      }
+      .copy-btn.copied {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+      }
+
+      /* ─── Affiliate / Paid Section ─── */
+      .affiliate-section {
+        padding: 70px 0;
+        position: relative;
+      }
+      .affiliate-section .section-title {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .affiliate-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .affiliate-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(var(--primary-rgb), 0.12);
+        border-radius: 18px;
+        padding: 30px;
+        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .affiliate-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 40px rgba(var(--primary-rgb), 0.18);
+        border-color: var(--primary-color);
+      }
+      .affiliate-card-icon {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #fff;
+        margin-bottom: 18px;
+      }
+      .affiliate-card h3 {
+        font-size: 1.15rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+      }
+      .affiliate-card p {
+        color: var(--text-color-light);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .affiliate-card .price-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      /* ─── Social & Links Section ─── */
+      .social-links-section {
+        padding: 60px 0;
+      }
+      .social-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 30px;
+      }
+      .social-link-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 16px 20px;
+        text-decoration: none;
+        color: var(--text-color);
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .social-link-card:hover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.12);
+        color: var(--primary-color);
+      }
+      .social-link-card .icon-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .social-link-card .label {
+        font-size: 0.92rem;
+      }
+      .social-link-card .sublabel {
+        font-size: 0.78rem;
+        color: var(--text-color-light);
+        font-weight: 400;
+      }
+
+      /* ─── Works Slider ─── */
+      .works-slider-section {
+        padding: 50px 0 70px;
+        overflow: hidden;
+      }
+      .works-slider-section .section-title {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+      .works-slider-track {
+        display: flex;
+        gap: 20px;
+        width: max-content;
+        animation: slideWorks 30s linear infinite;
+        will-change: transform;
+      }
+      .works-slider-track:hover {
+        animation-play-state: paused;
+      }
+      @keyframes slideWorks {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .works-slide-card {
+        flex-shrink: 0;
+        width: 240px;
+        height: 170px;
+        border-radius: 14px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(var(--primary-rgb), 0.1);
+        transition: all 0.35s ease;
+      }
+      .works-slide-card:hover {
+        transform: translateY(-6px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(var(--primary-rgb), 0.2);
+        border-color: var(--primary-color);
+        z-index: 2;
+      }
+      .works-slide-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+        transition: object-position 1.5s ease;
+      }
+      .works-slide-card:hover img {
+        object-position: bottom;
+      }
+      .works-slide-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 55%);
+        display: flex;
+        align-items: flex-end;
+        padding: 12px 14px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .works-slide-card:hover .works-slide-overlay {
+        opacity: 1;
+      }
+      .works-slide-overlay span {
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .view-all-works {
+        display: block;
+        text-align: center;
+        margin-top: 28px;
+      }
+      .view-all-works a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary-gradient);
+        color: #fff;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+      }
+      .view-all-works a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(var(--primary-rgb), 0.3);
+      }
+
+      /* ─── Responsive ─── */
+      @media (max-width: 768px) {
+        .snippets-hero h1 { font-size: 1.9rem; }
+        .snippets-grid { grid-template-columns: 1fr; }
+        .affiliate-grid { grid-template-columns: 1fr; }
+        .social-grid { grid-template-columns: 1fr; }
+        .works-slide-card { width: 180px; height: 130px; }
+      }
+    </style>
+  </head>
+  <body class="theme-aware">
+    <div class="grain-overlay"></div>
+    <div id="three-canvas-container"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <a href="../index.html">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </a>
+          </div>
+          <nav class="nav">
+            <ul class="nav-links">
+              <li><a href="../index.html#home">الرئيسية</a></li>
+              <li><a href="../index.html#about">من نحن</a></li>
+              <li><a href="../index.html#services">خدماتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 512 512">
+                <use href="../assets/images/icons.svg#icon-moon"></use>
+              </svg>
+            </div>
+            <div class="mobile-toggle">
+              <svg class="svg-icon" viewBox="0 0 448 512">
+                <use href="../assets/images/icons.svg#icon-bars"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════ Hero ═══════════════ -->
+    <section class="snippets-hero">
+      <div class="container">
+        <h1>أكواد CSS &amp; JavaScript المجانية</h1>
+        <p>
+          مكتبة أكواد مجانية ومفتوحة المصدر لمتاجر سلة وزد — انسخ الكود والصقه
+          مباشرة في متجرك. جميع الأكواد مجانية ومجرّبة على منصات سلة وزد.
+        </p>
+        <div class="badge-row">
+          <span class="badge"><i class="fab fa-css3-alt"></i> CSS</span>
+          <span class="badge"><i class="fab fa-js-square"></i> JavaScript</span>
+          <span class="badge"><i class="fas fa-store"></i> سلة &amp; زد</span>
+        </div>
+
+        <div class="snippets-tabs">
+          <button class="snippets-tab active" data-filter="all">الكل</button>
+          <button class="snippets-tab" data-filter="css">CSS</button>
+          <button class="snippets-tab" data-filter="js">JavaScript</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ Snippets Grid ═══════════════ -->
+    <section style="padding: 0 0 40px;">
+      <div class="container">
+        <div class="snippets-grid" id="snippetsGrid">
+
+          <!-- ─── Snippet 1: Sticky Ad Bar ─── -->
+          <div class="snippet-card" data-type="css" id="sticky-ad">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-thumbtack" style="color:var(--primary-color)"></i> تثبيت شريط الإعلان</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'sticky-ad')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#sticky-ad</span>
+              </a>
+              <span class="snippet-lang css">CSS</span>
+            </div>
+            <pre><code>.salla-advertisement {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10000 !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.main-nav-container.fixed-pinned {
+  top: 46px !important;
+}
+
+.main-nav-container.fixed-header .inner {
+  transform: none !important;
+  margin-top: 44px;
+}</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">تثبيت شريط الإعلان لثيم رائد فوق أعلى المتجر — ينزل معك في أي مكان</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 2: Hide Sold Out Badge ─── -->
+          <div class="snippet-card" data-type="css" id="hide-sold-out">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-eye-slash" style="color:#ef4444"></i> إخفاء بادج نفدت</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'hide-sold-out')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#hide-sold-out</span>
+              </a>
+              <span class="snippet-lang css">CSS</span>
+            </div>
+            <pre><code>.product-label--sold-out {
+  display: none !important;
+}
+
+.product-label-out-of-stock {
+  display: none !important;
+}</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">إخفاء بادج "نفدت" من بطاقات المنتجات في سلة</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 3: Custom Scrollbar ─── -->
+          <div class="snippet-card" data-type="css" id="custom-scrollbar">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-arrows-alt-v" style="color:#8b5cf6"></i> شريط تمرير مخصص</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'custom-scrollbar')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#custom-scrollbar</span>
+              </a>
+              <span class="snippet-lang css">CSS</span>
+            </div>
+            <pre><code>::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5e3bee, #8b5cf6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a2fbe;
+}</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">تصميم شريط التمرير بلون مخصص يتناسب مع هوية المتجر</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 4: Smooth Hover ─── -->
+          <div class="snippet-card" data-type="css" id="hover-effect">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-hand-pointer" style="color:#22c55e"></i> تأثير Hover مميز</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'hover-effect')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#hover-effect</span>
+              </a>
+              <span class="snippet-lang css">CSS</span>
+            </div>
+            <pre><code>.product-card {
+  transition: transform 0.4s cubic-bezier(
+    0.175, 0.885, 0.32, 1.275
+  ),
+  box-shadow 0.4s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">تأثير رفع وتكبير سلس عند مرور الماوس على بطاقة المنتج</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 5: Gradient Button ─── -->
+          <div class="snippet-card" data-type="css" id="gradient-btn">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-paint-brush" style="color:#f59e0b"></i> زر بتدرج لوني</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'gradient-btn')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#gradient-btn</span>
+              </a>
+              <span class="snippet-lang css">CSS</span>
+            </div>
+            <pre><code>.btn-gradient {
+  background: linear-gradient(135deg, #5e3bee 0%, #8b5cf6 100%);
+  color: #ffffff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(94, 59, 238, 0.35);
+}
+
+.btn-gradient:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(94, 59, 238, 0.5);
+}</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">زر بتدرج بنفسجي مع تأثير ظل عند التمرير</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 6: Counter JS ─── -->
+          <div class="snippet-card" data-type="js" id="counter">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-sort-numeric-up" style="color:#3b82f6"></i> عداد أرقام متحرك</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'counter')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#counter</span>
+              </a>
+              <span class="snippet-lang js">JavaScript</span>
+            </div>
+            <pre><code>function animateCounter(el, target, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  function tick() {
+    start += step;
+    if (start >= target) {
+      el.textContent = target.toLocaleString();
+      return;
+    }
+    el.textContent = Math.floor(start).toLocaleString();
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+// Usage:
+// animateCounter(document.getElementById('stat'), 1500, 2000);</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">عداد أرقام متحرك بتأثير سلس — مثالي لإحصائيات المتجر</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 7: Lazy Load Images JS ─── -->
+          <div class="snippet-card" data-type="js" id="lazy-load">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-image" style="color:#06b6d4"></i> تحميل كسول للصور</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'lazy-load')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#lazy-load</span>
+              </a>
+              <span class="snippet-lang js">JavaScript</span>
+            </div>
+            <pre><code>document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        img.classList.add('loaded');
+        observer.unobserve(img);
+      }
+    });
+  }, { rootMargin: '100px' });
+
+  document.querySelectorAll('img[data-src]')
+    .forEach(img => observer.observe(img));
+});</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">تحميل الصور تلقائياً عند اقترابها من الشاشة لتحسين الأداء</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+          <!-- ─── Snippet 8: Back to Top JS ─── -->
+          <div class="snippet-card" data-type="js" id="back-to-top">
+            <div class="snippet-card-header">
+              <h3><i class="fas fa-arrow-up" style="color:#22c55e"></i> زر العودة للأعلى</h3>
+              <a class="snippet-hash-link" onclick="copyHash(this, 'back-to-top')" title="نسخ رابط الكود">
+                <i class="fas fa-link"></i>
+                <span>#back-to-top</span>
+              </a>
+              <span class="snippet-lang js">JavaScript</span>
+            </div>
+            <pre><code>&lt;button id="backToTop" style="
+  position:fixed;bottom:30px;left:30px;
+  width:48px;height:48px;border-radius:50%;
+  background:#5e3bee;color:#fff;border:none;
+  font-size:20px;cursor:pointer;
+  display:none;z-index:9999;
+  transition:all 0.3s ease;
+"&gt;↑&lt;/button&gt;
+
+&lt;script&gt;
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('backToTop');
+  btn.style.display = window.scrollY > 400
+    ? 'flex' : 'none';
+});
+document.getElementById('backToTop')
+  .addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+&lt;/script&gt;</code></pre>
+            <div class="snippet-card-footer">
+              <span class="desc">زر العودة للأعلى يظهر عند التمرير — جاهز للصق</span>
+              <button class="copy-btn" onclick="copySnippet(this)">
+                <i class="fas fa-copy"></i> نسخ
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ Affiliate / Paid Codes ═══════════════ -->
+    <section class="affiliate-section" style="background: rgba(var(--primary-rgb), 0.03);">
+      <div class="container">
+        <div class="section-title">
+          <h2 style="font-size:2rem; color:var(--primary-color); margin-bottom:10px;">
+            أكواد CSS مدفوعة جاهزة
+          </h2>
+          <p style="color:var(--text-color-light); max-width:600px; margin:0 auto;">
+            أكواد CSS احترافية مدفوعة لمتاجر سلة — احصل عليها من متجر Gumroad الخاص بنا
+          </p>
+        </div>
+
+        <div class="affiliate-grid">
+          <a
+            href="https://salla1zid.gumroad.com/?a=1073096435"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="affiliate-card"
+          >
+            <div class="affiliate-card-icon"><i class="fas fa-store"></i></div>
+            <h3>كود CSS لمتجر سلة</h3>
+            <p>
+              كود CSS احترافي لتخصيص واجهة متجرك على سلة — تصميم عصري ومميز يزيد من ثقة العملاء ويرفع من مبيعاتك.
+            </p>
+            <span class="price-tag"><i class="fas fa-shopping-cart"></i> اشترِ الآن من Gumroad</span>
+          </a>
+
+          <a
+            href="https://salla1zid.gumroad.com/?a=1073096435"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="affiliate-card"
+          >
+            <div class="affiliate-card-icon"><i class="fas fa-palette"></i></div>
+            <h3>ثيمات متاجر سلة</h3>
+            <p>
+              مجموعة ثيمات CSS جاهزة لمتاجر سلة — اختر الثيم المناسب لمتجرك وطبّقه في دقائق معدودة.
+            </p>
+            <span class="price-tag"><i class="fas fa-shopping-cart"></i> تصفّح المتجر</span>
+          </a>
+
+          <a
+            href="https://salla1zid.gumroad.com/?a=1073096435"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="affiliate-card"
+          >
+            <div class="affiliate-card-icon"><i class="fas fa-code"></i></div>
+            <h3>أكواد CSS مجمّعة</h3>
+            <p>
+              حزمة متكاملة من أكواد CSS لمتاجر سلة — أكثر من 50 كود جاهز للنسخ والاستخدام المباشر.
+            </p>
+            <span class="price-tag"><i class="fas fa-box-open"></i> الحزمة الكاملة</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ Social & Portfolio Links ═══════════════ -->
+    <section class="social-links-section">
+      <div class="container">
+        <div class="section-title" style="text-align:center; margin-bottom:10px;">
+          <h2 style="font-size:1.8rem; color:var(--primary-color);">تابعني وشوف أعمالي</h2>
+          <p style="color:var(--text-color-light);">حساباتي على مواقع التواصل ومعرض أعمالي</p>
+        </div>
+
+        <div class="social-grid">
+          <a href="https://www.behance.net/3lwaaa1" target="_blank" rel="noopener" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,#1769ff,#0057ff);">
+              <i class="fab fa-behance"></i>
+            </div>
+            <div>
+              <div class="label">Behance</div>
+              <div class="sublabel">معرض الأعمال والتصاميم</div>
+            </div>
+          </a>
+
+          <a href="https://www.instagram.com/salla1zid/" target="_blank" rel="noopener" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <div>
+              <div class="label">Instagram</div>
+              <div class="sublabel">@salla1zid</div>
+            </div>
+          </a>
+
+          <a href="https://twitter.com/salla1zid" target="_blank" rel="noopener" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,#1da1f2,#0d8bd9);">
+              <i class="fab fa-twitter"></i>
+            </div>
+            <div>
+              <div class="label">Twitter / X</div>
+              <div class="sublabel">@salla1zid</div>
+            </div>
+          </a>
+
+          <a href="https://t.me/cssfree1" target="_blank" rel="noopener" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,#0088cc,#0066aa);">
+              <i class="fab fa-telegram-plane"></i>
+            </div>
+            <div>
+              <div class="label">Telegram</div>
+              <div class="sublabel">@cssfree1 — مجتمع الأكواد</div>
+            </div>
+          </a>
+
+          <a href="https://wa.me/201002241591" target="_blank" rel="noopener" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,#25d366,#128c7e);">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div>
+              <div class="label">WhatsApp</div>
+              <div class="sublabel">تواصل مباشر</div>
+            </div>
+          </a>
+
+          <a href="../works.html" class="social-link-card">
+            <div class="icon-circle" style="background:linear-gradient(135deg,var(--primary-color),var(--secondary-purple));">
+              <i class="fas fa-images"></i>
+            </div>
+            <div>
+              <div class="label">معرض الأعمال</div>
+              <div class="sublabel">150+ متجر تصميم احترافي</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ Recent Works Slider ═══════════════ -->
+    <section class="works-slider-section">
+      <div class="container">
+        <div class="section-title" style="text-align:center; margin-bottom:30px;">
+          <h2 style="font-size:1.6rem; color:var(--primary-color);">آخر الأعمال</h2>
+          <p style="color:var(--text-color-light); font-size:0.95rem;">مجموعة من أحدث الأعمال — مرر لاستكشاف المزيد</p>
+        </div>
+      </div>
+
+      <div class="works-slider-track" id="worksTrack">
+        <!-- JS يبني السلايدر تلقائياً -->
+      </div>
+
+      <div class="container">
+        <div class="view-all-works">
+          <a href="../works.html">
+            <i class="fas fa-th-large"></i> عرض جميع الأعمال
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ Footer ═══════════════ -->
+    <footer class="footer" id="footer_aboutus">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-about">
+            <div class="footer-logo">
+              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
+            </div>
+            <p class="about-text">
+              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص
+              CSS لجعل متجرك فريداً ومميز.
+            </p>
+            <div class="footer-certificate">
+              <a href="https://www.behance.net/3lwaaa1" target="_blank">
+                <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
+                <span>Ali Ahmed | مصمم منصة زد وسلة</span>
+              </a>
+            </div>
+            <p class="footer-cr">Custom Css Salla zid</p>
+          </div>
+
+          <div class="footer-links">
+            <h3>روابط سريعة</h3>
+            <ul>
+              <li><a href="../index.html">الرئيسية</a></li>
+              <li><a href="index.html">أدواتنا</a></li>
+              <li><a href="../works.html">أعمالنا</a></li>
+              <li><a href="../index.html#contact">تواصل معنا</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h3>تواصل معنا</h3>
+            <ul>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 384 512">
+                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
+                </svg>
+                <span>مصر</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-phone"></use>
+                </svg>
+                <span>+20 100 224 1591</span>
+              </li>
+              <li>
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-envelope"></use>
+                </svg>
+                <span>salla1zid@gmail.com</span>
+              </li>
+            </ul>
+            <div class="footer-social">
+              <a href="https://wa.me/201002241591" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/salla1zid/" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 448 512">
+                  <use href="../assets/images/icons.svg#icon-instagram"></use>
+                </svg>
+              </a>
+              <a href="https://twitter.com/salla1zid" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 512 512">
+                  <use href="../assets/images/icons.svg#icon-twitter"></use>
+                </svg>
+              </a>
+              <a href="https://t.me/cssfree1" target="_blank">
+                <svg class="svg-icon" viewBox="0 0 496 512">
+                  <use href="../assets/images/icons.svg#icon-telegram"></use>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed |
+            أكواد CSS &amp; JavaScript المجانية
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- WhatsApp Floating -->
+    <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
+      <svg class="svg-icon" viewBox="0 0 448 512">
+        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
+      </svg>
+    </a>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+      /* ═══════════════ Copy Hash Link ═══════════════ */
+      function copyHash(btn, id) {
+        var url = location.origin + location.pathname + '#' + id;
+        navigator.clipboard.writeText(url).then(function () {
+          btn.classList.add('copied');
+          var span = btn.querySelector('span');
+          var old = span.textContent;
+          span.textContent = 'تم النسخ!';
+          history.replaceState(null, '', '#' + id);
+          setTimeout(function () {
+            btn.classList.remove('copied');
+            span.textContent = '#' + id;
+          }, 2000);
+        });
+      }
+
+      /* ═══════════════ Hash Navigation on Load ═══════════════ */
+      (function () {
+        var hash = location.hash.replace('#', '');
+        if (!hash) return;
+        var target = document.getElementById(hash);
+        if (target) {
+          setTimeout(function () {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        }
+      })();
+
+      /* ═══════════════ Copy Snippet ═══════════════ */
+      function copySnippet(btn) {
+        const code = btn.closest('.snippet-card').querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = '<i class="fas fa-check"></i> تم النسخ';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<i class="fas fa-copy"></i> نسخ';
+          }, 2000);
+        });
+      }
+
+      /* ═══════════════ Tab Filtering ═══════════════ */
+      document.querySelectorAll('.snippets-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.snippets-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const filter = tab.dataset.filter;
+          document.querySelectorAll('.snippet-card').forEach(card => {
+            card.style.display = (filter === 'all' || card.dataset.type === filter) ? '' : 'none';
+          });
+        });
+      });
+
+      /* ═══════════════ Works Slider ═══════════════ */
+      (function () {
+        var works = [
+          { img: '../assets/images/prt/39.jpeg', name: 'نوفونا' },
+          { img: '../assets/images/prt/38.jpeg', name: 'زينة الشرق' },
+          { img: '../assets/images/prt/37.jpeg', name: 'Tine' },
+          { img: '../assets/images/prt/36.jpeg', name: 'أغصان الطيب' },
+          { img: '../assets/images/prt/35.jpeg', name: 'نحو الأفضل' },
+          { img: '../assets/images/prt/34.jpeg', name: 'المتجر الذهبي' },
+          { img: '../assets/images/prt/33.jpeg', name: 'شرفة' },
+          { img: '../assets/images/prt/32.jpeg', name: 'الجواهري' },
+          { img: '../assets/images/prt/31.jpeg', name: 'باقة بنفسج' },
+          { img: '../assets/images/prt/30.jpeg', name: 'قيمر لايت' },
+          { img: '../assets/images/prt/29.jpeg', name: 'قيمر لايت 2' },
+          { img: '../assets/images/prt/28.jpeg', name: 'محمصة سييد' },
+          { img: '../assets/images/prt/27.jpeg', name: 'جاذبية' },
+          { img: '../assets/images/prt/26.jpeg', name: 'قرناس' },
+        ];
+
+        var track = document.getElementById('worksTrack');
+        if (!track) return;
+
+        /* duplicate for infinite scroll */
+        var all = works.concat(works);
+        all.forEach(function (w) {
+          var card = document.createElement('a');
+          card.href = '../works.html';
+          card.className = 'works-slide-card';
+          card.innerHTML =
+            '<img src="' + w.img + '" alt="' + w.name + '" loading="lazy" />' +
+            '<div class="works-slide-overlay"><span>' + w.name + '</span></div>';
+          track.appendChild(card);
+        });
+
+        /* Adjust speed by items count */
+        track.style.animationDuration = Math.max(20, works.length * 2.2) + 's';
+      })();
+
+      /* Theme handled by main.js — no override needed */
+    </script>
+  </body>
+</html>
