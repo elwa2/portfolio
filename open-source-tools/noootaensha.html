@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="أداة لتوليد النوتة الحسابية لرخص الإنشاء والتعلية بصيغتي Word وPDF مباشرة من المتصفح">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23e8734a'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E📐%3C/text%3E%3C/svg%3E">
 <title>مولّد النوتة الحسابية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/docx-preview@0.4.0/dist/docx-preview.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.0/dist/docx-preview.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#0d0d0f;--bg1:#141416;--bg2:#1a1a1e;--bg3:#202024;
@@ -102,6 +108,43 @@ body{font-family:"Cairo",sans-serif;direction:rtl;background:var(--bg);color:var
 
 .foot{text-align:center;margin-top:20px;font-size:.73rem;color:var(--text3);animation:up .5s .25s both}
 @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Keyboard accessibility */
+a:focus-visible,button:focus-visible,.fi:focus-visible,.ubox:focus-within{
+  outline:2px solid var(--acc);outline-offset:2px}
+
+/* Progress bar */
+.progress{height:5px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:26px}
+.pfill{height:100%;width:0%;background:linear-gradient(90deg,var(--acc),var(--acc2));
+  border-radius:99px;transition:width .35s ease}
+
+/* Field validation */
+.fg.invalid .fi{border-color:var(--err);animation:shake .4s}
+.fg.invalid .fl{color:var(--err)}
+@keyframes shake{
+  10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}
+  30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+
+/* Reset link */
+.reset-link{display:block;margin:14px auto 0;background:none;border:none;color:var(--text3);
+  font-family:"Cairo",sans-serif;font-size:.78rem;cursor:pointer;padding:6px;transition:color .2s}
+.reset-link:hover{color:var(--err)}
+
+/* Loading overlay (multi-page PDF export) */
+.overlay{position:fixed;inset:0;background:rgba(13,13,15,.78);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50}
+.overlay.show{display:flex}
+.spinner{width:44px;height:44px;border:4px solid var(--border2);border-top-color:var(--acc);
+  border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay p{color:var(--text2);font-size:.85rem;font-weight:600}
+
+@media (max-width:380px){
+  .toggle,.btns{grid-template-columns:1fr}
+  .uploads-grid{grid-template-columns:1fr}
+  .card{padding:24px 18px}
+  .hdr h1{font-size:1.55rem}
+}
 </style>
 </head>
 <body>
@@ -113,6 +156,8 @@ body{font-family:"Cairo",sans-serif;direction:rtl;background:var(--bg);color:var
   </div>
 
   <div class="card">
+    <div class="progress"><div class="pfill" id="pfill"></div></div>
+
     <!-- Template toggle -->
     <div class="toggle">
       <button class="tbtn on" id="btn-i" onclick="selTpl('i')">
@@ -125,22 +170,22 @@ body{font-family:"Cairo",sans-serif;direction:rtl;background:var(--bg);color:var
 
     <div class="sec">بيانات الرخصة</div>
 
-    <div class="fg">
-      <label class="fl"><span>👤</span> اسم المالك</label>
+    <div class="fg" id="fg-owner">
+      <label class="fl" for="owner"><span>👤</span> اسم المالك</label>
       <input class="fi" id="owner" placeholder="مثال: محمد أحمد علي">
     </div>
-    <div class="fg">
-      <label class="fl"><span>📍</span> الموقع / العنوان</label>
+    <div class="fg" id="fg-location">
+      <label class="fl" for="location"><span>📍</span> الموقع / العنوان</label>
       <input class="fi" id="location" placeholder="مثال: كفر الشيخ - قرية السلام">
     </div>
-    <div class="fg">
-      <label class="fl"><span>🏢</span> وصف الأدوار</label>
+    <div class="fg" id="fg-floors">
+      <label class="fl" for="floors"><span>🏢</span> وصف الأدوار</label>
       <input class="fi" id="floors" placeholder="مثال: أرضي وأول وثاني علوي">
       <div class="fhint" id="fhint">أدخل الأدوار المراد إنشاؤها</div>
     </div>
-    <div class="fg">
-      <label class="fl"><span>📏</span> منسوب البلاطة (م)</label>
-      <input class="fi" id="level" placeholder="مثال: 5.70">
+    <div class="fg" id="fg-level">
+      <label class="fl" for="level"><span>📏</span> منسوب البلاطة (م)</label>
+      <input class="fi" id="level" inputmode="decimal" placeholder="مثال: 5.70">
     </div>
 
     <div class="sec" style="margin-top:28px">اللوحات الهندسية</div>
@@ -155,10 +200,17 @@ body{font-family:"Cairo",sans-serif;direction:rtl;background:var(--bg);color:var
       </button>
     </div>
     <div class="status" id="status"></div>
+    <button class="reset-link" type="button" onclick="resetForm()">🔄 مسح النموذج والبدء من جديد</button>
   </div>
 
   <div class="foot">يدعم رفع صور PNG/JPG وملفات PDF — الملف جاهز للطباعة والإرسال</div>
 </div>
+
+<div class="overlay" id="pdfOverlay">
+  <div class="spinner"></div>
+  <p id="overlayMsg">جاري تجهيز ملف PDF...</p>
+</div>
+<div id="pdfRenderHost" style="position:fixed;top:0;left:-99999px;background:#fff;"></div>
 
 <script>
 // ─── Data ──────────────────────────────────────────────────────────────────
@@ -179,6 +231,8 @@ const SLOTS = {
 // ─── State ────────────────────────────────────────────────────────────────
 let tpl = 'i';
 let uploads = { mawar: null, asasat: null };
+let statusTimer = null;
+const DRAFT_KEY = 'noteGenDraft_v1';
 
 if (typeof pdfjsLib !== 'undefined')
   pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -197,6 +251,7 @@ function selTpl(t) {
   uploads = { mawar:null, asasat:null };
   renderUploads();
   hideStatus();
+  updateProgress();
 }
 
 // ─── Upload UI ────────────────────────────────────────────────────────────
@@ -219,6 +274,7 @@ function renderUploads() {
       if (e.dataTransfer.files[0]) processFile(k, e.dataTransfer.files[0]);
     });
   });
+  updateProgress();
 }
 
 function uboxHTML(key, icon, title) {
@@ -229,7 +285,7 @@ function uboxHTML(key, icon, title) {
       <input type="file" id="inp-${key}" accept="image/*,application/pdf">
       <div class="ui">✅</div>
       <div class="ut" style="color:var(--ok)">${title}</div>
-      ${u.preview ? `<img class="prev" src="${u.preview}">` : ''}
+      ${u.preview ? `<img class="prev" src="${u.preview}" alt="معاينة ${title}">` : ''}
       <div class="un">${u.name}</div>
     </div>`;
   return `
@@ -248,7 +304,13 @@ function clearU(key, e) {
 }
 
 // ─── File processing ──────────────────────────────────────────────────────
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
 async function processFile(key, file) {
+  if (file.size > MAX_FILE_SIZE) {
+    showStatus('err', '❌ حجم الملف كبير جدًا (الحد الأقصى 20 ميجابايت)');
+    return;
+  }
   showStatus('inf', '⏳ جاري معالجة الملف...');
   try {
     const slot = SLOTS[tpl][key];
@@ -334,9 +396,25 @@ async function buildDocx() {
   const owner    = document.getElementById('owner').value.trim();
   const location = document.getElementById('location').value.trim();
   const floors   = document.getElementById('floors').value.trim();
-  const level    = document.getElementById('level').value.trim();
-  if (!owner || !location || !floors || !level) {
-    showStatus('err','❌ يرجى ملء جميع الحقول النصية أولاً'); return null;
+  let level      = document.getElementById('level').value.trim();
+
+  clearAllInvalid();
+  const fields = { owner, location, floors, level };
+  const missing = Object.keys(fields).filter(k => !fields[k]);
+  if (missing.length) {
+    missing.forEach(markInvalid);
+    document.getElementById(missing[0]).focus();
+    showStatus('err', '❌ يرجى ملء الحقول المظللة باللون الأحمر');
+    return null;
+  }
+
+  // Normalize level: accept Arabic-Indic digits and a comma decimal separator
+  level = level.replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(',', '.');
+  if (!/^\d+(\.\d+)?$/.test(level)) {
+    markInvalid('level');
+    document.getElementById('level').focus();
+    showStatus('err', '❌ منسوب البلاطة يجب أن يكون رقمًا (مثال: 5.70)');
+    return null;
   }
 
   const isI = tpl === 'i';
@@ -410,8 +488,83 @@ function triggerDownload(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 3000);
 }
 
-// ─── PDF via docx-preview in popup ────────────────────────────────────────
+// ─── PDF export (real, directly downloadable file) ────────────────────────
 async function downloadAsPDF(docxBlob, baseName) {
+  const overlay    = document.getElementById('pdfOverlay');
+  const overlayMsg = document.getElementById('overlayMsg');
+  const host       = document.getElementById('pdfRenderHost');
+
+  overlay.classList.add('show');
+  overlayMsg.textContent = 'جاري تجهيز ملف PDF...';
+  showStatus('inf', '⏳ جاري توليد PDF...');
+  host.innerHTML = '';
+
+  try {
+    if (typeof docxPreview === 'undefined' || typeof html2canvas === 'undefined' || !window.jspdf) {
+      throw new Error('مكتبات تصدير PDF لم يتم تحميلها (تحقق من الاتصال بالإنترنت)');
+    }
+
+    await docxPreview.renderAsync(docxBlob, host, null, {
+      className: 'docx-viewer',
+      inWrapper: true,
+      ignoreWidth: false,
+      ignoreHeight: false,
+      ignoreFonts: false,
+      breakPages: true,
+      renderHeaders: true,
+      renderFooters: true,
+      renderFootnotes: true,
+      useBase64URL: true
+    });
+
+    // Wait for every embedded image to finish decoding before we snapshot the pages
+    const imgs = Array.from(host.querySelectorAll('img'));
+    await Promise.all(imgs.map(img => img.complete
+      ? Promise.resolve()
+      : new Promise(res => { img.onload = img.onerror = res; })));
+    await new Promise(res => setTimeout(res, 200)); // let layout/fonts settle
+
+    let pages = Array.from(host.querySelectorAll('.docx-wrapper > *'));
+    if (!pages.length && host.firstElementChild) pages = [host.firstElementChild];
+    if (!pages.length) throw new Error('تعذر العثور على صفحات المستند للتصدير');
+
+    const { jsPDF } = window.jspdf;
+    let pdf = null;
+
+    for (let i = 0; i < pages.length; i++) {
+      overlayMsg.textContent = `جاري تصدير الصفحة ${i + 1} من ${pages.length}...`;
+      const canvas = await html2canvas(pages[i], {
+        scale: 2.2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const wMM = 210; // reference width in mm; height follows the captured aspect ratio
+      const hMM = canvas.height * wMM / canvas.width;
+      const orientation = hMM >= wMM ? 'portrait' : 'landscape';
+      if (i === 0) {
+        pdf = new jsPDF({ unit: 'mm', format: [wMM, hMM], orientation });
+      } else {
+        pdf.addPage([wMM, hMM], orientation);
+      }
+      pdf.addImage(imgData, 'JPEG', 0, 0, wMM, hMM);
+    }
+
+    triggerDownload(pdf.output('blob'), baseName + '.pdf');
+    showStatus('ok', `✅ تم توليد "${baseName}.pdf" — تحقق من مجلد التنزيلات`);
+
+  } catch (err) {
+    console.error('تعذر تصدير PDF مباشرة، سيتم فتح نافذة المعاينة كبديل:', err);
+    await openPrintPreview(docxBlob, baseName);
+  } finally {
+    host.innerHTML = '';
+    overlay.classList.remove('show');
+  }
+}
+
+// ─── Fallback: print-preview popup (used only if direct export above fails) ─
+async function openPrintPreview(docxBlob, baseName) {
   showStatus('inf','⏳ جاري فتح نافذة الطباعة لحفظ PDF...');
 
   // Convert blob to base64 to pass to popup
@@ -436,7 +589,7 @@ async function downloadAsPDF(docxBlob, baseName) {
 <head>
 <meta charset="UTF-8">
 <title>PDF Preview</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docx-preview/dist/docx-preview.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docx-preview@0.4.0/dist/docx-preview.css">
 <style>
   body{margin:0;padding:0;background:#f0f0f0;font-family:sans-serif}
   #toolbar{background:#333;color:#fff;padding:10px 16px;display:flex;align-items:center;
@@ -461,7 +614,7 @@ async function downloadAsPDF(docxBlob, baseName) {
   <span style="font-size:12px;opacity:.7">(اختر "Save as PDF" في نافذة الطباعة)</span>
 </div>
 <div id="preview"><div id="container"></div></div>
-<script src="https://cdn.jsdelivr.net/npm/docx-preview/dist/docx-preview.umd.min.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.0/dist/docx-preview.umd.min.js"><\/script>
 <script>
 function b64ToBlob(b64){
   const raw=atob(b64);
@@ -490,15 +643,91 @@ docxPreview.renderAsync(blob,document.getElementById('container'),null,{
   showStatus('ok','✅ تم فتح نافذة المعاينة — اضغط "طباعة / حفظ كـ PDF" ثم اختار Save as PDF');
 }
 
+
 // ─── Status ───────────────────────────────────────────────────────────────
 function showStatus(type,msg){
   const el=document.getElementById('status');
   el.className='status '+type; el.textContent=msg;
+  if (statusTimer) clearTimeout(statusTimer);
+  if (type === 'ok') statusTimer = setTimeout(hideStatus, 6000);
 }
 function hideStatus(){document.getElementById('status').className='status'}
 
+// ─── Field validation ──────────────────────────────────────────────────────
+function markInvalid(id){
+  const fg = document.getElementById(id).closest('.fg');
+  if (!fg) return;
+  fg.classList.remove('invalid');
+  void fg.offsetWidth; // restart the shake animation
+  fg.classList.add('invalid');
+}
+function clearInvalid(id){
+  const fg = document.getElementById(id).closest('.fg');
+  if (fg) fg.classList.remove('invalid');
+}
+function clearAllInvalid(){
+  document.querySelectorAll('.fg.invalid').forEach(el => el.classList.remove('invalid'));
+}
+
+// ─── Completion progress ────────────────────────────────────────────────────
+function updateProgress(){
+  const total = 4 + (tpl === 'i' ? 2 : 1);
+  let filled = 0;
+  ['owner','location','floors','level'].forEach(id => {
+    if (document.getElementById(id).value.trim()) filled++;
+  });
+  if (uploads.mawar) filled++;
+  if (tpl === 'i' && uploads.asasat) filled++;
+  const bar = document.getElementById('pfill');
+  if (bar) bar.style.width = Math.round(filled / total * 100) + '%';
+}
+
+// ─── Draft persistence (text fields only — uploads are never stored) ──────
+function saveDraft(){
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      tpl,
+      owner: document.getElementById('owner').value,
+      location: document.getElementById('location').value,
+      floors: document.getElementById('floors').value,
+      level: document.getElementById('level').value
+    }));
+  } catch(e) { /* localStorage unavailable — ignore silently */ }
+}
+function loadDraft(){
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.tpl && d.tpl !== tpl) selTpl(d.tpl);
+    if (d.owner)    document.getElementById('owner').value    = d.owner;
+    if (d.location) document.getElementById('location').value = d.location;
+    if (d.floors)   document.getElementById('floors').value   = d.floors;
+    if (d.level)    document.getElementById('level').value    = d.level;
+    updateProgress();
+  } catch(e) { /* corrupted draft — ignore silently */ }
+}
+function resetForm(){
+  ['owner','location','floors','level'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  uploads = { mawar: null, asasat: null };
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+  clearAllInvalid();
+  renderUploads();
+  hideStatus();
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────
 selTpl('i');
+['owner','location','floors','level'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    clearInvalid(id);
+    updateProgress();
+    saveDraft();
+  });
+});
+loadDraft();
 </script>
 </body>
 </html>
