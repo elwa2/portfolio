@@ -82,6 +82,48 @@ body{font-family:"Cairo",sans-serif;direction:rtl;background:var(--bg);color:var
 .ubox .us{font-size:.7rem;color:var(--text3)}
 .ubox .un{font-size:.72rem;color:var(--ok);font-weight:600;margin-top:5px;word-break:break-all;padding:0 4px}
 .ubox img.prev{max-width:100%;max-height:80px;border-radius:6px;margin-top:6px;object-fit:contain}
+.ubox.invalid{border-color:var(--err);animation:shake .4s}
+.uwarn{font-size:.66rem;color:#f5c26b;font-weight:700;margin-top:4px}
+
+/* Smart-recall suggestion chip */
+.suggest-chip{display:none;margin-top:8px;padding:9px 12px;border-radius:10px;
+  background:var(--glow);border:1px solid var(--acc);color:var(--acc);
+  font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s}
+.suggest-chip:hover{background:rgba(232,115,74,.18)}
+
+/* Confirmation modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(13,13,15,.78);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal-backdrop.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:26px;
+  max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h3{font-size:1.05rem;margin-bottom:16px;color:var(--text)}
+.modal-warn{background:rgba(245,194,107,.12);border:1px solid #f5c26b;color:#f5c26b;
+  border-radius:10px;padding:10px 12px;font-size:.78rem;font-weight:700;margin-bottom:14px}
+.confirm-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;
+  border-bottom:1px solid var(--border);font-size:.83rem}
+.confirm-row:last-child{border-bottom:none}
+.confirm-row span{color:var(--text3)}
+.confirm-row b{color:var(--text);font-weight:700;text-align:left}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.modal-btns button{padding:12px;border-radius:12px;border:none;font-family:"Cairo",sans-serif;
+  font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .15s}
+.modal-btns button:active{transform:scale(.97)}
+#confirmCancel{background:var(--border);color:var(--text2)}
+#confirmOk{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+
+/* History panel */
+.history-panel{margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
+.history-panel summary{cursor:pointer;font-size:.78rem;color:var(--text3);font-weight:700;
+  list-style:none;user-select:none}
+.history-panel summary::-webkit-details-marker{display:none}
+.hitem{padding:9px 10px;border-radius:10px;background:var(--glow2,rgba(255,255,255,.03));
+  margin-top:8px;cursor:pointer;transition:background .2s;display:flex;flex-direction:column;gap:2px}
+.hitem:hover{background:rgba(232,115,74,.1)}
+.hitem b{font-size:.8rem;color:var(--text)}
+.hitem span{font-size:.72rem;color:var(--text2)}
+.hitem em{font-size:.66rem;color:var(--text3);font-style:normal}
+.hempty{font-size:.75rem;color:var(--text3);margin-top:8px}
 .uclear{position:absolute;top:7px;left:7px;background:rgba(248,113,113,.2);border:none;
   color:var(--err);border-radius:6px;padding:2px 8px;font-size:.68rem;cursor:pointer;
   font-family:"Cairo",sans-serif;z-index:2;transition:background .2s}
@@ -172,12 +214,15 @@ a:focus-visible,button:focus-visible,.fi:focus-visible,.ubox:focus-within{
 
     <div class="fg" id="fg-owner">
       <label class="fl" for="owner"><span>👤</span> اسم المالك</label>
-      <input class="fi" id="owner" placeholder="مثال: محمد أحمد علي">
+      <input class="fi" id="owner" list="ownerList" placeholder="مثال: محمد أحمد علي" autocomplete="off">
+      <div class="suggest-chip" id="ownerSuggest"></div>
     </div>
     <div class="fg" id="fg-location">
       <label class="fl" for="location"><span>📍</span> الموقع / العنوان</label>
-      <input class="fi" id="location" placeholder="مثال: كفر الشيخ - قرية السلام">
+      <input class="fi" id="location" list="locationList" placeholder="مثال: كفر الشيخ - قرية السلام" autocomplete="off">
     </div>
+    <datalist id="ownerList"></datalist>
+    <datalist id="locationList"></datalist>
     <div class="fg" id="fg-floors">
       <label class="fl" for="floors"><span>🏢</span> وصف الأدوار</label>
       <input class="fi" id="floors" placeholder="مثال: أرضي وأول وثاني علوي">
@@ -201,6 +246,11 @@ a:focus-visible,button:focus-visible,.fi:focus-visible,.ubox:focus-within{
     </div>
     <div class="status" id="status"></div>
     <button class="reset-link" type="button" onclick="resetForm()">🔄 مسح النموذج والبدء من جديد</button>
+
+    <details class="history-panel" id="historyPanel">
+      <summary>🕓 آخر العمليات (اضغط لاسترجاع بيانات أي سجل)</summary>
+      <div id="historyList"></div>
+    </details>
   </div>
 
   <div class="foot">يدعم رفع صور PNG/JPG وملفات PDF — الملف جاهز للطباعة والإرسال</div>
@@ -211,6 +261,17 @@ a:focus-visible,button:focus-visible,.fi:focus-visible,.ubox:focus-within{
   <p id="overlayMsg">جاري تجهيز ملف PDF...</p>
 </div>
 <div id="pdfRenderHost" style="position:fixed;top:0;left:-99999px;background:#fff;"></div>
+
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <h3>📋 راجع البيانات قبل التوليد</h3>
+    <div id="confirmBody"></div>
+    <div class="modal-btns">
+      <button id="confirmCancel">تعديل البيانات</button>
+      <button id="confirmOk">تأكيد وتوليد</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ─── Data ──────────────────────────────────────────────────────────────────
@@ -287,6 +348,7 @@ function uboxHTML(key, icon, title) {
       <div class="ut" style="color:var(--ok)">${title}</div>
       ${u.preview ? `<img class="prev" src="${u.preview}" alt="معاينة ${title}">` : ''}
       <div class="un">${u.name}</div>
+      ${u.warnLowRes ? '<div class="uwarn">⚠️ دقة منخفضة</div>' : ''}
     </div>`;
   return `
     <div class="ubox" id="box-${key}">
@@ -341,13 +403,22 @@ async function processFile(key, file) {
     const mime = slot.fmt === 'jpeg' ? 'image/jpeg' : 'image/png';
     const dataUrl = out.toDataURL(mime, 0.93);
 
+    // Smart quality check: flag uploads that need significant upscaling to fill the slot
+    const qualityRatio = Math.min(srcCanvas.width / slot.w, srcCanvas.height / slot.h);
+    const warnLowRes = qualityRatio < 0.7;
+
     uploads[key] = {
       name:    file.name,
       bytes:   dataUrlToBytes(dataUrl),
-      preview: out.toDataURL('image/jpeg', 0.5)   // small preview only
+      preview: out.toDataURL('image/jpeg', 0.5),   // small preview only
+      warnLowRes
     };
     renderUploads();
-    hideStatus();
+    if (warnLowRes) {
+      showStatus('inf', '⚠️ دقة الصورة أقل من المطلوب — قد تظهر غير واضحة في المستند النهائي، يفضّل رفع صورة أعلى دقة');
+    } else {
+      hideStatus();
+    }
   } catch(err) {
     console.error(err);
     showStatus('err', '❌ خطأ في معالجة الملف: ' + err.message);
@@ -392,19 +463,45 @@ function xmlEsc(s) {
           .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
-async function buildDocx() {
+// ─── Strict validation ──────────────────────────────────────────────────────
+function markUploadInvalid(key){
+  const box = document.getElementById('box-'+key);
+  if (!box) return;
+  box.classList.remove('invalid');
+  void box.offsetWidth;
+  box.classList.add('invalid');
+}
+function clearUploadInvalid(){
+  document.querySelectorAll('.ubox.invalid').forEach(el => el.classList.remove('invalid'));
+}
+
+function validateAll() {
   const owner    = document.getElementById('owner').value.trim();
   const location = document.getElementById('location').value.trim();
   const floors   = document.getElementById('floors').value.trim();
   let level      = document.getElementById('level').value.trim();
 
   clearAllInvalid();
+  clearUploadInvalid();
+
   const fields = { owner, location, floors, level };
   const missing = Object.keys(fields).filter(k => !fields[k]);
   if (missing.length) {
     missing.forEach(markInvalid);
     document.getElementById(missing[0]).focus();
     showStatus('err', '❌ يرجى ملء الحقول المظللة باللون الأحمر');
+    return null;
+  }
+
+  const hasLetters = /[A-Za-z\u0600-\u06FF]/;
+  if (owner.length < 3 || !hasLetters.test(owner)) {
+    markInvalid('owner'); document.getElementById('owner').focus();
+    showStatus('err', '❌ اسم المالك غير صالح — أدخل الاسم كاملًا');
+    return null;
+  }
+  if (location.length < 3 || !hasLetters.test(location)) {
+    markInvalid('location'); document.getElementById('location').focus();
+    showStatus('err', '❌ الموقع غير صالح — أدخل عنوانًا واضحًا');
     return null;
   }
 
@@ -416,7 +513,29 @@ async function buildDocx() {
     showStatus('err', '❌ منسوب البلاطة يجب أن يكون رقمًا (مثال: 5.70)');
     return null;
   }
+  const levelNum = parseFloat(level);
+  if (levelNum <= 0 || levelNum > 60) {
+    markInvalid('level');
+    document.getElementById('level').focus();
+    showStatus('err', '❌ منسوب غير منطقي — تحقق من الرقم (المسموح: أكبر من صفر وحتى 60م)');
+    return null;
+  }
 
+  // Required engineering drawings — strict, no generating without them
+  const needAsasat = tpl === 'i';
+  const missingUploads = (!uploads.mawar) || (needAsasat && !uploads.asasat);
+  if (missingUploads) {
+    if (!uploads.mawar) markUploadInvalid('mawar');
+    if (needAsasat && !uploads.asasat) markUploadInvalid('asasat');
+    showStatus('err', '❌ يجب رفع اللوحات الهندسية المطلوبة (المظللة بالأحمر) قبل التوليد');
+    return null;
+  }
+
+  return { owner, location, floors, level };
+}
+
+async function buildDocx(data) {
+  const { owner, location, floors, level } = data;
   const isI = tpl === 'i';
   const zip = await JSZip.loadAsync(b64ToBytes(isI ? INSHA_B64 : TAALIA_B64));
 
@@ -454,7 +573,52 @@ async function buildDocx() {
 }
 
 // ─── Download handlers ────────────────────────────────────────────────────
+function showConfirmModal(data, duplicateWarning) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('confirmModal');
+    const body  = document.getElementById('confirmBody');
+    const needAsasat = tpl === 'i';
+    body.innerHTML = `
+      ${duplicateWarning ? `<div class="modal-warn">⚠️ ${xmlEsc(duplicateWarning)}</div>` : ''}
+      <div class="confirm-row"><span>نوع الرخصة</span><b>${tpl === 'i' ? 'إنشاء' : 'تعلية'}</b></div>
+      <div class="confirm-row"><span>المالك</span><b>${xmlEsc(data.owner)}</b></div>
+      <div class="confirm-row"><span>الموقع</span><b>${xmlEsc(data.location)}</b></div>
+      <div class="confirm-row"><span>الأدوار</span><b>${xmlEsc(data.floors)}</b></div>
+      <div class="confirm-row"><span>المنسوب</span><b>${xmlEsc(data.level)} م</b></div>
+      <div class="confirm-row"><span>لوحة المحاور</span><b>${uploads.mawar ? '✅ مرفقة' : '—'}</b></div>
+      ${needAsasat ? `<div class="confirm-row"><span>لوحة الأساسات</span><b>${uploads.asasat ? '✅ مرفقة' : '—'}</b></div>` : ''}
+    `;
+    modal.classList.add('show');
+    const okBtn = document.getElementById('confirmOk');
+    const cancelBtn = document.getElementById('confirmCancel');
+    function cleanup(result){
+      modal.classList.remove('show');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  });
+}
+
 async function doGenerate(mode) {
+  const data = validateAll();
+  if (!data) return;
+
+  const dupe = getClients().find(c =>
+    c.owner.trim().toLowerCase() === data.owner.trim().toLowerCase() &&
+    c.tpl === tpl && (Date.now() - c.ts) < 24 * 60 * 60 * 1000
+  );
+  const dupeWarning = dupe
+    ? `تم توليد نوتة ${dupe.tpl === 'i' ? 'إنشاء' : 'تعلية'} بنفس الاسم خلال آخر 24 ساعة — تأكد أن التكرار مقصود`
+    : null;
+
+  const confirmed = await showConfirmModal(data, dupeWarning);
+  if (!confirmed) { showStatus('inf','ℹ️ راجع البيانات ثم أعد الضغط على زر التوليد'); return; }
+
   const btnId = mode === 'pdf' ? 'btn-pdf' : 'btn-gen';
   const btn   = document.getElementById(btnId);
   btn.disabled = true;
@@ -463,8 +627,7 @@ async function doGenerate(mode) {
   hideStatus();
 
   try {
-    const result = await buildDocx();
-    if (!result) { btn.disabled=false; btn.innerHTML=origHTML; return; }
+    const result = await buildDocx(data);
 
     if (mode === 'docx') {
       triggerDownload(result.blob, result.name + '.docx');
@@ -472,6 +635,9 @@ async function doGenerate(mode) {
     } else {
       await downloadAsPDF(result.blob, result.name);
     }
+
+    saveClient(data);
+    renderHistory();
   } catch(err) {
     console.error(err);
     showStatus('err','❌ خطأ: ' + err.message);
@@ -714,8 +880,65 @@ function resetForm(){
   uploads = { mawar: null, asasat: null };
   try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
   clearAllInvalid();
+  clearUploadInvalid();
   renderUploads();
   hideStatus();
+  document.getElementById('ownerSuggest').style.display = 'none';
+}
+
+// ─── Client memory: autocomplete + smart recall + history ─────────────────
+const CLIENTS_KEY = 'noteGenClients_v1';
+
+function getClients(){
+  try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+function saveClient(data){
+  try {
+    let list = getClients();
+    list = list.filter(c => c.owner.trim().toLowerCase() !== data.owner.trim().toLowerCase());
+    list.unshift({ owner:data.owner, location:data.location, floors:data.floors, level:data.level, tpl, ts:Date.now() });
+    if (list.length > 50) list = list.slice(0, 50);
+    localStorage.setItem(CLIENTS_KEY, JSON.stringify(list));
+    refreshDatalists();
+  } catch(e) { /* localStorage unavailable — ignore silently */ }
+}
+
+function findClient(ownerName){
+  return getClients().find(c => c.owner.trim().toLowerCase() === ownerName.trim().toLowerCase());
+}
+
+function refreshDatalists(){
+  const list = getClients();
+  const owners    = [...new Set(list.map(c => c.owner))];
+  const locations = [...new Set(list.map(c => c.location))];
+  document.getElementById('ownerList').innerHTML    = owners.map(o => `<option value="${xmlEsc(o)}">`).join('');
+  document.getElementById('locationList').innerHTML = locations.map(l => `<option value="${xmlEsc(l)}">`).join('');
+}
+
+function renderHistory(){
+  const list  = getClients().slice(0, 8);
+  const panel = document.getElementById('historyList');
+  if (!list.length) { panel.innerHTML = '<p class="hempty">لا يوجد سجل بعد</p>'; return; }
+  panel.innerHTML = list.map((c, i) => `
+    <div class="hitem" data-idx="${i}">
+      <b>${xmlEsc(c.owner)}</b>
+      <span>${xmlEsc(c.location)}</span>
+      <em>${c.tpl === 'i' ? 'إنشاء' : 'تعلية'} · ${new Date(c.ts).toLocaleDateString('ar-EG')}</em>
+    </div>`).join('');
+  panel.querySelectorAll('.hitem').forEach(el => {
+    el.addEventListener('click', () => {
+      const c = list[+el.dataset.idx];
+      if (c.tpl !== tpl) selTpl(c.tpl);
+      document.getElementById('owner').value    = c.owner;
+      document.getElementById('location').value = c.location;
+      document.getElementById('floors').value   = c.floors;
+      document.getElementById('level').value    = c.level;
+      clearAllInvalid(); clearUploadInvalid(); updateProgress(); saveDraft();
+      showStatus('inf', 'ℹ️ تم استرجاع بيانات هذا السجل — راجعها ثم أعد رفع اللوحات وولّد المستند');
+    });
+  });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────
@@ -727,6 +950,28 @@ selTpl('i');
     saveDraft();
   });
 });
+document.getElementById('owner').addEventListener('blur', () => {
+  const chip = document.getElementById('ownerSuggest');
+  const name = document.getElementById('owner').value.trim();
+  const rec  = name ? findClient(name) : null;
+  const locationEmpty = !document.getElementById('location').value.trim();
+  if (rec && locationEmpty) {
+    chip.style.display = 'block';
+    chip.textContent = `🔁 استخدام بيانات آخر رخصة لهذا العميل (${rec.location})`;
+    chip.onclick = () => {
+      if (rec.tpl !== tpl) selTpl(rec.tpl);
+      document.getElementById('location').value = rec.location;
+      document.getElementById('floors').value   = rec.floors;
+      document.getElementById('level').value    = rec.level;
+      chip.style.display = 'none';
+      updateProgress(); saveDraft();
+    };
+  } else {
+    chip.style.display = 'none';
+  }
+});
+refreshDatalists();
+renderHistory();
 loadDraft();
 </script>
 </body>
