@@ -936,7 +936,9 @@
   function idbGet(key){return new Promise(async(res,rej)=>{try{const db=await idbOpen();const tx=db.transaction("project","readonly");const rq=tx.objectStore("project").get(key);rq.onsuccess=()=>res(rq.result||null);rq.onerror=()=>rej(rq.error);}catch(e){rej(e);}});}
   function saveProject(){
     if(!originalImage)return;
-    const dataUrl=originalImage.toDataURL("image/png");
+    let src=originalImage;
+    if(!(src instanceof HTMLCanvasElement)){const cc=mkCanvas(src.width,src.height);cc.getContext("2d").drawImage(src,0,0);src=cc;}
+    const dataUrl=src.toDataURL("image/png");
     const payload={dataUrl,state:{...pickAdjust(),rotate:state.rotate,flipH:state.flipH,flipV:state.flipV,textOverlay:state.textOverlay?{...state.textOverlay}:null,strokes:cloneStrokes()},meta:{currentFileName,currentFileNameBase,currentFileSize}};
     idbSet("current",payload).then(()=>{}).catch(()=>{});
     try{if(dataUrl.length<3.5e6)localStorage.setItem("pf-project",JSON.stringify(payload));else localStorage.removeItem("pf-project");}catch(e){}
