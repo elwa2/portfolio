@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إيصالات الإيداع - نقابة المهندسين والرعاية الصحية</title>
+<style>
+  :root {
+    --navy: #1b2a4a;
+    --navy-light: #2c4270;
+    --muted: #6b7280;
+    --border: #d8dbe2;
+    --good: #2c6e49;
+    --bad: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Tahoma", "Segoe UI", "Arial", sans-serif;
+    background: #eef0f4;
+    margin: 0;
+    padding: 30px 16px;
+    direction: rtl;
+    color: #1a1a1a;
+  }
+  .wrapper { max-width: 900px; margin: 0 auto; }
+
+  h2 { margin: 0 0 4px; font-size: 17px; color: var(--navy); text-align: center; }
+  .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+
+  .panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 18px rgba(20, 30, 60, 0.06);
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 13px;
+    color: var(--navy);
+  }
+  .field input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #c7cbd4;
+    border-radius: 8px;
+    background: #fafbfc;
+    font-family: inherit;
+  }
+  .field input:focus { outline: none; border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(44,66,112,.12); }
+
+  /* ---- entries controls ---- */
+  .entries-list { display: flex; flex-direction: column; gap: 12px; }
+  .entry-row {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .entry-row .hint {
+    grid-column: 1 / -1;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: -6px;
+  }
+  @media (max-width: 640px) {
+    .entry-row { grid-template-columns: 1fr 1fr; }
+    .entry-row .remove-btn { grid-column: 1 / -1; }
+  }
+  .entry-row .field { margin: 0; }
+  .entry-row input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #c7cbd4;
+    border-radius: 7px;
+    background: #fff;
+  }
+  .entry-row .remove-btn {
+    background: #fbeceb;
+    color: var(--bad);
+    border: none;
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .entry-row .remove-btn:hover { background: #f6d9d7; }
+
+  .entries-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .add-btn, .print-btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 9px;
+    font-size: 14.5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .add-btn { background: #eef1f6; color: var(--navy); border: 1px solid var(--border); }
+  .add-btn:hover { background: #e3e7ee; }
+  .add-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .print-btn { background: var(--navy); color: #fff; }
+  .print-btn:hover { background: var(--navy-light); }
+
+  /* ---------- A4 sheet, styled close to the original scanned form ---------- */
+  .a4-sheet {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 4px 18px rgba(20, 30, 60, 0.06);
+    padding: 8mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 6mm;
+  }
+  .person-block {
+    border: 1px solid #000;
+  }
+  .person-block.empty { border: none; }
+
+  .doc-box {
+    padding: 7px 10px;
+    font-size: 10.5px;
+    line-height: 1.65;
+    font-family: "Arial", "Tahoma", sans-serif;
+  }
+  .doc-box + .doc-box { border-top: 1px solid #000; }
+
+  .doc-box .doc-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  .doc-box .acc-row {
+    text-align: center;
+  }
+  .doc-box .acc-row .acc-num {
+    direction: ltr;
+    display: inline-block;
+    unicode-bidi: embed;
+  }
+  .doc-box .amount-label {
+    margin-top: 3px;
+  }
+  .doc-box .amount-value {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 2px 0 4px;
+  }
+  .doc-box .amount-value.placeholder,
+  .doc-box .name-value.placeholder { color: #bbb; font-weight: normal; }
+  .doc-box .name-row .name-value { font-weight: bold; }
+
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff; padding: 0; margin: 0; }
+    .wrapper { max-width: 100%; }
+    .a4-sheet {
+      box-shadow: none;
+      border: none;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 10mm;
+      gap: 8mm;
+      margin: 0 auto;
+    }
+    .person-block { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <h2>إيصالات الإيداع</h2>
+  <div class="sub">نقابة المهندسين — الرعاية الصحية والاجتماعية غير المنتظمة</div>
+
+  <!-- ============ Entries (up to 4 names) ============ -->
+  <div class="panel no-print">
+    <h2 style="text-align:right;font-size:15px;">الأسماء (حتى 4 أسماء في الورقة)</h2>
+    <div class="entries-list" id="entriesList"></div>
+    <div class="entries-actions">
+      <button class="add-btn" id="addBtn" onclick="addEntry()">+ إضافة اسم</button>
+      <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
+    </div>
+  </div>
+
+  <!-- ============ A4 preview ============ -->
+  <div class="a4-sheet" id="a4Sheet"></div>
+
+</div>
+
+<script>
+  const ENG_ACCOUNT = "0906013000421818";
+  const CARE_ACCOUNT = "0900113001211818";
+  const SYNDICATE_RATE = 0.0045;
+  const DIFF = 50;
+
+  function round2(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  /* ---------------- entries (names) ---------------- */
+  let entries = [{ name: '', works: '', care: '' }];
+  const MAX_ENTRIES = 4;
+
+  function addEntry() {
+    if (entries.length >= MAX_ENTRIES) return;
+    entries.push({ name: '', works: '', care: '' });
+    renderAll();
+  }
+
+  function removeEntry(i) {
+    if (entries.length <= 1) return;
+    entries.splice(i, 1);
+    renderAll();
+  }
+
+  function renderInputs() {
+    const list = document.getElementById('entriesList');
+    list.innerHTML = '';
+    entries.forEach((e, i) => {
+      const row = document.createElement('div');
+      row.className = 'entry-row';
+      row.innerHTML = `
+        <div class="field">
+          <label>اسم المودع ${i + 1}</label>
+          <input type="text" data-idx="${i}" data-key="name" value="${escapeHtml(e.name)}" placeholder="اكتب الاسم">
+        </div>
+        <div class="field">
+          <label>قيمة الأعمال (اختياري)</label>
+          <input type="number" data-idx="${i}" data-key="works" value="${escapeHtml(e.works)}" placeholder="مثال: 200000">
+        </div>
+        <div class="field">
+          <label>مبلغ الرعاية</label>
+          <input type="number" data-idx="${i}" data-key="care" value="${escapeHtml(e.care)}" placeholder="مثال: 780">
+        </div>
+        <button class="remove-btn" onclick="removeEntry(${i})" ${entries.length <= 1 ? 'style="visibility:hidden"' : ''}>حذف</button>
+        <div class="hint">اكتب قيمة الأعمال هيتحسب مبلغ الرعاية والنقابة أوتوماتيك، أو اكتب مبلغ الرعاية مباشرة لو عندك</div>
+      `;
+      list.appendChild(row);
+    });
+
+    list.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', (ev) => {
+        const idx = parseInt(ev.target.dataset.idx);
+        const key = ev.target.dataset.key;
+        entries[idx][key] = ev.target.value;
+
+        if (key === 'works') {
+          const raw = ev.target.value.trim();
+          if (raw !== '' && !isNaN(raw)) {
+            const computedCare = round2(parseFloat(raw) * SYNDICATE_RATE + DIFF);
+            entries[idx].care = String(computedCare);
+            const careInput = list.querySelector(`input[data-idx="${idx}"][data-key="care"]`);
+            if (careInput) careInput.value = computedCare;
+          }
+        }
+        renderPreview();
+      });
+    });
+
+    document.getElementById('addBtn').disabled = entries.length >= MAX_ENTRIES;
+  }
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function renderPreview() {
+    const sheet = document.getElementById('a4Sheet');
+    sheet.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+      const cell = document.createElement('div');
+      if (i < entries.length) {
+        const e = entries[i];
+        const name = e.name.trim();
+        const careRaw = e.care.toString().trim();
+        const hasCare = careRaw !== '' && !isNaN(careRaw);
+        const careVal = hasCare ? parseFloat(careRaw) : null;
+        const synVal = hasCare ? round2(careVal - DIFF) : null;
+
+        cell.className = 'person-block';
+        cell.innerHTML = `
+          <div class="doc-box">
+            <div class="doc-title">فرع نقابة المهندسين كفر الشيخ بالبريد المصرى<br>فرع كفر الشيخ</div>
+            <div class="acc-row">رقم الحساب <span class="acc-num">${ENG_ACCOUNT}</span></div>
+            <div class="amount-label">المبلغ المطلوب /</div>
+            <div class="amount-value ${synVal === null ? 'placeholder' : ''}">${synVal === null ? '—' : synVal}</div>
+            <div class="name-row">أسم المودع / <span class="name-value ${name ? '' : 'placeholder'}">${name ? name : '—'}</span></div>
+          </div>
+          <div class="doc-box">
+            <div class="doc-title">الرعاية الصحية والاجتماعية للعمالة غير المنتظمة بالبريد المصرى<br>فرع كفر الشيخ</div>
+            <div class="acc-row">رقم الحساب <span class="acc-num">${CARE_ACCOUNT}</span></div>
+            <div class="amount-label">المبلغ المطلوب /</div>
+            <div class="amount-value ${careVal === null ? 'placeholder' : ''}">${careVal === null ? '—' : careVal}</div>
+            <div class="name-row">أسم المودع / <span class="name-value ${name ? '' : 'placeholder'}">${name ? name : '—'}</span></div>
+          </div>
+        `;
+      } else {
+        cell.className = 'person-block empty';
+      }
+      sheet.appendChild(cell);
+    }
+  }
+
+  function renderAll() {
+    renderInputs();
+    renderPreview();
+  }
+
+  renderAll();
+</script>
+</body>
+</html>

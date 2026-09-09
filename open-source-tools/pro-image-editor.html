@@ -1,372 +1,522 @@
 <!doctype html>
 <html lang="ar" dir="rtl" data-theme="light">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B3TL3YJ0J"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag() { dataLayer.push(arguments); }
       gtag("js", new Date());
       gtag("config", "G-1B3TL3YJ0J");
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>محرر الصور الاحترافي | Pro Image Editor</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
     <link rel="stylesheet" href="../assets/css/fonts.css" />
     <link rel="stylesheet" href="../assets/css/style.css" />
     <link rel="stylesheet" href="../assets/css/design-enhancements.css" />
     <link rel="stylesheet" href="../assets/css/svg-icons.css" />
     <link rel="stylesheet" href="../assets/css/animations.css" />
-    <link
-      rel="icon"
-      href="../assets/images/logo ico.svg"
-      type="image/svg+xml"
-    />
+    <link rel="icon" href="../assets/images/logo ico.svg" type="image/svg+xml" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="../assets/js/three-bg.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/svg-icons.js" defer></script>
 
     <style>
-      .tool-page-wrapper {
-        padding: 50px 0;
-        min-height: 80vh;
+      /* ============================================================
+         Design tokens — theme-aware (dark default / light override)
+         ============================================================ */
+      :root, [data-theme="dark"] {
+        --pe-bg-deep: #070c16;
+        --pe-bg-panel: rgba(12, 20, 38, 0.94);
+        --pe-bg-card: rgba(19, 31, 56, 0.78);
+        --pe-bg-input: rgba(24, 38, 68, 0.7);
+        --pe-bg-hover: rgba(40, 65, 115, 0.45);
+        --pe-border: rgba(120, 160, 240, 0.16);
+        --pe-border-hover: rgba(130, 180, 255, 0.45);
+        --pe-accent: #5ba8ff;
+        --pe-accent-glow: rgba(91, 168, 255, 0.35);
+        --pe-accent2: #9b6cff;
+        --pe-accent2-glow: rgba(155, 108, 255, 0.3);
+        --pe-success: #34d399;
+        --pe-warning: #fbbf24;
+        --pe-danger: #f87171;
+        --pe-text: #ecf1fb;
+        --pe-text-dim: rgba(236, 241, 251, 0.66);
+        --pe-text-muted: rgba(236, 241, 251, 0.36);
+        --pe-track: rgba(255, 255, 255, 0.12);
+        --pe-ghost: rgba(255, 255, 255, 0.045);
+        --pe-checker-a: #0d1526;
+        --pe-checker-b: #111c31;
+        --pe-scrim: 4, 8, 18;
+        --pe-radius: 14px;
+        --pe-radius-sm: 8px;
+        --pe-radius-xs: 6px;
+        --pe-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        --pe-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        --pe-glow: 0 0 24px var(--pe-accent-glow);
+      }
+
+      [data-theme="light"] {
+        --pe-bg-deep: #eef1f8;
+        --pe-bg-panel: rgba(255, 255, 255, 0.94);
+        --pe-bg-card: rgba(246, 249, 255, 0.98);
+        --pe-bg-input: rgba(233, 239, 250, 0.95);
+        --pe-bg-hover: rgba(74, 158, 255, 0.12);
+        --pe-border: rgba(70, 105, 170, 0.18);
+        --pe-border-hover: rgba(47, 127, 214, 0.5);
+        --pe-accent: #2f7fd6;
+        --pe-accent-glow: rgba(47, 127, 214, 0.3);
+        --pe-accent2: #7c3aed;
+        --pe-accent2-glow: rgba(124, 58, 237, 0.25);
+        --pe-success: #16a34a;
+        --pe-warning: #d97706;
+        --pe-danger: #dc2626;
+        --pe-text: #1a2740;
+        --pe-text-dim: rgba(26, 39, 64, 0.68);
+        --pe-text-muted: rgba(26, 39, 64, 0.42);
+        --pe-track: rgba(26, 39, 64, 0.14);
+        --pe-ghost: rgba(26, 39, 64, 0.05);
+        --pe-checker-a: #eaedf4;
+        --pe-checker-b: #dfe4ee;
+        --pe-scrim: 230, 238, 250;
+        --pe-radius: 14px;
+        --pe-radius-sm: 8px;
+        --pe-radius-xs: 6px;
+        --pe-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        --pe-shadow: 0 12px 40px rgba(40, 70, 130, 0.16);
+        --pe-glow: 0 0 20px var(--pe-accent-glow);
+      }
+
+      .tool-page-wrapper { padding: 50px 0; min-height: 80vh; position: relative; z-index: 2; }
+
+      /* ===== Shell ===== */
+      .editor-shell {
         position: relative;
+        background: var(--pe-bg-panel);
+        border: 1px solid var(--pe-border);
+        border-radius: 20px;
+        box-shadow: var(--pe-shadow);
+        padding: 0;
+        color: var(--pe-text);
+        overflow: hidden;
+      }
+      .editor-shell::before {
+        content: "";
+        position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--pe-accent), var(--pe-accent2), var(--pe-accent));
         z-index: 2;
       }
 
-      .editor-shell {
-        background: linear-gradient(160deg, rgba(8,14,26,0.97), rgba(12,22,40,0.96));
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 22px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-        padding: 24px;
-        color: #e7edf6;
-        backdrop-filter: blur(2px);
-      }
-
-      .editor-title {
-        margin: 0 0 10px; color: #f7fbff; font-size: 2rem;
+      .editor-header {
         display: flex; align-items: center; gap: 12px;
+        padding: 18px 24px;
+        background: linear-gradient(135deg, var(--pe-accent-glow), var(--pe-accent2-glow));
+        border-bottom: 1px solid var(--pe-border);
       }
-      .editor-title i { color: #58a6ff; font-size: 1.6rem; }
-      .editor-subtitle { margin: 0; color: rgba(231,237,246,0.8); }
+      .editor-header .eh-icon {
+        width: 40px; height: 40px; border-radius: 10px;
+        background: linear-gradient(135deg, var(--pe-accent), var(--pe-accent2));
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px var(--pe-accent-glow);
+      }
+      .editor-header .eh-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
+      .editor-header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--pe-text); }
+      .editor-header p { margin: 2px 0 0; font-size: 0.78rem; color: var(--pe-text-dim); }
 
       .editor-layout {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 20px;
-        margin-top: 24px;
+        display: grid; grid-template-columns: 1.5fr 1fr; min-height: 70vh;
       }
 
-      .preview-panel, .controls-panel {
-        background: rgba(4,10,20,0.65);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 16px;
-        padding: 16px;
+      .preview-panel {
+        padding: 16px; display: flex; flex-direction: column; gap: 12px;
+        border-left: 1px solid var(--pe-border);
       }
+      .controls-panel { display: flex; flex-direction: column; max-height: 78vh; }
+      .controls-scroll {
+        flex: 1; overflow-y: auto; padding: 12px;
+        display: flex; flex-direction: column; gap: 8px;
+        scrollbar-width: thin; scrollbar-color: var(--pe-track) transparent;
+      }
+      .controls-scroll::-webkit-scrollbar { width: 4px; }
+      .controls-scroll::-webkit-scrollbar-thumb { background: var(--pe-track); border-radius: 4px; }
 
-      /* ===== Upload Zone ===== */
+      /* ===== Upload ===== */
       .upload-zone {
-        display: flex; flex-direction: column; align-items: center; gap: 8px;
-        width: 100%; box-sizing: border-box;
-        border: 2px dashed rgba(88,166,255,0.55);
-        border-radius: 14px; padding: 20px 16px;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+        border: 2px dashed var(--pe-border-hover);
+        border-radius: var(--pe-radius); padding: 26px 16px;
         text-align: center; cursor: pointer;
-        transition: all 0.3s ease; margin-bottom: 14px;
-        background: rgba(32,60,104,0.18);
+        transition: all var(--pe-transition);
+        background: var(--pe-bg-card);
+        flex-shrink: 0;
       }
-      .upload-zone i { font-size: 2.2rem; color: #58a6ff; opacity: 0.8; }
-      .upload-zone:hover { border-color: #8ed1ff; background: rgba(80,130,200,0.2); }
-      .upload-zone:hover i { opacity: 1; transform: scale(1.05); }
-      .upload-zone.dragover { border-color: #8ed1ff; background: rgba(80,130,200,0.22); }
-      .upload-zone.dragover i { opacity: 1; animation: uploadPulse 0.8s ease infinite; }
-      @keyframes uploadPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+      .upload-zone svg { width: 48px; height: 48px; stroke: var(--pe-accent); fill: none; stroke-width: 1.5; opacity: 0.75; transition: all var(--pe-transition); }
+      .upload-zone:hover { border-color: var(--pe-accent); background: var(--pe-bg-hover); box-shadow: inset 0 0 30px var(--pe-accent-glow); }
+      .upload-zone:hover svg { opacity: 1; transform: translateY(-2px); }
+      .upload-zone.dragover { border-color: var(--pe-accent); background: var(--pe-bg-hover); box-shadow: var(--pe-glow); }
+      .upload-zone strong { color: var(--pe-text); font-size: 0.88rem; }
+      .upload-zone .uz-note { font-size: 0.72rem; color: var(--pe-text-dim); }
 
-      /* ===== Zoom Toolbar ===== */
-      .zoom-bar {
-        display: flex; align-items: center; gap: 6px;
-        margin-bottom: 10px; padding: 6px 10px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 10px; justify-content: center;
+      /* ===== Toolbar ===== */
+      .toolbar-row {
+        display: flex; align-items: center; gap: 4px;
+        padding: 6px 8px; background: var(--pe-bg-card);
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-sm);
+        flex-wrap: wrap;
       }
-      .zoom-bar .zoom-level {
-        font-size: 0.82rem; color: #8bd0ff; font-weight: 600;
-        min-width: 48px; text-align: center; direction: ltr;
-      }
+      .toolbar-row .tb-sep { width: 1px; height: 24px; background: var(--pe-border); margin: 0 4px; flex-shrink: 0; }
+      .zoom-display { font-size: 0.78rem; color: var(--pe-accent); font-weight: 700; min-width: 48px; text-align: center; direction: ltr; }
 
       /* ===== Preview ===== */
       .preview-wrap {
-        position: relative; width: 100%;
-        height: clamp(280px, 56vh, 580px); border-radius: 14px;
-        overflow: hidden; border: 1px solid rgba(255,255,255,0.14);
+        position: relative; width: 100%; flex: 1;
+        min-height: clamp(260px, 50vh, 560px); border-radius: var(--pe-radius);
+        overflow: hidden; border: 1px solid var(--pe-border);
         display: flex; align-items: center; justify-content: center;
         background:
-          radial-gradient(circle at 20% 20%, rgba(83,132,201,0.35), transparent 35%),
-          radial-gradient(circle at 80% 0%, rgba(37,87,156,0.35), transparent 30%),
-          repeating-conic-gradient(from 45deg, #0d1422 0deg 10deg, #111b2d 10deg 20deg);
+          radial-gradient(circle at 25% 25%, var(--pe-accent-glow), transparent 40%),
+          radial-gradient(circle at 75% 15%, var(--pe-accent2-glow), transparent 35%),
+          repeating-conic-gradient(from 45deg, var(--pe-checker-a) 0deg 10deg, var(--pe-checker-b) 10deg 20deg);
       }
-
-      #imageCanvas, #overlayCanvas {
-        display: block; position: absolute;
-        left: 50%; top: 50%; transform: translate(-50%,-50%);
-        max-width: none; max-height: none;
+      .preview-wrap.panning { cursor: grabbing !important; }
+      .preview-wrap.zoomable { cursor: grab; }
+      .canvas-stage {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
       }
-      #overlayCanvas { pointer-events: none; }
-
+      .canvas-stage canvas { display: block; }
+      #overlayCanvas { position: absolute; inset: 0; }
+      #drawCanvas { position: absolute; inset: 0; }
       .canvas-empty {
-        min-height: 280px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: rgba(231,237,246,0.75); text-align: center; padding: 20px; gap: 8px;
+        min-height: 260px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 12px;
+        color: var(--pe-text-dim); text-align: center; padding: 20px;
       }
-      .canvas-empty i { font-size: 3rem; color: rgba(88,166,255,0.4); }
+      .canvas-empty svg { width: 64px; height: 64px; stroke: var(--pe-accent); fill: none; stroke-width: 1; opacity: 0.4; }
+      .canvas-empty p { margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--pe-text); }
+      .canvas-empty .es-hint { font-size: 0.7rem; color: var(--pe-text-muted); }
+      .draw-canvas-active #drawCanvas { pointer-events: auto; cursor: crosshair; }
 
-      /* ===== Image Info Bar ===== */
+      /* ===== Loading overlay ===== */
+      .loading-overlay {
+        position: absolute; inset: 0; z-index: 6;
+        display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+        background: rgba(var(--pe-scrim), 0.45); backdrop-filter: blur(3px);
+        border-radius: var(--pe-radius); color: var(--pe-text); font-size: 0.82rem;
+      }
+      .loading-overlay.visible { display: flex; }
+      .spinner {
+        width: 34px; height: 34px; border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--pe-accent), var(--pe-accent2), transparent 60%);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+        animation: pe-spin 0.9s linear infinite;
+      }
+      @keyframes pe-spin { to { transform: rotate(360deg); } }
+
+      /* ===== Export bar ===== */
+      .export-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+
+      /* ===== Image info ===== */
       .image-info {
-        display: none; align-items: center; gap: 16px;
-        margin-top: 10px; padding: 6px 12px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 8px; font-size: 0.78rem; color: rgba(231,237,246,0.65);
+        display: none; align-items: center; gap: 14px;
+        padding: 6px 12px; background: var(--pe-bg-card);
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-xs);
+        font-size: 0.72rem; color: var(--pe-text-dim);
       }
       .image-info.visible { display: flex; }
-      .image-info span { display: flex; align-items: center; gap: 5px; }
-      .image-info i { color: #58a6ff; font-size: 0.75rem; }
+      .image-info span { display: flex; align-items: center; gap: 4px; }
+      .image-info svg { width: 12px; height: 12px; stroke: var(--pe-accent); fill: none; stroke-width: 2; }
 
-      /* ===== Controls Panel ===== */
-      .controls-panel {
-        display: flex; flex-direction: column;
-        max-height: 74vh; gap: 10px; overflow: hidden;
-      }
-      .controls-scroll {
-        flex: 1; overflow-y: auto; min-height: 0;
-        display: flex; flex-direction: column; gap: 10px;
-        scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
-      }
-      .controls-scroll::-webkit-scrollbar { width: 4px; }
-      .controls-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-      #group-actions { flex-shrink: 0; }
-
-      .control-group {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-      }
-
-      .control-group-header {
-        display: flex; align-items: center; gap: 8px;
-        padding: 10px 12px; cursor: pointer; user-select: none;
-        font-size: 0.92rem; font-weight: 700; color: #c9e4ff;
-        transition: background 0.2s;
-      }
-      .control-group-header:hover { background: rgba(255,255,255,0.03); }
-      .control-group-header i { font-size: 0.85rem; width: 1.2em; color: #58a6ff; }
-      .control-group-header .collapse-icon { margin-right: auto; font-size: 0.7rem; transition: transform 0.25s; color: rgba(255,255,255,0.3); }
-      .control-group.collapsed .collapse-icon { transform: rotate(-90deg); }
-      .control-group.collapsed .control-group-body { display: none; }
-
-      .control-group-body { padding: 0 12px 12px; }
-      .control-row { margin-bottom: 8px; }
-      .control-row:last-child { margin-bottom: 0; }
-
-      .control-label {
-        display: flex; align-items: center; justify-content: space-between;
-        font-size: 0.82rem; margin-bottom: 4px; gap: 8px;
-      }
-      .control-label span.value {
-        color: #8bd0ff; font-weight: 700; font-size: 0.78rem;
-        min-width: 40px; text-align: right; direction: ltr;
-      }
-
-      input[type="range"] {
-        width: 100%; accent-color: #4cb3ff; margin: 0;
-        -webkit-appearance: none; appearance: none; background: transparent;
-      }
-      input[type="range"]::-webkit-slider-runnable-track {
-        height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;
-      }
-      input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none; appearance: none;
-        width: 16px; height: 16px; border-radius: 50%;
-        background: linear-gradient(135deg, #4cb3ff, #2a7fd4);
-        cursor: pointer; margin-top: -6px;
-        box-shadow: 0 0 10px rgba(76,179,255,0.3);
-      }
-
-      /* ===== Buttons ===== */
-      .btn-row {
-        display: flex; flex-wrap: wrap; gap: 6px;
-      }
-      .btn-row .btn-tool { flex: 1; min-width: 0; }
-      .btn-row-center { justify-content: center; }
-      .btn-row-end { justify-content: flex-end; }
-
-      .btn-tool {
-        border: 0; border-radius: 10px; padding: 8px 10px;
-        color: #f4f8ff; font-size: 0.82rem;
-        background: linear-gradient(135deg, #1f5aa8, #2f7ec7);
-        cursor: pointer; font-family: "Cairo", sans-serif;
-        transition: all 0.2s ease;
-        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-        white-space: nowrap;
-      }
-      .btn-tool i { font-size: 0.9rem; }
-      .btn-tool:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(41,124,209,0.35);
-      }
-      .btn-tool:active { transform: translateY(0) scale(0.97); }
-
-      .btn-tool.secondary { background: linear-gradient(135deg, #4f6075, #445265); }
-      .btn-tool.secondary:hover { background: linear-gradient(135deg, #5a6d85, #4f6075); }
-      .btn-tool.warn { background: linear-gradient(135deg, #9d5a0e, #d98a26); }
-      .btn-tool.warn:hover { background: linear-gradient(135deg, #b06a14, #e89a30); }
-      .btn-tool.danger { background: linear-gradient(135deg, #8a2d2d, #b94545); }
-      .btn-tool.danger:hover { background: linear-gradient(135deg, #9e3535, #c94f4f); }
-      .btn-tool.success { background: linear-gradient(135deg, #1a8a4a, #26b865); }
-      .btn-tool.success:hover { background: linear-gradient(135deg, #1f9e55, #2dd073); }
-      .btn-tool.active { box-shadow: 0 0 0 2px rgba(145,203,255,0.5) inset; }
-      .btn-tool:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-
-      .btn-tool.icon-only { padding: 8px 10px; min-width: 36px; }
-      .btn-tool.icon-only i { font-size: 1rem; margin: 0; }
-
-      .tiny-note { font-size: 0.78rem; color: rgba(231,237,246,0.7); }
-
-      #fileInput, .paste-catcher { display: none; }
-      .paste-catcher {
-        position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;
-      }
-
-      .export-actions { margin: 10px 0; }
-
-      /* ===== Data URL ===== */
-      .data-url-panel { margin-top: 10px; }
-      .data-url-output {
-        width: 100%; min-height: 80px; resize: vertical; box-sizing: border-box;
-        border-radius: 10px; border: 1px solid rgba(255,255,255,0.14);
-        background: rgba(7,15,27,0.85); color: #dceaff; padding: 10px;
-        font-family: Consolas,"Courier New",monospace; direction: ltr;
-        white-space: pre; overflow-wrap: normal; word-break: normal;
-        overflow-x: auto; overflow-y: auto; font-size: 0.78rem;
-      }
-
-      /* ===== PDF Nav ===== */
+      /* ===== PDF nav ===== */
       .pdf-nav {
         display: none; align-items: center; gap: 6px;
-        margin-top: 10px; padding: 8px 10px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 10px; justify-content: center;
+        padding: 8px 10px; background: var(--pe-bg-card);
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-sm);
+        justify-content: center;
       }
       .pdf-nav.visible { display: flex; }
       .pdf-nav .page-input {
         width: 44px; text-align: center; direction: ltr;
-        background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 6px; color: #e7edf6; padding: 4px; font-size: 0.82rem; font-family: inherit;
+        background: var(--pe-bg-input); border: 1px solid var(--pe-border);
+        border-radius: var(--pe-radius-xs); color: var(--pe-text);
+        padding: 4px; font-size: 0.82rem; font-family: inherit;
       }
-      .pdf-nav .page-input:focus { outline: none; border-color: #4cb3ff; }
-      .pdf-nav .page-total { font-size: 0.82rem; color: rgba(231,237,246,0.6); min-width: 20px; }
-      .pdf-nav .btn-tool { padding: 6px 8px; }
-      .pdf-nav .btn-tool i { font-size: 0.85rem; }
+      .pdf-nav .page-input:focus { outline: none; border-color: var(--pe-accent); }
+      .pdf-nav .page-total { font-size: 0.78rem; color: var(--pe-text-dim); }
       .pdf-nav .quality-select {
-        background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 6px; color: #e7edf6; padding: 4px 6px;
-        font-size: 0.75rem; font-family: inherit; cursor: pointer;
+        background: var(--pe-bg-input); border: 1px solid var(--pe-border);
+        border-radius: var(--pe-radius-xs); color: var(--pe-text);
+        padding: 4px 6px; font-size: 0.72rem; font-family: inherit; cursor: pointer;
       }
 
-      /* ===== Filter Presets ===== */
-      .preset-grid {
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+      /* ===== Data URL ===== */
+      .data-url-output {
+        width: 100%; min-height: 60px; resize: vertical; box-sizing: border-box;
+        border-radius: var(--pe-radius-xs); border: 1px solid var(--pe-border);
+        background: var(--pe-bg-input); color: var(--pe-accent);
+        padding: 8px; font-family: Consolas, "Courier New", monospace;
+        direction: ltr; white-space: pre; font-size: 0.7rem;
+        overflow-wrap: normal; word-break: normal; overflow-x: auto; overflow-y: auto;
       }
+      .data-url-output:focus { outline: none; border-color: var(--pe-accent); }
+      .data-url-output.error { color: var(--pe-danger); }
+
+      /* ===== Icon button ===== */
+      .ib {
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-xs);
+        padding: 7px; background: var(--pe-bg-card);
+        cursor: pointer; transition: all var(--pe-transition);
+        display: inline-flex; align-items: center; justify-content: center;
+        position: relative; flex-shrink: 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      .ib svg { width: 18px; height: 18px; stroke: var(--pe-text); fill: none; stroke-width: 2; transition: all var(--pe-transition); }
+      .ib:hover { background: var(--pe-bg-hover); border-color: var(--pe-border-hover); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14); }
+      .ib:hover svg { stroke: var(--pe-accent); }
+      .ib:active { transform: translateY(0) scale(0.95); }
+      .ib.active { border-color: var(--pe-accent); background: var(--pe-bg-hover); box-shadow: 0 0 0 1px var(--pe-accent-glow), var(--pe-glow); }
+      .ib.active svg { stroke: var(--pe-accent); }
+      .ib:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+      .ib.accent { background: linear-gradient(135deg, var(--pe-accent-glow), var(--pe-accent2-glow)); border-color: var(--pe-border-hover); }
+      .ib.accent svg { stroke: var(--pe-accent); }
+      .ib.accent:hover { background: linear-gradient(135deg, var(--pe-accent), var(--pe-accent2)); }
+      .ib.accent:hover svg { stroke: #fff; }
+      .ib.danger { border-color: color-mix(in srgb, var(--pe-danger) 40%, transparent); }
+      .ib.danger svg { stroke: var(--pe-danger); }
+      .ib.danger:hover { background: color-mix(in srgb, var(--pe-danger) 14%, transparent); border-color: var(--pe-danger); }
+      .ib.success { border-color: color-mix(in srgb, var(--pe-success) 40%, transparent); }
+      .ib.success svg { stroke: var(--pe-success); }
+      .ib.success:hover { background: color-mix(in srgb, var(--pe-success) 14%, transparent); border-color: var(--pe-success); }
+      .ib.warning { border-color: color-mix(in srgb, var(--pe-warning) 40%, transparent); }
+      .ib.warning svg { stroke: var(--pe-warning); }
+      .ib.warning:hover { background: color-mix(in srgb, var(--pe-warning) 14%, transparent); border-color: var(--pe-warning); }
+      .ib .ib-tooltip {
+        position: absolute; bottom: calc(100% + 8px); left: 50%;
+        transform: translateX(-50%); padding: 4px 8px; border-radius: 6px;
+        background: rgba(0, 0, 0, 0.9); color: #fff; font-size: 0.68rem;
+        white-space: nowrap; pointer-events: none; opacity: 0;
+        transition: opacity 0.15s; z-index: 100;
+      }
+      .ib:hover .ib-tooltip { opacity: 1; }
+      .ib .ib-tooltip .kbd { color: #fff; opacity: 0.7; }
+
+      /* ===== Range sliders + live value bubble ===== */
+      .ctrl-row { margin-bottom: 10px; }
+      .ctrl-row:last-child { margin-bottom: 0; }
+      .ctrl-label {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 0.75rem; margin-bottom: 5px; color: var(--pe-text-dim);
+      }
+      .ctrl-label .val {
+        color: var(--pe-accent); font-weight: 700; font-size: 0.72rem;
+        min-width: 38px; text-align: right; direction: ltr;
+        transition: color 0.15s;
+      }
+      .ctrl-label .val.live { color: var(--pe-accent2); }
+      .range-wrap { position: relative; padding-top: 8px; }
+      input[type="range"] {
+        width: 100%; margin: 0; -webkit-appearance: none; appearance: none;
+        background: transparent; cursor: pointer; direction: ltr;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px; background: var(--pe-track); border-radius: 2px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none;
+        width: 14px; height: 14px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--pe-accent), var(--pe-accent2));
+        cursor: pointer; margin-top: -5px;
+        box-shadow: 0 0 8px var(--pe-accent-glow);
+        transition: box-shadow 0.2s, transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 14px var(--pe-accent-glow); }
+      input[type="range"]::-moz-range-track {
+        height: 4px; background: var(--pe-track); border-radius: 2px; border: none;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 14px; height: 14px; border-radius: 50%; border: none;
+        background: linear-gradient(135deg, var(--pe-accent), var(--pe-accent2));
+        box-shadow: 0 0 8px var(--pe-accent-glow);
+      }
+      .range-bubble {
+        position: absolute; top: -4px; left: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+        background: linear-gradient(135deg, var(--pe-accent), var(--pe-accent2));
+        color: #fff; font-size: 0.66rem; font-weight: 700;
+        padding: 2px 8px; border-radius: 7px;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.15s, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+        white-space: nowrap; direction: ltr;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+        z-index: 5;
+      }
+      .range-wrap.dragging .range-bubble { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+
+      /* ===== Control groups ===== */
+      .control-group {
+        background: var(--pe-bg-card); border: 1px solid var(--pe-border);
+        border-radius: var(--pe-radius-sm); overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        transition: border-color var(--pe-transition);
+        flex-shrink: 0;
+      }
+      .cg-header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 12px; cursor: pointer; user-select: none;
+        font-size: 0.82rem; font-weight: 700; color: var(--pe-text);
+        transition: background var(--pe-transition);
+      }
+      .cg-header:hover { background: var(--pe-ghost); }
+      .cg-header svg { width: 16px; height: 16px; stroke: var(--pe-accent); fill: none; stroke-width: 2; flex-shrink: 0; }
+      .cg-header .cg-arrow {
+        margin-right: auto; width: 14px; height: 14px;
+        stroke: var(--pe-text-muted); transition: transform 0.25s;
+      }
+      .control-group.collapsed .cg-arrow { transform: rotate(-90deg); }
+      .control-group.collapsed .cg-body { display: none; }
+      .cg-body { padding: 10px 12px 12px; }
+      .ctrl-row-tools { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+
+      /* ===== Preset grid ===== */
+      .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
       .preset-btn {
-        border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
-        padding: 6px 4px; background: rgba(255,255,255,0.03);
-        color: rgba(231,237,246,0.75); font-size: 0.7rem;
-        cursor: pointer; text-align: center; transition: all 0.2s;
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-sm);
+        padding: 10px 4px; background: var(--pe-bg-input);
+        color: var(--pe-text-dim); font-size: 0.74rem;
+        cursor: pointer; text-align: center; transition: all var(--pe-transition);
         font-family: "Cairo", sans-serif;
-        display: flex; flex-direction: column; align-items: center; gap: 3px;
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
       }
-      .preset-btn i { font-size: 0.9rem; color: #58a6ff; }
-      .preset-btn:hover { border-color: rgba(88,166,255,0.4); background: rgba(88,166,255,0.08); }
-      .preset-btn.active { border-color: #4cb3ff; background: rgba(76,179,255,0.12); color: #fff; }
-      .preset-btn.active i { color: #8bd0ff; }
+      .preset-btn svg { width: 26px; height: 26px; stroke: var(--pe-accent); fill: none; stroke-width: 2; }
+      .preset-btn:hover { border-color: var(--pe-border-hover); background: var(--pe-bg-hover); transform: translateY(-1px); }
+      .preset-btn.active { border-color: var(--pe-accent); background: var(--pe-bg-hover); color: var(--pe-text); box-shadow: 0 0 0 1px var(--pe-accent-glow); }
+      .preset-btn.active svg { stroke: var(--pe-accent); }
 
-      /* ===== Crop Aspect ===== */
-      .aspect-grid {
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-      }
+      /* ===== Aspect grid ===== */
+      .aspect-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
       .aspect-btn {
-        border: 1px solid rgba(255,255,255,0.07); border-radius: 6px;
-        padding: 4px; background: rgba(255,255,255,0.02);
-        color: rgba(231,237,246,0.65); font-size: 0.7rem;
-        cursor: pointer; text-align: center; transition: all 0.2s;
+        border: 1px solid var(--pe-border); border-radius: var(--pe-radius-xs);
+        padding: 5px; background: var(--pe-bg-input);
+        color: var(--pe-text-dim); font-size: 0.68rem;
+        cursor: pointer; text-align: center; transition: all var(--pe-transition);
         font-family: "Cairo", sans-serif;
       }
-      .aspect-btn:hover { border-color: rgba(88,166,255,0.35); background: rgba(88,166,255,0.06); }
-      .aspect-btn.active { border-color: #4cb3ff; background: rgba(76,179,255,0.1); color: #fff; }
+      .aspect-btn:hover { border-color: var(--pe-border-hover); background: var(--pe-bg-hover); }
+      .aspect-btn.active { border-color: var(--pe-accent); background: var(--pe-bg-hover); color: var(--pe-text); }
 
-      /* ===== Grid Overlay ===== */
-      .grid-overlay-toggle {
-        display: flex; align-items: center; gap: 6px;
-        padding: 6px 10px; border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 8px; cursor: pointer; transition: all 0.2s;
-        font-size: 0.82rem; color: rgba(231,237,246,0.7);
-        background: rgba(255,255,255,0.02);
+      /* ===== Color picker ===== */
+      .color-pick-wrap { display: flex; align-items: center; gap: 8px; }
+      .color-pick-wrap input[type="color"] {
+        -webkit-appearance: none; appearance: none; border: none;
+        width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+        background: transparent; padding: 0;
       }
-      .grid-overlay-toggle:hover { background: rgba(255,255,255,0.05); }
-      .grid-overlay-toggle.active { border-color: #4cb3ff; color: #fff; }
-      .grid-overlay-toggle i { font-size: 0.9rem; }
+      .color-pick-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+      .color-pick-wrap input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: 1px solid var(--pe-border); }
+      .color-pick-wrap .color-hex { font-size: 0.72rem; color: var(--pe-text-dim); font-family: monospace; }
+      .color-pick-wrap input[type="text"] {
+        flex: 1; min-width: 0; box-sizing: border-box;
+        padding: 8px 10px; border-radius: var(--pe-radius-xs);
+        border: 1px solid var(--pe-border); background: var(--pe-bg-input);
+        color: var(--pe-text); font-family: inherit; font-size: 0.82rem;
+      }
+      .color-pick-wrap input[type="text"]:focus { outline: none; border-color: var(--pe-accent); }
 
-      /* ===== Context Menu ===== */
+      /* ===== Context menu ===== */
       .custom-context-menu {
         position: fixed; z-index: 9999; min-width: 200px;
-        background: rgba(10,18,33,0.98);
-        border: 1px solid rgba(140,200,255,0.35);
-        border-radius: 12px; padding: 6px;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-        display: none; backdrop-filter: blur(8px);
+        background: var(--pe-bg-panel);
+        border: 1px solid var(--pe-border-hover);
+        border-radius: var(--pe-radius-sm); padding: 6px;
+        box-shadow: var(--pe-shadow);
+        display: none; backdrop-filter: blur(12px);
       }
-      .context-menu-btn {
-        width: 100%; text-align: right; border: 0; border-radius: 8px;
-        padding: 8px 10px; color: #ecf5ff; background: transparent;
+      .ctx-btn {
+        width: 100%; text-align: right; border: 0; border-radius: var(--pe-radius-xs);
+        padding: 8px 10px; color: var(--pe-text); background: transparent;
         cursor: pointer; font-family: "Cairo", sans-serif;
         display: flex; align-items: center; gap: 8px; font-size: 0.82rem;
+        transition: background var(--pe-transition);
       }
-      .context-menu-btn i { font-size: 0.85rem; color: #58a6ff; }
-      .context-menu-btn:hover { background: rgba(79,150,224,0.2); }
+      .ctx-btn svg { width: 15px; height: 15px; stroke: var(--pe-accent); fill: none; stroke-width: 2; }
+      .ctx-btn:hover { background: var(--pe-bg-hover); }
 
-      /* ===== Keyboard Shortcuts ===== */
-      .kbd-hint {
-        display: inline-flex; align-items: center; gap: 4px;
-        font-size: 0.7rem; color: rgba(231,237,246,0.35);
-        margin-right: 4px;
+      /* ===== History ===== */
+      .history-panel { max-height: 130px; overflow-y: auto; margin-bottom: 8px; }
+      .history-panel::-webkit-scrollbar { width: 3px; }
+      .history-panel::-webkit-scrollbar-thumb { background: var(--pe-track); border-radius: 3px; }
+      .history-item {
+        width: 100%; border: 0; text-align: right; display: flex; align-items: center; gap: 6px;
+        padding: 4px 8px; border-radius: 4px; background: transparent;
+        font-family: inherit; font-size: 0.7rem; color: var(--pe-text-dim);
+        cursor: pointer; transition: background var(--pe-transition);
       }
-      .kbd-hint kbd {
-        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 3px; padding: 1px 4px; font-size: 0.65rem;
-        font-family: inherit; color: rgba(231,237,246,0.4);
+      .history-item:hover { background: var(--pe-bg-hover); color: var(--pe-text); }
+      .history-item svg { width: 12px; height: 12px; stroke: var(--pe-accent); fill: none; stroke-width: 2; flex-shrink: 0; }
+      .history-empty { padding: 6px 8px; font-size: 0.68rem; color: var(--pe-text-muted); }
+
+      /* ===== Tiny note + kbd ===== */
+      .tiny-note { font-size: 0.7rem; color: var(--pe-text-dim); margin: 0; line-height: 1.9; }
+      .kbd {
+        display: inline-block; padding: 1px 6px; margin: 0 1px;
+        border: 1px solid var(--pe-border); border-bottom-width: 2px; border-radius: 5px;
+        font-size: 0.66rem; line-height: 1.5; color: var(--pe-text-dim);
+        background: var(--pe-ghost); font-family: inherit;
+      }
+
+      /* ===== Toast ===== */
+      .toast-container {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        z-index: 2000; display: flex; flex-direction: column; gap: 8px;
+        align-items: center; pointer-events: none; width: max-content; max-width: 94vw;
+      }
+      .toast {
+        min-width: 230px; max-width: 420px;
+        border-radius: 12px; padding: 10px 14px; font-size: 0.8rem;
+        color: var(--pe-text); background: var(--pe-bg-panel);
+        border: 1px solid var(--pe-border-hover);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        display: flex; gap: 9px; align-items: center;
+        animation: pe-toast-in 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+      }
+      .toast .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--pe-accent); box-shadow: 0 0 8px currentColor; }
+      .toast.success .toast-dot { background: var(--pe-success); }
+      .toast.error .toast-dot { background: var(--pe-danger); }
+      .toast.warning .toast-dot { background: var(--pe-warning); }
+      .toast.leaving { transition: opacity 0.2s, transform 0.2s; opacity: 0; transform: translateY(8px); }
+      @keyframes pe-toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+      #fileInput, .paste-catcher { display: none; }
+      .paste-catcher { position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none; }
+
+      /* ===== Accessibility ===== */
+      :focus-visible { outline: 2px solid var(--pe-accent); outline-offset: 2px; border-radius: 4px; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
       }
 
       /* ===== Responsive ===== */
       @media (max-width: 1100px) {
         .editor-layout { grid-template-columns: 1fr; }
-        .controls-panel { max-height: none; overflow: visible; }
+        .preview-panel { border-left: none; border-bottom: 1px solid var(--pe-border); }
+        .controls-panel { max-height: none; }
         .controls-scroll { overflow-y: visible; max-height: none; }
-        .preset-grid { grid-template-columns: repeat(3, 1fr); }
       }
       @media (max-width: 600px) {
-        .editor-shell { padding: 14px; }
-        .preset-grid { grid-template-columns: repeat(2, 1fr); }
-        .aspect-grid { grid-template-columns: repeat(2, 1fr); }
-        .editor-title { font-size: 1.4rem; flex-wrap: wrap; }
+        .editor-shell { border-radius: 14px; }
+        .editor-header { padding: 14px 16px; }
+        .editor-header h1 { font-size: 1rem; }
+        .preview-panel, .controls-scroll { padding: 10px; }
+        .preset-grid { grid-template-columns: repeat(3, 1fr); }
+        .aspect-grid { grid-template-columns: repeat(3, 1fr); }
+        .toolbar-row { gap: 3px; padding: 4px 6px; }
       }
 
       #three-canvas-container {
@@ -374,61 +524,40 @@
         z-index: -1; pointer-events: none;
       }
     </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-      defer
-    ></script>
-    <script src="../assets/js/three-bg.js" defer></script>
-    <script src="../assets/js/main.js" defer></script>
-    <script src="../assets/js/svg-icons.js" defer></script>
   </head>
 
   <body class="theme-aware">
     <div class="grain-overlay"></div>
     <div id="three-canvas-container"></div>
     <div class="floating-background">
-      <div class="floating-icon" style="left: 10%; animation-duration: 8s; animation-delay: 0s">🚀</div>
-      <div class="floating-icon" style="left: 25%; animation-duration: 10s; animation-delay: 2s">⭐</div>
-      <div class="floating-icon" style="left: 40%; animation-duration: 12s; animation-delay: 4s">🔥</div>
-      <div class="floating-icon" style="left: 55%; animation-duration: 9s; animation-delay: 1s">💎</div>
-      <div class="floating-icon" style="left: 70%; animation-duration: 11s; animation-delay: 3s">🎯</div>
-      <div class="floating-icon" style="left: 85%; animation-duration: 13s; animation-delay: 5s">⚡</div>
+      <div class="floating-icon" style="left:10%;animation-duration:8s;animation-delay:0s">🚀</div>
+      <div class="floating-icon" style="left:25%;animation-duration:10s;animation-delay:2s">⭐</div>
+      <div class="floating-icon" style="left:40%;animation-duration:12s;animation-delay:4s">🔥</div>
+      <div class="floating-icon" style="left:55%;animation-duration:9s;animation-delay:1s">💎</div>
+      <div class="floating-icon" style="left:70%;animation-duration:11s;animation-delay:3s">🎯</div>
+      <div class="floating-icon" style="left:85%;animation-duration:13s;animation-delay:5s">⚡</div>
     </div>
 
     <header class="header">
       <div class="container">
         <div class="header-content">
-          <div class="logo">
-            <a href="../index.html">
-              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
-            </a>
-          </div>
+          <div class="logo"><a href="../index.html"><img src="../assets/images/logo.svg" alt="Ali Ahmed" /></a></div>
           <nav class="nav">
             <ul class="nav-links">
               <li><a href="../index.html#home">الرئيسية</a></li>
               <li><a href="../index.html#about">من نحن</a></li>
               <li><a href="../index.html#services">خدماتنا</a></li>
               <li><a href="../works.html">أعمالنا</a></li>
-              <li><a href="../index.html#salla-discounts">أكواد خصم سلة</a></li>
               <li><a href="index.html" class="active">أدواتنا</a></li>
               <li><a href="../index.html#contact">تواصل معنا</a></li>
-              <li><a href="../index.html#payment">الدفع</a></li>
             </ul>
           </nav>
           <div class="header-actions">
             <div class="theme-toggle" onclick="toggleTheme()">
-              <svg class="svg-icon" viewBox="0 0 512 512">
-                <use href="../assets/images/icons.svg#icon-moon"></use>
-              </svg>
+              <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-moon"></use></svg>
             </div>
             <div class="mobile-toggle">
-              <svg class="svg-icon" viewBox="0 0 448 512">
-                <use href="../assets/images/icons.svg#icon-bars"></use>
-              </svg>
+              <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-bars"></use></svg>
             </div>
           </div>
         </div>
@@ -438,230 +567,457 @@
     <div class="tool-page-wrapper">
       <div class="container">
         <section class="editor-shell">
-          <h1 class="editor-title">محرر الصور الاحترافي / Pro Image Editor</h1>
-          <p class="editor-subtitle">
-            رفع الصورة، تعديل الألوان والتأثيرات، القص، التدوير، والمقارنة قبل/بعد مع معالجة كاملة داخل المتصفح.
-          </p>
+          <div class="editor-header">
+            <div class="eh-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <div>
+              <h1>محرر الصور الاحترافي</h1>
+              <p>رفع، تعديل، قص، تدوير، تأثيرات، رسم، نص — كل شيء في المتصفح</p>
+            </div>
+          </div>
 
           <div class="editor-layout">
             <div class="preview-panel">
               <label class="upload-zone" id="uploadZone" for="fileInput">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <div><strong>اسحب الصورة أو ملف PDF هنا أو اضغط للرفع</strong></div>
-                <div class="tiny-note">يدعم: PNG, JPG, WEBP, PDF · لصق Ctrl+V</div>
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <strong>اسحب الصورة هنا أو اضغط للرفع</strong>
+                <span class="uz-note">PNG, JPG, WEBP, PDF · Ctrl+V للصق</span>
               </label>
               <input id="fileInput" type="file" accept="image/*,application/pdf" />
               <textarea id="pasteCatcher" class="paste-catcher" aria-hidden="true" tabindex="-1"></textarea>
 
-              <div class="zoom-bar" id="zoomBar">
-                <button class="btn-tool icon-only secondary" id="zoomOutBtn" type="button" title="تصغير"><i class="fas fa-search-minus"></i></button>
-                <span class="zoom-level" id="zoomLevel">100%</span>
-                <button class="btn-tool icon-only secondary" id="zoomInBtn" type="button" title="تكبير"><i class="fas fa-search-plus"></i></button>
-                <button class="btn-tool icon-only secondary" id="zoomFitBtn" type="button" title="ملاءمة"><i class="fas fa-expand"></i></button>
-                <button class="btn-tool icon-only secondary" id="zoomOneOneBtn" type="button" title="1:1"><i class="fas fa-compress"></i></button>
+              <div class="toolbar-row" id="mainToolbar">
+                <button class="ib" id="zoomOutBtn" type="button" aria-label="تصغير">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                  <span class="ib-tooltip">تصغير <span class="kbd">Ctrl+Scroll</span></span>
+                </button>
+                <span class="zoom-display" id="zoomLevel" role="status" aria-live="polite">100%</span>
+                <button class="ib" id="zoomInBtn" type="button" aria-label="تكبير">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                  <span class="ib-tooltip">تكبير</span>
+                </button>
+                <button class="ib" id="zoomFitBtn" type="button" aria-label="ملاءمة العرض">
+                  <svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  <span class="ib-tooltip">ملاءمة</span>
+                </button>
+                <button class="ib" id="zoomOneOneBtn" type="button" aria-label="حجم حقيقي ١٠٠٪">
+                  <svg viewBox="0 0 24 24"><polyline points="4 4 9 4 9 9"/><polyline points="20 20 15 20 15 15"/><line x1="9" y1="4" x2="4" y2="4"/><line x1="4" y1="4" x2="4" y2="9"/><line x1="15" y1="20" x2="20" y2="20"/><line x1="20" y1="20" x2="20" y2="15"/></svg>
+                  <span class="ib-tooltip">1:1</span>
+                </button>
+                <div class="tb-sep"></div>
+                <button class="ib" id="undoBtn" type="button" aria-label="تراجع">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                  <span class="ib-tooltip">تراجع <span class="kbd">Ctrl+Z</span></span>
+                </button>
+                <button class="ib" id="redoBtn" type="button" aria-label="إعادة">
+                  <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-11.36L23 10"/></svg>
+                  <span class="ib-tooltip">إعادة <span class="kbd">Ctrl+Y</span></span>
+                </button>
+                <div class="tb-sep"></div>
+                <button class="ib" id="beforeAfter" type="button" aria-label="مقارنة قبل وبعد" aria-pressed="false">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span class="ib-tooltip">مقارنة (اضغط مطولًا للمعاينة)</span>
+                </button>
+                <button class="ib" id="gridToggle" type="button" aria-label="شبكة التقسيم" aria-pressed="false">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  <span class="ib-tooltip">شبكة <span class="kbd">Ctrl+G</span></span>
+                </button>
               </div>
 
               <div class="preview-wrap" id="previewWrap">
                 <div class="canvas-empty" id="emptyState">
-                  <i class="fas fa-image"></i>
-                  ارفع صورة لبدء التعديل<br />
-                  Upload to start editing
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  <p>ارفع صورة لبدء التعديل</p>
+                  <span class="es-hint">اسحب الملف هنا أو اضغط على منطقة الرفع أعلاه</span>
                 </div>
-                <canvas id="imageCanvas"></canvas>
-                <canvas id="overlayCanvas"></canvas>
+                <div class="canvas-stage" id="canvasStage">
+                  <canvas id="imageCanvas"></canvas>
+                  <canvas id="overlayCanvas"></canvas>
+                  <canvas id="drawCanvas"></canvas>
+                </div>
+                <div class="loading-overlay" id="loadingOverlay" role="status">
+                  <div class="spinner"></div>
+                  <span id="loadingText">جارٍ المعالجة...</span>
+                </div>
               </div>
 
-              <div class="btn-row export-actions">
-                <button class="btn-tool secondary" id="openEditedTabBtn" type="button"><i class="fas fa-external-link-alt"></i> New Tab</button>
-                <button class="btn-tool secondary" id="copyEditedImageBtn" type="button"><i class="fas fa-copy"></i> Copy</button>
-                <button class="btn-tool secondary" id="pasteImageBtn" type="button" title="Paste Image / لصق صورة"><i class="fas fa-paste"></i> Paste</button>
+              <div class="export-bar">
+                <button class="ib accent" id="openEditedTabBtn" type="button" aria-label="فتح في تبويب جديد">
+                  <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <span class="ib-tooltip">فتح في تبويب جديد</span>
+                </button>
+                <button class="ib" id="copyEditedImageBtn" type="button" aria-label="نسخ الصورة">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  <span class="ib-tooltip">نسخ الصورة</span>
+                </button>
+                <button class="ib" id="pasteImageBtn" type="button" aria-label="لصق من الحافظة">
+                  <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+                  <span class="ib-tooltip">لصق صورة</span>
+                </button>
+                <div class="tb-sep"></div>
+                <button class="ib success" id="downloadPng" type="button" aria-label="تحميل PNG">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span class="ib-tooltip">تحميل PNG</span>
+                </button>
+                <button class="ib success" id="downloadJpg" type="button" aria-label="تحميل JPG">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span class="ib-tooltip">تحميل JPG</span>
+                </button>
+                <button class="ib success" id="downloadPdf" type="button" aria-label="تحميل PDF">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  <span class="ib-tooltip">تحميل PDF</span>
+                </button>
               </div>
 
               <div class="pdf-nav" id="pdfNav">
-                <button class="btn-tool icon-only secondary" id="pdfPrevBtn" type="button" title="الصفحة السابقة"><i class="fas fa-chevron-right"></i></button>
-                <input class="page-input" id="pdfPageInput" type="number" min="1" value="1" />
+                <button class="ib" id="pdfPrevBtn" type="button" aria-label="الصفحة السابقة">
+                  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <input class="page-input" id="pdfPageInput" type="number" min="1" value="1" aria-label="رقم الصفحة" />
                 <span class="page-total" id="pdfPageTotal">/ 1</span>
-                <button class="btn-tool icon-only secondary" id="pdfNextBtn" type="button" title="الصفحة التالية"><i class="fas fa-chevron-left"></i></button>
-                <select class="quality-select" id="pdfQuality">
-                  <option value="1">Draft</option>
-                  <option value="1.5" selected>Normal</option>
-                  <option value="2.5">High</option>
+                <button class="ib" id="pdfNextBtn" type="button" aria-label="الصفحة التالية">
+                  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                <select class="quality-select" id="pdfQuality" aria-label="جودة عرض PDF">
+                  <option value="1">مخطط</option>
+                  <option value="1.5" selected>عادي</option>
+                  <option value="2.5">عالٍ</option>
                 </select>
               </div>
 
               <div class="image-info" id="imageInfo">
-                <span><i class="fas fa-file-image"></i> <span id="infoFileName">-</span></span>
-                <span><i class="fas fa-arrows-alt"></i> <span id="infoDimensions">-</span></span>
-                <span><i class="fas fa-file"></i> <span id="infoSize">-</span></span>
+                <span><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--pe-accent);fill:none;stroke-width:2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> <span id="infoFileName">-</span></span>
+                <span><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--pe-accent);fill:none;stroke-width:2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg> <span id="infoDimensions">-</span></span>
+                <span><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--pe-accent);fill:none;stroke-width:2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> <span id="infoSize">-</span></span>
               </div>
 
               <div class="data-url-panel">
-                <div class="control-label"><span><i class="fas fa-code"></i> Data URL</span></div>
-                <textarea id="dataUrlOutput" class="data-url-output" wrap="off" readonly spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Load an image and edit it to generate data URL."></textarea>
-                <div class="btn-row" style="margin-top: 6px">
-                  <button class="btn-tool secondary" id="copyDataUrlBtn" type="button"><i class="fas fa-copy"></i> Copy Data URL</button>
+                <div class="ctrl-label"><span style="color:var(--pe-text-dim);font-size:0.75rem">Data URL</span></div>
+                <textarea id="dataUrlOutput" class="data-url-output" wrap="off" readonly spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Data URL" placeholder="ارفع صورة لإنشاء Data URL."></textarea>
+                <div style="margin-top:6px">
+                  <button class="ib" id="copyDataUrlBtn" type="button" aria-label="نسخ Data URL">
+                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    <span class="ib-tooltip">نسخ Data URL</span>
+                  </button>
                 </div>
               </div>
             </div>
 
             <aside class="controls-panel">
               <div class="controls-scroll">
-              <div class="control-group" id="group-presets">
-                <div class="control-group-header">
-                  <i class="fas fa-layer-group"></i> Filter Presets / مرشحات
-                  <i class="fas fa-chevron-down collapse-icon"></i>
-                </div>
-                <div class="control-group-body">
-                  <div class="preset-grid">
-                    <button class="preset-btn" data-preset="original" type="button"><i class="fas fa-undo"></i>Original</button>
-                    <button class="preset-btn" data-preset="vintage" type="button"><i class="fas fa-tint"></i>Vintage</button>
-                    <button class="preset-btn" data-preset="noir" type="button"><i class="fas fa-adjust"></i>Noir</button>
-                    <button class="preset-btn" data-preset="warm" type="button"><i class="fas fa-sun"></i>Warm</button>
-                    <button class="preset-btn" data-preset="cool" type="button"><i class="fas fa-snowflake"></i>Cool</button>
-                    <button class="preset-btn" data-preset="cinematic" type="button"><i class="fas fa-film"></i>Cinema</button>
-                    <button class="preset-btn" data-preset="soft" type="button"><i class="fas fa-feather-alt"></i>Soft</button>
-                    <button class="preset-btn" data-preset="vivid" type="button"><i class="fas fa-bolt"></i>Vivid</button>
-                  </div>
-                </div>
-              </div>
 
-              <div class="control-group" id="group-transform">
-                <div class="control-group-header">
-                  <i class="fas fa-crop-alt"></i> Transform / التحويل
-                  <i class="fas fa-chevron-down collapse-icon"></i>
+                <div class="control-group" id="group-presets">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    الفلاتر
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="preset-grid">
+                      <button class="preset-btn" data-preset="original" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                        الأصلي
+                      </button>
+                      <button class="preset-btn" data-preset="vintage" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                        عتيق
+                      </button>
+                      <button class="preset-btn" data-preset="noir" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z"/></svg>
+                        أبيض وأسود
+                      </button>
+                      <button class="preset-btn" data-preset="warm" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        دافئ
+                      </button>
+                      <button class="preset-btn" data-preset="cool" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M20 16l-4-4 4-4"/><path d="M4 8l4 4-4 4"/><path d="M16 4l-4 4-4-4"/><path d="M8 20l4-4 4 4"/></svg>
+                        بارد
+                      </button>
+                      <button class="preset-btn" data-preset="cinematic" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>
+                        سينمائي
+                      </button>
+                      <button class="preset-btn" data-preset="soft" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                        ناعم
+                      </button>
+                      <button class="preset-btn" data-preset="vivid" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        حيوي
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class="control-group-body">
-                  <div class="control-row">
-                    <div class="control-label">Rotation <span class="value" id="val-rotate">0°</span></div>
-                    <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
-                  </div>
-                  <div class="btn-row" style="margin-bottom:6px">
-                    <button class="btn-tool secondary" id="rotateLeft" type="button"><i class="fas fa-undo"></i> -90°</button>
-                    <button class="btn-tool secondary" id="rotateRight" type="button"><i class="fas fa-redo"></i> +90°</button>
-                  </div>
-                  <div class="btn-row" style="margin-bottom:6px">
-                    <button class="btn-tool secondary" id="flipH" type="button"><i class="fas fa-arrows-alt-h"></i> Flip H</button>
-                    <button class="btn-tool secondary" id="flipV" type="button"><i class="fas fa-arrows-alt-v"></i> Flip V</button>
-                  </div>
-                  <div class="btn-row" style="margin-bottom:6px">
-                    <button class="btn-tool warn" id="cropMode" type="button"><i class="fas fa-crop"></i> Crop</button>
-                    <button class="btn-tool warn" id="applyCrop" type="button"><i class="fas fa-check"></i> Apply</button>
-                    <button class="btn-tool secondary" id="cancelCrop" type="button"><i class="fas fa-times"></i> Cancel</button>
-                  </div>
-                  <div class="control-label" style="margin-bottom:4px;font-size:0.75rem;color:rgba(231,237,246,0.5)">Aspect Ratio</div>
-                  <div class="aspect-grid" id="aspectGrid">
-                    <button class="aspect-btn" data-ratio="free" type="button">Free</button>
-                    <button class="aspect-btn" data-ratio="1:1" type="button">1:1</button>
-                    <button class="aspect-btn" data-ratio="4:3" type="button">4:3</button>
-                    <button class="aspect-btn" data-ratio="16:9" type="button">16:9</button>
-                    <button class="aspect-btn" data-ratio="3:2" type="button">3:2</button>
-                    <button class="aspect-btn" data-ratio="21:9" type="button">21:9</button>
-                  </div>
-                </div>
-              </div>
 
-              <div class="control-group" id="group-color">
-                <div class="control-group-header">
-                  <i class="fas fa-palette"></i> Color / الألوان
-                  <i class="fas fa-chevron-down collapse-icon"></i>
+                <div class="control-group" id="group-transform">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    التحويل
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الدوران <span class="val" id="val-rotate">0°</span></div>
+                      <div class="range-wrap" id="wrap-rotate">
+                        <input id="rotate" type="range" min="-180" max="180" step="1" value="0" aria-label="الدوران" />
+                        <span class="range-bubble"></span>
+                      </div>
+                    </div>
+                    <div class="ctrl-row-tools">
+                      <button class="ib" id="rotateLeft" type="button">
+                        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                        <span class="ib-tooltip">-90°</span>
+                      </button>
+                      <button class="ib" id="rotateRight" type="button">
+                        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-11.36L23 10"/></svg>
+                        <span class="ib-tooltip">+90°</span>
+                      </button>
+                      <button class="ib" id="flipH" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v14c0 1.1.9 2 2 2h3"/><path d="M16 3h3a2 2 0 012 2v14a2 2 0 01-2 2h-3"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                        <span class="ib-tooltip">قلب أفقي</span>
+                      </button>
+                      <button class="ib" id="flipV" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 012-2h14c1.1 0 2 .9 2 2v3"/><path d="M3 16v3a2 2 0 002 2h14a2 2 0 002-2v-3"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                        <span class="ib-tooltip">قلب عمودي</span>
+                      </button>
+                    </div>
+                    <div class="ctrl-row-tools">
+                      <button class="ib warning" id="cropMode" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M6.13 1L6 16a2 2 0 002 2h15"/><path d="M1 6.13L16 6a2 2 0 012 2v15"/></svg>
+                        <span class="ib-tooltip">قص</span>
+                      </button>
+                      <button class="ib success" id="applyCrop" type="button">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span class="ib-tooltip">تطبيق القص</span>
+                      </button>
+                      <button class="ib" id="cancelCrop" type="button">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span class="ib-tooltip">إلغاء القص</span>
+                      </button>
+                    </div>
+                    <div class="ctrl-label" style="margin-bottom:5px;font-size:0.68rem;color:var(--pe-text-muted)">نسبة العرض</div>
+                    <div class="aspect-grid" id="aspectGrid">
+                      <button class="aspect-btn" data-ratio="free" type="button">حر</button>
+                      <button class="aspect-btn" data-ratio="1:1" type="button">1:1</button>
+                      <button class="aspect-btn" data-ratio="4:3" type="button">4:3</button>
+                      <button class="aspect-btn" data-ratio="16:9" type="button">16:9</button>
+                      <button class="aspect-btn" data-ratio="3:2" type="button">3:2</button>
+                      <button class="aspect-btn" data-ratio="21:9" type="button">21:9</button>
+                    </div>
+                  </div>
                 </div>
-                <div class="control-group-body">
-                  <div class="control-row">
-                    <div class="control-label">Red <span class="value" id="val-red">100%</span></div>
-                    <input id="red" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Green <span class="value" id="val-green">100%</span></div>
-                    <input id="green" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Blue <span class="value" id="val-blue">100%</span></div>
-                    <input id="blue" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Hue <span class="value" id="val-hue">0°</span></div>
-                    <input id="hue" type="range" min="-180" max="180" value="0" />
-                  </div>
-                  <div class="btn-row">
-                    <button class="btn-tool secondary" id="toggleSepia" type="button"><i class="fas fa-tint"></i> Sepia</button>
-                    <button class="btn-tool secondary" id="toggleGray" type="button"><i class="fas fa-adjust"></i> Gray</button>
-                  </div>
-                </div>
-              </div>
 
-              <div class="control-group" id="group-tone">
-                <div class="control-group-header">
-                  <i class="fas fa-sliders-h"></i> Tone / الإضاءة
-                  <i class="fas fa-chevron-down collapse-icon"></i>
+                <div class="control-group" id="group-color">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/><circle cx="8.5" cy="15.5" r="2.5"/><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2z"/></svg>
+                    الألوان
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الأحمر <span class="val" id="val-red">100%</span></div>
+                      <div class="range-wrap" id="wrap-red"><input id="red" type="range" min="0" max="200" value="100" aria-label="الأحمر" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الأخضر <span class="val" id="val-green">100%</span></div>
+                      <div class="range-wrap" id="wrap-green"><input id="green" type="range" min="0" max="200" value="100" aria-label="الأخضر" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الأزرق <span class="val" id="val-blue">100%</span></div>
+                      <div class="range-wrap" id="wrap-blue"><input id="blue" type="range" min="0" max="200" value="100" aria-label="الأزرق" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">تدرج اللون <span class="val" id="val-hue">0°</span></div>
+                      <div class="range-wrap" id="wrap-hue"><input id="hue" type="range" min="-180" max="180" value="0" aria-label="تدرج اللون" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row-tools">
+                      <button class="ib" id="toggleSepia" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+                        <span class="ib-tooltip">سيبيا</span>
+                      </button>
+                      <button class="ib" id="toggleGray" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z"/></svg>
+                        <span class="ib-tooltip">رمادي</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class="control-group-body">
-                  <div class="control-row">
-                    <div class="control-label">Brightness <span class="value" id="val-brightness">100%</span></div>
-                    <input id="brightness" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Contrast <span class="value" id="val-contrast">100%</span></div>
-                    <input id="contrast" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Saturation <span class="value" id="val-saturation">100%</span></div>
-                    <input id="saturation" type="range" min="0" max="200" value="100" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Exposure <span class="value" id="val-exposure">0.00</span></div>
-                    <input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" />
-                  </div>
-                </div>
-              </div>
 
-              <div class="control-group" id="group-effects">
-                <div class="control-group-header">
-                  <i class="fas fa-magic"></i> Effects / المؤثرات
-                  <i class="fas fa-chevron-down collapse-icon"></i>
-                </div>
-                <div class="control-group-body">
-                  <div class="control-row">
-                    <div class="control-label">Blur <span class="value" id="val-blur">0px</span></div>
-                    <input id="blur" type="range" min="0" max="12" step="0.1" value="0" />
+                <div class="control-group" id="group-tone">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                    الإضاءة
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
-                  <div class="control-row">
-                    <div class="control-label">Sharpen <span class="value" id="val-sharpen">0%</span></div>
-                    <input id="sharpen" type="range" min="0" max="100" value="0" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Noise <span class="value" id="val-noise">0%</span></div>
-                    <input id="noise" type="range" min="0" max="100" value="0" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Vignette <span class="value" id="val-vigIntensity">0%</span></div>
-                    <input id="vigIntensity" type="range" min="0" max="100" value="0" />
-                  </div>
-                  <div class="control-row">
-                    <div class="control-label">Vignette Spread <span class="value" id="val-vigSpread">65%</span></div>
-                    <input id="vigSpread" type="range" min="10" max="100" value="65" />
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">السطوع <span class="val" id="val-brightness">100%</span></div>
+                      <div class="range-wrap" id="wrap-brightness"><input id="brightness" type="range" min="0" max="200" value="100" aria-label="السطوع" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">التباين <span class="val" id="val-contrast">100%</span></div>
+                      <div class="range-wrap" id="wrap-contrast"><input id="contrast" type="range" min="0" max="200" value="100" aria-label="التباين" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">التشبع <span class="val" id="val-saturation">100%</span></div>
+                      <div class="range-wrap" id="wrap-saturation"><input id="saturation" type="range" min="0" max="200" value="100" aria-label="التشبع" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">التعرض <span class="val" id="val-exposure">0.00</span></div>
+                      <div class="range-wrap" id="wrap-exposure"><input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" aria-label="التعرض" /><span class="range-bubble"></span></div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              </div>
-              <div class="control-group" id="group-actions">
-                <div class="control-group-body" style="padding:12px">
-                  <div class="btn-row" style="margin-bottom:6px">
-                    <button class="btn-tool secondary" id="undoBtn" type="button" title="Undo / تراجع"><i class="fas fa-undo"></i> Undo</button>
-                    <button class="btn-tool secondary" id="redoBtn" type="button" title="Redo / إعادة"><i class="fas fa-redo"></i> Redo</button>
-                    <button class="btn-tool secondary" id="beforeAfter" type="button"><i class="fas fa-eye"></i> Compare</button>
+                <div class="control-group" id="group-effects">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    المؤثرات
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
-                  <div class="grid-overlay-toggle" id="gridToggle">
-                    <i class="fas fa-th"></i> Grid Overlay / شبكة
-                    <span style="margin-right:auto;font-size:0.7rem;color:rgba(231,237,246,0.3)">Ctrl+G</span>
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الضبابية <span class="val" id="val-blur">0px</span></div>
+                      <div class="range-wrap" id="wrap-blur"><input id="blur" type="range" min="0" max="12" step="0.1" value="0" aria-label="الضبابية" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الحدة <span class="val" id="val-sharpen">0%</span></div>
+                      <div class="range-wrap" id="wrap-sharpen"><input id="sharpen" type="range" min="0" max="100" value="0" aria-label="الحدة" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">التشويش <span class="val" id="val-noise">0%</span></div>
+                      <div class="range-wrap" id="wrap-noise"><input id="noise" type="range" min="0" max="100" value="0" aria-label="التشويش" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">Vignette <span class="val" id="val-vigIntensity">0%</span></div>
+                      <div class="range-wrap" id="wrap-vigIntensity"><input id="vigIntensity" type="range" min="0" max="100" value="0" aria-label="شدة التظليل الحوافي" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">انتشار Vignette <span class="val" id="val-vigSpread">65%</span></div>
+                      <div class="range-wrap" id="wrap-vigSpread"><input id="vigSpread" type="range" min="10" max="100" value="65" aria-label="انتشار التظليل" /><span class="range-bubble"></span></div>
+                    </div>
                   </div>
-                  <div class="btn-row" style="margin-top:6px">
-                    <button class="btn-tool danger" id="resetAll" type="button"><i class="fas fa-trash-alt"></i> Reset</button>
-                    <button class="btn-tool" id="downloadPng" type="button"><i class="fas fa-file-image"></i> PNG</button>
-                    <button class="btn-tool" id="downloadPdf" type="button"><i class="fas fa-file-pdf"></i> PDF</button>
-                  </div>
-                  <p class="tiny-note" style="margin-top:6px">اسحب على الصورة للقص · Ctrl+Z تراجع · Ctrl+Shift+Y إعادة</p>
                 </div>
+
+                <div class="control-group" id="group-draw">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                    الرسم
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="ctrl-row-tools">
+                      <button class="ib" id="drawPen" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                        <span class="ib-tooltip">قلم</span>
+                      </button>
+                      <button class="ib" id="drawEraser" type="button" aria-pressed="false">
+                        <svg viewBox="0 0 24 24"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0L21 4.8c.8.8.8 2 0 2.8L11 17"/></svg>
+                        <span class="ib-tooltip">ممحاة</span>
+                      </button>
+                      <button class="ib" id="drawClear" type="button">
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        <span class="ib-tooltip">مسح الرسم</span>
+                      </button>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">حجم الفرشة <span class="val" id="val-drawSize">4</span></div>
+                      <div class="range-wrap" id="wrap-drawSize"><input id="drawSize" type="range" min="1" max="50" value="4" aria-label="حجم الفرشة" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">الشفافية <span class="val" id="val-drawOpacity">100%</span></div>
+                      <div class="range-wrap" id="wrap-drawOpacity"><input id="drawOpacity" type="range" min="5" max="100" value="100" aria-label="شفافية الرسم" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">لون الرسم</div>
+                      <div class="color-pick-wrap">
+                        <input type="color" id="drawColor" value="#ffffff" />
+                        <span class="color-hex" id="drawColorHex">#ffffff</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="control-group" id="group-text">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    النص
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="color-pick-wrap">
+                        <input id="textInput" type="text" placeholder="اكتب النص هنا ثم أضفه..." aria-label="نص" />
+                      </div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">حجم الخط <span class="val" id="val-textSize">24</span></div>
+                      <div class="range-wrap" id="wrap-textSize"><input id="textSize" type="range" min="8" max="200" value="24" aria-label="حجم الخط" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">لون النص</div>
+                      <div class="color-pick-wrap">
+                        <input type="color" id="textColor" value="#ffffff" />
+                        <span class="color-hex" id="textColorHex">#ffffff</span>
+                      </div>
+                    </div>
+                    <div class="ctrl-row-tools">
+                      <button class="ib accent" id="addTextBtn" type="button">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span class="ib-tooltip">إضافة نص</span>
+                      </button>
+                      <button class="ib" id="clearTextBtn" type="button">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <span class="ib-tooltip">إزالة النص</span>
+                      </button>
+                    </div>
+                    <p class="tiny-note" id="textHint" style="margin-top:6px">بعد الإضافة يمكنك سحب النص على الصورة لتحريكه.</p>
+                  </div>
+                </div>
+
+                <div class="control-group" id="group-border">
+                  <div class="cg-header">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    الإطار
+                    <svg class="cg-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div class="cg-body">
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">سمك الإطار <span class="val" id="val-borderWidth">0</span></div>
+                      <div class="range-wrap" id="wrap-borderWidth"><input id="borderWidth" type="range" min="0" max="80" value="0" aria-label="سمك الإطار" /><span class="range-bubble"></span></div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">لون الإطار</div>
+                      <div class="color-pick-wrap">
+                        <input type="color" id="borderColor" value="#000000" />
+                        <span class="color-hex" id="borderColorHex">#000000</span>
+                      </div>
+                    </div>
+                    <div class="ctrl-row">
+                      <div class="ctrl-label">استدارة الزوايا <span class="val" id="val-borderRadius">0</span></div>
+                      <div class="range-wrap" id="wrap-borderRadius"><input id="borderRadius" type="range" min="0" max="100" value="0" aria-label="استدارة الزوايا" /><span class="range-bubble"></span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="control-group" id="group-actions" style="margin: 0 12px 12px; flex-shrink: 0;">
+                  <div class="cg-body" style="padding:12px">
+                    <div id="historyPanel" class="history-panel"></div>
+                    <div class="ctrl-row-tools" style="margin-bottom:10px">
+                      <button class="ib danger" id="resetAll" type="button">
+                        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                        <span class="ib-tooltip">إعادة تعيين</span>
+                      </button>
+                    </div>
+                    <p class="tiny-note">
+                      اسحب على الصورة للقص · اضغط مطولًا على زر المقارنة<br />
+                      <span class="kbd">Ctrl+Z</span> تراجع · <span class="kbd">Ctrl+Y</span> إعادة · <span class="kbd">Ctrl+G</span> شبكة · <span class="kbd">Ctrl+V</span> لصق · نقرة مزدوجة لملاءمة العرض
+                    </p>
+                  </div>
+                </div>
+
               </div>
             </aside>
           </div>
@@ -670,11 +1026,13 @@
     </div>
 
     <div id="canvasContextMenu" class="custom-context-menu" role="menu" aria-hidden="true">
-      <button class="context-menu-btn" type="button" id="ctxOpenEdited" role="menuitem">
-        <i class="fas fa-external-link-alt"></i> Open in New Tab
+      <button class="ctx-btn" type="button" id="ctxOpenEdited" role="menuitem">
+        <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        فتح في تبويب جديد
       </button>
-      <button class="context-menu-btn" type="button" id="ctxCopyEdited" role="menuitem">
-        <i class="fas fa-copy"></i> Copy Edited Image
+      <button class="ctx-btn" type="button" id="ctxCopyEdited" role="menuitem">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        نسخ الصورة
       </button>
     </div>
 
@@ -682,12 +1040,8 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-about">
-            <div class="footer-logo">
-              <img src="../assets/images/logo.svg" alt="Ali Ahmed" />
-            </div>
-            <p class="about-text">
-              مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميز.
-            </p>
+            <div class="footer-logo"><img src="../assets/images/logo.svg" alt="Ali Ahmed" /></div>
+            <p class="about-text">مصمم متخصص في تطوير وتصميم متاجر منصة زد وسلة، أقدم خدمات تخصيص CSS لجعل متجرك فريداً ومميز.</p>
             <div class="footer-certificate">
               <a href="https://www.behance.net/3lwaaa1" target="_blank">
                 <img src="../assets/images/logo ico.svg" alt="Ali Ahmed" />
@@ -696,7 +1050,6 @@
             </div>
             <p class="footer-cr">Custom Css Salla zid</p>
           </div>
-
           <div class="footer-links">
             <h3>روابط سريعة</h3>
             <ul>
@@ -705,453 +1058,78 @@
               <li><a href="../index.html#contact">تواصل معنا</a></li>
             </ul>
           </div>
-
           <div class="footer-contact">
             <h3>تواصل معنا</h3>
             <ul>
               <li>
-                <svg class="svg-icon" viewBox="0 0 384 512">
-                  <use href="../assets/images/icons.svg#icon-map-marker-alt"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 384 512"><use href="../assets/images/icons.svg#icon-map-marker-alt"></use></svg>
                 <span>مصر</span>
               </li>
               <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-phone"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-phone"></use></svg>
                 <span>+20 100 224 1591</span>
               </li>
               <li>
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-envelope"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-envelope"></use></svg>
                 <span>salla1zid@gmail.com</span>
               </li>
             </ul>
             <div class="footer-social">
               <a href="https://wa.me/201002241591" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
               </a>
               <a href="https://www.instagram.com/salla1zid/" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 448 512">
-                  <use href="../assets/images/icons.svg#icon-instagram"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-instagram"></use></svg>
               </a>
               <a href="https://twitter.com/salla1zid" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 512 512">
-                  <use href="../assets/images/icons.svg#icon-twitter"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 512 512"><use href="../assets/images/icons.svg#icon-twitter"></use></svg>
               </a>
               <a href="https://t.me/cssfree1" target="_blank">
-                <svg class="svg-icon" viewBox="0 0 496 512">
-                  <use href="../assets/images/icons.svg#icon-telegram"></use>
-                </svg>
+                <svg class="svg-icon" viewBox="0 0 496 512"><use href="../assets/images/icons.svg#icon-telegram"></use></svg>
               </a>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>
-            جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | أدوات المطورين
-          </p>
+          <p>جميع الحقوق محفوظة &copy; <span id="currentYear"></span> Ali Ahmed | أدوات المطورين</p>
         </div>
       </div>
     </footer>
 
     <a href="https://wa.me/201002241591" class="floating-whatsapp" target="_blank">
-      <svg class="svg-icon" viewBox="0 0 448 512">
-        <use href="../assets/images/icons.svg#icon-whatsapp"></use>
-      </svg>
+      <svg class="svg-icon" viewBox="0 0 448 512"><use href="../assets/images/icons.svg#icon-whatsapp"></use></svg>
     </a>
 
     <script>
       (() => {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        "use strict";
+        if (window.pdfjsLib) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
 
-        const fileInput = document.getElementById("fileInput");
-        const uploadZone = document.getElementById("uploadZone");
-        const emptyState = document.getElementById("emptyState");
-        const previewWrap = document.getElementById("previewWrap");
-        const pasteCatcher = document.getElementById("pasteCatcher");
-        const openEditedTabBtn = document.getElementById("openEditedTabBtn");
-        const copyEditedImageBtn = document.getElementById("copyEditedImageBtn");
-        const dataUrlOutput = document.getElementById("dataUrlOutput");
-        const copyDataUrlBtn = document.getElementById("copyDataUrlBtn");
-        const canvasContextMenu = document.getElementById("canvasContextMenu");
-        const ctxOpenEdited = document.getElementById("ctxOpenEdited");
-        const ctxCopyEdited = document.getElementById("ctxCopyEdited");
-        const imageCanvas = document.getElementById("imageCanvas");
-        const overlayCanvas = document.getElementById("overlayCanvas");
-        const imageCtx = imageCanvas.getContext("2d", { willReadFrequently: true });
-        const overlayCtx = overlayCanvas.getContext("2d");
-        const zoomLevelEl = document.getElementById("zoomLevel");
-        const pdfNav = document.getElementById("pdfNav");
-        const pdfPageInput = document.getElementById("pdfPageInput");
-        const pdfPageTotal = document.getElementById("pdfPageTotal");
-        const pdfQuality = document.getElementById("pdfQuality");
-        const imageInfoEl = document.getElementById("imageInfo");
-        const infoFileName = document.getElementById("infoFileName");
-        const infoDimensions = document.getElementById("infoDimensions");
-        const infoSize = document.getElementById("infoSize");
+        /* =========================================================
+           Utils
+           ========================================================= */
+        const $ = (id) => document.getElementById(id);
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const mkCanvas = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
+        const esc = (s) => String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
 
-        const state = {
+        /* =========================================================
+           Single source of truth (DEFAULTS)
+           ========================================================= */
+        const DEFAULTS = {
           red: 100, green: 100, blue: 100, hue: 0,
           brightness: 100, contrast: 100, saturation: 100, exposure: 0,
           blur: 0, sharpen: 0, noise: 0, vigIntensity: 0, vigSpread: 65,
           rotate: 0, flipH: false, flipV: false, sepia: false, gray: false,
-          showOriginal: false, cropMode: false, zoom: 1, gridOverlay: false,
+          borderWidth: 0, borderColor: "#000000", borderRadius: 0,
         };
+        const ADJUST_KEYS = Object.keys(DEFAULTS);
+        const MAX_UNDO = 30;
+        const MAX_PIXELS = 20e6;
 
-        let pdfDoc = null, pdfCurrentPage = 1, pdfTotalPages = 1, pdfScale = 1.5;
-        let undoStack = [], redoStack = [];
-        const MAX_UNDO = 25;
-        let originalImage = null, cropSelection = null, isDraggingCrop = false, cropStart = null, cropAspect = null;
-        let currentFileName = "", currentFileSize = "";
-        const beforeAfterBtn = document.getElementById("beforeAfter");
-
-        const rangeMap = [
-          ["red","val-red","%"],["green","val-green","%"],["blue","val-blue","%"],
-          ["hue","val-hue","°"],["brightness","val-brightness","%"],
-          ["contrast","val-contrast","%"],["saturation","val-saturation","%"],
-          ["exposure","val-exposure",""],["blur","val-blur","px"],
-          ["sharpen","val-sharpen","%"],["noise","val-noise","%"],
-          ["vigIntensity","val-vigIntensity","%"],["vigSpread","val-vigSpread","%"],
-          ["rotate","val-rotate","°"],
-        ];
-
-        function clamp(v) { return Math.max(0, Math.min(255, v)); }
-
-        function updateValueLabels() {
-          rangeMap.forEach(([key, out, suffix]) => {
-            const el = document.getElementById(out);
-            if (!el) return;
-            el.textContent = key === "exposure" ? Number(state[key]).toFixed(2) : `${state[key]}${suffix}`;
-          });
-        }
-
-        function bindRanges() {
-          rangeMap.forEach(([key]) => {
-            const input = document.getElementById(key);
-            if (!input) return;
-            input.addEventListener("input", () => {
-              pushUndoState();
-              state[key] = Number(input.value);
-              updateValueLabels();
-              render();
-            });
-          });
-          updateValueLabels();
-        }
-
-        function captureState() { const s = {}; for (const k of Object.keys(state)) s[k] = state[k]; return s; }
-        function applyState(s) {
-          Object.assign(state, s);
-          rangeMap.forEach(([key]) => { const inp = document.getElementById(key); if (inp && s[key] !== undefined) inp.value = s[key]; });
-          updateValueLabels(); updateToggleButtons();
-        }
-        function pushUndoState() { undoStack.push(captureState()); if (undoStack.length > MAX_UNDO) undoStack.shift(); redoStack = []; }
-        function undo() { if (!undoStack.length || !originalImage) return; redoStack.push(captureState()); applyState(undoStack.pop()); render(); }
-        function redo() { if (!redoStack.length || !originalImage) return; undoStack.push(captureState()); applyState(redoStack.pop()); render(); }
-
-        function setZoom(level) { state.zoom = Math.max(0.1, Math.min(5, level)); updateZoomDisplay(); if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); } }
-        function updateZoomDisplay() { zoomLevelEl.textContent = `${Math.round(state.zoom * 100)}%`; }
-
-        function toggleGrid() { state.gridOverlay = !state.gridOverlay; document.getElementById("gridToggle").classList.toggle("active", state.gridOverlay); drawCropOverlay(); }
-        function drawGrid() {
-          if (!state.gridOverlay || !overlayCanvas.width) return;
-          const w = overlayCanvas.width, h = overlayCanvas.height;
-          overlayCtx.strokeStyle = "rgba(255,255,255,0.12)";
-          overlayCtx.lineWidth = 1;
-          [w / 3, w * 2 / 3].forEach(x => { overlayCtx.beginPath(); overlayCtx.moveTo(x, 0); overlayCtx.lineTo(x, h); overlayCtx.stroke(); });
-          [h / 3, h * 2 / 3].forEach(y => { overlayCtx.beginPath(); overlayCtx.moveTo(0, y); overlayCtx.lineTo(w, y); overlayCtx.stroke(); });
-        }
-
-        function buildTransformedCanvas() {
-          const w = originalImage.width, h = originalImage.height;
-          const rad = (state.rotate * Math.PI) / 180;
-          const absCos = Math.abs(Math.cos(rad)), absSin = Math.abs(Math.sin(rad));
-          const outW = Math.max(1, Math.round(w * absCos + h * absSin));
-          const outH = Math.max(1, Math.round(w * absSin + h * absCos));
-          const t = document.createElement("canvas"); t.width = outW; t.height = outH;
-          const c = t.getContext("2d");
-          c.translate(outW / 2, outH / 2); c.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1); c.rotate(rad);
-          c.drawImage(originalImage, -w / 2, -h / 2);
-          return t;
-        }
-
-        function applySharpen(imageData, amount) {
-          if (amount <= 0) return;
-          const w = imageData.width, h = imageData.height;
-          const src = new Uint8ClampedArray(imageData.data), out = imageData.data;
-          const f = (amount / 100) * 1.25;
-          for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
-            const idx = (y * w + x) * 4;
-            for (let c = 0; c < 3; c++) {
-              const center = src[idx + c] * (1 + 4 * f);
-              const edge = f * (src[idx - 4 + c] + src[idx + 4 + c] + src[idx - w * 4 + c] + src[idx + w * 4 + c]);
-              out[idx + c] = clamp(center - edge);
-            }
-          }
-        }
-
-        function applyPixelEffects(imageData) {
-          const { width, height, data } = imageData;
-          const rf = state.red / 100, gf = state.green / 100, bf = state.blue / 100;
-          const vigI = state.vigIntensity / 100, vigS = state.vigSpread / 100, noiseA = state.noise / 100;
-          const cx = width / 2, cy = height / 2, maxD = Math.sqrt(cx * cx + cy * cy);
-          for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-            const idx = (y * width + x) * 4;
-            let r = data[idx] * rf, g = data[idx + 1] * gf, b = data[idx + 2] * bf;
-            if (vigI > 0) {
-              const d = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2) / maxD;
-              const t = Math.max(0, (d - vigS) / Math.max(1e-4, 1 - vigS));
-              const v = 1 - vigI * Math.min(1, t * t);
-              r *= v; g *= v; b *= v;
-            }
-            if (noiseA > 0) { const n = (Math.random() * 2 - 1) * noiseA * 64; r += n; g += n; b += n; }
-            data[idx] = clamp(r); data[idx + 1] = clamp(g); data[idx + 2] = clamp(b);
-          }
-        }
-
-        function drawCropOverlay() {
-          overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-          if (state.gridOverlay) drawGrid();
-          if (state.cropMode && cropSelection) {
-            const { x, y, w, h } = cropSelection;
-            overlayCtx.fillStyle = "rgba(0,0,0,0.35)";
-            overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-            overlayCtx.clearRect(x, y, w, h);
-            overlayCtx.strokeStyle = "#7ad0ff"; overlayCtx.lineWidth = 2; overlayCtx.setLineDash([8, 6]);
-            overlayCtx.strokeRect(x, y, w, h); overlayCtx.setLineDash([]);
-          }
-        }
-
-        function fitCanvasDisplaySize() {
-          if (!imageCanvas.width || !imageCanvas.height) return;
-          const padding = 16;
-          const areaW = Math.max(1, previewWrap.clientWidth - padding * 2);
-          const areaH = Math.max(1, previewWrap.clientHeight - padding * 2);
-          const base = Math.min(areaW / imageCanvas.width, areaH / imageCanvas.height, 1);
-          const scale = base * state.zoom;
-          imageCanvas.style.width = `${Math.max(1, Math.round(imageCanvas.width * scale))}px`;
-          imageCanvas.style.height = `${Math.max(1, Math.round(imageCanvas.height * scale))}px`;
-          overlayCanvas.style.width = imageCanvas.style.width;
-          overlayCanvas.style.height = imageCanvas.style.height;
-        }
-
-        function renderOriginalPreview() {
-          const t = buildTransformedCanvas();
-          imageCanvas.width = t.width; imageCanvas.height = t.height;
-          overlayCanvas.width = t.width; overlayCanvas.height = t.height;
-          fitCanvasDisplaySize();
-          imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-          imageCtx.drawImage(t, 0, 0);
-          drawCropOverlay(); updateDataUrlOutput();
-        }
-
-        function render() {
-          if (!originalImage) return;
-          emptyState.style.display = "none";
-          if (state.showOriginal) { renderOriginalPreview(); return; }
-          const transformed = buildTransformedCanvas();
-          const filtered = document.createElement("canvas");
-          filtered.width = transformed.width; filtered.height = transformed.height;
-          const fctx = filtered.getContext("2d", { willReadFrequently: true });
-          const eb = Math.round(state.brightness * Math.pow(2, state.exposure));
-          fctx.filter = `brightness(${eb}%) contrast(${state.contrast}%) saturate(${state.saturation}%) hue-rotate(${state.hue}deg) blur(${state.blur}px) sepia(${state.sepia ? 100 : 0}%) grayscale(${state.gray ? 100 : 0}%)`;
-          fctx.drawImage(transformed, 0, 0);
-          let id = fctx.getImageData(0, 0, filtered.width, filtered.height);
-          applySharpen(id, state.sharpen); applyPixelEffects(id);
-          fctx.putImageData(id, 0, 0);
-          imageCanvas.width = filtered.width; imageCanvas.height = filtered.height;
-          overlayCanvas.width = filtered.width; overlayCanvas.height = filtered.height;
-          fitCanvasDisplaySize();
-          imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-          imageCtx.drawImage(filtered, 0, 0);
-          drawCropOverlay(); updateDataUrlOutput();
-        }
-
-        function getEditedDataUrl() { if (!originalImage || !imageCanvas.width || !imageCanvas.height) return ""; try { return imageCanvas.toDataURL("image/png"); } catch (e) { return ""; } }
-        function normalizeDataUrl(v) { return String(v || "").trim().replace(/\s+/g, ""); }
-
-        async function copyTextToClipboard(value) {
-          const text = String(value || ""); if (!text) return false;
-          if (navigator.clipboard && window.isSecureContext) { try { await navigator.clipboard.writeText(text); return true; } catch (e) {} }
-          const temp = document.createElement("textarea"); temp.value = text; temp.setAttribute("readonly", ""); temp.style.position = "fixed"; temp.style.left = "-9999px"; temp.style.top = "-9999px";
-          document.body.appendChild(temp); temp.focus(); temp.select(); temp.setSelectionRange(0, temp.value.length);
-          let copied = false; try { copied = document.execCommand("copy"); } catch (e) {} document.body.removeChild(temp); return copied;
-        }
-
-        function updateDataUrlOutput() { dataUrlOutput.value = normalizeDataUrl(getEditedDataUrl()); dataUrlOutput.scrollLeft = 0; dataUrlOutput.scrollTop = 0; }
-
-        function setImageFromDataUrl(dataUrl) {
-          const img = new Image();
-          img.onload = () => { originalImage = img; cropSelection = null; hidePdfNav(); updateImageInfo(currentFileName, img.width, img.height, currentFileSize); render(); };
-          img.onerror = () => alert("Failed to load image.");
-          img.src = dataUrl;
-        }
-
-        async function loadPdfPage(num) {
-          if (!pdfDoc) return;
-          try {
-            const page = await pdfDoc.getPage(num);
-            pdfCurrentPage = num;
-            const viewport = page.getViewport({ scale: pdfScale });
-            const canvas = document.createElement("canvas");
-            canvas.width = viewport.width; canvas.height = viewport.height;
-            await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
-            const dataUrl = canvas.toDataURL("image/png");
-            const img = new Image();
-            img.onload = () => { originalImage = img; cropSelection = null; updatePdfNav(); render(); };
-            img.src = dataUrl;
-          } catch (e) { alert("Failed to load PDF page."); }
-        }
-
-        function updatePdfNav() { pdfPageInput.value = pdfCurrentPage; pdfPageTotal.textContent = `/ ${pdfTotalPages}`; pdfNav.classList.add("visible"); }
-        function hidePdfNav() { pdfNav.classList.remove("visible"); pdfDoc = null; pdfCurrentPage = 1; pdfTotalPages = 1; }
-
-        async function loadPdfFile(file) {
-          try {
-            const arrayBuffer = await file.arrayBuffer();
-            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            pdfTotalPages = pdfDoc.numPages; pdfCurrentPage = 1;
-            pdfScale = parseFloat(pdfQuality.value) || 1.5;
-            await loadPdfPage(1);
-          } catch (e) { alert("تعذر تحميل ملف PDF / Failed to load PDF."); }
-        }
-
-        function loadImageFile(file) {
-          if (!file) return;
-          if (file.type === "application/pdf" || (file.name && file.name.toLowerCase().endsWith(".pdf"))) {
-            currentFileName = file.name; currentFileSize = file.size > 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${file.size} B`;
-            loadPdfFile(file); return;
-          }
-          if (!file.type || !file.type.startsWith("image/")) { alert("Please choose a valid image or PDF file."); return; }
-          currentFileName = file.name; currentFileSize = file.size > 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${file.size} B`;
-          const reader = new FileReader();
-          reader.onload = (e) => setImageFromDataUrl(e.target.result);
-          reader.onerror = () => alert("Cannot read this image file.");
-          reader.readAsDataURL(file);
-        }
-
-        function extractImageFromDataTransfer(dt) {
-          if (!dt) return null;
-          if (dt.files && dt.files.length > 0) for (let i = 0; i < dt.files.length; i++) { const f = dt.files[i]; if (f && f.type && (f.type.startsWith("image/") || f.type === "application/pdf")) return f; }
-          if (!dt.items) return null;
-          for (let i = 0; i < dt.items.length; i++) { const it = dt.items[i]; if (it && it.type && (it.type.startsWith("image/") || it.type === "application/pdf")) return it.getAsFile(); }
-          return null;
-        }
-
-        function handlePasteEvent(event) { const f = extractImageFromDataTransfer(event.clipboardData); if (!f) return false; event.preventDefault(); loadImageFile(f); return true; }
-        async function readClipboardImageViaApi() {
-          if (!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.read) return false;
-          try {
-            const items = await navigator.clipboard.read();
-            for (let i = 0; i < items.length; i++) {
-              const t = items[i].types.find(t => t.startsWith("image/")); if (!t) continue;
-              const blob = await items[i].getType(t); loadImageFile(new File([blob], `pasted-${Date.now()}.png`, { type: blob.type || "image/png" })); return true;
-            }
-          } catch (e) {} return false;
-        }
-
-        async function openEditedImageInNewTab() {
-          const dataUrl = normalizeDataUrl(getEditedDataUrl()); if (!dataUrl) { alert("Upload an image first."); return; }
-          const newTab = window.open("", "_blank"); if (!newTab) { alert("Please allow popups."); return; }
-          try { const blob = await new Promise(r => imageCanvas.toBlob(b => r(b), "image/png")); if (blob) { const url = URL.createObjectURL(blob); newTab.location.replace(url); setTimeout(() => URL.revokeObjectURL(url), 60000); return; } } catch (e) {}
-          newTab.location.href = dataUrl;
-        }
-
-        function downloadEditedPdf() {
-          if (!originalImage) { alert("Upload an image first."); return; }
-          if (!window.jspdf || !window.jspdf.jsPDF) { alert("PDF library is still loading."); return; }
-          const { jsPDF } = window.jspdf;
-          const w = Math.max(1, imageCanvas.width), h = Math.max(1, imageCanvas.height);
-          const pdf = new jsPDF({ orientation: w >= h ? "landscape" : "portrait", unit: "px", format: [w, h], compress: true });
-          pdf.addImage(imageCanvas.toDataURL("image/png"), "PNG", 0, 0, w, h, undefined, "FAST");
-          pdf.save("pro-image-editor-output.pdf");
-        }
-
-        async function copyEditedImage() {
-          if (!originalImage) { alert("Upload an image first."); return false; }
-          try {
-            const blob = await new Promise(r => imageCanvas.toBlob(b => r(b), "image/png"));
-            if (!blob) throw new Error();
-            if (navigator.clipboard && window.ClipboardItem) { await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]); return true; }
-            const du = normalizeDataUrl(getEditedDataUrl()); if (du && await copyTextToClipboard(du)) return true;
-          } catch (e) {} return false;
-        }
-
-        async function copyDataUrlText() {
-          const du = normalizeDataUrl(getEditedDataUrl()); if (!du) { alert("Upload an image first."); return; }
-          if (await copyTextToClipboard(du)) { alert("Data URL copied."); return; }
-          dataUrlOutput.focus(); dataUrlOutput.select(); dataUrlOutput.setSelectionRange(0, dataUrlOutput.value.length);
-          alert("Press Ctrl+C to copy Data URL.");
-        }
-
-        function hideContextMenu() { canvasContextMenu.style.display = "none"; canvasContextMenu.setAttribute("aria-hidden", "true"); }
-        function showContextMenu(event) {
-          if (!originalImage) return;
-          event.preventDefault();
-          canvasContextMenu.style.left = `${Math.max(8, Math.min(event.clientX, window.innerWidth - 240 - 10))}px`;
-          canvasContextMenu.style.top = `${Math.max(8, Math.min(event.clientY, window.innerHeight - 120 - 10))}px`;
-          canvasContextMenu.style.display = "block"; canvasContextMenu.setAttribute("aria-hidden", "false");
-        }
-        function isEditableElement(t) { return t && (["input","textarea"].includes((t.tagName||"").toLowerCase()) || t.isContentEditable); }
-        function getCanvasPoint(e) { const r = overlayCanvas.getBoundingClientRect(), sx = overlayCanvas.width / r.width, sy = overlayCanvas.height / r.height; return { x: Math.max(0, Math.min(overlayCanvas.width, (e.clientX - r.left) * sx)), y: Math.max(0, Math.min(overlayCanvas.height, (e.clientY - r.top) * sy)) }; }
-        function normalizeRect(a, b) { const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x, y, w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) }; }
-
-        function updateToggleButtons() {
-          document.getElementById("toggleSepia").classList.toggle("active", state.sepia);
-          document.getElementById("toggleGray").classList.toggle("active", state.gray);
-          document.getElementById("flipH").classList.toggle("active", state.flipH);
-          document.getElementById("flipV").classList.toggle("active", state.flipV);
-          document.getElementById("cropMode").classList.toggle("active", state.cropMode);
-          beforeAfterBtn.classList.toggle("active", state.showOriginal);
-          beforeAfterBtn.innerHTML = state.showOriginal ? '<i class="fas fa-eye-slash"></i> Before' : '<i class="fas fa-eye"></i> Compare';
-        }
-
-        function hasAnyEdits() {
-          return state.red !== 100 || state.green !== 100 || state.blue !== 100 || state.hue !== 0 ||
-            state.brightness !== 100 || state.contrast !== 100 || state.saturation !== 100 || state.exposure !== 0 ||
-            state.blur !== 0 || state.sharpen !== 0 || state.noise !== 0 || state.vigIntensity !== 0 || state.vigSpread !== 65 ||
-            state.rotate !== 0 || state.flipH || state.flipV || state.sepia || state.gray;
-        }
-
-        function resetAdjustments() {
-          Object.assign(state, { red: 100, green: 100, blue: 100, hue: 0, brightness: 100, contrast: 100, saturation: 100, exposure: 0, blur: 0, sharpen: 0, noise: 0, vigIntensity: 0, vigSpread: 65, rotate: 0, flipH: false, flipV: false, sepia: false, gray: false, showOriginal: false, cropMode: false });
-          rangeMap.forEach(([key]) => { const inp = document.getElementById(key); if (inp) inp.value = state[key]; });
-          cropSelection = null; overlayCanvas.style.pointerEvents = "none";
-          updateValueLabels(); updateToggleButtons();
-          if (originalImage) render();
-        }
-
-        function applyCrop() {
-          if (!originalImage || !cropSelection) { alert("حدد منطقة القص أولاً / Select crop area first"); return; }
-          if (cropSelection.w < 5 || cropSelection.h < 5) { alert("منطقة القص صغيرة جدًا / Crop area is too small"); return; }
-          pushUndoState();
-          const t = buildTransformedCanvas();
-          const c = document.createElement("canvas"); c.width = Math.round(cropSelection.w); c.height = Math.round(cropSelection.h);
-          c.getContext("2d").drawImage(t, cropSelection.x, cropSelection.y, cropSelection.w, cropSelection.h, 0, 0, c.width, c.height);
-          state.rotate = 0; state.flipH = false; state.flipV = false;
-          document.getElementById("rotate").value = 0; cropSelection = null; state.cropMode = false;
-          overlayCanvas.style.pointerEvents = "none"; updateValueLabels(); updateToggleButtons();
-          const img = new Image(); img.onload = () => { originalImage = img; render(); }; img.src = c.toDataURL("image/png");
-        }
-
-        function updateImageInfo(name, w, h, size) {
-          if (name) { infoFileName.textContent = name; infoDimensions.textContent = `${w} × ${h}`; infoSize.textContent = size || "-"; imageInfoEl.classList.add("visible"); }
-          else { imageInfoEl.classList.remove("visible"); }
-        }
-
-        function setCropAspect(ratio) {
-          cropAspect = ratio === "free" ? null : ratio;
-          document.querySelectorAll(".aspect-btn").forEach(b => b.classList.toggle("active", b.dataset.ratio === ratio));
-          cropSelection = null; drawCropOverlay();
-        }
-
-        const presets = {
+        const PRESETS = {
           original: {},
           vintage: { red: 120, green: 105, blue: 85, sepia: true, contrast: 85, saturation: 80, vigIntensity: 15 },
           noir: { gray: true, contrast: 140, brightness: 90, saturation: 0 },
@@ -1161,105 +1139,1356 @@
           soft: { contrast: 85, saturation: 90, blur: 0.5 },
           vivid: { saturation: 150, contrast: 120, brightness: 105, sharpen: 15 },
         };
-        function applyPreset(name) {
-          pushUndoState(); resetAdjustments();
-          const p = presets[name]; if (!p) return;
-          for (const [k, v] of Object.entries(p)) { state[k] = v; const inp = document.getElementById(k); if (inp) inp.value = v; }
-          updateValueLabels(); updateToggleButtons(); render();
+
+        const RANGES = [
+          { id: "rotate",       val: "val-rotate",       min: -180,  max: 180,  step: 1,    suffix: "°" },
+          { id: "red",          val: "val-red",          min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "green",        val: "val-green",        min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "blue",         val: "val-blue",         min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "hue",          val: "val-hue",          min: -180,  max: 180,  step: 1,    suffix: "°" },
+          { id: "brightness",   val: "val-brightness",   min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "contrast",     val: "val-contrast",     min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "saturation",   val: "val-saturation",   min: 0,     max: 200,  step: 1,    suffix: "%" },
+          { id: "exposure",     val: "val-exposure",     min: -2,    max: 2,    step: 0.01, suffix: "",  fmt: 2 },
+          { id: "blur",         val: "val-blur",         min: 0,     max: 12,   step: 0.1,  suffix: "px" },
+          { id: "sharpen",      val: "val-sharpen",      min: 0,     max: 100,  step: 1,    suffix: "%" },
+          { id: "noise",        val: "val-noise",        min: 0,     max: 100,  step: 1,    suffix: "%" },
+          { id: "vigIntensity", val: "val-vigIntensity", min: 0,     max: 100,  step: 1,    suffix: "%" },
+          { id: "vigSpread",    val: "val-vigSpread",    min: 10,    max: 100,  step: 1,    suffix: "%" },
+          { id: "borderWidth",  val: "val-borderWidth",  min: 0,     max: 80,   step: 1,    suffix: "" },
+          { id: "borderRadius", val: "val-borderRadius", min: 0,     max: 100,  step: 1,    suffix: "" },
+        ];
+        const SLIDER_LABELS = {
+          rotate: "الدوران", red: "الأحمر", green: "الأخضر", blue: "الأزرق", hue: "تدرج اللون",
+          brightness: "السطوع", contrast: "التباين", saturation: "التشبع", exposure: "التعرض",
+          blur: "الضبابية", sharpen: "الحدة", noise: "التشويش", vigIntensity: "التظليل الحوافي",
+          vigSpread: "انتشار التظليل", borderWidth: "سمك الإطار", borderRadius: "استدارة الزوايا",
+        };
+
+        /* =========================================================
+           DOM cache
+           ========================================================= */
+        const fileInput = $("fileInput"), uploadZone = $("uploadZone"), emptyState = $("emptyState");
+        const previewWrap = $("previewWrap"), canvasStage = $("canvasStage"), pasteCatcher = $("pasteCatcher");
+        const openEditedTabBtn = $("openEditedTabBtn"), copyEditedImageBtn = $("copyEditedImageBtn");
+        const dataUrlOutput = $("dataUrlOutput"), copyDataUrlBtn = $("copyDataUrlBtn");
+        const canvasContextMenu = $("canvasContextMenu");
+        const ctxOpenEdited = $("ctxOpenEdited"), ctxCopyEdited = $("ctxCopyEdited");
+        const imageCanvas = $("imageCanvas"), overlayCanvas = $("overlayCanvas"), drawCanvas = $("drawCanvas");
+        const imageCtx = imageCanvas.getContext("2d", { willReadFrequently: true });
+        const overlayCtx = overlayCanvas.getContext("2d");
+        const drawCtx = drawCanvas.getContext("2d");
+        const zoomLevelEl = $("zoomLevel");
+        const pdfNav = $("pdfNav"), pdfPageInput = $("pdfPageInput"), pdfPageTotal = $("pdfPageTotal"), pdfQuality = $("pdfQuality");
+        const imageInfoEl = $("imageInfo"), infoFileName = $("infoFileName"), infoDimensions = $("infoDimensions"), infoSize = $("infoSize");
+        const beforeAfterBtn = $("beforeAfter"), gridToggleBtn = $("gridToggle");
+        const loadingOverlay = $("loadingOverlay"), loadingText = $("loadingText");
+        const historyPanel = $("historyPanel"), textHint = $("textHint");
+
+        /* =========================================================
+           State
+           ========================================================= */
+        const state = {
+          ...DEFAULTS,
+          showOriginal: false, cropMode: false, zoom: 1, gridOverlay: false,
+          drawMode: false, drawTool: "pen", drawSize: 4, drawOpacity: 100, drawColor: "#ffffff",
+          textOverlay: null, textSize: 24, textColor: "#ffffff",
+        };
+        let strokes = [];
+        let originalImage = null;
+        let cropSelection = null, cropStart = null, cropAspect = null, isDraggingCrop = false;
+        let pdfDoc = null, pdfCurrentPage = 1, pdfTotalPages = 1, pdfScale = 1.5;
+        let currentFileName = "", currentFileSize = "", currentFileNameBase = "edit";
+        let pan = { x: 0, y: 0 };
+        let undoStack = [], redoStack = [];
+        let renderQueued = false;
+        let dataUrlTimer = null;
+        let framePending = false;
+
+        const pickAdjust = () => { const s = {}; for (const k of ADJUST_KEYS) s[k] = state[k]; return s; };
+
+        /* =========================================================
+           Toast
+           ========================================================= */
+        let toastContainer = null;
+        function toast(message, type = "info", duration = 2600) {
+          if (!toastContainer) {
+            toastContainer = document.createElement("div");
+            toastContainer.className = "toast-container";
+            toastContainer.setAttribute("role", "status");
+            toastContainer.setAttribute("aria-live", "polite");
+            document.body.appendChild(toastContainer);
+          }
+          const t = document.createElement("div");
+          t.className = "toast " + type;
+          const dot = document.createElement("span");
+          dot.className = "toast-dot";
+          dot.setAttribute("aria-hidden", "true");
+          const msg = document.createElement("span");
+          msg.textContent = message;
+          t.appendChild(dot); t.appendChild(msg);
+          toastContainer.appendChild(t);
+          setTimeout(() => {
+            t.classList.add("leaving");
+            setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 210);
+          }, duration);
         }
 
+        function showLoading(text) { loadingText.textContent = text; loadingOverlay.classList.add("visible"); }
+        function hideLoading() { loadingOverlay.classList.remove("visible"); }
+
+        /* =========================================================
+           History (uniform, complete undo/redo)
+           ========================================================= */
+        function cloneStrokes() { return strokes.map((s) => ({ ...s, points: s.points.slice() })); }
+
+        function commit(label) {
+          undoStack.push({
+            label: label || "تعديل",
+            adjust: pickAdjust(),
+            textOverlay: state.textOverlay ? { ...state.textOverlay } : null,
+            strokes: cloneStrokes(),
+          });
+          if (undoStack.length > MAX_UNDO) undoStack.shift();
+          redoStack.length = 0;
+          renderHistory();
+          updateDataUrlOutput();
+        }
+
+        function applyEntry(entry) {
+          if (!entry) return;
+          Object.assign(state, entry.adjust || {});
+          state.textOverlay = entry.textOverlay ? { ...entry.textOverlay } : null;
+          strokes = entry.strokes || [];
+        }
+
+        function undo() {
+          if (!undoStack.length || !originalImage) return;
+          redoStack.push({ label: "إعادة: " + (undoStack[undoStack.length - 1].label || "تعديل"), adjust: pickAdjust(), textOverlay: state.textOverlay ? { ...state.textOverlay } : null, strokes: cloneStrokes() });
+          if (redoStack.length > MAX_UNDO) redoStack.shift();
+          const entry = undoStack.pop();
+          applyEntry(entry);
+          syncControlsFromState(); updateToggleButtons(); renderImmediately(); renderHistory();
+        }
+
+        function redo() {
+          if (!redoStack.length || !originalImage) return;
+          undoStack.push({ label: (redoStack[redoStack.length - 1].label || "تعديل").replace(/^إعادة: /, ""), adjust: pickAdjust(), textOverlay: state.textOverlay ? { ...state.textOverlay } : null, strokes: cloneStrokes() });
+          if (undoStack.length > MAX_UNDO) undoStack.shift();
+          const entry = redoStack.pop();
+          applyEntry(entry);
+          syncControlsFromState(); updateToggleButtons(); renderImmediately(); renderHistory();
+        }
+
+        function jumpHistory(index) {
+          if (!undoStack.length) return;
+          const entry = undoStack[index];
+          if (!entry) return;
+          for (let i = undoStack.length - 1; i > index; i--) {
+            const popped = undoStack.pop();
+            redoStack.push({ label: popped.label, adjust: popped.adjust, textOverlay: popped.textOverlay, strokes: popped.strokes });
+          }
+          if (redoStack.length > MAX_UNDO) redoStack.splice(0, redoStack.length - MAX_UNDO);
+          applyEntry(entry);
+          syncControlsFromState(); updateToggleButtons(); renderImmediately(); renderHistory();
+        }
+
+        function renderHistory() {
+          if (!historyPanel) return;
+          historyPanel.innerHTML = "";
+          if (!undoStack.length) {
+            const d = document.createElement("div");
+            d.className = "history-empty";
+            d.textContent = "سجل التعديلات فارغ";
+            historyPanel.appendChild(d);
+            return;
+          }
+          undoStack.forEach((e, i) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.className = "history-item";
+            b.setAttribute("role", "listitem");
+            b.setAttribute("aria-label", "استعادة: " + e.label);
+            b.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg><span>' + esc(e.label) + "</span>";
+            b.addEventListener("click", () => jumpHistory(i));
+            historyPanel.appendChild(b);
+          });
+        }
+
+        /* =========================================================
+           Value labels + slider binding
+           ========================================================= */
+        function formatRangeValue(id, v) {
+          const r = RANGES.find((x) => x.id === id);
+          if (!r) return String(v);
+          const n = typeof r.fmt === "number" ? Number(v).toFixed(r.fmt) : v;
+          return n + (r.suffix || "");
+        }
+
+        function updateValueLabels() {
+          for (const r of RANGES) {
+            const el = $(r.val);
+            if (el) el.textContent = formatRangeValue(r.id, state[r.id]);
+          }
+          $("val-drawSize").textContent = state.drawSize;
+          $("val-drawOpacity").textContent = state.drawOpacity + "%";
+          $("val-textSize").textContent = state.textSize;
+          $("drawColorHex").textContent = state.drawColor;
+          $("textColorHex").textContent = state.textColor;
+          $("borderColorHex").textContent = state.borderColor;
+        }
+
+        function syncControlsFromState() {
+          for (const r of RANGES) { const inp = $(r.id); if (inp) inp.value = state[r.id]; }
+        }
+
+        function bindRangeSlider(r) {
+          const input = $(r.id);
+          if (!input) return;
+          const wrap = $("wrap-" + r.id);
+          const bubble = wrap ? wrap.querySelector(".range-bubble") : null;
+
+          const updateBubble = () => {
+            if (!wrap || !bubble) return;
+            const pct = (input.value - r.min) / (r.max - r.min) * 100;
+            bubble.textContent = formatRangeValue(r.id, input.value);
+            bubble.style.left = pct + "%";
+          };
+          input.addEventListener("input", () => {
+            state[r.id] = Number(input.value);
+            const labelEl = $(r.val);
+            if (labelEl) { labelEl.textContent = formatRangeValue(r.id, input.value); labelEl.classList.add("live"); }
+            updateBubble();
+            scheduleRender();
+          });
+          input.addEventListener("pointerdown", () => { if (wrap) wrap.classList.add("dragging"); });
+          const hide = () => {
+            if (wrap) wrap.classList.remove("dragging");
+            const labelEl = $(r.val);
+            if (labelEl) labelEl.classList.remove("live");
+          };
+          input.addEventListener("pointerup", hide);
+          input.addEventListener("pointercancel", hide);
+          input.addEventListener("change", () => {
+            hide();
+            if (originalImage) {
+              const wasEdited = hasAnyEdits();
+              scheduleRenderImmediately();
+              if (state[r.id] !== DEFAULTS[r.id] || (r.id === "vigSpread")) {
+                commit("ضبط " + (SLIDER_LABELS[r.id] || r.id));
+              } else if (wasEdited) {
+                commit("ضبط " + (SLIDER_LABELS[r.id] || r.id));
+              }
+            }
+          });
+        }
+
+        function bindToolSlider(id) {
+          const input = $(id);
+          if (!input) return;
+          const wrap = $("wrap-" + id);
+          const bubble = wrap ? wrap.querySelector(".range-bubble") : null;
+          const min = Number(input.min), max = Number(input.max);
+          const updateBubble = () => {
+            if (!wrap || !bubble) return;
+            bubble.textContent = input.value;
+            bubble.style.left = ((input.value - min) / (max - min) * 100) + "%";
+          };
+          input.addEventListener("input", () => {
+            const v = Number(input.value);
+            if (id === "drawSize") { state.drawSize = v; $("val-drawSize").textContent = v; }
+            if (id === "drawOpacity") { state.drawOpacity = v; $("val-drawOpacity").textContent = v + "%"; }
+            if (id === "textSize") { state.textSize = v; $("val-textSize").textContent = v; if (state.textOverlay) { state.textOverlay.size = v; scheduleRender(); } }
+            updateBubble();
+          });
+          input.addEventListener("pointerdown", () => { if (wrap) wrap.classList.add("dragging"); updBubbleNow(); });
+          const cleanup = () => { if (wrap) wrap.classList.remove("dragging"); };
+          input.addEventListener("pointerup", cleanup);
+          input.addEventListener("pointercancel", cleanup);
+          function updBubbleNow() { updateBubble(); }
+          updateBubble();
+        }
+
+        /* =========================================================
+           Render pipeline
+           ========================================================= */
+        function baseDims() {
+          const w = originalImage.width, h = originalImage.height;
+          const rad = state.rotate * Math.PI / 180;
+          const absCos = Math.abs(Math.cos(rad)), absSin = Math.abs(Math.sin(rad));
+          return {
+            w, h, rad,
+            outW: Math.max(1, Math.round(w * absCos + h * absSin)),
+            outH: Math.max(1, Math.round(w * absSin + h * absCos)),
+          };
+        }
+        function mapOriginalToOutput(p, d) {
+          const x = p.x - d.w / 2, y = p.y - d.h / 2;
+          let fx = state.flipH ? -x : x, fy = state.flipV ? -y : y;
+          const c = Math.cos(d.rad), s = Math.sin(d.rad);
+          return { x: fx * c - fy * s + d.outW / 2, y: fx * s + fy * c + d.outH / 2 };
+        }
+        function mapOutputToOriginal(p, d) {
+          const x = p.x - d.outW / 2, y = p.y - d.outH / 2;
+          const c = Math.cos(-d.rad), s = Math.sin(-d.rad);
+          let ix = x * c - y * s, iy = x * s + y * c;
+          if (state.flipH) ix = -ix;
+          if (state.flipV) iy = -iy;
+          return { x: ix + d.w / 2, y: iy + d.h / 2 };
+        }
+
+        function buildTransformedCanvas() {
+          const d = baseDims();
+          const t = mkCanvas(d.outW, d.outH);
+          const c = t.getContext("2d");
+          c.translate(d.outW / 2, d.outH / 2);
+          c.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
+          c.rotate(d.rad);
+          c.drawImage(originalImage, -d.w / 2, -d.h / 2);
+          return t;
+        }
+
+        function renderStrokesTo(ctx) {
+          if (!strokes.length) return;
+          const d = baseDims();
+          ctx.save();
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          for (const st of strokes) {
+            if (!st.points.length) continue;
+            ctx.globalAlpha = st.opacity;
+            ctx.lineWidth = st.size;
+            if (st.tool === "eraser") {
+              ctx.globalCompositeOperation = "destination-out";
+              ctx.strokeStyle = "#000";
+            } else {
+              ctx.globalCompositeOperation = "source-over";
+              ctx.strokeStyle = st.color;
+            }
+            ctx.beginPath();
+            st.points.forEach((p, i) => {
+              const op = mapOriginalToOutput(p, d);
+              i ? ctx.lineTo(op.x, op.y) : ctx.moveTo(op.x, op.y);
+            });
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        function applySharpen(data, amount) {
+          if (amount <= 0) return;
+          const w = data.width, h = data.height;
+          const src = new Uint8ClampedArray(data.data), out = data.data;
+          const f = (amount / 100) * 1.25;
+          for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+              const idx = (y * w + x) * 4;
+              for (let c = 0; c < 3; c++) {
+                const center = src[idx + c] * (1 + 4 * f);
+                const edge = f * (src[idx - 4 + c] + src[idx + 4 + c] + src[idx - w * 4 + c] + src[idx + w * 4 + c]);
+                out[idx + c] = clamp(center - edge, 0, 255);
+              }
+            }
+          }
+        }
+
+        // Precomputed per-row/col squared-distance tables remove per-pixel multiplications.
+        let vigCache = { w: 0, h: 0, spread: 0, rows: null, cols: null, maxD: 1 };
+        function vignetteCache(w, h, spread) {
+          if (vigCache.w === w && vigCache.h === h && vigCache.spread === spread) return vigCache;
+          const cx = w / 2, cy = h / 2;
+          const maxD = Math.sqrt(cx * cx + cy * cy);
+          const rows = new Float32Array(h), cols = new Float32Array(w);
+          for (let y = 0; y < h; y++) { const dy = (y - cy) / maxD; rows[y] = dy * dy; }
+          for (let x = 0; x < w; x++) { const dx = (x - cx) / maxD; cols[x] = dx * dx; }
+          vigCache = { w, h, spread, rows, cols, maxD };
+          return vigCache;
+        }
+
+        function applyPixelEffects(data) {
+          const { width, height, data: px } = data;
+          const rf = state.red / 100, gf = state.green / 100, bf = state.blue / 100;
+          const vigI = state.vigIntensity / 100;
+          const noiseA = state.noise / 100;
+          const hasVig = vigI > 0;
+          const hasNoise = noiseA > 0;
+          const hasRgb = rf !== 1 || gf !== 1 || bf !== 1;
+          if (!hasVig && !hasNoise && !hasRgb) return;
+          const vc = hasVig ? vignetteCache(width, height, state.vigSpread) : null;
+          for (let y = 0; y < height; y++) {
+            const rowMul = vc ? vc.rows[y] : 0;
+            for (let x = 0; x < width; x++) {
+              const idx = (y * width + x) * 4;
+              let r = px[idx], g = px[idx + 1], b = px[idx + 2];
+              if (hasRgb) { r *= rf; g *= gf; b *= bf; }
+              if (hasVig) {
+                const d = Math.sqrt(rowMul + vc.cols[x]);
+                const t = Math.max(0, (d - vc.spread / 100) / Math.max(1e-4, 1 - vc.spread / 100));
+                const v = 1 - vigI * Math.min(1, t * t);
+                r *= v; g *= v; b *= v;
+              }
+              if (hasNoise) { const n = (Math.random() * 2 - 1) * noiseA * 64; r += n; g += n; b += n; }
+              px[idx] = clamp(r, 0, 255);
+              px[idx + 1] = clamp(g, 0, 255);
+              px[idx + 2] = clamp(b, 0, 255);
+            }
+          }
+        }
+
+        function drawGridInto() {
+          if (!state.gridOverlay || !overlayCanvas.width) return;
+          const w = overlayCanvas.width, h = overlayCanvas.height;
+          overlayCtx.strokeStyle = "rgba(255,255,255,0.12)";
+          overlayCtx.lineWidth = 1;
+          [w / 3, w * 2 / 3].forEach((x) => { overlayCtx.beginPath(); overlayCtx.moveTo(x, 0); overlayCtx.lineTo(x, h); overlayCtx.stroke(); });
+          [h / 3, h * 2 / 3].forEach((y) => { overlayCtx.beginPath(); overlayCtx.moveTo(0, y); overlayCtx.lineTo(w, y); overlayCtx.stroke(); });
+        }
+
+        function drawCropOverlay() {
+          overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+          if (state.gridOverlay) drawGridInto();
+          if (state.cropMode && cropSelection) {
+            const { x, y, w, h } = cropSelection;
+            overlayCtx.fillStyle = "rgba(0,0,0,0.4)";
+            overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.clearRect(x, y, w, h);
+            overlayCtx.strokeStyle = "#4a9eff";
+            overlayCtx.lineWidth = 2;
+            overlayCtx.setLineDash([8, 6]);
+            overlayCtx.strokeRect(x, y, w, h);
+            overlayCtx.setLineDash([]);
+            const hs = 8;
+            overlayCtx.fillStyle = "#4a9eff";
+            [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([hx, hy]) => {
+              overlayCtx.fillRect(hx - hs / 2, hy - hs / 2, hs, hs);
+            });
+          }
+        }
+
+        function fitCanvasDisplaySize() {
+          if (!imageCanvas.width || !imageCanvas.height) return;
+          const pad = 16;
+          const areaW = Math.max(1, previewWrap.clientWidth - pad * 2);
+          const areaH = Math.max(1, previewWrap.clientHeight - pad * 2);
+          const base = Math.min(areaW / imageCanvas.width, areaH / imageCanvas.height, 1);
+          const scale = base * state.zoom;
+          const cw = Math.max(1, Math.round(imageCanvas.width * scale));
+          const ch = Math.max(1, Math.round(imageCanvas.height * scale));
+          imageCanvas.style.width = cw + "px";
+          imageCanvas.style.height = ch + "px";
+          const maxPanX = Math.max(0, (cw - areaW) / 2);
+          const maxPanY = Math.max(0, (ch - areaH) / 2);
+          pan.x = clamp(pan.x, -maxPanX, maxPanX);
+          pan.y = clamp(pan.y, -maxPanY, maxPanY);
+          previewWrap.classList.toggle("zoomable", state.zoom > 1.02 && !state.cropMode && !state.drawMode);
+          canvasStage.style.transform = "translate(calc(-50% + " + pan.x + "px), calc(-50% + " + pan.y + "px))";
+        }
+
+        function bakeTransformAndFill(canvas) {
+          imageCanvas.width = canvas.width;
+          imageCanvas.height = canvas.height;
+          overlayCanvas.width = canvas.width;
+          overlayCanvas.height = canvas.height;
+          drawCanvas.width = canvas.width;
+          drawCanvas.height = canvas.height;
+          imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+          imageCtx.drawImage(canvas, 0, 0);
+          fitCanvasDisplaySize();
+        }
+
+        function drawBorderAndText() {
+          if (state.borderWidth > 0) {
+            const bw = state.borderWidth;
+            imageCtx.strokeStyle = state.borderColor;
+            imageCtx.lineWidth = bw;
+            imageCtx.lineJoin = "round";
+            const r = state.borderRadius;
+            const w = imageCanvas.width, h = imageCanvas.height;
+            imageCtx.beginPath();
+            if (r > 0) imageCtx.roundRect(bw / 2, bw / 2, w - bw, h - bw, r);
+            else imageCtx.rect(bw / 2, bw / 2, w - bw, h - bw);
+            imageCtx.stroke();
+          }
+          if (state.textOverlay) {
+            const t = state.textOverlay;
+            imageCtx.font = `bold ${t.size}px "Cairo", sans-serif`;
+            imageCtx.textAlign = "center";
+            imageCtx.textBaseline = "middle";
+            imageCtx.shadowColor = "rgba(0,0,0,0.5)";
+            imageCtx.shadowBlur = 4;
+            imageCtx.shadowOffsetX = 1;
+            imageCtx.shadowOffsetY = 1;
+            imageCtx.fillText(t.text, t.x, t.y);
+            imageCtx.shadowColor = "transparent";
+          }
+        }
+
+        function renderImmediately() {
+          if (!originalImage) return;
+          emptyState.style.display = "none";
+          if (state.showOriginal) {
+            const t = buildTransformedCanvas();
+            bakeTransformAndFill(t);
+            drawCropOverlay();
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            scheduleDataUrlUpdate();
+            return;
+          }
+          const transformed = buildTransformedCanvas();
+          const filtered = mkCanvas(transformed.width, transformed.height);
+          const fctx = filtered.getContext("2d", { willReadFrequently: true });
+          const eb = Math.round(state.brightness * Math.pow(2, state.exposure));
+          fctx.filter = `brightness(${eb}%) contrast(${state.contrast}%) saturate(${state.saturation}%) hue-rotate(${state.hue}deg) blur(${state.blur}px) sepia(${state.sepia ? 100 : 0}%) grayscale(${state.gray ? 100 : 0}%)`;
+          fctx.drawImage(transformed, 0, 0);
+          if (state.sharpen > 0 || state.noise > 0 || state.vigIntensity > 0 || state.red !== 100 || state.green !== 100 || state.blue !== 100) {
+            const id = fctx.getImageData(0, 0, filtered.width, filtered.height);
+            applySharpen(id, state.sharpen);
+            applyPixelEffects(id);
+            fctx.putImageData(id, 0, 0);
+          }
+          bakeTransformAndFill(filtered);
+          drawBorderAndText();
+          drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+          renderStrokesTo(drawCtx);
+          drawCropOverlay();
+          scheduleDataUrlUpdate();
+        }
+
+        function scheduleRender() {
+          if (renderQueued) return;
+          renderQueued = true;
+          requestAnimationFrame(() => { renderQueued = false; renderImmediately(); });
+        }
+        function scheduleRenderImmediately() {
+          renderQueued = false;
+          renderImmediately();
+        }
+        function scheduleDataUrlUpdate() {
+          clearTimeout(dataUrlTimer);
+          dataUrlTimer = setTimeout(() => updateDataUrlOutput(), 450);
+        }
+
+        function setZoom(level) {
+          state.zoom = clamp(level, 0.1, 5);
+          updateZoomDisplay();
+          if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); }
+        }
+        function updateZoomDisplay() { zoomLevelEl.textContent = Math.round(state.zoom * 100) + "%"; }
+
+        /* =========================================================
+           Export (preview == output)
+           ========================================================= */
+        function composeOutputCanvas() {
+          const c = mkCanvas(imageCanvas.width, imageCanvas.height);
+          const cx = c.getContext("2d");
+          cx.drawImage(imageCanvas, 0, 0);
+          if (!state.showOriginal) cx.drawImage(drawCanvas, 0, 0);
+          return c;
+        }
+        function getEditedDataUrl(type, quality) {
+          try {
+            if (state.showOriginal) return composeOutputCanvas().toDataURL("image/png");
+            return composeOutputCanvas().toDataURL(type || "image/png", quality);
+          } catch (e) { return ""; }
+        }
+
+        function updateDataUrlOutput() {
+          dataUrlOutput.value = normalizeDataUrl(getEditedDataUrl());
+          dataUrlOutput.scrollLeft = 0;
+          dataUrlOutput.scrollTop = 0;
+        }
+        function normalizeDataUrl(v) { return String(v || "").trim().replace(/\s+/g, ""); }
+
+        async function copyTextToClipboard(value) {
+          const text = String(value || "");
+          if (!text) return false;
+          if (navigator.clipboard && window.isSecureContext) {
+            try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+          }
+          const temp = document.createElement("textarea");
+          temp.value = text; temp.setAttribute("readonly", "");
+          temp.style.position = "fixed"; temp.style.left = "-9999px"; temp.style.top = "-9999px";
+          document.body.appendChild(temp); temp.focus(); temp.select(); temp.setSelectionRange(0, temp.value.length);
+          let ok = false;
+          try { ok = document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(temp);
+          return ok;
+        }
+
+        function exportFileName(ext) {
+          const base = currentFileNameBase || "edit";
+          return base + "-معدل." + ext;
+        }
+
+        function downloadCanvas(canvas, filename, mime, quality) {
+          const a = document.createElement("a");
+          a.href = canvas.toDataURL(mime, quality);
+          a.download = filename;
+          a.click();
+        }
+
+        function downloadEditedPng() {
+          if (!originalImage) { toast("ارفع صورة أولًا.", "warning"); return; }
+          downloadCanvas(composeOutputCanvas(), exportFileName("png"), "image/png");
+          toast("تم تحميل الصورة PNG.", "success");
+        }
+        function downloadEditedJpg() {
+          if (!originalImage) { toast("ارفع صورة أولًا.", "warning"); return; }
+          downloadCanvas(composeOutputCanvas(), exportFileName("jpg"), "image/jpeg", 0.92);
+          toast("تم تحميل الصورة JPG.", "success");
+        }
+        function downloadEditedPdf() {
+          if (!originalImage) { toast("ارفع صورة أولًا.", "warning"); return; }
+          if (!window.jspdf || !window.jspdf.jsPDF) { toast("مكتبة PDF ما زالت تُحمّل، حاول مجددًا.", "warning"); return; }
+          showLoading("جارٍ إنشاء ملف PDF...");
+          setTimeout(() => {
+            try {
+              const { jsPDF } = window.jspdf;
+              const w = Math.max(1, imageCanvas.width), h = Math.max(1, imageCanvas.height);
+              const pdf = new jsPDF({ orientation: w >= h ? "landscape" : "portrait", unit: "px", format: [w, h], compress: true });
+              pdf.addImage(getEditedDataUrl("image/png"), "PNG", 0, 0, w, h, undefined, "FAST");
+              pdf.save(exportFileName("pdf"));
+              toast("تم تحميل ملف PDF.", "success");
+            } catch (e) {
+              toast("تعذّر إنشاء PDF.", "error");
+            } finally {
+              hideLoading();
+            }
+          }, 30);
+        }
+
+        async function openEditedImageInNewTab() {
+          const dataUrl = getEditedDataUrl("image/png");
+          if (!dataUrl) { toast("ارفع صورة أولًا.", "warning"); return; }
+          const newTab = window.open("", "_blank");
+          if (!newTab) { toast("اسمح بالنوافذ المنبثقة للمتابعة.", "warning"); return; }
+          try {
+            const blob = await new Promise((r) => composeOutputCanvas().toBlob((b) => r(b), "image/png"));
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              newTab.location.replace(url);
+              setTimeout(() => URL.revokeObjectURL(url), 60000);
+              return;
+            }
+          } catch (e) {}
+          newTab.location.href = dataUrl;
+        }
+
+        async function copyEditedImage() {
+          if (!originalImage) { toast("ارفع صورة أولًا.", "warning"); return false; }
+          try {
+            const blob = await new Promise((r) => composeOutputCanvas().toBlob((b) => r(b), "image/png"));
+            if (!blob) throw new Error();
+            if (navigator.clipboard && window.ClipboardItem) {
+              await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+              return true;
+            }
+            const du = getEditedDataUrl("image/png");
+            if (du && await copyTextToClipboard(du)) return true;
+          } catch (e) {}
+          return false;
+        }
+
+        async function copyDataUrlText() {
+          const du = getEditedDataUrl("image/png");
+          if (!du) { toast("ارفع صورة أولًا.", "warning"); return; }
+          if (await copyTextToClipboard(du)) { toast("تم نسخ Data URL.", "success"); return; }
+          dataUrlOutput.focus(); dataUrlOutput.select(); dataUrlOutput.setSelectionRange(0, dataUrlOutput.value.length);
+          toast("اضغط Ctrl+C لنسخ Data URL.", "info");
+        }
+
+        /* =========================================================
+           Image loading (with dimension guard)
+           ========================================================= */
+        function installSource(src, name) {
+          const img = src;
+          const total = img.width * img.height;
+          if (total > MAX_PIXELS) {
+            const ratio = Math.sqrt(MAX_PIXELS / total);
+            const nw = Math.max(1, Math.round(img.width * ratio));
+            const nh = Math.max(1, Math.round(img.height * ratio));
+            const c = mkCanvas(nw, nh);
+            c.getContext("2d").drawImage(img, 0, 0, nw, nh);
+            originalImage = c;
+            toast("الصورة كبيرة — صُغّرت للحفاظ على الأداء.", "info", 3400);
+          } else {
+            originalImage = img;
+          }
+          cropSelection = null;
+          strokes = [];
+          state.textOverlay = null;
+          state.rotate = 0; state.flipH = false; state.flipV = false;
+          state.cropMode = false; state.showOriginal = false;
+          pan = { x: 0, y: 0 };
+          toggleCropUi(false);
+          syncControlsFromState();
+          updateToggleButtons();
+          undoStack = []; redoStack = [];
+          renderHistory();
+          renderImmediately();
+          updateDataUrlOutput();
+        }
+
+        function setImageFromDataUrl(dataUrl, name) {
+          const img = new Image();
+          img.onload = () => { installSource(img, name); };
+          img.onerror = () => toast("تعذّر تحميل الصورة.", "error");
+          img.src = dataUrl;
+        }
+
+        function updateImageInfo() {
+          if (!originalImage) return;
+          infoFileName.textContent = currentFileName || "-";
+          infoDimensions.textContent = originalImage.width + " x " + originalImage.height;
+          infoSize.textContent = currentFileSize || "-";
+          imageInfoEl.classList.add("visible");
+        }
+
+        async function loadPdfPage(num) {
+          if (!pdfDoc) return;
+          try {
+            showLoading("جارٍ عرض صفحة " + num + " من " + pdfTotalPages + "...");
+            const page = await pdfDoc.getPage(num);
+            pdfCurrentPage = num;
+            const viewport = page.getViewport({ scale: pdfScale });
+            const canvas = mkCanvas(viewport.width, viewport.height);
+            await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+            const dataUrl = canvas.toDataURL("image/png");
+            const img = new Image();
+            img.onload = () => {
+              installSource(img, currentFileName);
+              updatePdfNav();
+              hideLoading();
+            };
+            img.src = dataUrl;
+          } catch (e) {
+            hideLoading();
+            toast("تعذّر عرض صفحة PDF.", "error");
+          }
+        }
+
+        function updatePdfNav() {
+          pdfPageInput.value = pdfCurrentPage;
+          pdfPageTotal.textContent = "/ " + pdfTotalPages;
+          pdfNav.classList.add("visible");
+        }
+        function hidePdfNav() {
+          pdfNav.classList.remove("visible");
+          pdfDoc = null; pdfCurrentPage = 1; pdfTotalPages = 1;
+        }
+
+        async function loadPdfFile(file) {
+          try {
+            showLoading("جارٍ تحليل ملف PDF...");
+            const arrayBuffer = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            pdfTotalPages = pdfDoc.numPages;
+            pdfCurrentPage = 1;
+            pdfScale = parseFloat(pdfQuality.value) || 1.5;
+            await loadPdfPage(1);
+          } catch (e) {
+            hideLoading();
+            toast("تعذّر تحميل ملف PDF.", "error");
+          }
+        }
+
+        function loadImageFile(file) {
+          if (!file) return;
+          setMetaFromFile(file);
+          if (file.type === "application/pdf" || (file.name && file.name.toLowerCase().endsWith(".pdf"))) {
+            loadPdfFile(file);
+            return;
+          }
+          if (!file.type || !file.type.startsWith("image/")) {
+            toast("اختر صورة أو ملف PDF صالحًا.", "error");
+            return;
+          }
+          showLoading("جارٍ قراءة الصورة...");
+          const reader = new FileReader();
+          reader.onload = (e) => { setImageFromDataUrl(e.target.result, file.name); hideLoading(); };
+          reader.onerror = () => { hideLoading(); toast("تعذّرت قراءة الملف.", "error"); };
+          reader.readAsDataURL(file);
+        }
+
+        function deriveBaseName(name) {
+          const s = String(name || "").replace(/\.[^.]*$/, "").trim();
+          return s ? s.replace(/[\\/:*?"<>|]/g, "-").slice(0, 60) : "edit";
+        }
+        function setMetaFromFile(file) {
+          currentFileName = file.name || "-";
+          currentFileSize = file.size > 1024 ? (file.size / 1024).toFixed(1) + " KB" : file.size + " B";
+          currentFileNameBase = deriveBaseName(currentFileName);
+        }
+
+        function extractImageFromDataTransfer(dt) {
+          if (!dt) return null;
+          if (dt.files && dt.files.length > 0) {
+            for (let i = 0; i < dt.files.length; i++) {
+              const f = dt.files[i];
+              if (f && f.type && (f.type.startsWith("image/") || f.type === "application/pdf")) return f;
+            }
+          }
+          if (!dt.items) return null;
+          for (let i = 0; i < dt.items.length; i++) {
+            const it = dt.items[i];
+            if (it && it.type && (it.type.startsWith("image/") || it.type === "application/pdf")) return it.getAsFile();
+          }
+          return null;
+        }
+
+        function handlePasteEvent(event) {
+          const f = extractImageFromDataTransfer(event.clipboardData);
+          if (!f) return false;
+          event.preventDefault();
+          loadImageFile(f);
+          return true;
+        }
+        async function readClipboardImageViaApi() {
+          if (!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.read) return false;
+          try {
+            const items = await navigator.clipboard.read();
+            for (let i = 0; i < items.length; i++) {
+              const t = items[i].types.find((x) => x.startsWith("image/"));
+              if (!t) continue;
+              const blob = await items[i].getType(t);
+              loadImageFile(new File([blob], "pasted-" + Date.now() + ".png", { type: blob.type || "image/png" }));
+              return true;
+            }
+          } catch (e) {}
+          return false;
+        }
+
+        /* =========================================================
+           Crop
+           ========================================================= */
+        function toggleCropUi(on) {
+          overlayCanvas.style.pointerEvents = on && originalImage ? "auto" : "none";
+          drawCanvas.style.pointerEvents = state.drawMode ? "auto" : "none";
+          previewWrap.classList.toggle("zoomable", state.zoom > 1.02 && !state.cropMode && !state.drawMode);
+        }
+
+        function applyCrop() {
+          if (!originalImage || !cropSelection) { toast("حدّد منطقة القص أولًا.", "warning"); return; }
+          if (cropSelection.w < 5 || cropSelection.h < 5) { toast("منطقة القص صغيرة جدًا.", "warning"); return; }
+          const sel = cropSelection;
+          const src = buildTransformedCanvas();
+          const sctx = src.getContext("2d");
+          // Bake drawn strokes into the crop source so nothing is lost.
+          renderStrokesTo(sctx);
+          const out = mkCanvas(Math.round(sel.w), Math.round(sel.h));
+          out.getContext("2d").drawImage(src, sel.x, sel.y, sel.w, sel.h, 0, 0, out.width, out.height);
+          originalImage = out;
+          strokes = [];
+          state.rotate = 0; state.flipH = false; state.flipV = false;
+          state.cropMode = false; state.showOriginal = false;
+          cropSelection = null;
+          pan = { x: 0, y: 0 };
+          toggleCropUi(false);
+          syncControlsFromState(); updateToggleButtons();
+          commit("قص الصورة");
+          renderImmediately();
+          toast("تم تطبيق القص.", "success");
+        }
+
+        function canvasPoint(event) {
+          const r = overlayCanvas.getBoundingClientRect();
+          const sx = overlayCanvas.width / r.width, sy = overlayCanvas.height / r.height;
+          return {
+            x: clamp((event.clientX - r.left) * sx, 0, overlayCanvas.width),
+            y: clamp((event.clientY - r.top) * sy, 0, overlayCanvas.height),
+          };
+        }
+        function normalizeRect(a, b) {
+          const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+          return { x, y, w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
+        }
+
+        /* =========================================================
+           Presets / adjustments
+           ========================================================= */
+        function applyPreset(name) {
+          if (!originalImage) return;
+          commit(name === "original" ? "فلتر الأصلي" : "فلتر " + PRESET_LABELS[name] || name);
+          for (const k of ADJUST_KEYS) state[k] = DEFAULTS[k];
+          const p = PRESETS[name];
+          if (p) { for (const [k, v] of Object.entries(p)) state[k] = v; }
+          syncControlsFromState(); updateValueLabels(); updateToggleButtons();
+          renderImmediately();
+          document.querySelectorAll(".preset-btn").forEach((b) => b.classList.toggle("active", b.dataset.preset === name));
+        }
+        const PRESET_LABELS = { original: "الأصلي", vintage: "عتيق", noir: "أبيض وأسود", warm: "دافئ", cool: "بارد", cinematic: "سينمائي", soft: "ناعم", vivid: "حيوي" };
+
+        function resetAdjustments() {
+          if (!originalImage) return;
+          commit("إعادة تعيين");
+          for (const k of ADJUST_KEYS) state[k] = DEFAULTS[k];
+          state.textOverlay = null;
+          strokes = [];
+          cropSelection = null;
+          state.cropMode = false;
+          toggleCropUi(false);
+          syncControlsFromState(); updateValueLabels(); updateToggleButtons();
+          document.querySelectorAll(".preset-btn").forEach((b) => b.classList.remove("active"));
+          renderImmediately();
+          toast("تمت إعادة التعيين.", "success");
+        }
+
+        function hasAnyEdits() {
+          return ADJUST_KEYS.some((k) => state[k] !== DEFAULTS[k]) || !!state.textOverlay || strokes.length > 0;
+        }
+
+        /* =========================================================
+           Toggle buttons
+           ========================================================= */
+        function updateToggleButtons() {
+          $("toggleSepia").classList.toggle("active", state.sepia);
+          $("toggleSepia").setAttribute("aria-pressed", String(state.sepia));
+          $("toggleGray").classList.toggle("active", state.gray);
+          $("toggleGray").setAttribute("aria-pressed", String(state.gray));
+          $("flipH").classList.toggle("active", state.flipH);
+          $("flipH").setAttribute("aria-pressed", String(state.flipH));
+          $("flipV").classList.toggle("active", state.flipV);
+          $("flipV").setAttribute("aria-pressed", String(state.flipV));
+          $("cropMode").classList.toggle("active", state.cropMode);
+          $("cropMode").setAttribute("aria-pressed", String(state.cropMode));
+          beforeAfterBtn.classList.toggle("active", state.showOriginal);
+          beforeAfterBtn.setAttribute("aria-pressed", String(state.showOriginal));
+          gridToggleBtn.classList.toggle("active", state.gridOverlay);
+          gridToggleBtn.setAttribute("aria-pressed", String(state.gridOverlay));
+          $("drawPen").classList.toggle("active", state.drawMode && state.drawTool === "pen");
+          $("drawPen").setAttribute("aria-pressed", String(state.drawMode && state.drawTool === "pen"));
+          $("drawEraser").classList.toggle("active", state.drawMode && state.drawTool === "eraser");
+          $("drawEraser").setAttribute("aria-pressed", String(state.drawMode && state.drawTool === "eraser"));
+          previewWrap.classList.toggle("draw-canvas-active", state.drawMode);
+        }
+
+        /* =========================================================
+           Compare (fixed: click toggles, long-press peeks)
+           ========================================================= */
+        function setShowOriginal(v) {
+          state.showOriginal = v;
+          updateToggleButtons();
+          renderImmediately();
+        }
+        function comparePress() {
+          if (!originalImage || !hasAnyEdits()) { toast("لا توجد تعديلات بعد.", "info"); return false; }
+          setShowOriginal(true);
+          return true;
+        }
+        function compareRelease() {
+          if (state.showOriginal) setShowOriginal(false);
+        }
+        function compareClick() {
+          if (!originalImage || !hasAnyEdits()) { toast("لا توجد تعديلات بعد.", "info"); return; }
+          setShowOriginal(!state.showOriginal);
+        }
+
+        /* =========================================================
+           Events
+           ========================================================= */
         function initEvents() {
+          /* ---- upload / paste ---- */
           fileInput.addEventListener("click", () => { fileInput.value = ""; });
           fileInput.addEventListener("change", (e) => { loadImageFile(e.target.files[0]); });
-          ["dragenter","dragover"].forEach(ev => uploadZone.addEventListener(ev, e => { e.preventDefault(); uploadZone.classList.add("dragover"); }));
-          ["dragleave","drop"].forEach(ev => uploadZone.addEventListener(ev, e => { e.preventDefault(); uploadZone.classList.remove("dragover"); }));
-          uploadZone.addEventListener("drop", e => { const f = extractImageFromDataTransfer(e.dataTransfer) || e.dataTransfer.files[0]; if (f) loadImageFile(f); });
+          ["dragenter", "dragover"].forEach((ev) => uploadZone.addEventListener(ev, (e) => { e.preventDefault(); uploadZone.classList.add("dragover"); }));
+          ["dragleave", "drop"].forEach((ev) => uploadZone.addEventListener(ev, (e) => { e.preventDefault(); uploadZone.classList.remove("dragover"); }));
+          uploadZone.addEventListener("drop", (e) => { const f = extractImageFromDataTransfer(e.dataTransfer) || e.dataTransfer.files[0]; if (f) loadImageFile(f); });
           document.addEventListener("paste", handlePasteEvent);
           window.addEventListener("paste", handlePasteEvent);
           pasteCatcher.addEventListener("paste", handlePasteEvent);
 
           window.addEventListener("keydown", async (e) => {
             const c = e.ctrlKey || e.metaKey;
-            if (c && e.key.toLowerCase() === "v" && !isEditableElement(e.target)) { if (await readClipboardImageViaApi()) { e.preventDefault(); return; } pasteCatcher.focus(); setTimeout(() => pasteCatcher.blur(), 100); return; }
-            if (c && e.key.toLowerCase() === "z" && !isEditableElement(e.target)) { e.preventDefault(); undo(); return; }
-            if ((c && e.key.toLowerCase() === "y" || (c && e.shiftKey && e.key.toLowerCase() === "z")) && !isEditableElement(e.target)) { e.preventDefault(); redo(); return; }
-            if (c && e.key.toLowerCase() === "g" && !isEditableElement(e.target)) { e.preventDefault(); toggleGrid(); }
+            const targetIsEditable = isEditable(e.target);
+            if (c && e.key.toLowerCase() === "v" && !targetIsEditable) {
+              if (await readClipboardImageViaApi()) { e.preventDefault(); return; }
+              pasteCatcher.focus();
+              setTimeout(() => pasteCatcher.blur(), 100);
+              return;
+            }
+            if (c && e.key.toLowerCase() === "z" && !targetIsEditable) { e.preventDefault(); undo(); return; }
+            if ((c && e.key.toLowerCase() === "y" || (c && e.shiftKey && e.key.toLowerCase() === "z")) && !targetIsEditable) { e.preventDefault(); redo(); return; }
+            if (c && e.key.toLowerCase() === "g" && !targetIsEditable) { e.preventDefault(); toggleGrid(); }
           });
 
-          document.getElementById("zoomInBtn").addEventListener("click", () => setZoom(state.zoom + 0.25));
-          document.getElementById("zoomOutBtn").addEventListener("click", () => setZoom(state.zoom - 0.25));
-          document.getElementById("zoomFitBtn").addEventListener("click", () => setZoom(1));
-          document.getElementById("zoomOneOneBtn").addEventListener("click", () => {
-            const pad = 16, aw = Math.max(1, previewWrap.clientWidth - pad * 2), ah = Math.max(1, previewWrap.clientHeight - pad * 2);
+          /* ---- zoom ---- */
+          $("zoomInBtn").addEventListener("click", () => setZoom(state.zoom + 0.25));
+          $("zoomOutBtn").addEventListener("click", () => setZoom(state.zoom - 0.25));
+          $("zoomFitBtn").addEventListener("click", () => { setZoom(1); pan = { x: 0, y: 0 }; fitCanvasDisplaySize(); });
+          $("zoomOneOneBtn").addEventListener("click", () => {
+            const pad = 16;
+            const aw = Math.max(1, previewWrap.clientWidth - pad * 2), ah = Math.max(1, previewWrap.clientHeight - pad * 2);
             const base = Math.min(aw / imageCanvas.width, ah / imageCanvas.height, 1);
             setZoom(1 / base);
           });
+          previewWrap.addEventListener("wheel", (e) => {
+            if (!originalImage) return;
+            e.preventDefault();
+            const factor = Math.exp(-e.deltaY * 0.0012);
+            setZoom(state.zoom * factor);
+          }, { passive: false });
+          previewWrap.addEventListener("dblclick", (e) => {
+            if (!originalImage) return;
+            if (state.cropMode || state.drawMode) return;
+            e.preventDefault();
+            setZoom(1); pan = { x: 0, y: 0 }; fitCanvasDisplaySize();
+          });
 
-          document.getElementById("pdfPrevBtn").addEventListener("click", () => { if (pdfCurrentPage > 1) loadPdfPage(pdfCurrentPage - 1); });
-          document.getElementById("pdfNextBtn").addEventListener("click", () => { if (pdfCurrentPage < pdfTotalPages) loadPdfPage(pdfCurrentPage + 1); });
-          pdfPageInput.addEventListener("change", () => { const p = parseInt(pdfPageInput.value); if (p >= 1 && p <= pdfTotalPages && p !== pdfCurrentPage) loadPdfPage(p); else pdfPageInput.value = pdfCurrentPage; });
-          pdfQuality.addEventListener("change", () => { pdfScale = parseFloat(pdfQuality.value) || 1.5; if (pdfDoc) loadPdfPage(pdfCurrentPage); });
+          /* ---- pan (when zoomed in, no active tool) ---- */
+          let panning = false, panStart = null, panBase = null;
+          overlayCanvas.addEventListener("pointerdown", (e) => {
+            if (state.cropMode || state.drawMode || state.textOverlay) return;
+            if (state.zoom <= 1.02) return;
+            panning = true;
+            panStart = { x: e.clientX, y: e.clientY };
+            panBase = { x: pan.x, y: pan.y };
+            previewWrap.classList.add("panning");
+            overlayCanvas.setPointerCapture(e.pointerId);
+            e.preventDefault();
+          });
+          overlayCanvas.addEventListener("pointermove", (e) => {
+            if (!panning) return;
+            pan.x = panBase.x + (e.clientX - panStart.x);
+            pan.y = panBase.y + (e.clientY - panStart.y);
+            fitCanvasDisplaySize();
+          });
+          overlayCanvas.addEventListener("pointerup", () => { panning = false; previewWrap.classList.remove("panning"); });
+          overlayCanvas.addEventListener("pointercancel", () => { panning = false; previewWrap.classList.remove("panning"); });
 
-          document.getElementById("pasteImageBtn").addEventListener("click", async () => { if (await readClipboardImageViaApi()) return; pasteCatcher.focus(); alert("Use Ctrl+V or allow clipboard permission."); });
+          /* ---- undo/redo/grid ---- */
+          $("undoBtn").addEventListener("click", undo);
+          $("redoBtn").addEventListener("click", redo);
+          gridToggleBtn.addEventListener("click", toggleGrid);
+
+          function toggleGrid() {
+            state.gridOverlay = !state.gridOverlay;
+            updateToggleButtons();
+            drawCropOverlay();
+          }
+
+          /* ---- compare ---- */
+          let holdTimer = null, holdActive = false, suppressClick = false;
+          const clearHold = () => { if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; } };
+          beforeAfterBtn.addEventListener("pointerdown", () => {
+            if (!originalImage) return;
+            holdActive = false;
+            clearHold();
+            holdTimer = setTimeout(() => {
+              holdActive = true;
+              suppressClick = true;
+              comparePress();
+            }, 220);
+          });
+          const releaseHold = () => {
+            clearHold();
+            if (holdActive) {
+              compareRelease();
+              holdActive = false;
+            }
+          };
+          beforeAfterBtn.addEventListener("pointerup", releaseHold);
+          beforeAfterBtn.addEventListener("pointercancel", releaseHold);
+          beforeAfterBtn.addEventListener("pointerleave", releaseHold);
+          beforeAfterBtn.addEventListener("click", () => {
+            if (suppressClick) { suppressClick = false; return; }
+            compareClick();
+          });
+
+          /* ---- PDF nav ---- */
+          $("pdfPrevBtn").addEventListener("click", () => { if (pdfCurrentPage > 1) loadPdfPage(pdfCurrentPage - 1); });
+          $("pdfNextBtn").addEventListener("click", () => { if (pdfCurrentPage < pdfTotalPages) loadPdfPage(pdfCurrentPage + 1); });
+          pdfPageInput.addEventListener("change", () => {
+            const p = parseInt(pdfPageInput.value, 10);
+            if (p >= 1 && p <= pdfTotalPages && p !== pdfCurrentPage) loadPdfPage(p);
+            else pdfPageInput.value = pdfCurrentPage;
+          });
+          pdfQuality.addEventListener("change", () => {
+            pdfScale = parseFloat(pdfQuality.value) || 1.5;
+            if (pdfDoc) loadPdfPage(pdfCurrentPage);
+          });
+
+          /* ---- export / copy ---- */
+          $("pasteImageBtn").addEventListener("click", async () => { if (await readClipboardImageViaApi()) return; pasteCatcher.focus(); toast("استخدم Ctrl+V بعد السماح بقراءة الحافظة.", "info"); });
           openEditedTabBtn.addEventListener("click", openEditedImageInNewTab);
-          copyEditedImageBtn.addEventListener("click", async () => alert(await copyEditedImage() ? "Copied." : "Could not copy."));
+          copyEditedImageBtn.addEventListener("click", async () => toast((await copyEditedImage()) ? "تم نسخ الصورة." : "تعذّر النسخ.", (await copyEditedImage() !== false) ? "success" : "error"));
           copyDataUrlBtn.addEventListener("click", copyDataUrlText);
+          $("downloadPng").addEventListener("click", downloadEditedPng);
+          $("downloadJpg").addEventListener("click", downloadEditedJpg);
+          $("downloadPdf").addEventListener("click", downloadEditedPdf);
 
-          previewWrap.addEventListener("contextmenu", showContextMenu);
-          canvasContextMenu.addEventListener("click", e => e.stopPropagation());
+          /* ---- context menu ---- */
+          previewWrap.addEventListener("contextmenu", (e) => {
+            if (!originalImage) return;
+            e.preventDefault();
+            canvasContextMenu.style.left = `${Math.max(8, Math.min(e.clientX, window.innerWidth - 240 - 10))}px`;
+            canvasContextMenu.style.top = `${Math.max(8, Math.min(e.clientY, window.innerHeight - 120 - 10))}px`;
+            canvasContextMenu.style.display = "block";
+            canvasContextMenu.setAttribute("aria-hidden", "false");
+          });
+          canvasContextMenu.addEventListener("click", (e) => e.stopPropagation());
           ctxOpenEdited.addEventListener("click", () => { hideContextMenu(); openEditedImageInNewTab(); });
-          ctxCopyEdited.addEventListener("click", async () => { hideContextMenu(); alert(await copyEditedImage() ? "Copied." : "Could not copy."); });
+          ctxCopyEdited.addEventListener("click", async () => { hideContextMenu(); toast((await copyEditedImage()) ? "تم نسخ الصورة." : "تعذّر النسخ.", "success"); });
           document.addEventListener("click", hideContextMenu);
           window.addEventListener("scroll", hideContextMenu);
           window.addEventListener("resize", hideContextMenu);
+          function hideContextMenu() { canvasContextMenu.style.display = "none"; canvasContextMenu.setAttribute("aria-hidden", "true"); }
 
-          const toggleBtn = (id, key) => document.getElementById(id).addEventListener("click", () => { pushUndoState(); state[key] = !state[key]; updateToggleButtons(); render(); });
-          toggleBtn("toggleSepia", "sepia"); toggleBtn("toggleGray", "gray"); toggleBtn("flipH", "flipH"); toggleBtn("flipV", "flipV");
+          /* ---- toggles: sepia / gray / flips ---- */
+          const simpleToggle = (id, key, label) => $(id).addEventListener("click", () => {
+            if (!originalImage) return;
+            commit("تفعيل " + label);
+            state[key] = !state[key];
+            updateToggleButtons();
+            renderImmediately();
+          });
+          simpleToggle("toggleSepia", "sepia", "سيبيا");
+          simpleToggle("toggleGray", "gray", "رمادي");
+          simpleToggle("flipH", "flipH", "قلب أفقي");
+          simpleToggle("flipV", "flipV", "قلب عمودي");
 
-          document.getElementById("rotateLeft").addEventListener("click", () => { pushUndoState(); state.rotate = Math.max(-180, state.rotate - 90); document.getElementById("rotate").value = state.rotate; updateValueLabels(); render(); });
-          document.getElementById("rotateRight").addEventListener("click", () => { pushUndoState(); state.rotate = Math.min(180, state.rotate + 90); document.getElementById("rotate").value = state.rotate; updateValueLabels(); render(); });
+          $("rotateLeft").addEventListener("click", () => {
+            if (!originalImage) return;
+            commit("تدوير 90°");
+            state.rotate = clamp(state.rotate - 90, -180, 180);
+            $("rotate").value = state.rotate;
+            updateValueLabels();
+            renderImmediately();
+          });
+          $("rotateRight").addEventListener("click", () => {
+            if (!originalImage) return;
+            commit("تدوير +90°");
+            state.rotate = clamp(state.rotate + 90, -180, 180);
+            $("rotate").value = state.rotate;
+            updateValueLabels();
+            renderImmediately();
+          });
 
-          document.getElementById("cropMode").addEventListener("click", () => { if (!originalImage) return; state.cropMode = !state.cropMode; cropSelection = null; overlayCanvas.style.pointerEvents = state.cropMode ? "auto" : "none"; updateToggleButtons(); drawCropOverlay(); });
-          document.getElementById("cancelCrop").addEventListener("click", () => { state.cropMode = false; cropSelection = null; overlayCanvas.style.pointerEvents = "none"; updateToggleButtons(); drawCropOverlay(); });
-          document.getElementById("applyCrop").addEventListener("click", applyCrop);
+          /* ---- crop ---- */
+          $("cropMode").addEventListener("click", () => {
+            if (!originalImage) return;
+            state.cropMode = !state.cropMode;
+            state.drawMode = false;
+            cropSelection = null;
+            toggleCropUi(state.cropMode);
+            updateToggleButtons();
+            drawCropOverlay();
+            if (state.cropMode) toast("اسحب على الصورة لتحديد منطقة القص.", "info");
+          });
+          $("cancelCrop").addEventListener("click", () => {
+            state.cropMode = false;
+            cropSelection = null;
+            toggleCropUi(false);
+            updateToggleButtons();
+            drawCropOverlay();
+          });
+          $("applyCrop").addEventListener("click", applyCrop);
 
-          overlayCanvas.addEventListener("mousedown", (e) => { if (!state.cropMode || !originalImage) return; isDraggingCrop = true; cropStart = getCanvasPoint(e); cropSelection = { x: cropStart.x, y: cropStart.y, w: 0, h: 0 }; drawCropOverlay(); });
+          overlayCanvas.addEventListener("mousedown", (e) => {
+            if (!state.cropMode || !originalImage) return;
+            isDraggingCrop = true;
+            cropStart = canvasPoint(e);
+            cropSelection = { x: cropStart.x, y: cropStart.y, w: 0, h: 0 };
+            drawCropOverlay();
+          });
           overlayCanvas.addEventListener("mousemove", (e) => {
             if (!isDraggingCrop || !state.cropMode) return;
-            const p = getCanvasPoint(e);
+            const p = canvasPoint(e);
             if (cropAspect) {
               const [aw, ah] = cropAspect.split(":").map(Number);
               const dx = p.x - cropStart.x, dy = p.y - cropStart.y;
               const absDx = Math.abs(dx), absDy = Math.abs(dy);
-              if (absDx * ah > absDy * aw) { const s = dy > 0 ? 1 : -1; cropSelection = normalizeRect(cropStart, { x: p.x, y: cropStart.y + s * (absDx / aw * ah) }); }
-              else { const s = dx > 0 ? 1 : -1; cropSelection = normalizeRect(cropStart, { x: cropStart.x + s * (absDy / ah * aw), y: p.y }); }
-            } else { cropSelection = normalizeRect(cropStart, p); }
+              if (absDx * ah > absDy * aw) {
+                const s = dy > 0 ? 1 : -1;
+                cropSelection = normalizeRect(cropStart, { x: p.x, y: cropStart.y + s * (absDx / aw * ah) });
+              } else {
+                const s = dx > 0 ? 1 : -1;
+                cropSelection = normalizeRect(cropStart, { x: cropStart.x + s * (absDy / ah * aw), y: p.y });
+              }
+            } else {
+              cropSelection = normalizeRect(cropStart, p);
+            }
             drawCropOverlay();
           });
           window.addEventListener("mouseup", () => { isDraggingCrop = false; });
 
-          beforeAfterBtn.addEventListener("click", () => { if (!originalImage || !hasAnyEdits()) { if (!hasAnyEdits()) alert("No edits yet."); return; } state.showOriginal = !state.showOriginal; updateToggleButtons(); render(); });
-          const hs = () => { if (!originalImage || !hasAnyEdits()) return; state.showOriginal = true; updateToggleButtons(); render(); };
-          const he = () => { if (!originalImage || !hasAnyEdits()) return; state.showOriginal = false; updateToggleButtons(); render(); };
-          beforeAfterBtn.addEventListener("mousedown", hs); beforeAfterBtn.addEventListener("mouseup", he);
-          beforeAfterBtn.addEventListener("mouseleave", he);
-          beforeAfterBtn.addEventListener("touchstart", hs, { passive: true }); beforeAfterBtn.addEventListener("touchend", he); beforeAfterBtn.addEventListener("touchcancel", he);
+          document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => applyPreset(b.dataset.preset)));
+          document.querySelectorAll("[data-ratio]").forEach((b) => b.addEventListener("click", () => {
+            cropAspect = b.dataset.ratio === "free" ? null : b.dataset.ratio;
+            document.querySelectorAll(".aspect-btn").forEach((x) => x.classList.toggle("active", x.dataset.ratio === b.dataset.ratio));
+            cropSelection = null;
+            drawCropOverlay();
+          }));
+          document.querySelectorAll(".cg-header").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("collapsed")));
 
-          document.getElementById("resetAll").addEventListener("click", () => { if (!originalImage) return; pushUndoState(); resetAdjustments(); });
-          document.getElementById("downloadPng").addEventListener("click", () => { if (!originalImage) { alert("Upload an image first"); return; } const a = document.createElement("a"); a.href = imageCanvas.toDataURL("image/png"); a.download = "pro-image-editor-output.png"; a.click(); });
-          document.getElementById("downloadPdf").addEventListener("click", downloadEditedPdf);
-          document.getElementById("undoBtn").addEventListener("click", undo);
-          document.getElementById("redoBtn").addEventListener("click", redo);
-          document.getElementById("gridToggle").addEventListener("click", toggleGrid);
-          document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => applyPreset(b.dataset.preset)));
-          document.querySelectorAll("[data-ratio]").forEach(b => b.addEventListener("click", () => setCropAspect(b.dataset.ratio)));
-          document.querySelectorAll(".control-group-header").forEach(h => h.addEventListener("click", () => h.parentElement.classList.toggle("collapsed")));
+          $("resetAll").addEventListener("click", resetAdjustments);
+
+          /* ---- draw tools ---- */
+          const setDrawTool = (tool) => {
+            if (!originalImage) return;
+            const turningOn = !state.drawMode || state.drawTool !== tool;
+            state.drawMode = turningOn;
+            state.drawTool = tool;
+            if (turningOn) {
+              state.cropMode = false;
+              cropSelection = null;
+              toggleCropUi(false);
+            } else {
+              toggleCropUi(false);
+            }
+            updateToggleButtons();
+            toast(turningOn ? (tool === "eraser" ? "وضع الممحاة" : "وضع الرسم") : "تم إيقاف الرسم", "info");
+          };
+          $("drawPen").addEventListener("click", () => setDrawTool("pen"));
+          $("drawEraser").addEventListener("click", () => setDrawTool("eraser"));
+          $("drawClear").addEventListener("click", () => {
+            if (!strokes.length) return;
+            commit("مسح الرسم");
+            strokes = [];
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            renderImmediately();
+          });
+
+          bindToolSlider("drawSize");
+          bindToolSlider("drawOpacity");
+          bindToolSlider("textSize");
+          $("drawColor").addEventListener("input", (e) => { state.drawColor = e.target.value; $("drawColorHex").textContent = e.target.value; });
+          $("textColor").addEventListener("input", (e) => { state.textColor = e.target.value; $("textColorHex").textContent = e.target.value; if (state.textOverlay) { state.textOverlay.color = e.target.value; scheduleRender(); } });
+          $("borderColor").addEventListener("input", (e) => { state.borderColor = e.target.value; $("borderColorHex").textContent = e.target.value; scheduleRender(); });
+          $("borderColor").addEventListener("change", () => { if (originalImage && hasAnyEdits()) commit("لون الإطار"); });
+
+          let isDrawing = false, lastDrawPoint = null, drawStroke = null;
+          drawCanvas.addEventListener("mousedown", (e) => {
+            if (!state.drawMode || !originalImage) return;
+            e.preventDefault();
+            isDrawing = true;
+            const d = baseDims();
+            const r = drawCanvas.getBoundingClientRect();
+            const sx = drawCanvas.width / r.width, sy = drawCanvas.height / r.height;
+            const outPt = { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+            lastDrawPoint = outPt;
+            drawStroke = {
+              tool: state.drawTool,
+              size: state.drawSize,
+              opacity: state.drawOpacity / 100,
+              color: state.drawColor,
+              points: [mapOutputToOriginal(outPt, d)],
+            };
+            strokes.push(drawStroke);
+          });
+          drawCanvas.addEventListener("mousemove", (e) => {
+            if (!isDrawing || !state.drawMode) return;
+            const r = drawCanvas.getBoundingClientRect();
+            const sx = drawCanvas.width / r.width, sy = drawCanvas.height / r.height;
+            const pt = { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+            const d = baseDims();
+            drawCtx.globalAlpha = state.drawOpacity / 100;
+            drawCtx.lineWidth = state.drawSize;
+            drawCtx.lineCap = "round";
+            drawCtx.lineJoin = "round";
+            if (state.drawTool === "eraser") {
+              drawCtx.globalCompositeOperation = "destination-out";
+              drawCtx.strokeStyle = "rgba(0,0,0,1)";
+            } else {
+              drawCtx.globalCompositeOperation = "source-over";
+              drawCtx.strokeStyle = state.drawColor;
+            }
+            drawCtx.beginPath();
+            drawCtx.moveTo(lastDrawPoint.x, lastDrawPoint.y);
+            drawCtx.lineTo(pt.x, pt.y);
+            drawCtx.stroke();
+            lastDrawPoint = pt;
+            if (drawStroke) drawStroke.points.push(mapOutputToOriginal(pt, d));
+          });
+          window.addEventListener("mouseup", () => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (drawStroke && drawStroke.points.length > 0) commit(state.drawTool === "eraser" ? "ممحاة" : "رسم");
+            drawStroke = null;
+          });
+
+          /* ---- text ---- */
+          $("addTextBtn").addEventListener("click", () => {
+            if (!originalImage) { toast("ارفع صورة أولًا.", "warning"); return; }
+            const txt = $("textInput").value.trim();
+            if (!txt) { toast("اكتب النص أولًا.", "warning"); return; }
+            state.textOverlay = {
+              text: txt, size: state.textSize, color: state.textColor,
+              x: imageCanvas.width / 2, y: imageCanvas.height / 2,
+            };
+            commit("إضافة نص");
+            renderImmediately();
+            toast("اسحب النص على الصورة لتحريكه.", "info");
+          });
+          $("clearTextBtn").addEventListener("click", () => {
+            if (!state.textOverlay) return;
+            commit("إزالة النص");
+            state.textOverlay = null;
+            renderImmediately();
+          });
+
+          /* ---- text drag reposition ---- */
+          let draggingText = false, textDragStart = null, textDragBase = null;
+          overlayCanvas.addEventListener("mousedown", (e) => {
+            if (state.cropMode || state.drawMode) return;
+            if (!state.textOverlay || !originalImage) return;
+            if (state.zoom <= 1.02 && !state.textOverlay) return;
+            draggingText = true;
+            textDragStart = canvasPoint(e);
+            textDragBase = { x: state.textOverlay.x, y: state.textOverlay.y };
+            e.preventDefault();
+            drawTextFrame();
+          });
+          overlayCanvas.addEventListener("mousemove", (e) => {
+            if (!draggingText) return;
+            const p = canvasPoint(e);
+            const dx = p.x - textDragStart.x, dy = p.y - textDragStart.y;
+            state.textOverlay.x = clamp(textDragBase.x + dx, 40, overlayCanvas.width - 40);
+            state.textOverlay.y = clamp(textDragBase.y + dy, 20, overlayCanvas.height - 20);
+            renderImmediately();
+            drawTextFrame();
+          });
+          window.addEventListener("mouseup", () => {
+            if (!draggingText) return;
+            draggingText = false;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            drawCropOverlay();
+            commit("تحريك النص");
+          });
+
+          function drawTextFrame() {
+            if (!state.textOverlay || !originalImage) return;
+            const t = state.textOverlay;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            if (state.gridOverlay) drawGridInto();
+            overlayCtx.font = `bold ${t.size}px "Cairo", sans-serif`;
+            const w = overlayCtx.measureText(t.text).width + 16;
+            const h = t.size + 12;
+            overlayCtx.strokeStyle = "#4a9eff";
+            overlayCtx.lineWidth = 1.5;
+            overlayCtx.setLineDash([5, 4]);
+            overlayCtx.strokeRect(t.x - w / 2, t.y - h / 2, w, h);
+            overlayCtx.setLineDash([]);
+          }
         }
 
-        bindRanges(); initEvents(); updateToggleButtons();
-        overlayCanvas.style.pointerEvents = "none"; updateDataUrlOutput(); updateZoomDisplay();
-        document.getElementById("gridToggle").classList.toggle("active", state.gridOverlay);
-        window.addEventListener("resize", () => { if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); } });
+        function isEditable(target) {
+          return target && (["input", "textarea"].includes((target.tagName || "").toLowerCase()) || target.isContentEditable);
+        }
+
+        /* =========================================================
+           Init
+           ========================================================= */
+        RANGES.forEach(bindRangeSlider);
+        updateValueLabels();
+        initEvents();
+        updateToggleButtons();
+        updateZoomDisplay();
+        renderHistory();
+        overlayCanvas.style.pointerEvents = "none";
+        drawCanvas.style.pointerEvents = "none";
+        window.addEventListener("resize", () => {
+          if (originalImage) { fitCanvasDisplaySize(); drawCropOverlay(); }
+        });
       })();
     </script>
   </body>
