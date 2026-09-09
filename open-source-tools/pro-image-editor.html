@@ -144,20 +144,30 @@
 
     /* === LEFT TOOLBAR === */
     .toolbar{width:var(--pf-toolbar-w);background:var(--pf-bg-2);border-right:1px solid var(--pf-border);
-      display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:1px;flex-shrink:0;overflow-y:auto;scrollbar-width:none;}
+      display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:3px;flex-shrink:0;overflow-y:auto;scrollbar-width:none;}
     .toolbar::-webkit-scrollbar{width:0;}
-    .tool-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-      border-radius:var(--pf-radius);cursor:pointer;position:relative;transition:all var(--pf-transition);color:var(--pf-text-dim);}
+    .tool-btn{width:36px;height:36px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+      border-radius:var(--pf-radius);cursor:pointer;position:relative;border:1px solid transparent;
+      transition:background var(--pf-transition),color var(--pf-transition),box-shadow var(--pf-transition);
+      color:var(--pf-text-dim);outline:none;-webkit-tap-highlight-color:transparent;}
     .tool-btn:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
-    .tool-btn.active{background:var(--pf-accent);color:#fff;box-shadow:0 0 12px var(--pf-accent-glow);}
-    .tool-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;}
+    .tool-btn:active{transform:translateY(0.5px);}
+    .tool-btn.active{background:var(--pf-accent);color:#fff;
+      box-shadow:0 0 0 1px rgba(79,172,254,0.35),0 0 14px var(--pf-accent-glow);}
+    .tool-btn svg{width:20px;height:20px;flex-shrink:0;stroke:currentColor;fill:none;
+      stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
     .tool-btn .tool-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);
       background:var(--pf-bg-5);color:var(--pf-text);padding:4px 8px;border-radius:var(--pf-radius-sm);
       font-size:10.5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.12s;z-index:200;
       box-shadow:var(--pf-shadow-md);}
     .tool-btn .tool-tip .kbd{color:var(--pf-text-muted);font-size:9.5px;margin-left:6px;}
     .tool-btn:hover .tool-tip{opacity:1;}
-    .tool-sep{width:28px;height:1px;background:var(--pf-border);margin:4px 0;}
+    .tool-sep{width:26px;height:1px;background:var(--pf-border);margin:3px 0;flex:0 0 auto;}
+    .tool-btn .swatch-pair{position:relative;width:20px;height:20px;flex-shrink:0;cursor:pointer;}
+    .tool-btn .swatch-pair .swatch{position:absolute;width:15px;height:15px;border-radius:3px;
+      box-shadow:0 0 0 1px var(--pf-bg-2),0 0 0 2px rgba(255,255,255,0.35);cursor:pointer;}
+    .tool-btn .swatch-pair .swatch.fg{top:0;right:0;z-index:2;}
+    .tool-btn .swatch-pair .swatch.bg{bottom:0;left:0;z-index:1;}
 
     /* === CANVAS AREA === */
     .canvas-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--pf-canvas-bg);position:relative;}
@@ -563,6 +573,9 @@
       <span class="ob-label">Opacity <span id="val-drawOpacity" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">100%</span></span>
       <div class="range-wrap" id="wrap-drawOpacity" style="width:90px;"><input id="drawOpacity" type="range" min="1" max="100" value="100" /><span class="range-bubble"></span></div>
       <div class="ob-sep"></div>
+      <span class="ob-label">Flow <span id="val-drawFlow" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">100%</span></span>
+      <div class="range-wrap" id="wrap-drawFlow" style="width:90px;"><input id="drawFlow" type="range" min="1" max="100" value="100" /><span class="range-bubble"></span></div>
+      <div class="ob-sep"></div>
       <span class="ob-label">Hardness <span id="val-drawHardness" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">70%</span></span>
       <div class="range-wrap" id="wrap-drawHardness" style="width:90px;"><input id="drawHardness" type="range" min="0" max="100" value="70" /><span class="range-bubble"></span></div>
       <div class="ob-sep"></div>
@@ -594,23 +607,23 @@
     <div class="toolbar" id="toolbar">
       <div class="tool-btn active" data-tool="move"><svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg><span class="tool-tip">Move <span class="kbd">V</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="marquee"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 3"/></svg><span class="tool-tip">Marquee <span class="kbd">M</span></span></div>
+      <div class="tool-btn" data-tool="marquee"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3.5 3"/></svg><span class="tool-tip">Marquee <span class="kbd">M</span></span></div>
       <div class="tool-btn" data-tool="lasso"><svg viewBox="0 0 24 24"><path d="M6.5 4.2A5 5 0 016 14c2 1 5 .5 6-2l1.6-5.4A5 5 0 0117 3.6 3.5 3.5 0 0114.2 7"/><path d="M4.8 16.5c-.6 1.8.3 3.6 2 4.4"/><path d="M9.5 19.5a2 2 0 002-2"/></svg><span class="tool-tip">Lasso <span class="kbd">L</span></span></div>
       <div class="tool-btn" data-tool="wand"><svg viewBox="0 0 24 24"><path d="M5 17L17 5l2 2L7 19z"/><path d="M14 6l1-2M10 10l-2-1M18 10l2-1M12 18l1-2"/></svg><span class="tool-tip">Magic Wand <span class="kbd">W</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="crop"><svg viewBox="0 0 24 24"><path d="M6.13 1L6 16a2 2 0 002 2h15"/><path d="M1 6.13L16 6a2 2 0 012 2v15"/></svg><span class="tool-tip">Crop <span class="kbd">C</span></span></div>
-      <div class="tool-btn" data-tool="eyedropper"><svg viewBox="0 0 24 24"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0L21 4.8c.8.8.8 2 0 2.8L11 17"/></svg><span class="tool-tip">Eyedropper <span class="kbd">I</span></span></div>
+      <div class="tool-btn" data-tool="crop"><svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg><span class="tool-tip">Crop <span class="kbd">C</span></span></div>
+      <div class="tool-btn" data-tool="eyedropper"><svg viewBox="0 0 24 24"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 113 3L18 9l.4.4a2.1 2.1 0 11-3 3l-3.8-3.8a2.1 2.1 0 113-3l.4.4Z"/></svg><span class="tool-tip">Eyedropper <span class="kbd">I</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="brush"><svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg><span class="tool-tip">Brush <span class="kbd">B</span></span></div>
-      <div class="tool-btn" data-tool="eraser"><svg viewBox="0 0 24 24"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0L21 4.8c.8.8.8 2 0 2.8L11 17"/></svg><span class="tool-tip">Eraser <span class="kbd">E</span></span></div>
-      <div class="tool-btn" data-tool="clone"><svg viewBox="0 0 24 24"><rect x="0" y="0" width="24" height="24" fill="none"/><rect x="10" y="10" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/><circle cx="4.5" cy="18.5" r="2.2"/></svg><span class="tool-tip">Clone <span class="kbd">N</span></span></div>
-      <div class="tool-btn" data-tool="heal"><svg viewBox="0 0 24 24"><path d="M3 21l6-6"/><path d="M6 5a3 3 0 013 3v5.6l-1 1H8.2A3 3 0 014 12.4V5"/><path d="M14 4l1.6 4M19 4l-1.6 4"/><path d="M11 6h7"/><path d="M14 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg><span class="tool-tip">Healing <span class="kbd">J</span></span></div>
+      <div class="tool-btn" data-tool="brush"><svg viewBox="0 0 24 24"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 00-3-3.02z"/></svg><span class="tool-tip">Brush <span class="kbd">B</span></span></div>
+      <div class="tool-btn" data-tool="eraser"><svg viewBox="0 0 24 24"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg><span class="tool-tip">Eraser <span class="kbd">E</span></span></div>
+      <div class="tool-btn" data-tool="clone"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="tool-tip">Clone <span class="kbd">N</span></span></div>
+      <div class="tool-btn" data-tool="heal"><svg viewBox="0 0 24 24"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg><span class="tool-tip">Healing <span class="kbd">J</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="gradient"><svg viewBox="0 0 24 24"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="0.5" stop-color="#888"/><stop offset="1" stop-color="#000"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor"/><rect x="5" y="7" width="14" height="10" fill="url(#lg1)"/></svg><span class="tool-tip">Gradient <span class="kbd">K</span></span></div>
+      <div class="tool-btn" data-tool="gradient"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2.5"/><path d="M5 16 19 8"/></svg><span class="tool-tip">Gradient <span class="kbd">K</span></span></div>
       <div class="tool-btn" data-tool="smudge"><svg viewBox="0 0 24 24"><path d="M3 19c4 0 7-11 12-11 2.5 0 4.5 1.5 6 3"/><path d="M3 15c3.5-.6 5-2.5 6.5-4.5"/><path d="M6 21c3-1.6 4-3.5 5-5.5"/></svg><span class="tool-tip">Smudge <span class="kbd">S</span></span></div>
-      <div class="tool-btn" data-tool="dodge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg><span class="tool-tip">Dodge/Burn <span class="kbd">D</span></span></div>
+      <div class="tool-btn" data-tool="dodge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z"/></svg><span class="tool-tip">Dodge/Burn <span class="kbd">O</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="pen"><svg viewBox="0 0 24 24"><path d="M12 2l7 7-8.5 12.5H6.5L8 10 12 2z"/><path d="M12 2l4 8H8l4-8z"/></svg><span class="tool-tip">Pen <span class="kbd">P</span></span></div>
+      <div class="tool-btn" data-tool="pen"><svg viewBox="0 0 24 24"><path d="M15.707 21.293a1 1 0 01-1.414 0l-1.586-1.586a1 1 0 010-1.414l5.586-5.586a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 00-.746-.776L3.235 2.028a1 1 0 00-1.19 1.19l3.322 12.644a1 1 0 00.776.746L13 18"/><circle cx="13" cy="13" r="2"/></svg><span class="tool-tip">Pen <span class="kbd">P</span></span></div>
       <div class="tool-btn" data-tool="fill"><svg viewBox="0 0 24 24"><path d="M19 11l-8-8-8.6 8.6a2 2 0 000 2.8l5.2 5.2a2 2 0 002.8 0L19 11z"/><path d="M5 21a2 2 0 002-2 2 2 0 00-2-2 2 2 0 00-2 2 2 2 0 002 2z"/></svg><span class="tool-tip">Fill <span class="kbd">G</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="text"><svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span class="tool-tip">Type <span class="kbd">T</span></span></div>
@@ -619,10 +632,10 @@
       <div class="tool-btn" data-tool="hand"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 00-4 0v1"/><path d="M14 10V4a2 2 0 00-4 0v2"/><path d="M10 10.5V6a2 2 0 00-4 0v8"/><path d="M18 8a2 2 0 014 0v6a8 8 0 01-8 8h-2c-2.8 0-4.5-.9-5.8-2.4L3.2 14a1.5 1.5 0 012.1-2.1L8 14"/></svg><span class="tool-tip">Hand <span class="kbd">H</span></span></div>
       <div class="tool-btn" data-tool="zoom"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg><span class="tool-tip">Zoom <span class="kbd">Z</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" id="swapColors" title="Swap Colors (X)">
-        <div style="position:relative;width:22px;height:22px;">
-          <div id="fgColorSwatch" style="width:16px;height:16px;background:#fff;border:1.5px solid var(--pf-bg-5);border-radius:2px;position:absolute;top:0;right:0;z-index:2;"></div>
-          <div id="bgColorSwatch" style="width:16px;height:16px;background:#000;border:1.5px solid var(--pf-bg-5);border-radius:2px;position:absolute;bottom:0;left:0;z-index:1;"></div>
+      <div class="tool-btn" id="swapColors" title="Swap colors (X) — double-click to reset (D)">
+        <div class="swatch-pair">
+          <div id="fgColorSwatch" class="swatch fg" title="Foreground color (click to change)"></div>
+          <div id="bgColorSwatch" class="swatch bg" title="Background color"></div>
         </div>
       </div>
     </div>
@@ -704,7 +717,7 @@
         <div class="panel-section">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Transform</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
-            <div class="ctrl-row"><div class="ctrl-label">Rotation <span class="val" id="val-rotate">0°</span></div><div class="range-wrap" id="wrap-rotate"><input id="rotate" type="range" min="-180" max="180" step="1" value="0" /><span class="range-bubble"></span></div></div>
+            <div class="ctrl-row"><div class="ctrl-label">Rotation <span class="val" id="val-rotate">0°</span></div><div class="range-wrap" id="wrap-rotate"><input id="rotate" type="range" min="0" max="360" step="1" value="0" /><span class="range-bubble"></span></div></div>
             <div class="ib-row" style="margin-top:4px;">
               <button class="ib" id="rotateLeft" title="Rotate Left 90°"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg></button>
               <button class="ib" id="rotateRight" title="Rotate Right 90°"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-11.36L23 10"/></svg></button>
@@ -880,7 +893,7 @@
   const PRESET_LABELS = { original:"Original",vintage:"Vintage",noir:"Noir",warm:"Warm",cool:"Cool",cinematic:"Cinema",soft:"Soft",vivid:"Vivid" };
 
   const RANGES = [
-    {id:"rotate",val:"val-rotate",min:-180,max:180,step:1,suffix:"°"},
+    {id:"rotate",val:"val-rotate",min:0,max:360,step:1,suffix:"°"},
     {id:"brightness",val:"val-brightness",min:0,max:200,step:1,suffix:"%"},
     {id:"contrast",val:"val-contrast",min:0,max:200,step:1,suffix:"%"},
     {id:"saturation",val:"val-saturation",min:0,max:200,step:1,suffix:"%"},
@@ -903,7 +916,7 @@
 
   /* ===================== STATE ===================== */
   const state={...DEFAULTS,showOriginal:false,cropMode:false,zoom:1,gridOverlay:false,rulersVisible:true,
-    drawMode:false,drawTool:"pen",drawSize:4,drawOpacity:100,drawHardness:70,drawColor:"#ffffff",
+    drawMode:false,drawTool:"pen",drawSize:4,drawOpacity:100,drawHardness:70,drawFlow:100,drawColor:"#ffffff",
     textOverlay:null,textSize:32,textColor:"#ffffff",textFont:"Inter",
     fgColor:"#ffffff",bgColor:"#000000",
     shapeType:"rect",shapeFill:"#4facfe",shapeStroke:"#ffffff",shapeStrokeWidth:2,
@@ -1163,7 +1176,7 @@
   function updateValueLabels(){for(const r of RANGES){const el=$(r.val);if(el)el.textContent=formatRangeValue(r.id,state[r.id]);}}
   function syncControlsFromState(){
     for(const r of RANGES){const inp=$(r.id);if(inp)inp.value=state[r.id];}
-    const SMAP={drawSize:["val-drawSize"+(state.drawSize+"")],drawOpacity:["val-drawOpacity",state.drawOpacity+"%"],drawHardness:["val-drawHardness",state.drawHardness+"%"],
+    const SMAP={drawSize:["val-drawSize"+(state.drawSize+"")],drawOpacity:["val-drawOpacity",state.drawOpacity+"%"],drawHardness:["val-drawHardness",state.drawHardness+"%"],drawFlow:["val-drawFlow",state.drawFlow+"%"],
       penSize:["val-penSize",state.penSize+""],cloneSize:["val-cloneSize",state.cloneSize+""],cloneOpacity:["val-cloneOpacity",state.cloneOpacity+"%"],cloneHardness:["val-cloneHardness",state.cloneHardness+"%"],
       healSize:["val-healSize",state.healSize+""],healOpacity:["val-healOpacity",state.healOpacity+"%"],wandTolerance:["val-wandTolerance",String(state.wandTolerance!=null?state.wandTolerance:32)],
       gradientOpacity:["val-gradientOpacity",state.gradientOpacity+"%"],smudgeSize:["val-smudgeSize",state.smudgeSize+""],smudgeStrength:["val-smudgeStrength",state.smudgeStrength+"%"],
@@ -1190,8 +1203,8 @@
       commit("Adjust "+(SLIDER_LABELS[r.id]||r.id));
     }});
   }
-  const TOOL_SLIDER_FIELDS={drawSize:"drawSize",drawOpacity:"drawOpacity",drawHardness:"drawHardness",penSize:"penSize",cloneSize:"cloneSize",cloneOpacity:"cloneOpacity",cloneHardness:"cloneHardness",healSize:"healSize",healOpacity:"healOpacity",wandTolerance:"wandTolerance",gradientOpacity:"gradientOpacity",smudgeSize:"smudgeSize",smudgeStrength:"smudgeStrength",dodgeSize:"dodgeSize",dodgeExposure:"dodgeExposure"};
-const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",cloneHardness:"%",healOpacity:"%",gradientOpacity:"%",smudgeStrength:"%",dodgeExposure:"%"};
+  const TOOL_SLIDER_FIELDS={drawSize:"drawSize",drawOpacity:"drawOpacity",drawHardness:"drawHardness",drawFlow:"drawFlow",penSize:"penSize",cloneSize:"cloneSize",cloneOpacity:"cloneOpacity",cloneHardness:"cloneHardness",healSize:"healSize",healOpacity:"healOpacity",wandTolerance:"wandTolerance",gradientOpacity:"gradientOpacity",smudgeSize:"smudgeSize",smudgeStrength:"smudgeStrength",dodgeSize:"dodgeSize",dodgeExposure:"dodgeExposure"};
+const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpacity:"%",cloneHardness:"%",healOpacity:"%",gradientOpacity:"%",smudgeStrength:"%",dodgeExposure:"%"};
   function bindToolSlider(id){
     const input=$(id);if(!input)return;
     const wrap=$("wrap-"+id),bubble=wrap?wrap.querySelector(".range-bubble"):null;
@@ -1813,10 +1826,10 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
         const s=saved.state||{};
         strokes=Array.isArray(s.strokes)?s.strokes:[];
         state.textOverlay=s.textOverlay?{...s.textOverlay}:null;
-        if(typeof s.rotate==="number")state.rotate=s.rotate;
+        if(typeof s.rotate==="number")state.rotate=(((s.rotate%360)+360)%360);
         if(s.flipH)state.flipH=true;if(s.flipV)state.flipV=true;
         for(const k of ADJUST_KEYS){if(typeof s[k]!=="undefined"&&s[k]!==null)state[k]=s[k];}
-        if(Array.isArray(s.layers)&&s.layers.length>1)rebuildLayers(s.layers,s.activeLayerIdx,s.groups,s.nextGroupId);
+        if(Array.isArray(s.layers)&&s.layers.length>0)rebuildLayers(s.layers,s.activeLayerIdx,s.groups,s.nextGroupId);
         if(saved.meta){currentFileName=saved.meta.currentFileName||"";currentFileNameBase=saved.meta.currentFileNameBase||"edit";currentFileSize=saved.meta.currentFileSize||"";}
         if(s.groups)groups=s.groups.map(g=>({...g}));
       }catch(e){}
@@ -2284,10 +2297,19 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
     }
     brushCache[key]=c;return c;
   }
+  function tintedBrush(size,brush,color){
+    const s=Math.max(2,Math.ceil(size));
+    const c=mkCanvas(s,s),cx=c.getContext("2d");
+    cx.drawImage(brush,0,0);
+    cx.globalCompositeOperation="source-in";
+    cx.fillStyle=color||"#000000";
+    cx.fillRect(0,0,s,s);
+    return c;
+  }
   function paintSize(){const t=getToolMode();if(t==="clone")return state.cloneSize;if(t==="heal")return Math.max(2,Number(state.healSize)||20);if(t==="smudge")return state.smudgeSize;if(t==="dodge")return state.dodgeSize;if(t==="pen")return state.penSize;return state.drawSize;}
   function paintHardness(){const t=getToolMode();if(t==="clone")return state.cloneHardness;return state.drawHardness;}
-  function paintOpacity(){const t=getToolMode();if(t==="clone")return state.cloneOpacity/100;return state.drawOpacity/100;}
-  function paintColor(){const t=getToolMode();if(t==="pen")return state.penColor||state.fgColor;return state.drawColor||state.fgColor;}
+  function paintOpacity(){const t=getToolMode();if(t==="clone")return state.cloneOpacity/100;return (state.drawOpacity/100)*(typeof state.drawFlow==="number"?clamp(state.drawFlow,0,100)/100:1);}
+  function paintColor(){const t=getToolMode();if(t==="pen")return state.penColor||state.fgColor||"#ffffff";return state.fgColor||state.drawColor||"#ffffff";}
   function layerLocalPt(p){const L=layers[activeLayerIdx];return{x:p.x-(L.dx||0),y:p.y-(L.dy||0)};}
   function stampMasked(lctx,drawfn){
     const L=layers[activeLayerIdx];
@@ -2398,7 +2420,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
         if(tool==="eraser"){stampMasked(lctx,c=>stampMaskCtx(c,x,y,size,brush,opacity,false));}
         else{const lum=lumOf(color);const reveal=lum>=0.5;stampMasked(lctx,c=>stampMaskCtx(c,x,y,size,brush,opacity*(reveal?lum:1-lum),reveal));}
       }
-      else if(tool==="brush"||tool==="pen"){stampMasked(lctx,c=>{c.save();c.globalAlpha=opacity;c.globalCompositeOperation="source-over";c.drawImage(brush,x-size/2,y-size/2);c.restore();});}
+      else if(tool==="brush"||tool==="pen"){const tint=tintedBrush(size,brush,color);stampMasked(lctx,c=>{c.save();c.globalAlpha=opacity;c.globalCompositeOperation="source-over";c.drawImage(tint,x-size/2,y-size/2);c.restore();});}
       else if(tool==="eraser"){stampMasked(lctx,c=>{c.save();c.globalAlpha=opacity;c.globalCompositeOperation="destination-out";c.drawImage(brush,x-size/2,y-size/2);c.restore();});}
       else if(tool==="smudge"){doSmudge(x,y);}
       else if(tool==="dodge"){doDodge(x,y);}
@@ -2456,15 +2478,18 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
     const L=layers[activeLayerIdx];if(!L)return;
     const lctx=L.canvas.getContext("2d");
     const lp0=layerLocalPt(p0),lp1=layerLocalPt(p1);
-    const fg=hexToRgb(state.fgColor),col="rgba("+fg.r+","+fg.g+","+fg.b+",1)",col0="rgba("+fg.r+","+fg.g+","+fg.b+",0)";
+    const fg=hexToRgb(state.fgColor),bg=hexToRgb(state.bgColor),
+      col="rgba("+fg.r+","+fg.g+","+fg.b+",1)",
+      col1="rgba("+bg.r+","+bg.g+","+bg.b+",1)",
+      col0="rgba("+fg.r+","+fg.g+","+fg.b+",0)";
     stampMasked(lctx,c=>{
       c.save();c.globalAlpha=state.gradientOpacity/100;
       if(state.gradientType==="radial"){
         const rr=Math.max(1,Math.hypot(lp1.x-lp0.x,lp1.y-lp0.y));
-        const g=c.createRadialGradient(lp0.x,lp0.y,0,lp0.x,lp0.y,rr);g.addColorStop(0,col);g.addColorStop(1,col0);
+        const g=c.createRadialGradient(lp0.x,lp0.y,0,lp0.x,lp0.y,rr);g.addColorStop(0,col);g.addColorStop(1,col1);
         c.fillStyle=g;c.fillRect(0,0,L.canvas.width,L.canvas.height);
       }else{
-        const g=c.createLinearGradient(lp0.x,lp0.y,lp1.x,lp1.y);g.addColorStop(0,col);g.addColorStop(1,col0);
+        const g=c.createLinearGradient(lp0.x,lp0.y,lp1.x,lp1.y);g.addColorStop(0,col);g.addColorStop(1,col1);
         c.fillStyle=g;c.fillRect(0,0,L.canvas.width,L.canvas.height);
       }
       c.restore();
@@ -2622,8 +2647,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
         clearSelection();return;
       }
       if(e.key.toLowerCase()==="x"&&!editable&&!c){const tmp=state.fgColor;state.fgColor=state.bgColor;state.bgColor=tmp;updateColorSwatches();return;}
+      if(e.key.toLowerCase()==="d"&&!editable&&!c){state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");return;}
       if(!editable&&!c){
-        const tm={v:"move",m:"marquee",l:"lasso",w:"wand",c:"crop",i:"eyedropper",b:"brush",e:"eraser",n:"clone",j:"heal",k:"gradient",s:"smudge",d:"dodge",p:"pen",g:"fill",t:"text",u:"shape",h:"hand",z:"zoom"};
+        const tm={v:"move",m:"marquee",l:"lasso",w:"wand",c:"crop",i:"eyedropper",b:"brush",e:"eraser",n:"clone",j:"heal",k:"gradient",s:"smudge",o:"dodge",p:"pen",g:"fill",t:"text",u:"shape",h:"hand",z:"zoom"};
         const tool=tm[e.key.toLowerCase()];if(tool)selectTool(tool);
       }
     });
@@ -2664,7 +2690,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
     toggle("toggleSepia","sepia");toggle("toggleGray","gray");toggle("flipH","flipH");toggle("flipV","flipV");
 
     /* Rotate */
-    const rotateBy=deg=>{if(!originalImage)return;commit("Rotate "+(deg>0?"+":"")+deg+"°");preTransform();state.rotate=clamp(state.rotate+deg,-180,180);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();};
+    const rotWrap=deg=>{const raw=state.rotate+deg;return raw>360?raw-360:(raw<0?raw+360:raw);};
+    const rotateBy=deg=>{if(!originalImage)return;commit("Rotate "+(deg>0?"+":"")+deg+"°");preTransform();state.rotate=rotWrap(deg);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();};
     $("rotateLeft").addEventListener("click",()=>rotateBy(-90));
     $("rotateRight").addEventListener("click",()=>rotateBy(90));
 
@@ -2754,7 +2781,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
     $("drawClear")&&$("drawClear").addEventListener("click",()=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;beginLayerEdit("Clear layer");const lctx=L.canvas.getContext("2d");lctx.save();lctx.globalCompositeOperation="destination-out";lctx.clearRect(0,0,L.canvas.width,L.canvas.height);lctx.restore();renderImmediately();});
 
     bindToolSlider("drawSize");bindToolSlider("drawOpacity");
-    bindToolSlider("drawHardness");
+    bindToolSlider("drawHardness");bindToolSlider("drawFlow");
     bindToolSlider("penSize");
     bindToolSlider("cloneSize");bindToolSlider("cloneOpacity");bindToolSlider("cloneHardness");
     bindToolSlider("healSize");bindToolSlider("healOpacity");bindToolSlider("wandTolerance");
@@ -2780,6 +2807,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
     /* Swap colors */
     $("swapColors").addEventListener("click",()=>{const t=state.fgColor;state.fgColor=state.bgColor;state.bgColor=t;updateColorSwatches();});
     $("swapColors").addEventListener("dblclick",()=>{state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");});
+    $("fgColorSwatch").addEventListener("click",e=>{e.stopPropagation();const dc=$("drawColor");if(dc)dc.click();});
 
     /* Blend mode (active layer) */
     $("blendMode").addEventListener("change",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;beginLayerEdit("Blend mode");L.blend=e.target.value;renderLayers();renderImmediately();});
@@ -2866,8 +2894,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",cloneOpacity:"%",clone
         else if(a==="invertSel")invertSelection();
         else if(a==="freeTransform")startTransform();
         else if(a==="compare"){if(originalImage){state.showOriginal=!state.showOriginal;renderImmediately();}}
-        else if(a==="rotateL"&&originalImage){commit("Rotate -90°");preTransform();state.rotate=clamp(state.rotate-90,-180,180);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();}
-        else if(a==="rotateR"&&originalImage){commit("Rotate +90°");preTransform();state.rotate=clamp(state.rotate+90,-180,180);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();}
+        else if(a==="rotateL"&&originalImage){commit("Rotate -90°");preTransform();state.rotate=rotWrap(-90);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();}
+        else if(a==="rotateR"&&originalImage){commit("Rotate +90°");preTransform();state.rotate=rotWrap(90);$("rotate").value=state.rotate;updateValueLabels();renderImmediately();}
         else if(a==="flipH"&&originalImage){commit("Flip H");preTransform();state.flipH=!state.flipH;updateToggleButtons();renderImmediately();}
         else if(a==="flipV"&&originalImage){commit("Flip V");preTransform();state.flipV=!state.flipV;updateToggleButtons();renderImmediately();}
         else if(a==="zoomIn")setZoom(state.zoom+0.25);else if(a==="zoomOut")setZoom(state.zoom-0.25);
