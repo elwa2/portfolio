@@ -180,6 +180,18 @@
     .tool-btn:active{transform:translateY(0.5px);}
     .tool-btn.active{background:var(--pf-accent);color:#fff;
       box-shadow:0 0 0 1px rgba(79,172,254,0.35),0 0 14px var(--pf-accent-glow);}
+    .tool-btn[data-group]::after{content:"";position:absolute;right:2px;bottom:3px;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid currentColor;opacity:.55;pointer-events:none;}
+    .tool-btn.active[data-group]::after{border-top-color:#fff;opacity:.9;}
+    .tool-btn[data-group][data-group-open]::after{transform:rotate(180deg);}
+    .tool-flyout{position:fixed;z-index:4000;min-width:164px;background:#1b1d2a;border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06);
+      display:none;flex-direction:column;}
+    .tool-flyout .fitem{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;font-size:12px;color:var(--pf-text);cursor:pointer;white-space:nowrap;}
+    .tool-flyout .fitem:hover{background:var(--pf-accent);color:#fff;}
+    .tool-flyout .fitem .fk{margin-left:auto;font-family:var(--pf-mono);font-size:9px;letter-spacing:.03em;color:var(--pf-text-muted);}
+    .tool-flyout .fitem:hover .fk{color:rgba(255,255,255,.85);}
+    .tool-flyout .fitem.sel{background:rgba(79,172,254,.2);color:var(--pf-accent);}
+    .tool-flyout .fitem.sel .fk{color:var(--pf-accent);}
     .tool-btn svg{width:24px;height:24px;flex-shrink:0;stroke:currentColor;fill:none;
       stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
     .tool-btn .tool-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);
@@ -507,11 +519,14 @@
     </div>
     <div class="ob-group" id="shapeOptions" style="display:none;">
       <span class="ob-label">Shape:</span>
-      <select class="ob-select" id="shapeType">
-        <option value="rect">Rectangle</option>
-        <option value="ellipse">Ellipse</option>
-        <option value="line">Line</option>
-      </select>
+<select class="ob-select" id="shapeType">
+    <option value="rect">Rectangle</option>
+    <option value="ellipse">Ellipse</option>
+    <option value="triangle">Triangle</option>
+    <option value="star">Star</option>
+    <option value="pentagon">Pentagon</option>
+    <option value="line">Line</option>
+  </select>
       <span class="ob-label">Fill:</span>
       <input type="color" id="shapeFill" value="#4facfe" style="width:24px;height:24px;border:none;cursor:pointer;" />
       <span class="ob-label">Stroke:</span>
@@ -676,31 +691,31 @@
     <div class="toolbar" id="toolbar">
       <div class="tool-btn active" data-tool="move" tabindex="0" role="button" aria-label="Move Tool — move layers and selections (V)"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Move Tool <span class="kbd">V</span></span><span class="tt-desc">Move layers &amp; elements</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="marquee" tabindex="0" role="button" aria-label="Rectangular Marquee — rectangular selection (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3.5 3"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Rectangular Marquee <span class="kbd">M</span></span><span class="tt-desc">Select a rectangular area</span></span></div>
-      <div class="tool-btn" data-tool="lasso" tabindex="0" role="button" aria-label="Lasso Tool — freehand selection (L)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.2A5 5 0 016 14c2 1 5 .5 6-2l1.6-5.4A5 5 0 0117 3.6 3.5 3.5 0 0114.2 7"/><path d="M4.8 16.5c-.6 1.8.3 3.6 2 4.4"/><path d="M9.5 19.5a2 2 0 002-2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Lasso Tool <span class="kbd">L</span></span><span class="tt-desc">Freehand selection</span></span></div>
-      <div class="tool-btn" data-tool="wand" tabindex="0" role="button" aria-label="Magic Wand — auto-select by color (W)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17L17 5l2 2L7 19z"/><path d="M14 6l1-2M10 10l-2-1M18 10l2-1M12 18l1-2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Magic Wand <span class="kbd">W</span></span><span class="tt-desc">Auto-select by color similarity</span></span></div>
-      <div class="tool-btn" data-tool="qsel" tabindex="0" role="button" aria-label="Quick Selection — brush that grows selection (Q)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 00-4 4c0 1.3.6 2.4 1.5 3.2A6 6 0 006 16h12a6 6 0 00-3.5-5.8c.9-.8 1.5-1.9 1.5-3.2a4 4 0 00-4-4z"/><path d="M9 17c0 2.2 1.3 4 3 4s3-1.8 3-4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Quick Selection <span class="kbd">Q</span></span><span class="tt-desc">Brush to grow selection by similarity</span></span></div>
+      <div class="tool-btn" data-tool="marquee" data-group="select" tabindex="0" role="button" title="Right-click for more selection tools" aria-label="Rectangular Marquee — rectangular selection (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3.5 3"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Rectangular Marquee <span class="kbd">M</span></span><span class="tt-desc">Select a rectangular area</span></span></div>
+      <div class="tool-btn" data-tool="lasso" data-group="select" tabindex="0" role="button" title="Right-click for more selection tools" aria-label="Lasso Tool — freehand selection (L)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.2A5 5 0 016 14c2 1 5 .5 6-2l1.6-5.4A5 5 0 0117 3.6 3.5 3.5 0 0114.2 7"/><path d="M4.8 16.5c-.6 1.8.3 3.6 2 4.4"/><path d="M9.5 19.5a2 2 0 002-2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Lasso Tool <span class="kbd">L</span></span><span class="tt-desc">Freehand selection</span></span></div>
+      <div class="tool-btn" data-tool="wand" data-group="select" tabindex="0" role="button" title="Right-click for more selection tools" aria-label="Magic Wand — auto-select by color (W)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17L17 5l2 2L7 19z"/><path d="M14 6l1-2M10 10l-2-1M18 10l2-1M12 18l1-2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Magic Wand <span class="kbd">W</span></span><span class="tt-desc">Auto-select by color similarity</span></span></div>
+      <div class="tool-btn" data-tool="qsel" data-group="select" tabindex="0" role="button" title="Right-click for more selection tools" aria-label="Quick Selection — brush that grows selection (Q)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 00-4 4c0 1.3.6 2.4 1.5 3.2A6 6 0 006 16h12a6 6 0 00-3.5-5.8c.9-.8 1.5-1.9 1.5-3.2a4 4 0 00-4-4z"/><path d="M9 17c0 2.2 1.3 4 3 4s3-1.8 3-4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Quick Selection <span class="kbd">Q</span></span><span class="tt-desc">Brush to grow selection by similarity</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="crop" tabindex="0" role="button" aria-label="Crop Tool — crop the image (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v14a2 2 0 002 2h14"/><path d="M18 22V8a2 2 0 00-2-2H2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Crop Tool <span class="kbd">C</span></span><span class="tt-desc">Crop / trim the image</span></span></div>
       <div class="tool-btn" data-tool="eyedropper" tabindex="0" role="button" aria-label="Eyedropper Tool — pick a color (I)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 113 3L18 9l.4.4a2.1 2.1 0 11-3 3l-3.8-3.8a2.1 2.1 0 113-3l.4.4Z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Eyedropper Tool <span class="kbd">I</span></span><span class="tt-desc">Pick a color from the image</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="brush" tabindex="0" role="button" aria-label="Brush Tool — paint with brush (B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 00-3-3.02z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Brush Tool <span class="kbd">B</span></span><span class="tt-desc">Paint with soft strokes</span></span></div>
-      <div class="tool-btn" data-tool="eraser" tabindex="0" role="button" aria-label="Eraser Tool — erase layer pixels (E)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Eraser Tool <span class="kbd">E</span></span><span class="tt-desc">Erase parts of the layer</span></span></div>
-      <div class="tool-btn" data-tool="clone" tabindex="0" role="button" aria-label="Clone Stamp — copy pixels from one area to another (N)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Clone Stamp <span class="kbd">N</span></span><span class="tt-desc">Copy pixels from one area to another</span></span></div>
-      <div class="tool-btn" data-tool="heal" tabindex="0" role="button" aria-label="Healing Brush — repair blemishes (J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Healing Brush <span class="kbd">J</span></span><span class="tt-desc">Repair blemishes with sampled texture</span></span></div>
+      <div class="tool-btn" data-tool="brush" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Brush Tool — paint with brush (B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 00-3-3.02z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Brush Tool <span class="kbd">B</span></span><span class="tt-desc">Paint with soft strokes</span></span></div>
+      <div class="tool-btn" data-tool="eraser" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Eraser Tool — erase layer pixels (E)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Eraser Tool <span class="kbd">E</span></span><span class="tt-desc">Erase parts of the layer</span></span></div>
+      <div class="tool-btn" data-tool="clone" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Clone Stamp — copy pixels from one area to another (N)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Clone Stamp <span class="kbd">N</span></span><span class="tt-desc">Copy pixels from one area to another</span></span></div>
+      <div class="tool-btn" data-tool="heal" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Healing Brush — repair blemishes (J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Healing Brush <span class="kbd">J</span></span><span class="tt-desc">Repair blemishes with sampled texture</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="gradient" tabindex="0" role="button" aria-label="Gradient Tool — fill with a gradient (K)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2.5"/><path d="M5 16 19 8"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Gradient Tool <span class="kbd">K</span></span><span class="tt-desc">Fill with a smooth color gradient</span></span></div>
-      <div class="tool-btn" data-tool="smudge" tabindex="0" role="button" aria-label="Smudge Tool — smudge pixels (S)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19c4 0 7-11 12-11 2.5 0 4.5 1.5 6 3"/><path d="M3 15c3.5-.6 5-2.5 6.5-4.5"/><path d="M6 21c3-1.6 4-3.5 5-5.5"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Smudge Tool <span class="kbd">S</span></span><span class="tt-desc">Blur or smudge pixels</span></span></div>
-      <div class="tool-btn" data-tool="dodge" tabindex="0" role="button" aria-label="Dodge/Burn Tool — lighten or darken (O)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Dodge/Burn Tool <span class="kbd">O</span></span><span class="tt-desc">Lighten or darken an area</span></span></div>
+      <div class="tool-btn" data-tool="gradient" data-group="craft" tabindex="0" role="button" title="Right-click for more fill tools" aria-label="Gradient Tool — fill with a gradient (K)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2.5"/><path d="M5 16 19 8"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Gradient Tool <span class="kbd">K</span></span><span class="tt-desc">Fill with a smooth color gradient</span></span></div>
+      <div class="tool-btn" data-tool="smudge" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Smudge Tool — smudge pixels (S)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19c4 0 7-11 12-11 2.5 0 4.5 1.5 6 3"/><path d="M3 15c3.5-.6 5-2.5 6.5-4.5"/><path d="M6 21c3-1.6 4-3.5 5-5.5"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Smudge Tool <span class="kbd">S</span></span><span class="tt-desc">Blur or smudge pixels</span></span></div>
+      <div class="tool-btn" data-tool="dodge" data-group="paint" tabindex="0" role="button" title="Right-click for more painting tools" aria-label="Dodge/Burn Tool — lighten or darken (O)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Dodge/Burn Tool <span class="kbd">O</span></span><span class="tt-desc">Lighten or darken an area</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="pen" tabindex="0" role="button" aria-label="Pen Tool — draw precise paths (P)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.707 21.293a1 1 0 01-1.414 0l-1.586-1.586a1 1 0 010-1.414l5.586-5.586a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 00-.746-.776L3.235 2.028a1 1 0 00-1.19 1.19l3.322 12.644a1 1 0 00.776.746L13 18"/><circle cx="13" cy="13" r="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Pen Tool <span class="kbd">P</span></span><span class="tt-desc">Draw precise paths with handles</span></span></div>
-      <div class="tool-btn" data-tool="fill" tabindex="0" role="button" aria-label="Fill Tool — flood fill an area (G)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 11l-8-8-8.6 8.6a2 2 0 000 2.8l5.2 5.2a2 2 0 002.8 0L19 11z"/><path d="M5 21a2 2 0 002-2 2 2 0 00-2-2 2 2 0 00-2 2 2 2 0 002 2z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Fill Tool <span class="kbd">G</span></span><span class="tt-desc">Flood-fill an area with color</span></span></div>
+      <div class="tool-btn" data-tool="pen" data-group="vector" tabindex="0" role="button" title="Right-click for more shape tools" aria-label="Pen Tool — draw precise paths (P)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.707 21.293a1 1 0 01-1.414 0l-1.586-1.586a1 1 0 010-1.414l5.586-5.586a1 1 0 011.414 0l1.586 1.586a1 1 0 010 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 00-.746-.776L3.235 2.028a1 1 0 00-1.19 1.19l3.322 12.644a1 1 0 00.776.746L13 18"/><circle cx="13" cy="13" r="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Pen Tool <span class="kbd">P</span></span><span class="tt-desc">Draw precise paths with handles</span></span></div>
+      <div class="tool-btn" data-tool="fill" data-group="craft" tabindex="0" role="button" title="Right-click for more fill tools" aria-label="Fill Tool — flood fill an area (G)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 11l-8-8-8.6 8.6a2 2 0 000 2.8l5.2 5.2a2 2 0 002.8 0L19 11z"/><path d="M5 21a2 2 0 002-2 2 2 0 00-2-2 2 2 0 00-2 2 2 2 0 002 2z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Fill Tool <span class="kbd">G</span></span><span class="tt-desc">Flood-fill an area with color</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="text" tabindex="0" role="button" aria-label="Type Tool — add editable text (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Type Tool <span class="kbd">T</span></span><span class="tt-desc">Add editable text</span></span></div>
-      <div class="tool-btn" data-tool="shape" tabindex="0" role="button" aria-label="Shape Tool — draw geometric shapes (U)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Shape Tool <span class="kbd">U</span></span><span class="tt-desc">Draw geometric shapes</span></span></div>
+      <div class="tool-btn" data-tool="text" data-group="vector" tabindex="0" role="button" title="Right-click for more shape tools" aria-label="Type Tool — add editable text (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Type Tool <span class="kbd">T</span></span><span class="tt-desc">Add editable text</span></span></div>
+      <div class="tool-btn" data-tool="shape" data-group="vector" tabindex="0" role="button" title="Right-click for more shape tools" aria-label="Shape Tool — draw geometric shapes (U)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Shape Tool <span class="kbd">U</span></span><span class="tt-desc">Draw geometric shapes</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="hand" tabindex="0" role="button" aria-label="Hand Tool — pan the canvas (H)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V6a2 2 0 00-4 0v1"/><path d="M14 10V4a2 2 0 00-4 0v2"/><path d="M10 10.5V6a2 2 0 00-4 0v8"/><path d="M18 8a2 2 0 014 0v6a8 8 0 01-8 8h-2c-2.8 0-4.5-.9-5.8-2.4L3.2 14a1.5 1.5 0 012.1-2.1L8 14"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Hand Tool <span class="kbd">H</span></span><span class="tt-desc">Pan around the canvas</span></span></div>
-      <div class="tool-btn" data-tool="zoom" tabindex="0" role="button" aria-label="Zoom Tool — zoom in and out (Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Zoom Tool <span class="kbd">Z</span></span><span class="tt-desc">Zoom in and out</span></span></div>
+      <div class="tool-btn" data-tool="hand" data-group="view" tabindex="0" role="button" title="Right-click for more view tools" aria-label="Hand Tool — pan the canvas (H)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V6a2 2 0 00-4 0v1"/><path d="M14 10V4a2 2 0 00-4 0v2"/><path d="M10 10.5V6a2 2 0 00-4 0v8"/><path d="M18 8a2 2 0 014 0v6a8 8 0 01-8 8h-2c-2.8 0-4.5-.9-5.8-2.4L3.2 14a1.5 1.5 0 012.1-2.1L8 14"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Hand Tool <span class="kbd">H</span></span><span class="tt-desc">Pan around the canvas</span></span></div>
+      <div class="tool-btn" data-tool="zoom" data-group="view" tabindex="0" role="button" title="Right-click for more view tools" aria-label="Zoom Tool — zoom in and out (Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Zoom Tool <span class="kbd">Z</span></span><span class="tt-desc">Zoom in and out</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" id="swapColors" tabindex="0" role="button" aria-label="Colors — swap foreground and background (X), double-click to reset (D)">
         <div class="swatch-pair">
@@ -710,6 +725,7 @@
         <span class="tool-tip" role="tooltip"><span class="tt-title">Colors <span class="kbd">X</span></span><span class="tt-desc">Swap foreground/background · double-click resets</span></span>
       </div>
     </div>
+    <div class="tool-flyout" id="toolFlyout" role="menu"></div>
 
     <!-- Canvas Area -->
     <div class="canvas-area">
@@ -853,9 +869,15 @@
               <input id="layerOpacity" type="range" min="1" max="100" value="100" style="flex:1;min-width:50px;" title="Opacity of the active layer" />
               <span id="val-layerOpacity" style="font-family:var(--pf-mono);color:var(--pf-text-muted);font-size:10px;line-height:22px;width:26px;text-align:right;">100%</span>
             </div>
+            <div id="fillColorWrap" style="display:none;align-items:center;gap:6px;margin-bottom:6px;">
+              <span style="font-size:10px;line-height:22px;color:var(--pf-text);white-space:nowrap;">Fill color:</span>
+              <input type="color" id="fillColorInput" value="#ffffff" style="flex:0 0 auto;width:26px;height:24px;border:none;cursor:pointer;padding:0;" title="Solid fill color of the active layer" />
+              <span id="val-fillColor" style="font-family:var(--pf-mono);color:var(--pf-text-muted);font-size:10px;line-height:22px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#ffffff</span>
+            </div>
             <div id="layerList" style="border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);overflow:hidden;max-height:220px;overflow-y:auto;"></div>
             <div class="ib-row" style="margin-top:8px;flex-wrap:wrap;">
               <button class="ib" id="addLayerBtn" title="Add raster layer"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
+              <button class="ib" id="fillLayerBtn" title="Add solid color fill layer"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/><path d="M5.5 18h13"/></svg></button>
               <button class="ib" id="dupLayerBtn" title="Duplicate layer"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
               <button class="ib" id="delLayerBtn" title="Delete layer"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
               <button class="ib" id="mergeDownBtn" title="Merge down"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><path d="M12 22V13"/><path d="M9 10l3 3 3-3"/></svg></button>
@@ -915,6 +937,8 @@
   <div class="ctx-item" data-ctx="rename">Rename Layer...</div>
   <div class="ctx-item" data-ctx="duplicate">Duplicate Layer</div>
   <div class="ctx-item" data-ctx="delete">Delete Layer</div>
+  <div class="layer-ctx-sep"></div>
+  <div class="ctx-item" data-ctx="fillAdd">Add Solid Color Fill Layer</div>
   <div class="layer-ctx-sep"></div>
   <div class="ctx-item" data-ctx="clip">Create Clipping Mask</div>
   <div class="ctx-item" data-ctx="clipRemove">Release Clipping Mask</div>
@@ -1593,6 +1617,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   function startTransform(){
     if(transformState)return;
     const L=layers[activeLayerIdx];if(!L)return;
+    if(L.kind==="fill"){toast("Fill layers span the whole canvas.","info",1600);return;}
     const hasSel=!!selectionData;
     if(L.kind==="bg"&&!hasSel){toast("Select content or work on a layer.","warning",1600);return;}
     if(!layerCanEdit())return;
@@ -1669,7 +1694,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(state.marqueeMode&&marqueeSelection){const{x,y,w,h}=marqueeSelection;overlayCtx.strokeStyle="#4facfe";overlayCtx.lineWidth=1;overlayCtx.setLineDash([4,4]);overlayCtx.lineDashOffset=(Date.now()/50)%8;overlayCtx.beginPath();if(state.marqueeType==="ellipse")overlayCtx.ellipse(x+w/2,y+h/2,Math.abs(w)/2,Math.abs(h)/2,0,0,Math.PI*2);else overlayCtx.rect(x,y,w,h);overlayCtx.stroke();overlayCtx.setLineDash([]);}
     if(state.lassoMode&&lassoPoints&&lassoPoints.length>1){overlayCtx.beginPath();overlayCtx.moveTo(lassoPoints[0].x,lassoPoints[0].y);for(let i=1;i<lassoPoints.length;i++)overlayCtx.lineTo(lassoPoints[i].x,lassoPoints[i].y);overlayCtx.strokeStyle="#4facfe";overlayCtx.lineWidth=1;overlayCtx.stroke();}
     if(state.gradientMode&&gradPreview){const g=gradPreview;overlayCtx.setLineDash([6,4]);overlayCtx.strokeStyle="#fff";overlayCtx.lineWidth=1.5;overlayCtx.beginPath();overlayCtx.moveTo(g.x1,g.y1);overlayCtx.lineTo(g.x2,g.y2);overlayCtx.stroke();overlayCtx.setLineDash([]);overlayCtx.fillStyle="#4facfe";overlayCtx.beginPath();overlayCtx.arc(g.x1,g.y1,4,0,Math.PI*2);overlayCtx.arc(g.x2,g.y2,4,0,Math.PI*2);overlayCtx.fill();}
-    if(state.shapeMode&&shapePreview){const s=shapePreview;overlayCtx.strokeStyle="#4facfe";overlayCtx.lineWidth=1.5;overlayCtx.setLineDash([6,4]);overlayCtx.beginPath();if(s.type==="ellipse"){overlayCtx.ellipse(s.x+s.w/2,s.y+s.h/2,Math.abs(s.w)/2,Math.abs(s.h)/2,0,0,Math.PI*2);}else if(s.type==="line"){overlayCtx.moveTo(s.x,s.y);overlayCtx.lineTo(s.x+s.w,s.y+s.h);}else{overlayCtx.rect(Math.min(s.x,s.x+s.w),Math.min(s.y,s.y+s.h),Math.abs(s.w),Math.abs(s.h));}overlayCtx.stroke();overlayCtx.setLineDash([]);}
+    if(state.shapeMode&&shapePreview){const s=shapePreview;overlayCtx.strokeStyle="#4facfe";overlayCtx.lineWidth=1.5;overlayCtx.setLineDash([6,4]);traceShape(overlayCtx,s);overlayCtx.stroke();overlayCtx.setLineDash([]);}
     drawSelectionAnts();
     if(transformState){
       const t=transformState;
@@ -1836,6 +1861,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       const d={id:L.id,name:L.name,dx:L.dx,dy:L.dy,visible:L.visible,opacity:L.opacity,blend:L.blend,w:csrc.width,h:csrc.height,dataUrl:csrc.toDataURL("image/png")};
       if(L.locked)d.locked=true;
       if(L.group)d.group=L.group;
+      if(L.kind&&L.kind!=="img")d.kind=L.kind;
+      if(L.color)d.color=L.color;
       if(typeof L.clipTo==="number"&&L.clipTo!=null)d.clipTo=L.clipTo;
       if(L.mask&&L.mask.canvas){d.mask={visible:L.mask.visible!==false,linked:L.mask.linked!==false,dx:L.mask.dx||0,dy:L.mask.dy||0,dataUrl:L.mask.canvas.toDataURL("image/png"),w:L.mask.canvas.width,h:L.mask.canvas.height};}
       return d;
@@ -1997,7 +2024,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       if(!c){c=mkCanvas(originalImage.width,originalImage.height);}
       let mask=null;
       if(L&&L.mask&&L.mask.dataUrl){mask={visible:L.mask.visible!==false,linked:L.mask.linked!==false,dx:L.mask.dx||0,dy:L.mask.dy||0,canvas:null};const mi=new Image();try{await new Promise((res,rej)=>{mi.onload=res;mi.onerror=rej;mi.src=L.mask.dataUrl;});mask.canvas=mkCanvas(mi.width||originalImage.width,mi.height||originalImage.height);mask.canvas.getContext("2d").drawImage(mi,0,0);}catch(e){mask=null;}}
-      ovs.push({id:L&&L.id?L.id:nextLayerId++,name:L&&L.name||"Layer",kind:"img",canvas:c,dx:L&&L.dx||0,dy:L&&L.dy||0,visible:!(L&&L.visible===false),opacity:typeof(L&&L.opacity)==="number"?L.opacity:1,blend:L&&L.blend||"source-over",locked:!!(L&&L.locked),group:L&&L.group||null,clipTo:typeof(L&&L.clipTo)==="number"?L.clipTo:null,mask});
+      const kind=L&&L.kind==="fill"?"fill":(L&&L.kind==="bg"?"bg":"img");
+      const ck=c instanceof HTMLCanvasElement?c:mkCanvas(originalImage.width,originalImage.height);
+      ovs.push({id:L&&L.id?L.id:nextLayerId++,name:L&&L.name||"Layer",kind,canvas:ck,dx:L&&L.dx||0,dy:L&&L.dy||0,visible:!(L&&L.visible===false),opacity:typeof(L&&L.opacity)==="number"?L.opacity:1,blend:L&&L.blend||"source-over",locked:!!(L&&L.locked),group:L&&L.group||null,clipTo:typeof(L&&L.clipTo)==="number"?L.clipTo:null,mask,color:kind==="fill"?(L&&L.color||"#ffffff"):null});
     }
     layers=[layers[0],...ovs];
     if(Array.isArray(restoredGroups))groups=restoredGroups.map(g=>({...g}));
@@ -2135,6 +2164,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(!originalImage)return;
     const L=layers[activeLayerIdx];if(!L)return;
     if(L.kind==="bg"&&!selectionData)return;
+    if(L.kind==="fill")return;
     if(!L.visible)return;
     if(state.maskPaint)return;
     if(transformState)return;
@@ -2573,7 +2603,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     oc.drawImage(bg,offX,offY);
     layers[0].canvas=out;originalImage=out;
     layers[0].dx=0;layers[0].dy=0;
-    for(let i=1;i<layers.length;i++){const L=layers[i];L.dx=(L.dx||0)+offX;L.dy=(L.dy||0)+offY;}
+    for(let i=1;i<layers.length;i++){const L=layers[i];
+      if(L.kind==="fill"&&L.canvas.width===ow&&L.canvas.height===oh){L.canvas=makeFillCanvas(L.color||"#ffffff",tw,th);L.dx=0;L.dy=0;continue;}
+      L.dx=(L.dx||0)+offX;L.dy=(L.dy||0)+offY;}
     cropSelection=null;marqueeSelection=null;bumpSelection();
     syncControlsFromState();updateToggleButtons();
     pan={x:0,y:0};
@@ -2759,9 +2791,10 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(i===activeLayerIdx)row.style.background="var(--pf-surface-hover)";
     if(l.locked)row.style.opacity="0.6";
     const th=mkCanvas(28,28);const tc=th.getContext("2d");const lc=l.canvas;
-    try{const s=Math.min(1,28/Math.max(1,lc.width),28/Math.max(1,lc.height));tc.clearRect(0,0,28,28);if(l.visible)tc.drawImage(lc,(28-lc.width*s)/2,(28-lc.height*s)/2,lc.width*s,lc.height*s);}catch(e){}
+    try{if(l.kind==="fill"){tc.fillStyle=l.color||"#ffffff";tc.fillRect(2,2,24,24);tc.strokeStyle="rgba(255,255,255,0.35)";tc.strokeRect(1.5,1.5,25,25);}else{const s=Math.min(1,28/Math.max(1,lc.width),28/Math.max(1,lc.height));tc.clearRect(0,0,28,28);if(l.visible)tc.drawImage(lc,(28-lc.width*s)/2,(28-lc.height*s)/2,lc.width*s,lc.height*s);}}catch(e){}
     row.appendChild(th);
     if(indent>0)row.appendChild(indentBar());
+    if(l.kind==="fill"){const fb=document.createElement("span");fb.className="layer-badge";fb.textContent="fill";fb.title="Solid color fill layer - double-click thumbnail to change color";row.appendChild(fb);}
     const nm=document.createElement("span");nm.style.cssText="font-size:10.5px;color:var(--pf-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";nm.textContent=l.name+(isBgName?" (bg)":"");
     row.appendChild(nm);
     if(l.clipTo!=null&&layers[l.clipTo]){const cb=document.createElement("span");cb.className="layer-badge";cb.textContent="clip";cb.title="Clipping mask - Alt+click to remove";row.appendChild(cb);}
@@ -2786,7 +2819,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     row.appendChild(eye);
     row.addEventListener("click",ev=>{if(ev.altKey&&ev.shiftKey){toggleLayerClip(i);return;}if(ev.altKey){toggleLayerClip(i);return;}if(activeLayerIdx!==i){activeLayerIdx=i;renderLayers();updateLayerControls();}});
     row.addEventListener("contextmenu",ev=>{ev.preventDefault();ev.stopPropagation();if(activeLayerIdx!==i){activeLayerIdx=i;renderLayers();updateLayerControls();}showLayerCtxMenu(ev.clientX,ev.clientY,i);});
-    row.addEventListener("dblclick",ev=>{ev.stopPropagation();renameLayer(i);});
+    row.addEventListener("dblclick",ev=>{ev.stopPropagation();if(l.kind==="fill"){const c=$("fillColorInput");if(c){c.click();}return;}renameLayer(i);});
     row.draggable=true;
     row.addEventListener("dragstart",e=>{if(e.dataTransfer){e.dataTransfer.setData("text/plain","layer:"+l.id);e.dataTransfer.effectAllowed="move";}row.classList.add("dragging");});
     row.addEventListener("dragend",()=>row.classList.remove("dragging"));
@@ -2837,6 +2870,12 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const op=$("layerOpacity");if(op)op.value=Math.round(clamp(L.opacity,0,1)*100);
     const vo=$("val-layerOpacity");if(vo)vo.textContent=Math.round(clamp(L.opacity,0,1)*100)+"%";
     const isBg=L.kind==="bg";
+    const fcw=$("fillColorWrap");
+    if(fcw){
+      const isFill=L.kind==="fill";
+      fcw.style.display=isFill?"flex":"none";
+      if(isFill){const fi=$("fillColorInput");if(fi)fi.value=L.color||"#ffffff";const vf=$("val-fillColor");if(vf)vf.textContent=L.color||"#ffffff";}
+    }
     const del=$("delLayerBtn"),mg=$("mergeDownBtn"),dn=$("layerDownBtn");
     if(del)del.disabled=isBg;if(mg)mg.disabled=isBg;
     if(dn)dn.disabled=isBg||!canMoveTo(activeLayerIdx,-1);
@@ -2857,10 +2896,35 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     layers.push(makeLayer("Layer "+(layers.length),"img",mkCanvas(w,h)));activeLayerIdx=layers.length-1;
     renderLayers();updateLayerControls();renderImmediately();
   }
+  /* ===================== NEW: SOLID COLOR FILL LAYER ===================== */
+  function isFillLayer(i){const L=layers[i==null?activeLayerIdx:i];return L&&L.kind==="fill";}
+  function makeFillCanvas(color,w,h){
+    const c=mkCanvas(w,h),cx=c.getContext("2d");
+    cx.fillStyle=color||"#ffffff";cx.fillRect(0,0,w,h);return c;
+  }
+  function addFillLayer(){
+    if(!originalImage)return;
+    const w=imageCanvas.width||originalImage.width,h=imageCanvas.height||originalImage.height;
+    const color=state.fgColor&&state.fgColor!=="transparent"?state.fgColor:"#ffffff";
+    const n=makeLayer("Fill Layer","fill",makeFillCanvas(color,w,h));
+    n.color=color;
+    layers.splice(activeLayerIdx+1,0,n);activeLayerIdx=layers.indexOf(n);
+    renderLayers();updateLayerControls();renderImmediately();
+    toast("Solid color fill layer added. Change its color in the Layers panel.","info",2600);
+  }
+  function setFillLayerColor(i,color){
+    const L=layers[i==null?activeLayerIdx:i];if(!L)return;
+    if(L.kind!=="fill")return;
+    if(!color)return;
+    commit("Fill layer color");
+    L.canvas=makeFillCanvas(color,L.canvas.width,L.canvas.height);
+    L.color=color;
+    renderLayers();updateLayerControls();renderImmediately();
+  }
   function duplicateLayer(){
     if(!originalImage||!layers[activeLayerIdx]||!layerCanEdit())return;commit("Duplicate layer");
     const L=layers[activeLayerIdx],c=cloneCanvas(L.canvas),n=makeLayer(L.name+" copy",L.kind,c);
-    n.visible=L.visible;n.opacity=L.opacity;n.blend=L.blend;n.dx=L.dx;n.dy=L.dy;n.locked=L.locked;n.group=L.group;n.clipTo=(typeof L.clipTo==="number")?L.clipTo:null;
+    n.visible=L.visible;n.opacity=L.opacity;n.blend=L.blend;n.dx=L.dx;n.dy=L.dy;n.locked=L.locked;n.group=L.group;n.clipTo=(typeof L.clipTo==="number")?L.clipTo:null;n.color=L.color||null;
     if(L.mask&&L.mask.canvas)n.mask={visible:L.mask.visible!==false,linked:L.mask.linked!==false,dx:L.mask.dx||0,dy:L.mask.dy||0,canvas:cloneCanvas(L.mask.canvas)};
     layers.splice(activeLayerIdx+1,0,n);activeLayerIdx=activeLayerIdx+1;
     renderLayers();updateLayerControls();renderImmediately();
@@ -3200,23 +3264,50 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     bumpSelection();drawCropOverlay();
   }
   function clearSelection(){selectionData=null;lassoPoints=null;bumpSelection();drawCropOverlay();}
+  function traceShape(ctx,s){
+    const x=Math.min(s.x,s.x+s.w),y=Math.min(s.y,s.y+s.h),w=Math.abs(s.w),h=Math.abs(s.h);
+    if(s.type==="line"){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x+s.w,s.y+s.h);return;}
+    ctx.beginPath();
+    if(s.type==="ellipse"){ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);}
+    else if(s.type==="triangle"){
+      ctx.moveTo(x+w/2,y);ctx.lineTo(x,y+h);ctx.lineTo(x+w,y+h);ctx.closePath();
+    }else if(s.type==="star"){
+      const cx=x+w/2,cy=y+h/2,R=Math.max(1,Math.min(w,h)/2),T=Math.max(1,R*0.42),n=5;
+      for(let i=0;i<n*2;i++){
+        const rad=i*Math.PI/n-Math.PI/2,rr=(i%2===0)?R:T;
+        const px=cx+rr*Math.cos(rad),py=cy+rr*Math.sin(rad);
+        if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.closePath();
+    }else if(s.type==="pentagon"){
+      const cx=x+w/2,cy=y+h/2,R=Math.max(1,Math.min(w,h)/2),n=5;
+      for(let i=0;i<n;i++){
+        const rad=i*(2*Math.PI/n)-Math.PI/2;
+        const px=cx+R*Math.cos(rad),py=cy+R*Math.sin(rad);
+        if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.closePath();
+    }else{ctx.rect(x,y,w,h);}
+  }
   function finalizeShape(){
     const s=shapePreview;shapePreview=null;isDraggingShape=false;
     if(!s)return;
     if(Math.abs(s.w)<=1&&Math.abs(s.h)<=1){drawCropOverlay();return;}
     beginLayerEdit("Shape");
     const L=layers[activeLayerIdx];const lctx=L.canvas.getContext("2d");
-    const x=Math.min(s.x,s.x+s.w),y=Math.min(s.y,s.y+s.h),w=Math.abs(s.w),h=Math.abs(s.h);
-    const hp=layerLocalPt({x,y}),hx=hp.x,hy=hp.y;
+    const hp=layerLocalPt({x:Math.min(s.x,s.x+s.w),y:Math.min(s.y,s.y+s.h)});
+    const x=hp.x,y=hp.y,w=Math.abs(s.w),h=Math.abs(s.h);
+    const sl={...s,x,y,w,h};
     stampMasked(lctx,c=>{
       c.save();
+      c.lineJoin="round";c.lineCap="round";
       if(s.type==="line"){
         const a=layerLocalPt({x:s.x,y:s.y}),b=layerLocalPt({x:s.x+s.w,y:s.y+s.h});
-        c.strokeStyle=state.shapeStroke;c.lineWidth=state.shapeStrokeWidth;c.lineCap="round";
+        c.strokeStyle=state.shapeStroke;c.lineWidth=state.shapeStrokeWidth;
         c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
       }else{
-        if(state.shapeFill&&state.shapeFill!=="transparent"){c.fillStyle=state.shapeFill;c.beginPath();if(s.type==="ellipse")c.ellipse(hx+w/2,hy+h/2,w/2,h/2,0,0,Math.PI*2);else c.rect(hx,hy,w,h);c.fill();}
-        if(state.shapeStrokeWidth>0){c.strokeStyle=state.shapeStroke;c.lineWidth=state.shapeStrokeWidth;c.beginPath();if(s.type==="ellipse")c.ellipse(hx+w/2,hy+h/2,w/2,h/2,0,0,Math.PI*2);else c.rect(hx,hy,w,h);c.stroke();}
+        if(state.shapeFill&&state.shapeFill!=="transparent"){c.fillStyle=state.shapeFill;traceShape(c,sl);c.fill();}
+        if(state.shapeStrokeWidth>0){c.strokeStyle=state.shapeStroke;c.lineWidth=state.shapeStrokeWidth;traceShape(c,sl);c.stroke();}
       }
       c.restore();
     });
@@ -3426,6 +3517,37 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("toolbar").addEventListener("scroll",hideTooltip);
     window.addEventListener("resize",hideTooltip);
 
+    /* ===================== NEW: TOOL GROUP FLYOUT (right-click) ===================== */
+    const TOOL_GROUPS={select:["marquee","lasso","wand","qsel"],paint:["brush","eraser","heal","clone","smudge","dodge"],vector:["pen","text","shape"],craft:["gradient","fill"],view:["hand","zoom"]};
+    const TOOL_NAMES={marquee:"Marquee",lasso:"Lasso",wand:"Magic Wand",qsel:"Quick Selection",brush:"Brush",eraser:"Eraser",heal:"Healing Brush",clone:"Clone Stamp",smudge:"Smudge",dodge:"Dodge / Burn",pen:"Pen",text:"Type",shape:"Shape",gradient:"Gradient",fill:"Flood Fill",hand:"Hand",zoom:"Zoom",move:"Move",crop:"Crop",eyedropper:"Eyedropper"};
+    const TOOL_KEYS={marquee:"M",lasso:"L",wand:"W",qsel:"Q",brush:"B",eraser:"E",heal:"J",clone:"N",smudge:"S",dodge:"O",pen:"P",text:"T",shape:"U",gradient:"K",fill:"G",hand:"H",zoom:"Z",move:"V",crop:"C",eyedropper:"I"};
+    const toolFlyout=$("toolFlyout");
+    function closeToolFlyout(){if(toolFlyout){toolFlyout.style.display="none";toolFlyout.innerHTML="";}}
+    document.querySelectorAll(".tool-btn[data-group]").forEach(b=>{
+      b.addEventListener("contextmenu",e=>{
+        e.preventDefault();e.stopPropagation();hideTooltip();
+        const g=b.dataset.group,gc=b.dataset.tool,list=TOOL_GROUPS[g]||[];
+        toolFlyout.innerHTML="";
+        list.forEach(t=>{
+          const d=document.createElement("div");d.className="fitem"+(t===gc?" sel":"");d.setAttribute("role","menuitem");
+          d.innerHTML='<span class="fi-ic">'+(TOOL_NAMES[t]||t)+'</span>'+(TOOL_KEYS[t]?'<span class="fk">'+TOOL_KEYS[t]+'</span>':'');
+          d.addEventListener("click",ev=>{ev.stopPropagation();closeToolFlyout();selectTool(t);});
+          toolFlyout.appendChild(d);
+        });
+        const r=b.getBoundingClientRect();
+        toolFlyout.style.display="flex";
+        let x=r.right+4,y=r.top;
+        const fr=toolFlyout.getBoundingClientRect();
+        if(y+fr.height>window.innerHeight-8)y=Math.max(8,window.innerHeight-fr.height-8);
+        if(x+fr.width>window.innerWidth-8)x=r.left-fr.width-4;
+        toolFlyout.style.left=x+"px";toolFlyout.style.top=y+"px";
+        document.querySelectorAll(".tool-btn[data-group-open]").forEach(o=>o.removeAttribute("data-group-open"));
+        b.setAttribute("data-group-open","");
+      });
+    });
+    document.addEventListener("click",e=>{if(toolFlyout&&!toolFlyout.contains(e.target))closeToolFlyout();});
+    document.addEventListener("contextmenu",e=>{if(toolFlyout&&!toolFlyout.contains(e.target))closeToolFlyout();});
+
     /* Undo/Redo */
     $("undoBtn").addEventListener("click",undo);$("redoBtn").addEventListener("click",redo);
 
@@ -3576,6 +3698,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
 
     /* Layers panel */
     $("addLayerBtn").addEventListener("click",()=>{if(!originalImage)return;addLayer();});
+    $("fillLayerBtn")&&$("fillLayerBtn").addEventListener("click",()=>{if(!originalImage)return;addFillLayer();});
+    $("fillColorInput")&&$("fillColorInput").addEventListener("input",e=>{if(isFillLayer())setFillLayerColor(activeLayerIdx,e.target.value);});
     $("dupLayerBtn").addEventListener("click",()=>{if(!originalImage)return;duplicateLayer();});
     $("delLayerBtn").addEventListener("click",()=>{if(!originalImage)return;deleteLayer();});
     $("mergeDownBtn").addEventListener("click",()=>{if(!originalImage)return;mergeDownLayer();});
@@ -3610,6 +3734,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       $("layerCtxMenu").classList.remove("visible");
       const c=it.dataset.ctx,i=layerCtxIdx>=0?layerCtxIdx:activeLayerIdx;if(i<0||!layers[i])return;
       if(c==="rename")renameLayer(i);
+      else if(c==="fillAdd"){addFillLayer();}
       else if(c==="duplicate"){const prev=activeLayerIdx;activeLayerIdx=i;duplicateLayer();activeLayerIdx=prev;renderLayers();}
       else if(c==="delete"){activeLayerIdx=i;deleteLayer();}
       else if(c==="clip"||c==="clipRemove")toggleLayerClip(i);
