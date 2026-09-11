@@ -245,16 +245,80 @@
 
     /* === RIGHT PANEL === */
     .right-panel{width:var(--pf-panel-w);background:var(--pf-bg-2);border-left:1px solid var(--pf-border);
-      display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
-    .panel-tabs{display:flex;border-bottom:1px solid var(--pf-border);background:var(--pf-bg-1);flex-shrink:0;}
-    .panel-tab{flex:1;padding:6px 0;text-align:center;font-size:10.5px;font-weight:500;color:var(--pf-text-muted);
-      cursor:pointer;border-bottom:2px solid transparent;transition:all var(--pf-transition);}
-    .panel-tab:hover{color:var(--pf-text-dim);}
-    .panel-tab.active{color:var(--pf-accent);border-bottom-color:var(--pf-accent);}
+      display:flex;flex-direction:row;flex-shrink:0;overflow:hidden;}
+    /* Vertical icon rail (Photoshop-style) */
+    .panel-rail{width:44px;flex:0 0 44px;background:var(--pf-bg-2);border-right:1px solid var(--pf-border);
+      display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;}
+    .panel-rail .rail-spacer{flex:1;}
+    .panel-tab{width:36px;height:36px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+      border-radius:10px;cursor:pointer;position:relative;border:1px solid transparent;
+      transition:background var(--pf-transition),color var(--pf-transition),box-shadow var(--pf-transition);
+      color:var(--pf-text-dim);outline:none;-webkit-tap-highlight-color:transparent;}
+    .panel-tab:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
+    .panel-tab:focus-visible{outline:2px solid var(--pf-accent);outline-offset:1px;}
+    .panel-tab:active{transform:translateY(0.5px);}
+    .panel-tab.active{background:var(--pf-accent);color:#fff;
+      box-shadow:0 0 0 1px rgba(79,172,254,0.35),0 0 14px var(--pf-accent-glow);}
+    .panel-tab.rail-save{color:var(--pf-accent);}
+    .panel-tab.rail-save:hover{background:rgba(79,172,254,0.12);color:var(--pf-accent);}
+    .panel-tab svg{width:22px;height:22px;flex-shrink:0;stroke:currentColor;fill:none;
+      stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+    .panel-tab .rail-tip{position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);
+      background:#1b1d2a;color:#fff;padding:5px 9px;border-radius:7px;min-width:64px;
+      font-size:10.5px;line-height:1.3;text-align:center;pointer-events:none;white-space:nowrap;
+      opacity:0;visibility:hidden;z-index:300;
+      box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);
+      transition:opacity 0.08s ease 0s,visibility 0s 0.08s;}
+    .panel-tab .rail-tip::before{content:"";position:absolute;left:100%;top:50%;margin-top:-5px;
+      width:10px;height:10px;background:#1b1d2a;transform:rotate(45deg);border-top:1px solid rgba(255,255,255,.08);
+      border-right:1px solid rgba(255,255,255,.08);}
+    .panel-tab:hover .rail-tip{opacity:1;visibility:visible;
+      transition:opacity 0.12s ease 0.3s,visibility 0s 0.3s;}
+    .panel-stack{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
     .panel-content{display:none;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--pf-bg-5) transparent;}
     .panel-content.active{display:block;}
     .panel-content::-webkit-scrollbar{width:4px;}
     .panel-content::-webkit-scrollbar-thumb{background:var(--pf-bg-5);border-radius:2px;}
+
+    /* Save / Export bar (top of Adjust panel) */
+    .panel-savebar{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--pf-border);
+      background:var(--pf-bg-1);position:sticky;top:0;z-index:3;flex-shrink:0;}
+    .ib.save-export-btn{flex:1;height:32px;justify-content:center;background:var(--pf-accent);border-color:var(--pf-accent);
+      color:#fff;font-weight:600;font-size:11px;box-shadow:0 0 10px var(--pf-accent-glow);}
+    .ib.save-export-btn:hover{background:#3a9af0;border-color:#3a9af0;color:#fff;}
+    .ib.save-export-btn svg{width:15px;height:15px;}
+
+    /* Export dropdown menu */
+    .export-menu{position:fixed;z-index:4000;min-width:190px;background:var(--pf-menu-bg);
+      border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px;
+      box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06);
+      display:none;backdrop-filter:blur(12px);}
+    .export-menu.visible{display:block;}
+    .export-item{width:100%;text-align:left;border:0;border-radius:5px;padding:6px 10px;background:transparent;
+      color:var(--pf-text-dim);font-family:var(--pf-font);font-size:11.5px;cursor:pointer;
+      display:flex;align-items:center;gap:8px;white-space:nowrap;transition:background var(--pf-transition);}
+    .export-item:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
+    .export-item svg{width:14px;height:14px;stroke:var(--pf-accent);fill:none;stroke-width:2;flex-shrink:0;}
+    .export-sep{height:1px;background:var(--pf-border);margin:4px 8px;}
+
+    /* Layers panel (Photoshop style) */
+    .lyr-blend{width:100%;margin-bottom:6px;}
+    .lyr-opts{display:flex;gap:10px;margin-bottom:6px;}
+    .lyr-opt{display:flex;align-items:center;gap:5px;flex:1;min-width:0;}
+    .lyr-opt .lyr-label{font-size:9.5px;color:var(--pf-text-muted);white-space:nowrap;width:36px;flex-shrink:0;}
+    .lyr-opt input[type="range"]{flex:1;min-width:0;}
+    .lyr-opt .lyr-val{font-family:var(--pf-mono);color:var(--pf-accent);font-size:9.5px;width:30px;text-align:right;flex-shrink:0;}
+    .lock-row{display:flex;align-items:center;gap:3px;margin-bottom:8px;}
+    .lock-chip{width:26px;height:24px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);background:var(--pf-bg-3);
+      color:var(--pf-text-muted);cursor:pointer;transition:all var(--pf-transition);}
+    .lock-chip:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
+    .lock-chip.active{background:var(--pf-accent);border-color:var(--pf-accent);color:#fff;box-shadow:0 0 8px var(--pf-accent-glow);}
+    .lock-chip svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+    .layer-list{border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);overflow:hidden;max-height:190px;overflow-y:auto;}
+    .lyr-footer{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+    .lyr-footer .ib{width:26px;height:26px;}
+    .lyr-footer .ib svg{width:13px;height:13px;}
     .panel-section{border-bottom:1px solid var(--pf-border);}
     .panel-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer;transition:background var(--pf-transition);}
     .panel-header:hover{background:var(--pf-surface-hover);}
@@ -764,16 +828,58 @@
 
     <!-- Right Panel -->
     <div class="right-panel">
-      <div class="panel-tabs">
-        <div class="panel-tab active" data-panel="adjustments">Adjust</div>
-        <div class="panel-tab" data-panel="filters">Filters</div>
-        <div class="panel-tab" data-panel="layers">Layers</div>
-        <div class="panel-tab" data-panel="history">History</div>
+      <div class="panel-rail" id="panelRail">
+        <div class="panel-tab active" data-panel="adjustments" role="button" tabindex="0" aria-label="Adjust controls">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/>
+            <path d="M1 14h6M9 8h6M17 16h6"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Adjust</span>
+        </div>
+        <div class="panel-tab" data-panel="filters" role="button" tabindex="0" aria-label="Photo filters and presets">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3z"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Filters</span>
+        </div>
+        <div class="panel-tab" data-panel="layers" role="button" tabindex="0" aria-label="Layers panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Layers</span>
+        </div>
+        <div class="panel-tab" data-panel="history" role="button" tabindex="0" aria-label="Edit history">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M12 7v5l4 2"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">History</span>
+        </div>
+        <div class="rail-spacer"></div>
+        <div class="panel-tab rail-save" id="railSaveBtn" role="button" tabindex="0" aria-label="Save / Export image">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Save Image</span>
+        </div>
       </div>
+
+      <div class="panel-stack">
 
       <!-- ADJUSTMENTS PANEL -->
       <div class="panel-content active" data-panel="adjustments">
-        <div class="panel-section">
+        <div class="panel-savebar">
+          <button class="ib save-export-btn" id="saveExportBtn" title="Save / export the current image">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Save / Export Image
+          </button>
+        </div>
+        <div class="panel-section collapsed">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/></svg>Light</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
             <div class="ctrl-row"><div class="ctrl-label">Brightness <span class="val" id="val-brightness">100%</span></div><div class="range-wrap" id="wrap-brightness"><input id="brightness" type="range" min="0" max="200" value="100" /><span class="range-bubble"></span></div></div>
@@ -781,7 +887,7 @@
             <div class="ctrl-row"><div class="ctrl-label">Exposure <span class="val" id="val-exposure">0.00</span></div><div class="range-wrap" id="wrap-exposure"><input id="exposure" type="range" min="-2" max="2" step="0.01" value="0" /><span class="range-bubble"></span></div></div>
           </div>
         </div>
-        <div class="panel-section">
+        <div class="panel-section collapsed">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/><circle cx="8.5" cy="15.5" r="2.5"/></svg>Color</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
             <div class="ctrl-row"><div class="ctrl-label">Saturation <span class="val" id="val-saturation">100%</span></div><div class="range-wrap" id="wrap-saturation"><input id="saturation" type="range" min="0" max="200" value="100" /><span class="range-bubble"></span></div></div>
@@ -792,7 +898,7 @@
             </div>
           </div>
         </div>
-        <div class="panel-section">
+        <div class="panel-section collapsed">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Effects</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
             <div class="ctrl-row"><div class="ctrl-label">Blur <span class="val" id="val-blur">0px</span></div><div class="range-wrap" id="wrap-blur"><input id="blur" type="range" min="0" max="12" step="0.1" value="0" /><span class="range-bubble"></span></div></div>
@@ -813,7 +919,7 @@
             </div>
           </div>
         </div>
-        <div class="panel-section">
+        <div class="panel-section collapsed">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Border</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
             <div class="ctrl-row"><div class="ctrl-label">Width <span class="val" id="val-borderWidth">0</span></div><div class="range-wrap" id="wrap-borderWidth"><input id="borderWidth" type="range" min="0" max="80" value="0" /><span class="range-bubble"></span></div></div>
@@ -858,39 +964,44 @@
         <div class="panel-section">
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Layers</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
-            <div style="display:flex;gap:4px;margin-bottom:6px;">
-              <select class="ob-select" id="blendMode" style="flex:1;" title="Blend mode of the active layer">
-                <option value="source-over">Normal</option><option value="multiply">Multiply</option><option value="screen">Screen</option>
-                <option value="overlay">Overlay</option><option value="soft-light">Soft Light</option><option value="hard-light">Hard Light</option>
-                <option value="color-dodge">Color Dodge</option><option value="color-burn">Color Burn</option>
-                <option value="difference">Difference</option><option value="exclusion">Exclusion</option>
-              </select>
-              <span style="font-size:10px;line-height:22px;color:var(--pf-text-muted);white-space:nowrap;">Opacity</span>
-              <input id="layerOpacity" type="range" min="1" max="100" value="100" style="flex:1;min-width:50px;" title="Opacity of the active layer" />
-              <span id="val-layerOpacity" style="font-family:var(--pf-mono);color:var(--pf-text-muted);font-size:10px;line-height:22px;width:26px;text-align:right;">100%</span>
+            <select class="ob-select lyr-blend" id="blendMode" title="Blend mode of the active layer">
+              <option value="source-over">Normal</option><option value="multiply">Multiply</option><option value="screen">Screen</option>
+              <option value="overlay">Overlay</option><option value="soft-light">Soft Light</option><option value="hard-light">Hard Light</option>
+              <option value="color-dodge">Color Dodge</option><option value="color-burn">Color Burn</option>
+              <option value="difference">Difference</option><option value="exclusion">Exclusion</option>
+            </select>
+            <div class="lyr-opts">
+              <div class="lyr-opt"><span class="lyr-label">Opacity</span><input id="layerOpacity" type="range" min="1" max="100" value="100" title="Opacity of the active layer" /><span class="lyr-val" id="val-layerOpacity">100%</span></div>
+              <div class="lyr-opt"><span class="lyr-label">Fill</span><input id="layerFill" type="range" min="0" max="100" value="100" title="Fill (strength of the layer pixels)" /><span class="lyr-val" id="val-layerFill">100%</span></div>
             </div>
-            <div id="fillColorWrap" style="display:none;align-items:center;gap:6px;margin-bottom:6px;">
+            <div class="lock-row" id="lockRow">
+              <button class="lock-chip" data-lock="transparency" title="Lock transparent pixels"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none"/><path d="M3 3l18 18"/></svg></button>
+              <button class="lock-chip" data-lock="pixels" title="Lock image pixels (no painting)"><svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></button>
+              <button class="lock-chip" data-lock="position" title="Lock position (no moving)"><svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg></button>
+              <button class="lock-chip" data-lock="all" title="Lock all (full lock)"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></button>
+            </div>
+            <div id="fillColorWrap" style="display:none;align-items:center;gap:6px;margin-bottom:6px;background:var(--pf-bg-3);border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);padding:4px 6px;">
               <span style="font-size:10px;line-height:22px;color:var(--pf-text);white-space:nowrap;">Fill color:</span>
               <input type="color" id="fillColorInput" value="#ffffff" style="flex:0 0 auto;width:26px;height:24px;border:none;cursor:pointer;padding:0;" title="Solid fill color of the active layer" />
               <span id="val-fillColor" style="font-family:var(--pf-mono);color:var(--pf-text-muted);font-size:10px;line-height:22px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#ffffff</span>
             </div>
-            <div id="layerList" style="border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);overflow:hidden;max-height:220px;overflow-y:auto;"></div>
-            <div class="ib-row" style="margin-top:8px;flex-wrap:wrap;">
+            <div id="layerList" class="layer-list"></div>
+            <div class="lyr-footer" id="layerActions">
               <button class="ib" id="addLayerBtn" title="Add raster layer"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
-              <button class="ib" id="fillLayerBtn" title="Add solid color fill layer"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/><path d="M5.5 18h13"/></svg></button>
-              <button class="ib" id="dupLayerBtn" title="Duplicate layer"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
               <button class="ib" id="delLayerBtn" title="Delete layer"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+              <button class="ib" id="newGroupBtn" title="New group (move active layer into a folder)"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>
+              <button class="ib" id="maskAddBtn" title="Add layer mask (paint black to hide / white to show)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3v18M3 12h18"/></svg></button>
+              <button class="ib" id="dupLayerBtn" title="Duplicate layer"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+              <button class="ib" id="fillLayerBtn" title="Add solid color fill layer"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/><path d="M5.5 18h13"/></svg></button>
               <button class="ib" id="mergeDownBtn" title="Merge down"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><path d="M12 22V13"/><path d="M9 10l3 3 3-3"/></svg></button>
+              <button class="ib" id="flattenBtn" title="Flatten image"><svg viewBox="0 0 24 24"><path d="M21 21H3.5l6.5-6.5"/><path d="M4 12V4h16v8"/></svg></button>
               <button class="ib" id="layerUpBtn" title="Move layer up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg></button>
               <button class="ib" id="layerDownBtn" title="Move layer down"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
               <button class="ib" id="renameLayerBtn" title="Rename layer"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="ib" id="maskAddBtn" title="Add layer mask (paint black to hide / white to show)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3v18M3 12h18"/></svg></button>
               <button class="ib" id="maskDelBtn" title="Delete layer mask"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none"/><line x1="7" y1="7" x2="17" y2="17"/><line x1="17" y1="7" x2="7" y2="17"/></svg></button>
               <button class="ib" id="maskToggleBtn" title="Show / hide mask"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none"/><path d="M12 3a9 9 0 010 18z"/></svg></button>
               <button class="ib" id="maskPaintBtn" title="Paint on mask (black hides / white shows)"><svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></button>
-              <button class="ib" id="newGroupBtn" title="New group (move active layer into a folder)"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>
               <button class="ib" id="ungroupBtn" title="Ungroup active layer"><svg viewBox="0 0 24 24"><path d="M22 17H2"/><path d="M6 10L2 13.5 6 17"/><path d="M2 3h20v8H2z"/></svg></button>
-              <button class="ib" id="flattenBtn" title="Flatten image"><svg viewBox="0 0 24 24"><path d="M21 21H3.5l6.5-6.5"/><path d="M4 12V4h16v8"/></svg></button>
             </div>
           </div>
         </div>
@@ -905,6 +1016,8 @@
           </div>
         </div>
       </div>
+
+      </div><!-- /panel-stack -->
     </div>
   </div>
 
@@ -952,6 +1065,19 @@
   <div class="layer-ctx-sep"></div>
   <div class="ctx-item" data-ctx="merge">Merge Down</div>
   <div class="ctx-item" data-ctx="flatten">Flatten Image</div>
+</div>
+
+<!-- Export / Save dropdown menu -->
+<div class="export-menu" id="exportMenu">
+  <button class="export-item" data-export="png"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export as PNG</button>
+  <button class="export-item" data-export="jpg"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Export as JPG</button>
+  <button class="export-item" data-export="webp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 15.5c0-4 2-7 4-7s3 3 3 7c0 3-.5 4-1.5 4s-2-1-2-3"/></svg>Export as WebP</button>
+  <button class="export-item" data-export="pdf"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Export as PDF</button>
+  <div class="export-sep"></div>
+  <button class="export-item" data-export="copy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy to Clipboard</button>
+  <button class="export-item" data-export="pfx"><svg viewBox="0 0 24 24"><path d="M12 2l3 3h5v5l3 3-3 3v5h-5l-3 2-3-2H4v-5l-2-3 2-3V5h5z"/></svg>Save Project (.pfx)…</button>
+  <div class="export-sep"></div>
+  <button class="export-item" data-export="saveas"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Save As… (choose file name)</button>
 </div>
 
 <!-- Image Size Modal -->
@@ -1797,7 +1923,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   function compositeLayers(){
     for(let i=1;i<layers.length;i++){const l=layers[i];if(!l.visible)continue;
       if(transformState&&transformState.mode==="layer"&&i===activeLayerIdx)continue;
-      imageCtx.save();imageCtx.globalAlpha=clamp(l.opacity,0,1);imageCtx.globalCompositeOperation=l.blend||"source-over";
+      imageCtx.save();imageCtx.globalAlpha=clamp(l.opacity,0,1)*clamp(l.fill==null?1:l.fill,0,1);imageCtx.globalCompositeOperation=l.blend||"source-over";
       if(l.clipTo!=null&&layers[l.clipTo]){
         const mat=clipMaskMat(l);if(mat)imageCtx.drawImage(mat,l.dx||0,l.dy||0);
       }else{
@@ -1859,7 +1985,11 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       let csrc=L.canvas;
       if(!(csrc instanceof HTMLCanvasElement)){const cc=mkCanvas(csrc.width,csrc.height);cc.getContext("2d").drawImage(csrc,0,0);csrc=cc;}
       const d={id:L.id,name:L.name,dx:L.dx,dy:L.dy,visible:L.visible,opacity:L.opacity,blend:L.blend,w:csrc.width,h:csrc.height,dataUrl:csrc.toDataURL("image/png")};
+      if(L.fill!=null&&L.fill!==1)d.fill=L.fill;
       if(L.locked)d.locked=true;
+      if(L.lockTransparency)d.lockTransparency=true;
+      if(L.lockPixels)d.lockPixels=true;
+      if(L.lockPosition)d.lockPosition=true;
       if(L.group)d.group=L.group;
       if(L.kind&&L.kind!=="img")d.kind=L.kind;
       if(L.color)d.color=L.color;
@@ -2026,7 +2156,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       if(L&&L.mask&&L.mask.dataUrl){mask={visible:L.mask.visible!==false,linked:L.mask.linked!==false,dx:L.mask.dx||0,dy:L.mask.dy||0,canvas:null};const mi=new Image();try{await new Promise((res,rej)=>{mi.onload=res;mi.onerror=rej;mi.src=L.mask.dataUrl;});mask.canvas=mkCanvas(mi.width||originalImage.width,mi.height||originalImage.height);mask.canvas.getContext("2d").drawImage(mi,0,0);}catch(e){mask=null;}}
       const kind=L&&L.kind==="fill"?"fill":(L&&L.kind==="bg"?"bg":"img");
       const ck=c instanceof HTMLCanvasElement?c:mkCanvas(originalImage.width,originalImage.height);
-      ovs.push({id:L&&L.id?L.id:nextLayerId++,name:L&&L.name||"Layer",kind,canvas:ck,dx:L&&L.dx||0,dy:L&&L.dy||0,visible:!(L&&L.visible===false),opacity:typeof(L&&L.opacity)==="number"?L.opacity:1,blend:L&&L.blend||"source-over",locked:!!(L&&L.locked),group:L&&L.group||null,clipTo:typeof(L&&L.clipTo)==="number"?L.clipTo:null,mask,color:kind==="fill"?(L&&L.color||"#ffffff"):null});
+      ovs.push({id:L&&L.id?L.id:nextLayerId++,name:L&&L.name||"Layer",kind,canvas:ck,dx:L&&L.dx||0,dy:L&&L.dy||0,visible:!(L&&L.visible===false),opacity:typeof(L&&L.opacity)==="number"?L.opacity:1,fill:typeof(L&&L.fill)==="number"?L.fill:1,blend:L&&L.blend||"source-over",locked:!!(L&&L.locked),lockTransparency:!!(L&&L.lockTransparency),lockPixels:!!(L&&L.lockPixels),lockPosition:!!(L&&L.lockPosition),group:L&&L.group||null,clipTo:typeof(L&&L.clipTo)==="number"?L.clipTo:null,mask,color:kind==="fill"?(L&&L.color||"#ffffff"):null});
     }
     layers=[layers[0],...ovs];
     if(Array.isArray(restoredGroups))groups=restoredGroups.map(g=>({...g}));
@@ -2058,6 +2188,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     updateQe();
     const curI=activeTab();if(curI){curI.dirty=false;curI.loading=false;}
     renderTabBar();
+    if(!saved)resetPanelUi();
     saveProject();
   }
   function loadImageFile(file){
@@ -2243,6 +2374,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       transformState.pos.x+=dx;transformState.pos.y+=dy;
       drawCropOverlay();renderImmediately();return;
     }
+    if(L.lockPosition){toast('Layer "'+L.name+'" position is locked.','warning',1400);return;}
     commit("Move layer");
     L.dx=(L.dx||0)+dx;L.dy=(L.dy||0)+dy;
     renderImmediately();renderTabBar();
@@ -2687,7 +2819,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   function updateColorSwatches(){$("fgColorSwatch").style.background=state.fgColor;$("bgColorSwatch").style.background=state.bgColor;$("optTextColor").value=state.fgColor;$("shapeFill").value=state.fgColor;const dc=$("drawColor");if(dc)dc.value=state.fgColor;const pc=$("penColor");if(pc)pc.value=state.fgColor;}
 
   /* ===================== LAYERS & PAINT ENGINE ===================== */
-  function makeLayer(name,kind,canvas){return{id:nextLayerId++,name:name||"Layer",kind:kind||"img",canvas,visible:true,opacity:1,blend:"source-over",locked:false,group:null,clipTo:null,mask:null,dx:0,dy:0};}
+  function makeLayer(name,kind,canvas){return{id:nextLayerId++,name:name||"Layer",kind:kind||"img",canvas,visible:true,opacity:1,fill:1,blend:"source-over",locked:false,lockTransparency:false,lockPixels:false,lockPosition:false,group:null,clipTo:null,mask:null,dx:0,dy:0};}
   function initLayers(canvas){layers=[makeLayer("Background","bg",canvas)];activeLayerIdx=0;nextLayerId=1;groups=[];nextGroupId=1;}
   function cloneCanvas(c){const cc=mkCanvas(c.width,c.height);cc.getContext("2d").drawImage(c,0,0);return cc;}
   function cloneLayerObj(l){const n={...l,clipTo:(typeof l.clipTo==="number")?l.clipTo:null};if(l.mask&&l.mask.canvas)n.mask={visible:l.mask.visible!==false,linked:l.mask.linked!==false,dx:l.mask.dx||0,dy:l.mask.dy||0,canvas:cloneCanvas(l.mask.canvas)};return n;}
@@ -2708,7 +2840,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const base=buildBaseComposite();
     const out=mkCanvas(base.width,base.height);const oc=out.getContext("2d");
     oc.drawImage(base,0,0);
-    for(let i=1;i<layers.length;i++){const l=layers[i];if(!l.visible)continue;oc.save();oc.globalAlpha=clamp(l.opacity,0,1);oc.globalCompositeOperation=l.blend||"source-over";
+    for(let i=1;i<layers.length;i++){const l=layers[i];if(!l.visible)continue;oc.save();oc.globalAlpha=clamp(l.opacity,0,1)*clamp(l.fill==null?1:l.fill,0,1);oc.globalCompositeOperation=l.blend||"source-over";
       if(l.clipTo!=null&&layers[l.clipTo]){const mat=clipMaskMat(l);if(mat)oc.drawImage(mat,l.dx||0,l.dy||0);}else{paintMaskedLayer(oc,l);}
       oc.restore();}
     renderStrokesTo(oc);
@@ -2787,11 +2919,17 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const list=$("layerList");if(!list)return;
     const i=layers.indexOf(l);
     const row=document.createElement("div");row.className="layer-item"+(i===activeLayerIdx?" active":"")+(l.locked?" locked":"");
-    row.style.cssText="display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;border-bottom:1px solid var(--pf-border);";
-    if(i===activeLayerIdx)row.style.background="var(--pf-surface-hover)";
-    if(l.locked)row.style.opacity="0.6";
+    row.style.cssText="display:flex;align-items:center;gap:5px;padding:4px 6px;cursor:pointer;border-bottom:1px solid var(--pf-border);";
+    if(i===activeLayerIdx)row.style.background="var(--pf-bg-4)";
+    if(l.locked||l.lockPixels||l.lockPosition)row.style.opacity="0.65";
+    const eye=document.createElement("span");eye.style.cssText="width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:"+(l.visible?"1":"0.35")+";flex:0 0 auto;";
+    eye.innerHTML=l.visible?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>':'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/></svg>';
+    eye.title=l.visible?"Hide layer":"Show layer";
+    eye.addEventListener("click",ev=>{ev.stopPropagation();toggleLayerVisible(i);});
+    row.appendChild(eye);
     const th=mkCanvas(28,28);const tc=th.getContext("2d");const lc=l.canvas;
     try{if(l.kind==="fill"){tc.fillStyle=l.color||"#ffffff";tc.fillRect(2,2,24,24);tc.strokeStyle="rgba(255,255,255,0.35)";tc.strokeRect(1.5,1.5,25,25);}else{const s=Math.min(1,28/Math.max(1,lc.width),28/Math.max(1,lc.height));tc.clearRect(0,0,28,28);if(l.visible)tc.drawImage(lc,(28-lc.width*s)/2,(28-lc.height*s)/2,lc.width*s,lc.height*s);}}catch(e){}
+    th.style.cssText="flex:0 0 auto;border:1px solid var(--pf-border);border-radius:3px;";
     row.appendChild(th);
     if(indent>0)row.appendChild(indentBar());
     if(l.kind==="fill"){const fb=document.createElement("span");fb.className="layer-badge";fb.textContent="fill";fb.title="Solid color fill layer - double-click thumbnail to change color";row.appendChild(fb);}
@@ -2799,6 +2937,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     row.appendChild(nm);
     if(l.clipTo!=null&&layers[l.clipTo]){const cb=document.createElement("span");cb.className="layer-badge";cb.textContent="clip";cb.title="Clipping mask - Alt+click to remove";row.appendChild(cb);}
     if(l.mask&&l.mask.visible===false){const mb=document.createElement("span");mb.className="layer-badge";mb.textContent="m-off";mb.title="Mask hidden";row.appendChild(mb);}
+    const ms=document.createElement("span");ms.style.cssText="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:"+((l.mask&&l.mask.visible===false)?"0.4":"1")+";padding:2px;border:1px solid var(--pf-border);border-radius:2px;flex:0 0 auto;";
+    ms.innerHTML='<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2L2 12h4v8h6v-6h2v6h6v-8h4L12 2z"/></svg>';
     if(l.mask){ms.title="Mask "+((l.mask.visible===false)?"(hidden)":"(active)")+" - click: show/hide, Alt+click: link/unlink";
       ms.addEventListener("click",ev=>{ev.stopPropagation();if(ev.altKey){l.mask.linked=!l.mask.linked;renderLayers();}else{toggleLayerMaskVisible(i);}});
       row.appendChild(ms);
@@ -2807,16 +2947,11 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       mlink.title=l.mask.linked===false?"Mask unlinked from layer (drag mask moves independently)":"Mask linked to layer (moves together)";
       mlink.addEventListener("click",ev=>{ev.stopPropagation();l.mask.linked=!l.mask.linked;renderLayers();});
       row.appendChild(mlink);}
-    const lock=document.createElement("span");lock.style.cssText="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:"+(l.locked?"1":"0.35")+";";
+    const lock=document.createElement("span");lock.style.cssText="width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:"+(l.locked?"1":"0.35")+";flex:0 0 auto;";
     lock.innerHTML=l.locked?'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>':'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg>';
     lock.title=l.locked?"Unlock layer":"Lock layer";
     lock.addEventListener("click",ev=>{ev.stopPropagation();toggleLayerLock(i);});
     row.appendChild(lock);
-    const eye=document.createElement("span");eye.style.cssText="width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:"+(l.visible?"1":"0.35")+";";
-    eye.innerHTML=l.visible?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>':'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/></svg>';
-    eye.title=l.visible?"Hide layer":"Show layer";
-    eye.addEventListener("click",ev=>{ev.stopPropagation();toggleLayerVisible(i);});
-    row.appendChild(eye);
     row.addEventListener("click",ev=>{if(ev.altKey&&ev.shiftKey){toggleLayerClip(i);return;}if(ev.altKey){toggleLayerClip(i);return;}if(activeLayerIdx!==i){activeLayerIdx=i;renderLayers();updateLayerControls();}});
     row.addEventListener("contextmenu",ev=>{ev.preventDefault();ev.stopPropagation();if(activeLayerIdx!==i){activeLayerIdx=i;renderLayers();updateLayerControls();}showLayerCtxMenu(ev.clientX,ev.clientY,i);});
     row.addEventListener("dblclick",ev=>{ev.stopPropagation();if(l.kind==="fill"){const c=$("fillColorInput");if(c){c.click();}return;}renameLayer(i);});
@@ -2869,6 +3004,10 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const bm=$("blendMode");if(bm)bm.value=L.blend||"source-over";
     const op=$("layerOpacity");if(op)op.value=Math.round(clamp(L.opacity,0,1)*100);
     const vo=$("val-layerOpacity");if(vo)vo.textContent=Math.round(clamp(L.opacity,0,1)*100)+"%";
+    const fl=$("layerFill");if(fl)fl.value=Math.round(clamp(L.fill==null?1:L.fill,0,1)*100);
+    const vfl=$("val-layerFill");if(vfl)vfl.textContent=Math.round(clamp(L.fill==null?1:L.fill,0,1)*100)+"%";
+    const lockMap={transparency:!!L.lockTransparency,pixels:!!L.lockPixels,position:!!L.lockPosition,all:!!L.locked};
+    document.querySelectorAll(".lock-chip").forEach(ch=>{const k=ch.dataset.lock;ch.classList.toggle("active",!!lockMap[k]);});
     const isBg=L.kind==="bg";
     const fcw=$("fillColorWrap");
     if(fcw){
@@ -3021,7 +3160,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const B=layers[b],T=layers[t];
     const tc=(T.canvas instanceof HTMLCanvasElement)?T.canvas:mkCanvas(T.canvas.width,T.canvas.height);
     const cctx=tc.getContext("2d");
-    cctx.save();cctx.globalAlpha=clamp(B.opacity,0,1);cctx.globalCompositeOperation=B.blend||"source-over";
+    cctx.save();cctx.globalAlpha=clamp(B.opacity,0,1)*clamp(B.fill==null?1:B.fill,0,1);cctx.globalCompositeOperation=B.blend||"source-over";
     paintMaskedLayer(cctx,B,(B.dx||0)-(T.dx||0),(B.dy||0)-(T.dy||0));cctx.restore();
     T.canvas=tc;layers.splice(b,1);activeLayerIdx=t;
     if(t===0&&T.kind!=="bg")T.kind="bg";
@@ -3179,6 +3318,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const t=getToolMode();if(!t)return false;
     const labelMap={brush:"Brush",eraser:"Eraser",pen:"Pen",clone:"Clone Stamps",heal:"Healing Brush",smudge:"Smudge",dodge:"Dodge/Burn"};
     if(!labelMap[t])return false;
+    const L=layers[activeLayerIdx];
+    if(L&&L.lockPixels){toast('Layer "'+L.name+'" pixels are locked.','warning',1400);return false;}
+    if(L&&L.lockTransparency&&t==="eraser"){toast('Layer "'+L.name+'" transparency is locked.','warning',1400);return false;}
     if(!beginLayerEdit(labelMap[t]))return false;
     paintLast=layerLocalPt(p);
     if(t==="clone")cloneOffset=cloneSource?{dx:cloneSource.x-paintLast.x,dy:cloneSource.y-paintLast.y}:null;
@@ -3315,6 +3457,21 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   }
 
   /* ===================== EVENTS ===================== */
+
+  /* Default right-panel UI state: Adjust open with the Transform section expanded */
+  function resetPanelUi(){
+    document.querySelectorAll(".panel-tab[data-panel]").forEach(t=>t.classList.toggle("active",t.dataset.panel==="adjustments"));
+    document.querySelectorAll(".panel-content[data-panel]").forEach(p=>p.classList.toggle("active",p.dataset.panel==="adjustments"));
+    const adj=document.querySelector('.panel-content[data-panel="adjustments"]');
+    if(!adj)return;
+    adj.querySelectorAll(".panel-section").forEach(s=>{
+      if(!s.querySelector(".panel-header"))return;
+      const h=s.querySelector(".panel-header h4");
+      const isTransform=h&&h.textContent.trim().toLowerCase()==="transform";
+      s.classList.toggle("collapsed",!isTransform);
+    });
+  }
+
   function initEvents(){
     /* Tabs */
     const tabBar=$("tabBar");
@@ -3587,7 +3744,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       if(state.qselMode){qselLive=true;qselSub=e.altKey||e.shiftKey;qselRegion=qselSub?null:new Uint8Array(0);qselStrokeTo(p.x,p.y,qselSub);drawCropOverlay();return;}
       if(state.eyedropperMode){eyedropperPick(e);return;}
       const t=getToolMode();
-      if(t==="move"){const L=layers[activeLayerIdx];if(!L||L.kind==="bg")return;if(L.locked){toast('Layer "'+L.name+'" is locked.','warning',1400);return;}commit("Move layer");moveDrag={sx:p.x,sy:p.y,bdx:L.dx||0,bdy:L.dy||0};return;}
+      if(t==="move"){const L=layers[activeLayerIdx];if(!L||L.kind==="bg")return;if(L.locked){toast('Layer "'+L.name+'" is locked.','warning',1400);return;}if(L.lockPosition){toast('Layer "'+L.name+'" position is locked.','warning',1400);return;}commit("Move layer");moveDrag={sx:p.x,sy:p.y,bdx:L.dx||0,bdy:L.dy||0};return;}
       if(state.gradientMode){gradientStart=p;gradPreview={x1:p.x,y1:p.y,x2:p.x,y2:p.y};drawCropOverlay();return;}
       if(state.shapeMode){shapeStart=p;shapePreview={type:state.shapeType,x:p.x,y:p.y,w:0,h:0};isDraggingShape=true;drawCropOverlay();return;}
       if(paintTools[t]){paintStart(e,p);return;}
@@ -3687,8 +3844,10 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
 
     /* Blend mode (active layer) */
     $("blendMode").addEventListener("change",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;beginLayerEdit("Blend mode");L.blend=e.target.value;renderLayers();renderImmediately();});
-    $("layerOpacity").addEventListener("input",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;L.opacity=Number(e.target.value)/100;renderImmediately();});
+    $("layerOpacity").addEventListener("input",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;L.opacity=Number(e.target.value)/100;const v=$("val-layerOpacity");if(v)v.textContent=Math.round(Number(e.target.value))+"%";scheduleRender();});
     $("layerOpacity").addEventListener("change",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;beginLayerEdit("Layer opacity");L.opacity=Number(e.target.value)/100;renderImmediately();});
+    $("layerFill")&&$("layerFill").addEventListener("input",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;L.fill=Number(e.target.value)/100;const v=$("val-layerFill");if(v)v.textContent=Math.round(Number(e.target.value))+"%";scheduleRender();});
+    $("layerFill")&&$("layerFill").addEventListener("change",e=>{if(!originalImage)return;const L=layers[activeLayerIdx];if(!L)return;beginLayerEdit("Layer fill");L.fill=Number(e.target.value)/100;renderImmediately();});
 
     /* Option selects */
     $("marqueeType")&&$("marqueeType").addEventListener("change",e=>{state.marqueeType=e.target.value;});
@@ -3713,6 +3872,22 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("maskPaintBtn").addEventListener("click",()=>{if(!originalImage)return;if(activeHasMask()&&state.maskPaint){maskPaintEnd();}else if(maskPaintStart()){selectTool("brush");}updateLayerControls();});
     $("newGroupBtn").addEventListener("click",()=>{if(!originalImage)return;newGroupWithActive();});
     $("ungroupBtn").addEventListener("click",()=>{if(!originalImage)return;ungroupActive();});
+    /* Layer lock chips (Photoshop-style lock row) */
+    document.querySelectorAll(".lock-chip").forEach(ch=>{
+      ch.addEventListener("click",()=>{
+        if(!originalImage){toast("Open an image first.","warning");return;}
+        const L=layers[activeLayerIdx];if(!L)return;
+        const k=ch.dataset.lock;if(!k)return;
+        const cur= k==="all"?!!L.locked:(k==="transparency"?!!L.lockTransparency:(k==="pixels"?!!L.lockPixels:!!L.lockPosition));
+        commit("Layer lock: "+k);
+        if(k==="all")L.locked=!cur;
+        else if(k==="transparency")L.lockTransparency=!cur;
+        else if(k==="pixels")L.lockPixels=!cur;
+        else if(k==="position")L.lockPosition=!cur;
+        if(k==="pixels"||k==="transparency"||k==="all")maskPaintEnd();
+        renderLayers();updateLayerControls();
+      });
+    });
     $("cloneSetSource").addEventListener("click",()=>{toast("Right-click the canvas to set the clone source.");});
     $("healSetSource")&&$("healSetSource").addEventListener("click",()=>{toast("Right-click the canvas to set the healing source.");});
     const fe=id=>{const el=$(id);if(!el)return;const upd=()=>{const v=el.value;const l1=$("val-featherAmt"),l2=$("val-featherAmt2");if(l1)l1.textContent=v;if(l2)l2.textContent=v;const o=$("featherAmt"),o2=$("featherAmt2");if(o&&o!==el)o.value=v;if(o2&&o2!==el)o2.value=v;};el.addEventListener("input",upd);el.addEventListener("change",()=>featherSelection(Number(el.value)));};
@@ -3751,12 +3926,14 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("ctxDownloadPng").addEventListener("click",()=>{if(originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("png"),"image/png");});
     $("ctxDownloadJpg").addEventListener("click",()=>{if(originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("jpg"),"image/jpeg",0.92);});
 
-    /* Panel Tabs */
-    document.querySelectorAll(".panel-tab").forEach(t=>{
-      t.addEventListener("click",()=>{
-        document.querySelectorAll(".panel-tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+    /* Panel Tabs (vertical icon rail) */
+    document.querySelectorAll(".panel-tab[data-panel]").forEach(t=>{
+      const activate=()=>{
+        document.querySelectorAll(".panel-tab[data-panel]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
         document.querySelectorAll(".panel-content").forEach(p=>{p.classList.toggle("active",p.dataset.panel===t.dataset.panel);});
-      });
+      };
+      t.addEventListener("click",activate);
+      t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate();}});
     });
 
     /* Panel section toggles */
@@ -3904,6 +4081,43 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("qeAddPdf").addEventListener("click",addToPdf);
     $("qeExportAll").addEventListener("click",exportCombinedPdf);
 
+    /* Save / Export dropdown menu */
+    const exportMenu=$("exportMenu");
+    const positionExportMenu=(anchor)=>{
+      if(!exportMenu||!anchor)return;
+      exportMenu.classList.add("visible");
+      const r=anchor.getBoundingClientRect(),mw=exportMenu.offsetWidth,mh=exportMenu.offsetHeight;
+      let left=r.left,top=r.bottom+6;
+      if(left+mw>window.innerWidth-8)left=window.innerWidth-mw-8;
+      if(top+mh>window.innerHeight-8)top=Math.max(8,r.top-mh-6);
+      exportMenu.style.left=Math.max(8,left)+"px";
+      exportMenu.style.top=Math.max(8,top)+"px";
+    };
+    const toggleExportMenu=(btn)=>{
+      if(!exportMenu)return;
+      if(exportMenu.classList.contains("visible")&&exportMenu._anchor===btn){exportMenu.classList.remove("visible");exportMenu._anchor=null;return;}
+      exportMenu._anchor=btn;
+      positionExportMenu(btn);
+    };
+    $("saveExportBtn")&&$("saveExportBtn").addEventListener("click",e=>{e.stopPropagation();toggleExportMenu($("saveExportBtn"));});
+    $("railSaveBtn")&&$("railSaveBtn").addEventListener("click",e=>{e.stopPropagation();toggleExportMenu($("railSaveBtn"));});
+    $("railSaveBtn")&&$("railSaveBtn").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();e.stopPropagation();toggleExportMenu($("railSaveBtn"));}});
+    document.addEventListener("click",e=>{if(exportMenu&&!exportMenu.contains(e.target)){exportMenu.classList.remove("visible");exportMenu._anchor=null;}});
+    exportMenu&&exportMenu.querySelectorAll(".export-item").forEach(item=>{
+      item.addEventListener("click",()=>{
+        exportMenu.classList.remove("visible");exportMenu._anchor=null;
+        const mode=item.dataset.export;
+        if(!originalImage){toast("Open an image first.","warning");return;}
+        if(mode==="png")downloadCanvas(composeOutputCanvas(),exportFileName("png"),"image/png");
+        else if(mode==="jpg")downloadCanvas(composeOutputCanvas(),exportFileName("jpg"),"image/jpeg",0.92);
+        else if(mode==="webp")downloadCanvas(composeOutputCanvas(),exportFileName("webp"),"image/webp",0.9);
+        else if(mode==="pdf")exportPdfCurrent();
+        else if(mode==="copy"){(async()=>{const ok=await copyImage();toast(ok?"Image copied to clipboard.":"Copy failed — clipboard unavailable.",ok?"success":"error");})();}
+        else if(mode==="pfx")saveProjectFile();
+        else if(mode==="saveas"){const fn=prompt("Save As (PNG) — enter file name:",exportFileName("png"));if(fn)downloadCanvas(composeOutputCanvas(),fn.replace(/\.[^.]*$/,"")+".png","image/png");}
+      });
+    });
+
     /* Resize */
     window.addEventListener("resize",()=>{if(originalImage){fitCanvasDisplaySize();drawRulers();}});
   }
@@ -3913,6 +4127,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   RANGES.forEach(bindRangeSlider);updateValueLabels();initEvents();updateToggleButtons();zoomLevelEl.textContent="100%";
   overlayCanvas.style.pointerEvents="none";drawCanvas.style.pointerEvents="none";
   renderTabBar();
+  resetPanelUi();
   restoreProject();
 })();
 </script>
