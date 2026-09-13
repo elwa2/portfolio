@@ -3005,6 +3005,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   const TOOL_LABELS={move:"Move",marquee:"Marquee",lasso:"Lasso",wand:"Magic Wand",qsel:"Quick Select",crop:"Crop",eyedropper:"Eyedropper",brush:"Brush",eraser:"Eraser",clone:"Clone",heal:"Healing",gradient:"Gradient",smudge:"Smudge",dodge:"Dodge/Burn",pen:"Pen",fill:"Fill",text:"Type",shape:"Shape",hand:"Hand",zoom:"Zoom"};
   const OPTION_GROUPS=["moveOptions","textOptions","shapeOptions","brushOptions","penOptions","cloneOptions","healOptions","gradientOptions","smudgeOptions","dodgeOptions","marqueeOptions","lassoOptions","samplerOptions","rulerOptions","wandOptions","quickSelOptions"];
   let activeToolKey="move";
+  let altPickActive=false,altPickPrevKey=null;
   const lastUsedByGroup={};
   try{Object.assign(lastUsedByGroup,JSON.parse(localStorage.getItem("pfLastTool")||"{}"));}catch(e){}
 
@@ -3168,6 +3169,41 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     updateToggleButtons();
     syncVariantControls();
     applyToolUi(m);
+  }
+
+  /* Temp-eyedropper: hold Alt to pick a color, release to return to the previous tool */
+  function startAltPick(){
+    if(altPickActive||!originalImage)return;
+    if(document.body.classList.contains("dragging"))return;
+    altPickActive=true;
+    altPickPrevKey=activeToolKey;
+    selectTool("eyedropper");
+  }
+  function endAltPick(){
+    if(!altPickActive||!originalImage)return;
+    altPickActive=false;
+    if(altPickPrevKey){const k=altPickPrevKey;altPickPrevKey=null;selectTool(k);}
+    else altPickPrevKey=null;
+  }
+
+  /* [ / ] — quick brush size down / up (adapts step by size like Photoshop) */
+  function changeBrushSize(delta){
+    if(!originalImage)return;
+    const t=getToolMode();
+    const fieldMap={brush:"drawSize",eraser:"drawSize",pen:"penSize",clone:"cloneSize",heal:"healSize",smudge:"smudgeSize",dodge:"dodgeSize",qsel:"qselSize"};
+    const f=fieldMap[t];if(!f)return;
+    const input=$(f);if(!input)return;
+    const mn=Number(input.min)||1,mx=Number(input.max)||100;
+    const cur=Number(state[f]!==undefined?state[f]:input.value)||mn;
+    let step=1;
+    if(cur>=100)step=10;else if(cur>=40)step=5;else if(cur>=15)step=2;
+    const next=clamp(cur+delta*step,mn,mx);
+    state[f]=next;
+    input.value=next;
+    const wrap=$("wrap-"+f),bubble=wrap?wrap.querySelector(".range-bubble"):null;
+    if(bubble){bubble.textContent=next;bubble.style.left=((next-mn)/(mx-mn)*100)+"%";}
+    const val=$("val-"+f);if(val)val.textContent=next;
+    if(cursorPt&&t!=="move")drawCropOverlay();
   }
 
   /* ===================== NEW: AUTO TRANSFORM FOR MOVE TOOL ===================== */
@@ -5525,6 +5561,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       if(c&&e.key.toLowerCase()==="g"&&!editable){e.preventDefault();state.gridOverlay=!state.gridOverlay;drawCropOverlay();return;}
       if(c&&e.key.toLowerCase()==="d"&&!editable){e.preventDefault();clearSelection();return;}
       if(c&&e.key.toLowerCase()==="i"&&!editable){e.preventDefault();if(state.maskPaint&&activeHasMask())invertMask();else invertSelection();return;}
+      if(!c&&e.key==="Alt"&&!editable){e.preventDefault();startAltPick();return;}
       if((e.key==="Delete"||e.key==="Backspace")&&!editable&&originalImage){
         if(selectionData){if(!(state.drawMode||state.textMode)){e.preventDefault();deleteSelectionContent();}}
         else if(!state.textMode){e.preventDefault();deleteLayer();}
@@ -5562,12 +5599,15 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       }
       if(e.key.toLowerCase()==="x"&&!editable&&!c){const tmp=state.fgColor;state.fgColor=state.bgColor;state.bgColor=tmp;updateColorSwatches();return;}
       if(e.key.toLowerCase()==="d"&&!editable&&!c){state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");return;}
+      if(!editable&&!c&&(e.key==="["||e.key==="]")){e.preventDefault();changeBrushSize(e.key==="["?-1:1);return;}
       if(!editable&&!c){
         const tm={v:"move",m:"marquee",l:"lasso",w:"wand",q:"qsel",c:"crop",i:"eyedropper",j:"heal",b:"brush",s:"clone",e:"eraser",g:"gradient",r:"blur",o:"dodge",p:"pen",t:"text",u:"shape",h:"hand",z:"zoom"};
         const tool=tm[e.key.toLowerCase()];
         if(tool){if(TOOL_GROUPS[tool])selectGroupTool(tool);else selectTool(tool);}
       }
     });
+    window.addEventListener("keyup",e=>{if(e.key==="Alt")endAltPick();});
+    window.addEventListener("blur",endAltPick);
 
     /* Zoom */
     $("zoomInBtn").addEventListener("click",()=>setZoom(state.zoom+0.25));
