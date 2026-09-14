@@ -407,6 +407,16 @@
     .preset-btn svg{width:20px;height:20px;stroke:var(--pf-accent);fill:none;stroke-width:1.8;}
     .preset-btn:hover{border-color:var(--pf-accent);background:var(--pf-surface-hover);}
     .preset-btn.active{border-color:var(--pf-accent);background:rgba(79,172,254,0.12);color:var(--pf-accent);box-shadow:0 0 0 1px var(--pf-accent-glow);}
+    .preset-adjust{margin-top:10px;border-top:1px solid var(--pf-border);padding-top:10px;}
+    .preset-adjust .pa-title{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--pf-accent);font-weight:600;margin-bottom:8px;}
+    .preset-adjust .pa-title svg{width:13px;height:13px;stroke:var(--pf-accent);fill:none;stroke-width:2;flex-shrink:0;}
+    .pa-toggle-row{display:flex;gap:6px;flex-wrap:wrap;}
+    .pa-toggle{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:5px 10px;border:1px solid var(--pf-border);
+      border-radius:var(--pf-radius-sm);background:var(--pf-bg-3);color:var(--pf-text-dim);font-size:10px;cursor:pointer;
+      transition:all var(--pf-transition);}
+    .pa-toggle:hover{border-color:var(--pf-accent);background:var(--pf-surface-hover);color:var(--pf-text);}
+    .pa-toggle.active{background:var(--pf-accent);border-color:var(--pf-accent);color:#fff;box-shadow:0 0 8px var(--pf-accent-glow);}
+    .pa-empty{padding:10px;font-size:10px;color:var(--pf-text-muted);text-align:center;}
 
     /* History */
     .history-list{display:flex;flex-direction:column;gap:1px;}
@@ -1407,6 +1417,7 @@
               <button class="preset-btn" data-preset="soft"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Soft</button>
               <button class="preset-btn" data-preset="vivid"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Vivid</button>
             </div>
+            <div class="preset-adjust" id="presetAdjust"></div>
           </div>
         </div>
       </div>
@@ -1692,6 +1703,25 @@
     soft:{contrast:85,saturation:90,blur:0.5},vivid:{saturation:150,contrast:120,brightness:105,sharpen:15}
   };
   const PRESET_LABELS = { original:"Original",vintage:"Vintage",noir:"Noir",warm:"Warm",cool:"Cool",cinematic:"Cinema",soft:"Soft",vivid:"Vivid" };
+
+  const PA_SPEC={
+    red:{label:"Red",min:0,max:200,step:1,suffix:"%"},
+    green:{label:"Green",min:0,max:200,step:1,suffix:"%"},
+    blue:{label:"Blue",min:0,max:200,step:1,suffix:"%"},
+    hue:{label:"Hue",min:-180,max:180,step:1,suffix:"°"},
+    brightness:{label:"Brightness",min:0,max:200,step:1,suffix:"%"},
+    contrast:{label:"Contrast",min:0,max:200,step:1,suffix:"%"},
+    saturation:{label:"Saturation",min:0,max:200,step:1,suffix:"%"},
+    exposure:{label:"Exposure",min:-2,max:2,step:0.01,suffix:"",fmt:2},
+    blur:{label:"Blur",min:0,max:12,step:0.1,suffix:"px"},
+    sharpen:{label:"Sharpen",min:0,max:100,step:1,suffix:"%"},
+    noise:{label:"Noise",min:0,max:100,step:1,suffix:"%"},
+    vigIntensity:{label:"Vignette",min:0,max:100,step:1,suffix:"%"},
+    vigSpread:{label:"Vignette Spread",min:10,max:100,step:1,suffix:"%"},
+    sepia:{label:"Sepia",toggle:true},
+    gray:{label:"B&W",toggle:true}
+  };
+  const PA_ORDER=["red","green","blue","hue","brightness","contrast","saturation","exposure","blur","sharpen","noise","vigIntensity","vigSpread","sepia","gray"];
 
   const RANGES = [
     {id:"rotate",val:"val-rotate",min:0,max:360,step:1,suffix:"°"},
@@ -2003,6 +2033,7 @@
     const dm=$("dodgeMode");if(dm)dm.value=state.dodgeType;
     const pc=$("penColor");if(pc)pc.value=state.penColor;
     setBackdropUi();
+    syncPresetAdjust();
   }
 
   /* ===================== SLIDER BINDING ===================== */
@@ -2010,7 +2041,7 @@
     const input=$(r.id);if(!input)return;
     const wrap=$("wrap-"+r.id),bubble=wrap?wrap.querySelector(".range-bubble"):null;
     const upd=()=>{if(!wrap||!bubble)return;bubble.textContent=formatRangeValue(r.id,input.value);bubble.style.left=((input.value-r.min)/(r.max-r.min)*100)+"%";};
-    input.addEventListener("input",()=>{state[r.id]=Number(input.value);const el=$(r.val);if(el){el.textContent=formatRangeValue(r.id,input.value);el.classList.add("live");}upd();scheduleRender();});
+    input.addEventListener("input",()=>{state[r.id]=Number(input.value);const el=$(r.val);if(el){el.textContent=formatRangeValue(r.id,input.value);el.classList.add("live");}upd();syncPresetAdjust();scheduleRender();});
     input.addEventListener("pointerdown",()=>{if(wrap)wrap.classList.add("dragging");});
     const hide=()=>{if(wrap)wrap.classList.remove("dragging");const el=$(r.val);if(el)el.classList.remove("live");};
     input.addEventListener("pointerup",hide);input.addEventListener("pointercancel",hide);
@@ -2980,15 +3011,82 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   function toggleCropUi(on){overlayCanvas.style.pointerEvents=on&&originalImage?"auto":"none";}
 
   /* ===================== PRESETS ===================== */
-  function applyPreset(name){if(!originalImage)return;commit("Filter: "+(PRESET_LABELS[name]||name));for(const k of ADJUST_KEYS)state[k]=DEFAULTS[k];const p=PRESETS[name];if(p)for(const[k,v]of Object.entries(p))state[k]=v;syncControlsFromState();updateValueLabels();updateToggleButtons();renderImmediately();document.querySelectorAll(".preset-btn").forEach(b=>b.classList.toggle("active",b.dataset.preset===name));}
-  function resetAdjustments(){if(!originalImage)return;commit("Reset All");for(const k of ADJUST_KEYS)state[k]=DEFAULTS[k];state.textOverlay=null;strokes=[];cropSelection=null;marqueeSelection=null;state.cropMode=false;state.marqueeMode=false;toggleCropUi(false);syncControlsFromState();updateValueLabels();updateToggleButtons();document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));renderImmediately();toast("All reset.","success");}
+  function applyPreset(name){if(!originalImage)return;commit("Filter: "+(PRESET_LABELS[name]||name));for(const k of ADJUST_KEYS)state[k]=DEFAULTS[k];const p=PRESETS[name];if(p)for(const[k,v]of Object.entries(p))state[k]=v;syncControlsFromState();updateValueLabels();updateToggleButtons();renderImmediately();document.querySelectorAll(".preset-btn").forEach(b=>b.classList.toggle("active",b.dataset.preset===name));renderPresetAdjust(name);syncPresetAdjust();}
+  function resetAdjustments(){if(!originalImage)return;commit("Reset All");for(const k of ADJUST_KEYS)state[k]=DEFAULTS[k];state.textOverlay=null;strokes=[];cropSelection=null;marqueeSelection=null;state.cropMode=false;state.marqueeMode=false;toggleCropUi(false);syncControlsFromState();updateValueLabels();updateToggleButtons();document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));renderImmediately();toast("All reset.","success");renderPresetAdjust("original");syncPresetAdjust();}
   function hasAnyEdits(){return ADJUST_KEYS.some(k=>state[k]!==DEFAULTS[k])||!!state.textOverlay||strokes.length>0;}
+
+  /* Filter presets → inline fine-tuning controls in the FILTERS panel */
+  function paVal(k,v){const s=PA_SPEC[k];if(!s)return String(v);return(typeof s.fmt==="number"?Number(v).toFixed(s.fmt):v)+(s.suffix||"");}
+  function presetAdjustKeys(name){
+    if(name==="original"||!name)return["brightness","contrast","saturation","exposure"];
+    const p=PRESETS[name]||{};
+    return PA_ORDER.filter(k=>k in p);
+  }
+  function makePaSlider(k){
+    const sp=PA_SPEC[k];
+    const row=document.createElement("div");row.className="ctrl-row";
+    const lbl=document.createElement("div");lbl.className="ctrl-label";
+    lbl.innerHTML='<span>'+sp.label+'</span><span class="val" id="pa-val-'+k+'"></span>';
+    const wrap=document.createElement("div");wrap.className="range-wrap";wrap.id="pa-wrap-"+k;
+    const input=document.createElement("input");input.type="range";input.id="pa-"+k;
+    input.min=sp.min;input.max=sp.max;input.step=sp.step;input.value=state[k];
+    const bubble=document.createElement("span");bubble.className="range-bubble";
+    wrap.appendChild(input);wrap.appendChild(bubble);
+    row.appendChild(lbl);row.appendChild(wrap);
+    const upd=()=>{bubble.textContent=paVal(k,input.value);bubble.style.left=((input.value-sp.min)/(sp.max-sp.min)*100)+"%";};
+    input.addEventListener("input",()=>{
+      state[k]=Number(input.value);
+      const v=$("pa-val-"+k);if(v){v.textContent=paVal(k,input.value);v.classList.add("live");}
+      upd();syncControlsFromState();updateValueLabels();updateToggleButtons();scheduleRender();
+    });
+    input.addEventListener("pointerdown",()=>wrap.classList.add("dragging"));
+    const hide=()=>{wrap.classList.remove("dragging");const v=$("pa-val-"+k);if(v)v.classList.remove("live");};
+    input.addEventListener("pointerup",hide);input.addEventListener("pointercancel",hide);
+    input.addEventListener("change",()=>{hide();if(originalImage)commit("Adjust "+(sp.label));});
+    upd();
+    return row;
+  }
+  function makePaToggle(k){
+    const sp=PA_SPEC[k];
+    const b=document.createElement("button");b.type="button";b.className="pa-toggle";b.id="pa-toggle-"+k;
+    b.textContent=(state[k]?"✓ ":"")+sp.label;
+    b.addEventListener("click",()=>{
+      if(!originalImage)return;
+      commit("Filter: "+(sp.label));
+      state[k]=!state[k];
+      updateToggleButtons();syncPresetAdjust();renderImmediately();
+    });
+    return b;
+  }
+  function renderPresetAdjust(name){
+    const box=$("presetAdjust");if(!box)return;
+    const keys=presetAdjustKeys(name);
+    box.innerHTML="";
+    const title=document.createElement("div");title.className="pa-title";
+    title.innerHTML='<svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>Adjust · '+(PRESET_LABELS[name]||name);
+    box.appendChild(title);
+    if(!keys.length){const e=document.createElement("div");e.className="pa-empty";e.textContent="No extra adjustments for this filter.";box.appendChild(e);}
+    for(const k of keys)box.appendChild(PA_SPEC[k].toggle?makePaToggle(k):makePaSlider(k));
+  }
+  function syncPresetAdjust(){
+    const box=$("presetAdjust");if(!box)return;
+    for(const k in PA_SPEC){
+      const s=PA_SPEC[k];
+      if(s.toggle){
+        const b=$("pa-toggle-"+k);if(b){b.classList.toggle("active",!!state[k]);b.textContent=(state[k]?"✓ ":"")+s.label;}
+      }else{
+        const inp=$("pa-"+k);if(inp)inp.value=state[k];
+        const v=$("pa-val-"+k);if(v)v.textContent=paVal(k,state[k]);
+      }
+    }
+  }
   function updateToggleButtons(){
     $("toggleSepia").classList.toggle("active",state.sepia);$("toggleGray").classList.toggle("active",state.gray);
     $("flipH").classList.toggle("active",state.flipH);$("flipV").classList.toggle("active",state.flipV);
     $("drawPen")&&$("drawPen").classList.toggle("active",state.drawMode&&state.drawTool==="pen");
     $("drawEraser")&&$("drawEraser").classList.toggle("active",state.drawMode&&state.drawTool==="eraser");
     updateQe();
+    syncPresetAdjust();
   }
 
   /* ===================== TOOL SELECTION ===================== */
