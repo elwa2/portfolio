@@ -1092,6 +1092,15 @@
   .dt-quotes { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-2); margin-bottom: 12px; flex-wrap: wrap; }
   .dt-quotes label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
   .dt-quotes input { accent-color: #8b5cf6; }
+  .dt-svg-ctrls { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-2); margin-bottom: 14px; flex-wrap: wrap; }
+  .dt-svg-ctrls label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .dt-svg-ctrls input[type="color"] { -webkit-appearance: none; border: 2px solid var(--border-str); border-radius: 6px; width: 32px; height: 28px; padding: 0; cursor: pointer; background: none; }
+  .dt-svg-ctrls input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+  .dt-svg-ctrls input[type="color"]::-webkit-color-swatch { border: none; border-radius: 3px; }
+  .dt-svg-ctrls input[type="range"] { width: 100px; accent-color: #8b5cf6; cursor: pointer; }
+  .dt-svg-ctrls input[type="checkbox"] { accent-color: #8b5cf6; cursor: pointer; width: 15px; height: 15px; }
+  .dt-svg-ctrls .dt-svg-opacity-val { min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; color: var(--text-3); }
+  .dt-svg-ctrl-sep { width: 1px; height: 20px; background: var(--border-def); flex-shrink: 0; }
 
   @media (max-width: 820px) { .dt-grid2 { grid-template-columns: 1fr; } }
 
@@ -4068,6 +4077,10 @@
   let showDevDash = false;
   let dtActiveTool = 'css';
   let dtSvgQuotes = 'double';
+  let dtSvgColor = '#062458';
+  let dtSvgColor2 = '#38bdf8';
+  let dtSvgGradient = false;
+  let dtSvgOpacity = 1;
 
   function toggleDevDash(){
     showDevDash = !showDevDash;
@@ -4224,6 +4237,22 @@ function hello() {
             <label><input type="radio" name="dtSvgQuotes" value="double" checked> "Double"</label>
           </div>
 
+          <div class="dt-svg-ctrls">
+            <label><i class="ti ti-palette" style="color:#38bdf8"></i> اللون:
+              <input type="color" id="dtSvgColorPick" value="#062458">
+            </label>
+            <div class="dt-svg-ctrl-sep"></div>
+            <label><input type="checkbox" id="dtSvgGradToggle"> تدرج لونى</label>
+            <label id="dtSvgColor2Wrap" style="display:none">→
+              <input type="color" id="dtSvgColor2Pick" value="#38bdf8">
+            </label>
+            <div class="dt-svg-ctrl-sep"></div>
+            <label><i class="ti ti-eye" style="color:#38bdf8"></i> الشفافية:
+              <input type="range" id="dtSvgOpacity" min="0" max="1" step="0.05" value="1">
+              <span class="dt-svg-opacity-val" id="dtSvgOpacityVal">1</span>
+            </label>
+          </div>
+
           <div class="dt-grid2">
             <div>
               <div class="dt-head"><i class="ti ti-paste" style="color:#38bdf8"></i> أدخل كود SVG
@@ -4244,7 +4273,9 @@ function hello() {
 
           <div class="dt-grid2" style="margin-top:14px">
             <div>
-              <div class="dt-head"><i class="ti ti-link" style="color:#38bdf8"></i> النتيجة (Encoded URL)</div>
+              <div class="dt-head"><i class="ti ti-link" style="color:#38bdf8"></i> النتيجة (Encoded URL)
+                <a id="dtSvgOpenTab" href="#" target="_blank" style="margin-inline-start:auto;font-size:11px;color:#38bdf8;text-decoration:none;display:none" onclick="return dtSvgOpenLink(event)"><i class="ti ti-external-link"></i> فتح فى تبويب</a>
+              </div>
               <textarea class="dt-textarea" id="dtSvgResult" spellcheck="false" readonly onclick="dtCopy('dtSvgResult')"></textarea>
             </div>
             <div>
@@ -4279,6 +4310,17 @@ function hello() {
           if (demo) demo.style.background = b.dataset.color;
         });
       });
+      const svgColorPick = document.getElementById('dtSvgColorPick');
+      const svgColor2Pick = document.getElementById('dtSvgColor2Pick');
+      const svgGradToggle = document.getElementById('dtSvgGradToggle');
+      const svgColor2Wrap = document.getElementById('dtSvgColor2Wrap');
+      const svgOpacity = document.getElementById('dtSvgOpacity');
+      const svgOpacityVal = document.getElementById('dtSvgOpacityVal');
+      if (svgColorPick) svgColorPick.addEventListener('input', () => { dtSvgColor = svgColorPick.value; dtSvgUpdate(); });
+      if (svgColor2Pick) svgColor2Pick.addEventListener('input', () => { dtSvgColor2 = svgColor2Pick.value; dtSvgUpdate(); });
+      if (svgGradToggle) svgGradToggle.addEventListener('change', () => { dtSvgGradient = svgGradToggle.checked; if (svgColor2Wrap) svgColor2Wrap.style.display = svgGradToggle.checked ? '' : 'none'; dtSvgUpdate(); });
+      if (svgOpacity) svgOpacity.addEventListener('input', () => { dtSvgOpacity = parseFloat(svgOpacity.value); if (svgOpacityVal) svgOpacityVal.textContent = dtSvgOpacity; dtSvgUpdate(); });
+      dtSvgRestore();
     }
   }
 
@@ -4428,6 +4470,57 @@ function hello() {
   }
 
   // ── SVG Encoder ──
+  const DT_SVG_KEY = 'csm_svg_state';
+  const DT_SVG_TTL = 24 * 60 * 60 * 1000;
+
+  function dtSvgSave(){
+    const input = document.getElementById('dtSvgInput');
+    if (!input || !input.value.trim()) return;
+    try {
+      localStorage.setItem(DT_SVG_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        input: input.value,
+        color: dtSvgColor,
+        color2: dtSvgColor2,
+        gradient: dtSvgGradient,
+        opacity: dtSvgOpacity,
+        quotes: dtSvgQuotes
+      }));
+    } catch (e) {}
+  }
+
+  function dtSvgRestore(){
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem(DT_SVG_KEY) || 'null'); } catch (e) {}
+    if (!state || !state.input) return;
+    if ((Date.now() - (state.savedAt || 0)) > DT_SVG_TTL) {
+      try { localStorage.removeItem(DT_SVG_KEY); } catch (e) {}
+      return;
+    }
+    const input = document.getElementById('dtSvgInput');
+    if (!input) return;
+    if (typeof state.color === 'string') dtSvgColor = state.color;
+    if (typeof state.color2 === 'string') dtSvgColor2 = state.color2;
+    if (typeof state.gradient === 'boolean') dtSvgGradient = state.gradient;
+    if (typeof state.opacity === 'number') dtSvgOpacity = state.opacity;
+    if (state.quotes === 'single' || state.quotes === 'double') dtSvgQuotes = state.quotes;
+    input.value = state.input;
+    const colorPick = document.getElementById('dtSvgColorPick');
+    if (colorPick) colorPick.value = dtSvgColor;
+    const color2Pick = document.getElementById('dtSvgColor2Pick');
+    if (color2Pick) color2Pick.value = dtSvgColor2;
+    const grad = document.getElementById('dtSvgGradToggle');
+    if (grad) grad.checked = dtSvgGradient;
+    const gradWrap = document.getElementById('dtSvgColor2Wrap');
+    if (gradWrap) gradWrap.style.display = dtSvgGradient ? '' : 'none';
+    const op = document.getElementById('dtSvgOpacity');
+    if (op) op.value = dtSvgOpacity;
+    const opVal = document.getElementById('dtSvgOpacityVal');
+    if (opVal) opVal.textContent = dtSvgOpacity;
+    document.querySelectorAll('input[name="dtSvgQuotes"]').forEach(r => { r.checked = r.value === dtSvgQuotes; });
+    dtSvgUpdate();
+  }
+
   function dtSvgExample(){
     const input = document.getElementById('dtSvgInput');
     if (!input) return;
@@ -4442,6 +4535,49 @@ function hello() {
     };
   }
 
+  function dtSvgOpenLink(e){
+    e.preventDefault();
+    const val = document.getElementById('dtSvgResult');
+    if (!val || !val.value.trim()) { showToast('لا يوجد رابط لفتحه'); return false; }
+    try {
+      const svg = decodeURIComponent(val.value.replace(/^data:image\/svg\+xml,/, ''));
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+    } catch (err) {
+      showToast('تعذّر فتح الصورة');
+    }
+    return false;
+  }
+
+  function dtSvgModifySvg(svg, color, color2, gradient, opacity){
+    let s = svg;
+    if (opacity < 1) {
+      if (/\bopacity\s*=/.test(s)) {
+        s = s.replace(/\bopacity\s*=\s*["'][^"']*["']/, 'opacity="' + opacity + '"');
+      } else {
+        s = s.replace(/<svg\b/, '<svg opacity="' + opacity + '"');
+      }
+    }
+    if (gradient) {
+      const gradId = 'svgGrad';
+      if (s.indexOf(gradId) < 0) {
+        const defsBlock = '<defs><linearGradient id="' + gradId + '" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="' + color + '"/><stop offset="100%" stop-color="' + color2 + '"/></linearGradient></defs>';
+        s = s.replace(/<svg\b[^>]*>/, function(m){ return m + defsBlock; });
+      } else {
+        s = s.replace(/<stop\s+offset="0%"\s+stop-color="[^"]*"/, '<stop offset="0%" stop-color="' + color + '"');
+        s = s.replace(/<stop\s+offset="100%"\s+stop-color="[^"]*"/, '<stop offset="100%" stop-color="' + color2 + '"');
+      }
+      s = s.replace(/\bfill\s*=\s*["']#[0-9a-fA-F]+["']/g, 'fill="url(#' + gradId + ')"');
+      s = s.replace(/\bfill\s*:\s*#[0-9a-fA-F]+/g, 'fill:url(#' + gradId + ')');
+    } else {
+      s = s.replace(/\bfill\s*=\s*["']#[0-9a-fA-F]+["']/g, 'fill="' + color + '"');
+      s = s.replace(/\bfill\s*:\s*#[0-9a-fA-F]+/g, 'fill:' + color);
+    }
+    return s;
+  }
+
   function dtSvgUpdate(){
     const input = document.getElementById('dtSvgInput');
     const result = document.getElementById('dtSvgResult');
@@ -4452,10 +4588,13 @@ function hello() {
     if (!input.value.trim()) {
       result.value = cssOut.value = '';
       if (varOut) varOut.value = '';
+      const openTab = document.getElementById('dtSvgOpenTab');
+      if (openTab) openTab.style.display = 'none';
       demo.style.backgroundImage = '';
       return;
     }
     let data = input.value;
+    data = dtSvgModifySvg(data, dtSvgColor, dtSvgColor2, dtSvgGradient, dtSvgOpacity);
     const q = dtSvgQuotesObj();
     if (data.indexOf('http://www.w3.org/2000/svg') < 0) {
       data = data.replace(/<svg/g, '<svg xmlns=' + q.level2 + 'http://www.w3.org/2000/svg' + q.level2);
@@ -4465,13 +4604,17 @@ function hello() {
     else data = data.replace(/'/g, '"');
     data = data.replace(/>\s{1,}</g, '><').replace(/\s{2,}/g, ' ');
     const escaped = data.replace(symbols, encodeURIComponent);
-    result.value = escaped;
-    cssOut.value = 'background-image: url(' + q.level1 + 'data:image/svg+xml,' + escaped + q.level1 + ');';
+    const dataUri = 'data:image/svg+xml,' + escaped;
+    result.value = dataUri;
+    const openTab = document.getElementById('dtSvgOpenTab');
+    if (openTab) openTab.style.display = '';
+    cssOut.value = 'background-image: url(' + q.level1 + dataUri + q.level1 + ');';
     if (varOut) {
       const varName = (document.getElementById('dtSvgVarName').value || 'logo').trim();
-      varOut.value = ':root {\n  --' + varName + ': url(' + q.level1 + 'data:image/svg+xml,' + escaped + q.level1 + ');\n}';
+      varOut.value = ':root {\n  --' + varName + ': url(' + q.level1 + dataUri + q.level1 + ');\n}';
     }
-    demo.style.backgroundImage = 'url("data:image/svg+xml,' + escaped + '")';
+    demo.style.backgroundImage = 'url("' + dataUri + '")';
+    dtSvgSave();
   }
 
   // ── BASE64 DASHBOARD ──
@@ -7375,6 +7518,11 @@ function hello() {
   function hashGo(){
     const h = currentHash();
     const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
+    try {
+      const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
+      if (sub && sub.tool) dtActiveTool = sub.tool;
+      if (sub && sub.b64) b64ActiveTab = sub.b64;
+    } catch (e) {}
     clearDashFlags();
     if (h && ids.includes(h)) {
       const map = { has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
