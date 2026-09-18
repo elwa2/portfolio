@@ -803,8 +803,11 @@
       <div class="menu-dd-sep"></div>
       <div class="menu-dd-item" data-action="toggleGrid">Toggle Grid<span class="kbd">Ctrl+G</span></div>
       <div class="menu-dd-item" data-action="toggleRulers">Toggle Rulers</div>
-      <div class="menu-dd-sep"></div>
+    </div></div>
+    <div class="mb-item" data-menu="help">Help<div class="menu-dropdown" id="menuHelp">
       <div class="menu-dd-item" data-action="showShortcuts">Keyboard Shortcuts<span class="kbd">?</span></div>
+      <div class="menu-dd-sep"></div>
+      <div class="menu-dd-item" data-action="showAbout">About PhotoForge</div>
     </div></div>
     <div class="spacer"></div>
     <div class="qe-cluster">
@@ -1727,6 +1730,36 @@
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-primary" id="closeShortcutsBtn">OK</button></div>
+  </div>
+</div>
+
+<!-- About PhotoForge -->
+<div class="modal-overlay" id="aboutModal">
+  <div class="modal" style="width:520px;max-width:92vw;">
+    <div class="modal-header"><h3>About PhotoForge</h3><button class="modal-close" id="closeAbout">&times;</button></div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--pf-border);padding-bottom:12px;">
+        <div class="mb-logo" style="width:42px;height:42px;border-radius:10px;font-size:16px;">PF</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--pf-text);">PhotoForge — Pro Image Editor</div>
+          <div style="font-size:11px;color:var(--pf-text-dim);">Version <b>2.0</b> &bull; September 2026</div>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:var(--pf-text-dim);line-height:1.7;margin-top:10px;">Fully in-browser editor — everything runs on your device, images are never uploaded. Open directly from the file or host on GitHub Pages.</div>
+      <div style="font-size:11px;color:var(--pf-text-dim);margin-top:12px;">
+        <div style="font-weight:700;color:var(--pf-text);margin-bottom:4px;">What's new in 2.0</div>
+        <ul style="margin:0;padding-left:18px;line-height:1.8;">
+          <li>Drop a whole folder &rarr; every image opens in its own tab</li>
+          <li>Save All as JPG (chosen quality) or PNG straight into a folder</li>
+          <li>Close All + quick shortcuts &mdash; Alt+J / Alt+P / Alt+W</li>
+          <li>One JPG quality picker for the current image or all open</li>
+          <li>Stability: serialized loading, tab-aware rendering, save progress</li>
+          <li>JPG transparency notice before export</li>
+          <li>Faster first paint &mdash; PDF &amp; export libraries load only on first use</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" id="closeAboutBtn">OK</button></div>
   </div>
 </div>
 
@@ -4234,6 +4267,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
 
   /* ===================== NEW: SHORTCUTS MODAL ===================== */
   function showShortcutsModal(){$("shortcutsModal").classList.add("open");}
+  function showAboutModal(){$("aboutModal").classList.add("open");}
 
   /* ===================== NEW: LAYER CONTEXT MENU ===================== */
   let layerCtxIdx=-1;
@@ -7111,6 +7145,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
         else if(a==="layerViaCopy")layerViaCopy();
         else if(a==="layerViaCut")layerViaCut();
         else if(a==="showShortcuts")showShortcutsModal();
+        else if(a==="showAbout")showAboutModal();
         else if(a==="canvasSize")openCanvasSizeModal();
         else if(a==="imageSize"&&originalImage){$("imgSizeW").value=originalImage.width;$("imgSizeH").value=originalImage.height;$("imageSizeModal").classList.add("open");}
         else if(a.startsWith("preset_"))applyPreset(a.replace("preset_",""));
@@ -7205,11 +7240,13 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("cancelAdjModal")&&$("cancelAdjModal").addEventListener("click",cancelAdjModal);
     $("applyAdjModal")&&$("applyAdjModal").addEventListener("click",saveAdjModal);
     $("adjResetBtn")&&$("adjResetBtn").addEventListener("click",resetAdjModal);
-    document.addEventListener("keydown",(e)=>{if(e.key==="Escape"&&$("adjModal")&&$("adjModal").classList.contains("open")){e.stopPropagation();cancelAdjModal();}});
+    document.addEventListener("keydown",(e)=>{if(e.key==="Escape"){if($("adjModal")&&$("adjModal").classList.contains("open")){e.stopPropagation();cancelAdjModal();return;}document.querySelectorAll(".modal-overlay.open").forEach(o=>o.classList.remove("open"));}});
 
     /* NEW: Shortcuts modal */
     $("closeShortcuts")&&$("closeShortcuts").addEventListener("click",()=>$("shortcutsModal").classList.remove("open"));
     $("closeShortcutsBtn")&&$("closeShortcutsBtn").addEventListener("click",()=>$("shortcutsModal").classList.remove("open"));
+    $("closeAbout")&&$("closeAbout").addEventListener("click",()=>$("aboutModal").classList.remove("open"));
+    $("closeAboutBtn")&&$("closeAboutBtn").addEventListener("click",()=>$("aboutModal").classList.remove("open"));
 
     /* NEW: Quick Selection options */
     const bindQselSlider=(id,key)=>{
