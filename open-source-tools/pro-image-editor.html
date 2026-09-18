@@ -601,6 +601,16 @@
     .mb-paste-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
     .mb-paste-btn:hover{background:var(--pf-grad-trans);color:#fff;border-color:transparent;box-shadow:0 0 12px rgba(79,172,254,0.45);}
     .mb-paste-btn:active{transform:translateY(0.5px);}
+    .mb-batch{display:inline-flex;align-items:center;gap:5px;height:20px;margin-left:8px;padding:0 10px;
+      border:1px solid rgba(72,187,120,0.45);background:rgba(72,187,120,0.10);color:var(--pf-success);
+      border-radius:var(--pf-radius-sm);font-weight:600;font-size:11px;font-family:var(--pf-font);cursor:pointer;
+      transition:all var(--pf-transition);white-space:nowrap;}
+    .mb-batch svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .mb-batch:hover{background:var(--pf-success);color:#fff;border-color:transparent;box-shadow:0 0 12px rgba(72,187,120,0.45);}
+    .mb-batch:active{transform:translateY(0.5px);}
+    .mb-batch[disabled]{opacity:0.35;pointer-events:none;cursor:default;}
+    .mb-batch-warn{border-color:rgba(252,92,125,0.45);background:rgba(252,92,125,0.10);color:var(--pf-danger);}
+    .mb-batch-warn:hover{background:var(--pf-danger);border-color:transparent;color:#fff;box-shadow:0 0 12px rgba(252,92,125,0.45);}
     .mb-logo{background:var(--pf-grad-violet);box-shadow:0 0 10px rgba(139,92,246,0.45);}
     .mb-brand span{filter:drop-shadow(0 0 9px rgba(79,172,254,0.35));}
     .mb-icon-btn:hover{color:var(--pf-accent);}
@@ -689,6 +699,10 @@
       <div class="menu-dd-item" data-action="exportWebp">Export as WebP</div>
       <div class="menu-dd-item" data-action="exportPdf">Export as PDF</div>
       <div class="menu-dd-sep"></div>
+      <div class="menu-dd-item" data-action="saveAllJpg">Save All Images as JPG to Folder…</div>
+      <div class="menu-dd-item" data-action="saveAllPng">Save All Images as PNG to Folder…</div>
+      <div class="menu-dd-item" data-action="closeAll">Close All Tabs</div>
+      <div class="menu-dd-sep"></div>
       <div class="menu-dd-item" data-action="addToPdf">Add to PDF Queue…</div>
       <div class="menu-dd-item" data-action="exportAllPdf">Export Combined PDF…</div>
       <div class="menu-dd-item" data-action="clearPdfQueue">Clear PDF Queue</div>
@@ -756,6 +770,9 @@
       <button class="qe" id="qeAddPdf" title="Add current image to PDF queue" disabled><svg viewBox="0 0 24 24"><rect x="3" y="3" width="13" height="13" rx="2"/><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M14.5 11v6M11.5 14h6"/></svg><span class="qe-badge" id="qePdfCount">0</span></button>
       <button class="qe" id="qeExportAll" title="Export combined PDF" disabled><svg viewBox="0 0 24 24"><rect x="3" y="3" width="13" height="13" rx="2"/><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M14 18.5l2-2M16 16.5l2 2M16 16.5v4.2"/></svg></button>
     </div>
+    <button class="mb-batch" id="qeSaveAllJpg" title="Save all open images as JPG into one folder (compressed) — then close all tabs" disabled><svg viewBox="0 0 24 24"><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/><path d="M12 12V4m-3 3 3-3 3 3"/></svg>All&nbsp;JPG</button>
+    <button class="mb-batch" id="qeSaveAllPng" title="Save all open images as PNG into one folder (full quality) — then close all tabs" disabled><svg viewBox="0 0 24 24"><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/><path d="M12 12V4m-3 3 3-3 3 3"/></svg>All&nbsp;PNG</button>
+    <button class="mb-batch mb-batch-warn" id="qeCloseAll" title="Close all open tabs" disabled><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>Close&nbsp;All</button>
     <button class="mb-paste-btn" id="pasteNewBtn" title="Paste an image from the clipboard into a new tab">
       <svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4H8a1 1 0 0 0-1 1v1h10V5a1 1 0 0 0-1-1h-1a2 2 0 0 0-4 0Z"/><path d="M12 11v6M9 14h6"/></svg>
       <span>Paste</span>
@@ -1244,7 +1261,7 @@
         <div class="canvas-empty" id="emptyState">
           <div class="ce-icon" id="uploadZone"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
           <h3>Open an image to start editing</h3>
-          <p>Drag and drop an image here, or click the upload button.<br/>Supports PNG, JPG, WEBP, and PDF.</p>
+          <p>Drag and drop one or more images here — each opens in its own tab.<br/>Supports PNG, JPG, WEBP, and PDF.</p>
           <div class="ce-shortcuts"><span class="kbd">Ctrl+V</span> Paste &nbsp; <span class="kbd">Ctrl+A</span> Select All &nbsp; <span class="kbd">Ctrl+O</span> Open</div>
           <div class="ce-presets">
             <span class="ce-presets-label">New canvas</span>
@@ -1284,7 +1301,7 @@
           </select>
         </div>
       </div>
-      <input id="fileInput" type="file" accept="image/*,application/pdf" />
+      <input id="fileInput" type="file" accept="image/*,application/pdf" multiple />
       <textarea class="paste-catcher" id="pasteCatcher" tabindex="-1" aria-hidden="true"></textarea>
     </div>
 
@@ -1523,7 +1540,7 @@
     <div class="status-item"><svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/></svg><span id="statusDimensions">—</span></div>
     <div class="status-item"><span id="statusSize">—</span></div>
     <div class="spacer"></div>
-    <div class="status-item"><span id="statusHint" style="color:var(--pf-text-muted);font-size:10px;">Shift+drop image = place as layer &middot; Ctrl+Shift+T = new tab &middot; ? = shortcuts</span></div>
+    <div class="status-item"><span id="statusHint" style="color:var(--pf-text-muted);font-size:10px;">Drop a folder of images = open each in its own tab &middot; All JPG / All PNG = save everything to one folder &middot; ? = shortcuts</span></div>
     <div class="status-item">
       <button class="ib" id="zoomOutBtn" style="width:20px;height:20px;"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       <span class="zoom-display" id="zoomLevel">100%</span>
@@ -1677,6 +1694,38 @@
         <button class="btn btn-secondary" id="unsavedDontSave">Don't Save</button>
         <button class="btn btn-primary" id="unsavedCancel">Cancel</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Close All Tabs Modal -->
+<div class="modal-overlay" id="closeAllModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Close All Tabs</h3><button class="modal-close" id="closeAllX">&times;</button></div>
+    <div class="modal-body">
+      <p id="closeAllText" style="font-size:11.5px;color:var(--pf-text-dim);line-height:1.6;">Close all open tabs?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="closeAllCancel">Cancel</button>
+      <button class="btn btn-primary" id="closeAllConfirm">Close All</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="jpgQualityModal">
+  <div class="modal" style="width:380px;">
+    <div class="modal-header"><h3>Save All as JPG</h3><button class="modal-close" id="jpgQClose">&times;</button></div>
+    <div class="modal-body">
+      <p style="font-size:11.5px;color:var(--pf-text-dim);line-height:1.6;">Choose compression quality for all open images. Lower quality = smaller files but visible artifacts.</p>
+      <div class="ctrl-row" style="margin-top:12px;">
+        <div class="ctrl-label">Quality <span class="val" id="jpgQVal">92%</span></div>
+        <div class="range-wrap"><input id="jpgQ" type="range" min="10" max="100" value="92" /></div>
+      </div>
+      <p style="font-size:10.5px;color:var(--pf-text-dim);margin-top:8px;">100 ≈ near-lossless &bull; 80–92 great for photos &bull; 50–70 small files for sharing.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="jpgQCancel">Cancel</button>
+      <button class="btn btn-primary" id="jpgQConfirm">Save All as JPG</button>
     </div>
   </div>
 </div>
@@ -1923,6 +1972,7 @@
       bar.appendChild(el);
     }
     updateTabOverflow();
+    updateQe();
   }
   function updateTabOverflow(){
     const bar=$("tabBar"),btn=$("tabMoreBtn");
@@ -2661,6 +2711,172 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     return false;
   }
 
+  /* ===================== BATCH OPERATIONS (Save All / Close All) ===================== */
+  function batchImageCount(){return tabs.filter(t=>tabHasImage(t)).length;}
+  function isImageLike(f){
+    if(!f)return false;
+    const t=(f.type||"").toLowerCase(),n=(f.name||"").toLowerCase();
+    if(t.startsWith("image/")||t==="application/pdf")return true;
+    return /\.(png|jpe?g|gif|webp|bmp|svg|avif|ico|tiff?|pdf)$/.test(n);
+  }
+  function walkDirectory(entry){
+    return new Promise(resolve=>{
+      if(!entry||!entry.createReader)return resolve([]);
+      const reader=entry.createReader(),all=[];
+      const readBatch=()=>{
+        try{reader.readEntries(async entries=>{
+          if(!entries.length){resolve(all);return;}
+          for(const en of entries){
+            if(!en)continue;
+            if(en.isDirectory){all.push(...await walkDirectory(en));}
+            else if(en.isFile){try{all.push(await new Promise(r=>en.file(r)));}catch(e){}}
+          }
+          readBatch();
+        },()=>resolve(all));}catch(e){resolve(all);}
+      };
+      readBatch();
+    });
+  }
+  async function collectDroppedFiles(dt){
+    const out=[];if(!dt)return out;
+    if(dt.items&&dt.items.length){
+      for(let i=0;i<dt.items.length;i++){
+        const it=dt.items[i];if(!it)continue;
+        if(it.webkitGetAsEntry){const entry=it.webkitGetAsEntry();if(entry){
+          if(entry.isDirectory){out.push(...await walkDirectory(entry));continue;}
+          if(entry.isFile){const f=it.getAsFile();if(f)out.push(f);continue;}
+        }}
+        try{const f=it.getAsFile();if(f)out.push(f);}catch(e){}
+      }
+      if(out.length)return out;
+    }
+    if(dt.files){for(let i=0;i<dt.files.length;i++){const f=dt.files[i];if(f)out.push(f);}}
+    return out;
+  }
+  function openFileInNewTab(f,label){
+    const cur=activeTab();
+    if(cur&&tabHasImage(cur))captureActiveTab();
+    const nt=createTab();nt.loading=true;nt.name=label||"image";activeTabId=nt.id;renderTabBar();
+    return loadImageFileP(f);
+  }
+  async function openManyFiles(files){
+    if(!files||!files.length)return;
+    const imgs=[].slice.call(files);
+    if(imgs.length===1){addImageFile(imgs[0]);return;}
+    const cur=activeTab();
+    const canReuse=!!(cur&&!tabHasImage(cur)&&!cur.loading&&!cur.dirty);
+    let first=true;
+    for(const f of imgs){
+      if(first&&canReuse){await loadImageFileP(f);first=false;continue;}
+      await openFileInNewTab(f,(f.name||"").replace(/\.[^.]*$/,"")||"image");
+    }
+    toast("Opened "+imgs.length+" images — each in its own tab.","success",2600);
+  }
+  function tabOutputBase(t){
+    if(t.id===activeTabId)return currentFileNameBase;
+    if(t.session&&t.session.currentFileNameBase)return t.session.currentFileNameBase;
+    return String(t.name||"image").replace(/\.[^.]*$/,"");
+  }
+  function uniqueOutputName(t,used){
+    let raw=String(tabOutputBase(t)||"image").replace(/[\\/:*?"<>|]+/g,"-").replace(/[.\s]+$/,"").trim()||"image";
+    if(!used.has(raw)){used.add(raw);return raw;}
+    let i=2;while(used.has(raw+"-"+i))i++;
+    used.add(raw+"-"+i);return raw+"-"+i;
+  }
+  function jpgSafeCanvas(c){
+    const r=mkCanvas(c.width,c.height),rc=r.getContext("2d");
+    rc.fillStyle="#ffffff";rc.fillRect(0,0,c.width,c.height);
+    rc.drawImage(c,0,0);return r;
+  }
+  function composeTabCanvas(t){
+    if(t.session)putSession(t.session);
+    renderImmediately();
+    return composeOutputCanvas();
+  }
+  let lastJpgQuality=92;
+  function openJpgQualityModal(){
+    const m=$("jpgQualityModal");if(!m)return;
+    const sl=$("jpgQ"),vl=$("jpgQVal");
+    sl.value=lastJpgQuality;vl.textContent=lastJpgQuality+"%";
+    m.classList.add("open");
+  }
+  async function saveAllImages(format,closeAfter,quality){
+    const docs=tabs.filter(t=>tabHasImage(t));
+    if(!docs.length){toast("No images are open.","warning");return;}
+    showLoading("Preparing "+docs.length+" image(s)...");
+    const savedTabId=activeTabId;
+    if(activeTab()&&tabHasImage(activeTab()))captureActiveTab();
+    const jobs=[],used=new Set();
+    for(const t of docs)jobs.push({canvas:composeTabCanvas(t),name:uniqueOutputName(t,used)});
+    const back=tabs.find(x=>x.id===savedTabId);
+    if(back){if(back.session)putSession(back.session);else noDoc();renderImmediately();refreshAfterSwitch();}
+    const mime=format==="png"?"image/png":"image/jpeg";
+    const q=format==="png"?undefined:(typeof quality==="number"&&quality>0&&quality<=1?quality:0.92);
+    let savedCount=0;
+    if(window.showDirectoryPicker&&typeof window.showDirectoryPicker==="function"){
+      try{
+        const dir=await window.showDirectoryPicker({mode:"readwrite"});
+        showLoading("Saving "+jobs.length+" image(s) as "+format.toUpperCase()+"...");
+        for(const job of jobs){
+          const out=format==="jpg"?jpgSafeCanvas(job.canvas):job.canvas;
+          const blob=await new Promise(r=>{try{out.toBlob(b=>r(b),mime,q);}catch(e){r(null);}});
+          if(!blob)continue;
+          const fh=await dir.getFileHandle(job.name+"."+format,{create:true});
+          const fw=await fh.createWritable();
+          await fw.write(blob);
+          await fw.close();
+          savedCount++;
+        }
+        hideLoading();
+        toast("Saved "+savedCount+" image(s) as "+format.toUpperCase()+" into the chosen folder.","success",3400);
+      }catch(err){
+        if(err&&(err.name==="AbortError"||(err.message&&/abort|cancel/i.test(err.message)))){hideLoading();toast("Save cancelled.","info");return;}
+        hideLoading();
+        savedCount=await downloadAllFallback(jobs,format,q);
+      }
+    }else{
+      hideLoading();
+      savedCount=await downloadAllFallback(jobs,format,q);
+    }
+    if(closeAfter&&savedCount>0)doCloseAllTabs();
+  }
+  async function downloadAllFallback(jobs,format,q){
+    const mime=format==="png"?"image/png":"image/jpeg";
+    let count=0;
+    for(const job of jobs){
+      const out=format==="jpg"?jpgSafeCanvas(job.canvas):job.canvas;
+      const blob=await new Promise(r=>{try{out.toBlob(b=>r(b),mime,q);}catch(e){r(null);}});
+      if(!blob)continue;
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);a.download=job.name+"."+format;
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},1200);
+      count++;
+      await new Promise(r=>setTimeout(r,160));
+    }
+    if(count)toast("Saved "+count+" image(s) — check your Downloads folder.","success",3600);
+    return count;
+  }
+  function doCloseAllTabs(){
+    if(!tabs.length)return;
+    suppressAutoSave=true;
+    tabs.splice(0,tabs.length);
+    const nt=createTab();activeTabId=nt.id;noDoc();refreshAfterSwitch();
+    suppressAutoSave=false;
+    saveProject();
+    toast("All tabs closed.","info",2200);
+  }
+  function closeAllTabs(){
+    if(!tabs.length){toast("No tabs to close.","info");return;}
+    const dirtyCount=tabs.filter(t=>t.dirty).length;
+    if(dirtyCount){
+      $("closeAllText").textContent=dirtyCount+" tab(s) of "+tabs.length+" have unsaved edits. Close ALL tabs anyway? Unsaved changes will be lost.";
+      $("closeAllModal").classList.add("open");
+    }else{
+      doCloseAllTabs();
+    }
+  }
+
   /* ===================== SELECT ALL / COPY / PASTE LAYER ===================== */
   let appCopyBuffer=null;
   function selectAllCanvas(){
@@ -2858,6 +3074,11 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     ["qePng","qeJpg","qeWebp","qePdf","qeAddPdf","qeExportAll"].forEach(id=>{const el=$(id);if(el)el.disabled=!has;});
     const b=$("qePdfCount");if(b){b.textContent=pdfPages.length;b.classList.toggle("show",pdfPages.length>0);}
     const ea=$("qeExportAll");if(ea)ea.title=pdfPages.length?("Export Combined PDF ("+pdfPages.length+" pages)"):"Export Combined PDF";
+    const n=Math.max(0,batchImageCount());
+    const jp=$("qeSaveAllJpg"),pn=$("qeSaveAllPng"),ca=$("qeCloseAll");
+    if(jp){jp.disabled=!n;jp.title=n?("Save "+n+" open image(s) as JPG into one folder (compressed) — then close all tabs"):"Save all open images as JPG into one folder";}
+    if(pn){pn.disabled=!n;pn.title=n?("Save "+n+" open image(s) as PNG into one folder (full quality) — then close all tabs"):"Save all open images as PNG into one folder";}
+    if(ca){ca.disabled=!tabs.length;}
   }
   function exportPdfCurrent(){
     if(!originalImage){toast("Open an image first.","warning");return;}
@@ -2967,16 +3188,22 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const c=$("backdropColor");if(c)c.value=state.backdrop||"#ffffff";
     const b=$("backdropTransparent");if(b)b.classList.toggle("active",!state.backdrop);
   }
-  function loadImageFile(file){
-    if(!file)return;
-    const base=(file.name||"").replace(/\.[^.]*$/,"").trim()||"edit";
-    const slot=openDocSlot(base);
-    currentFileName=file.name||"-";currentFileSize=file.size>1024?(file.size/1024).toFixed(1)+" KB":file.size+" B";currentFileNameBase=base;
-    if(file.type==="application/pdf"||(file.name&&file.name.toLowerCase().endsWith(".pdf"))){loadPdfFile(file);return;}
-    if(!file.type||!file.type.startsWith("image/")){toast("Select an image or PDF.","error");return;}
-    showLoading("Reading image...");const reader=new FileReader();
-    reader.onload=e=>{const img=new Image();img.onload=()=>{installSource(img);if(slot){slot.name=base;}hideLoading();renderTabBar();};img.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to load image.","error");};img.src=e.target.result;};
-    reader.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to read file.","error");};reader.readAsDataURL(file);
+  function loadImageFile(file){loadImageFileP(file);}
+  function loadImageFileP(file,slot){
+    return new Promise(resolve=>{
+      if(!file)return resolve(false);
+      const base=(file.name||"").replace(/\.[^.]*$/,"").trim()||"edit";
+      slot=slot||openDocSlot(base);
+      currentFileName=file.name||"-";currentFileSize=file.size>1024?(file.size/1024).toFixed(1)+" KB":file.size+" B";currentFileNameBase=base;
+      if(file.type==="application/pdf"||(file.name&&file.name.toLowerCase().endsWith(".pdf"))){
+        (async()=>{await loadPdfFile(file);resolve(true);})();
+        return;
+      }
+      if(!file.type||!file.type.startsWith("image/")){toast("Select an image or PDF.","error");return resolve(false);}
+      showLoading("Reading image...");const reader=new FileReader();
+      reader.onload=e=>{const img=new Image();img.onload=()=>{installSource(img);if(slot){slot.name=base;}hideLoading();renderTabBar();resolve(true);};img.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to load image.","error");resolve(false);};img.src=e.target.result;};
+      reader.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to read file.","error");resolve(false);};reader.readAsDataURL(file);
+    });
   }
   function addImageFile(file){
     if(!file)return;
@@ -2986,7 +3213,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   async function loadPdfPage(num){
     if(!pdfDoc)return;try{showLoading("Rendering page "+num+" of "+pdfTotalPages+"...");const page=await pdfDoc.getPage(num);pdfCurrentPage=num;
       const vp=page.getViewport({scale:pdfScale}),c=mkCanvas(vp.width,vp.height);await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
-      const img=new Image();img.onload=()=>{installSource(img);hideLoading();};img.src=c.toDataURL("image/png");}catch(e){const c2=activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to render PDF.","error");}
+      await new Promise(res=>{const img=new Image();img.onload=()=>{installSource(img);hideLoading();res();};img.onerror=res;img.src=c.toDataURL("image/png");});}catch(e){const c2=activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to render PDF.","error");}
   }
   async function loadPdfFile(file){
     try{showLoading("Analyzing PDF...");const ab=await file.arrayBuffer();pdfDoc=await pdfjsLib.getDocument({data:ab}).promise;pdfTotalPages=pdfDoc.numPages;pdfCurrentPage=1;updatePdfNav();await loadPdfPage(1);}catch(e){const c2=activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to load PDF.","error");}
@@ -5588,15 +5815,16 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     /* Upload */
     $("uploadTrigger").addEventListener("click",()=>{fileInput.value="";fileInput.click();});
     uploadZone.addEventListener("click",()=>{fileInput.value="";fileInput.click();});
-    fileInput.addEventListener("change",e=>{addImageFile(e.target.files[0]);});
+    fileInput.addEventListener("change",e=>{openManyFiles(e.target.files);fileInput.value="";});
     ["dragenter","dragover"].forEach(ev=>canvasViewport.addEventListener(ev,e=>{e.preventDefault();canvasViewport.classList.add("dragover");}));
     ["dragleave","drop"].forEach(ev=>canvasViewport.addEventListener(ev,e=>{e.preventDefault();canvasViewport.classList.remove("dragover");}));
-    canvasViewport.addEventListener("drop",e=>{
-      const dt=e.dataTransfer;let f=null;
-      if(dt.files&&dt.files.length>0){for(let i=0;i<dt.files.length;i++){const ff=dt.files[i];if(ff&&ff.type&&(ff.type.startsWith("image/")||ff.type==="application/pdf")){f=ff;break;}}}
-      if(!f&&dt.items){for(let i=0;i<dt.items.length;i++){const it=dt.items[i];if(it&&it.type&&(it.type.startsWith("image/")||it.type==="application/pdf")){f=it.getAsFile();break;}}}
-      if(f&&e.shiftKey){e.preventDefault();placeImageLayer(f);return;}
-      if(f)addImageFile(f);
+    canvasViewport.addEventListener("drop",async e=>{
+      e.preventDefault();
+      const all=await collectDroppedFiles(e.dataTransfer);
+      const good=all.filter(isImageLike);
+      if(!good.length)return;
+      if(e.shiftKey){placeImageLayer(good[0]);return;}
+      openManyFiles(good);
     });
 
     /* Paste */
@@ -6729,6 +6957,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
         else if(a==="exportJpg"&&originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("jpg"),"image/jpeg",0.92);
         else if(a==="exportWebp"&&originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("webp"),"image/webp",0.9);
         else if(a==="exportPdf")exportPdfCurrent();
+        else if(a==="saveAllJpg")openJpgQualityModal();
+        else if(a==="saveAllPng")saveAllImages("png",true);
+        else if(a==="closeAll")closeAllTabs();
         else if(a==="addToPdf")addToPdf();
         else if(a==="exportAllPdf")exportCombinedPdf();
         else if(a==="clearPdfQueue")clearPdfQueue();
@@ -6902,6 +7133,27 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("qePdf").addEventListener("click",exportPdfCurrent);
     $("qeAddPdf").addEventListener("click",addToPdf);
     $("qeExportAll").addEventListener("click",exportCombinedPdf);
+    $("qeSaveAllJpg").addEventListener("click",openJpgQualityModal);
+    $("qeSaveAllPng").addEventListener("click",()=>saveAllImages("png",true));
+    $("qeCloseAll").addEventListener("click",closeAllTabs);
+    const jpgQModal=$("jpgQualityModal");
+    if(jpgQModal){
+      const jpgQHide=()=>jpgQModal.classList.remove("open");
+      const jpgQSl=$("jpgQ"),jpgQVal=$("jpgQVal");
+      if(jpgQSl)jpgQSl.addEventListener("input",()=>{const v=clamp(parseInt(jpgQSl.value,10)||92,10,100);lastJpgQuality=v;jpgQVal.textContent=v+"%";});
+      $("jpgQClose").addEventListener("click",jpgQHide);
+      $("jpgQCancel").addEventListener("click",jpgQHide);
+      $("jpgQConfirm").addEventListener("click",()=>{jpgQHide();saveAllImages("jpg",true,lastJpgQuality/100);});
+      jpgQModal.addEventListener("click",e=>{if(e.target===jpgQModal)jpgQHide();});
+    }
+    const closeAllModal=$("closeAllModal");
+    if(closeAllModal){
+      const closeAllHide=()=>closeAllModal.classList.remove("open");
+      $("closeAllX").addEventListener("click",closeAllHide);
+      $("closeAllCancel").addEventListener("click",closeAllHide);
+      $("closeAllConfirm").addEventListener("click",()=>{closeAllHide();doCloseAllTabs();});
+      closeAllModal.addEventListener("click",e=>{if(e.target===closeAllModal)closeAllHide();});
+    }
 
     /* Save / Export dropdown menu */
     const exportMenu=$("exportMenu");
