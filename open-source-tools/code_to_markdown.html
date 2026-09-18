@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحويل الكود إلى Markdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F4F6;
+    --panel: #FFFFFF;
+    --ink: #17212B;
+    --muted: #5A6774;
+    --line: #D6DDE4;
+    --accent: #0B6E8A;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E1F1F5;
+    --danger: #B3401D;
+    --sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11171C;
+      --panel: #192129;
+      --ink: #E7ECF0;
+      --muted: #98A5B0;
+      --line: #2A3540;
+      --accent: #5CC0DC;
+      --accent-ink: #0A1A20;
+      --accent-soft: #16333C;
+      --danger: #F08A66;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 20px 72px;
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(28px, 5vw, 44px);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .lead {
+    margin: 0 0 28px;
+    max-width: 60ch;
+    color: var(--muted);
+  }
+
+  /* ---------- Drop zone ---------- */
+  .drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 44px 24px;
+    text-align: center;
+    background: var(--panel);
+    border: 2px dashed var(--line);
+    border-radius: 18px;
+    transition: border-color .15s, background-color .15s;
+  }
+  .drop.over {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .drop svg { width: 56px; height: 56px; color: var(--accent); }
+  .drop-title { margin: 0; font-size: 20px; font-weight: 600; }
+  .drop-or { margin: 0; color: var(--muted); font-size: 14px; }
+  .drop-note { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+
+  .drop.compact {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 14px 20px;
+    text-align: right;
+    border-width: 1.5px;
+    border-radius: 12px;
+  }
+  .drop.compact svg { width: 32px; height: 32px; }
+  .drop.compact .drop-or,
+  .drop.compact .drop-note { display: none; }
+  .drop.compact .drop-title { font-size: 16px; flex: 1 1 auto; }
+  .drop.compact .drop-icon-wrap { display: flex; align-items: center; gap: 12px; flex: 1 1 260px; }
+
+  /* ---------- Buttons & inputs ---------- */
+  button, input, textarea { font: inherit; color: inherit; }
+  .btn {
+    appearance: none;
+    cursor: pointer;
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: 1.5px solid var(--accent);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .btn:hover { filter: brightness(1.07); }
+  .btn.ghost {
+    background: transparent;
+    color: var(--accent);
+  }
+  .btn.ghost:hover { background: var(--accent-soft); filter: none; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .btn.small { padding: 4px 12px; font-size: 14px; }
+
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .field {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+  }
+  .field:focus-visible { outline-offset: 0; border-color: var(--accent); }
+
+  .status:empty { display: none; }
+  .status {
+    margin: 14px 2px 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .status.error { color: var(--danger); }
+
+  /* ---------- Settings ---------- */
+  details.settings {
+    margin-top: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  details.settings summary {
+    cursor: pointer;
+    padding: 12px 18px;
+    font-weight: 600;
+  }
+  .settings-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+    padding: 4px 18px 18px;
+  }
+  .settings-body label { display: block; font-weight: 500; margin-bottom: 4px; }
+  .settings-body .hint { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
+  .settings-body textarea {
+    min-height: 96px;
+    resize: vertical;
+    direction: ltr;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .settings-actions { grid-column: 1 / -1; display: flex; gap: 10px; }
+
+  /* ---------- Result ---------- */
+  .result { margin-top: 28px; }
+  .result-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+    margin-bottom: 14px;
+  }
+  .result-title { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; }
+  .stats { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .stats b { color: var(--ink); font-weight: 600; }
+  .actions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+  .fname-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .fname-wrap label { font-size: 13px; color: var(--muted); }
+  .fname-wrap input { width: 210px; direction: ltr; text-align: left; font-family: var(--mono); font-size: 14px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .panel-head .tools { display: flex; gap: 6px; }
+
+  .files {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    max-height: 62vh;
+    overflow: auto;
+  }
+  .files li label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 14px;
+    cursor: pointer;
+  }
+  .files li label:hover { background: var(--accent-soft); }
+  .files input[type="checkbox"] { accent-color: var(--accent); flex: none; transform: translateY(2px); }
+  .files .path {
+    flex: 1 1 auto;
+    min-width: 0;
+    direction: ltr;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
+  .files .path .dir { color: var(--muted); }
+  .files .path .base { font-weight: 600; }
+  .files .size { flex: none; color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .empty { padding: 28px 18px; color: var(--muted); text-align: center; }
+
+  .preview {
+    display: block;
+    width: 100%;
+    height: 62vh;
+    min-height: 320px;
+    padding: 14px 16px;
+    border: 0;
+    resize: vertical;
+    background: transparent;
+    direction: ltr;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.55;
+    tab-size: 4;
+    white-space: pre;
+  }
+  .preview:focus-visible { outline-offset: -3px; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 24px;
+    margin-inline: auto;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: none; }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .files { max-height: 32vh; }
+    .preview { height: 50vh; }
+    .settings-body { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>تحويل الكود إلى Markdown</h1>
+  <p class="lead">اختر مجلد مشروعك، وستحصل على ملف Markdown واحد يحتوي على كل ملفات الكود النصية فيه.</p>
+
+  <section id="drop" class="drop" aria-label="اختيار مجلد المشروع">
+    <div class="drop-icon-wrap">
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 16a4 4 0 0 1 4-4h14l6 7h24a4 4 0 0 1 4 4v29a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V16z"/>
+        <path d="M22 38h20M22 46h12"/>
+      </svg>
+      <p class="drop-title" id="dropTitle">اسحب مجلد المشروع وأفلته هنا</p>
+    </div>
+    <p class="drop-or">أو</p>
+    <button type="button" class="btn" id="pick">اختيار مجلد المشروع</button>
+    <p class="drop-note">تُقرأ الملفات داخل متصفحك فقط، ولا تُرفع إلى أي خادم.</p>
+    <input type="file" id="picker" webkitdirectory multiple hidden>
+  </section>
+
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <details class="settings">
+    <summary>الإعدادات</summary>
+    <div class="settings-body">
+      <div>
+        <label for="ignore">المجلدات المستبعدة <span class="hint">افصل بين الأسماء بفاصلة أو سطر جديد</span></label>
+        <textarea id="ignore" class="field" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <label for="exts">الامتدادات المقبولة <span class="hint">الملفات التي تنتهي بهذه الامتدادات فقط تُضاف</span></label>
+        <textarea id="exts" class="field" spellcheck="false"></textarea>
+      </div>
+      <div class="settings-actions">
+        <button type="button" class="btn small" id="applySettings">تطبيق الإعدادات</button>
+        <button type="button" class="btn ghost small" id="resetSettings">استعادة الافتراضي</button>
+      </div>
+    </div>
+  </details>
+
+  <section id="result" class="result" hidden>
+    <div class="result-head">
+      <div>
+        <h2 class="result-title" id="projName"></h2>
+        <p class="stats" id="stats"></p>
+      </div>
+      <div class="actions">
+        <div class="fname-wrap">
+          <label for="fname">اسم الملف</label>
+          <input id="fname" class="field" type="text" value="project_overview.md" spellcheck="false">
+        </div>
+        <button type="button" class="btn" id="download">تنزيل الملف</button>
+        <button type="button" class="btn ghost" id="copy">نسخ المحتوى</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-head">
+          <span>الملفات المضمّنة</span>
+          <span class="tools">
+            <button type="button" class="btn ghost small" id="selAll">تحديد الكل</button>
+            <button type="button" class="btn ghost small" id="selNone">إلغاء الكل</button>
+          </span>
+        </div>
+        <ul class="files" id="files"></ul>
+        <div class="empty" id="emptyMsg" hidden>لم يُعثر على ملفات نصية مطابقة. جرّب تعديل الامتدادات أو المجلدات المستبعدة من الإعدادات.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span>معاينة ملف Markdown</span></div>
+        <textarea id="preview" class="preview" readonly spellcheck="false" aria-label="معاينة ملف Markdown"></textarea>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // نفس القوائم الافتراضية الموجودة في تطبيق بايثون
+  var DEFAULT_IGNORE = ["__pycache__", ".git", ".idea", ".vscode", "node_modules", "venv", ".env"];
+  var DEFAULT_EXT = [".py", ".pyw", ".txt", ".md", ".json", ".html", ".css", ".js", ".ts",
+                     ".xml", ".yaml", ".yml", ".ini", ".cfg", ".sh", ".bat"];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var state = {
+    source: null,       // { type: 'files' | 'entry', rootName, files | entry }
+    items: [],          // [{ rel, file?, entry? }] بعد التصفية والترتيب
+    selected: new Set(),
+    cache: new Map(),   // rel -> { text, size }
+    md: "",
+    busy: false
+  };
+
+  /* ---------- أدوات مساعدة ---------- */
+
+  function parseList(text, isExt) {
+    return text.split(/[\s,،;]+/).map(function (s) { return s.trim(); }).filter(Boolean).map(function (s) {
+      if (!isExt) return s;
+      return (s.charAt(0) === "." ? s : "." + s).toLowerCase();
+    });
+  }
+
+  function fmtSize(n) {
+    if (n < 1024) return n + " B";
+    if (n < 1048576) return (n / 1024).toFixed(1) + " KB";
+    return (n / 1048576).toFixed(2) + " MB";
+  }
+
+  var toastTimer;
+  function toast(msg) {
+    var el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2600);
+  }
+
+  function setStatus(msg, isError) {
+    var el = $("status");
+    el.textContent = msg || "";
+    el.classList.toggle("error", !!isError);
+  }
+
+  function setBusy(b) {
+    state.busy = b;
+    $("pick").disabled = b;
+    $("applySettings").disabled = b;
+  }
+
+  /* ---------- الإعدادات ---------- */
+
+  function fillDefaults() {
+    $("ignore").value = DEFAULT_IGNORE.join("\n");
+    $("exts").value = DEFAULT_EXT.join("\n");
+  }
+  fillDefaults();
+
+  /* ---------- قراءة المجلد ---------- */
+
+  function readAllEntries(reader) {
+    return new Promise(function (resolve, reject) {
+      var all = [];
+      (function step() {
+        reader.readEntries(function (batch) {
+          if (!batch.length) return resolve(all);
+          all.push.apply(all, batch);
+          step();
+        }, reject);
+      })();
+    });
+  }
+
+  function entryFile(entry) {
+    return new Promise(function (resolve, reject) { entry.file(resolve, reject); });
+  }
+
+  async function walk(dirEntry, prefix, ignore, out) {
+    var children = await readAllEntries(dirEntry.createReader());
+    for (var i = 0; i < children.length; i++) {
+      var c = children[i];
+      if (c.isDirectory) {
+        if (ignore.has(c.name)) continue;
+        await walk(c, prefix + c.name + "/", ignore, out);
+      } else if (c.isFile) {
+        out.push({ rel: prefix + c.name, entry: c });
+      }
+    }
+  }
+
+  // نفس ترتيب os.walk تقريباً: ملفات المجلد أولاً ثم المجلدات الفرعية
+  function cmpPath(a, b) {
+    var A = a.split("/"), B = b.split("/");
+    var n = Math.min(A.length, B.length);
+    for (var i = 0; i < n; i++) {
+      if (A[i] === B[i]) continue;
+      var aFile = i === A.length - 1, bFile = i === B.length - 1;
+      if (aFile !== bFile) return aFile ? -1 : 1;
+      return A[i].localeCompare(B[i], "en", { numeric: true, sensitivity: "base" });
+    }
+    return A.length - B.length;
+  }
+
+  function applyFilters(raw, ignore, exts) {
+    return raw.filter(function (it) {
+      var parts = it.rel.split("/");
+      for (var i = 0; i < parts.length - 1; i++) if (ignore.has(parts[i])) return false;
+      var name = parts[parts.length - 1].toLowerCase();
+      return exts.some(function (e) { return name.endsWith(e); });
+    }).sort(function (a, b) { return cmpPath(a.rel, b.rel); });
+  }
+
+  async function readContents() {
+    var todo = state.items.filter(function (it) { return !state.cache.has(it.rel); });
+    var done = 0, CHUNK = 24;
+    for (var i = 0; i < todo.length; i += CHUNK) {
+      await Promise.all(todo.slice(i, i + CHUNK).map(async function (it) {
+        var rec;
+        try {
+          var f = it.file || await entryFile(it.entry);
+          rec = { text: await f.text(), size: f.size };
+        } catch (e) {
+          rec = { text: null, size: 0 };
+        }
+        state.cache.set(it.rel, rec);
+        done++;
+      }));
+      setStatus("جارٍ قراءة الملفات… " + done + " من " + todo.length);
+    }
+  }
+
+  async function load() {
+    if (!state.source || state.busy) return;
+    setBusy(true);
+    setStatus("جارٍ فحص المجلد…");
+    try {
+      var ignore = new Set(parseList($("ignore").value, false));
+      var exts = parseList($("exts").value, true);
+      var raw;
+      if (state.source.type === "files") {
+        raw = state.source.files.map(function (f) {
+          return { rel: f.webkitRelativePath.split("/").slice(1).join("/"), file: f };
+        });
+      } else {
+        raw = [];
+        await walk(state.source.entry, "", ignore, raw);
+      }
+      state.items = applyFilters(raw, ignore, exts);
+      state.selected = new Set(state.items.map(function (it) { return it.rel; }));
+      await readContents();
+      setStatus("");
+      render();
+    } catch (err) {
+      setStatus("تعذّرت قراءة المجلد: " + (err && err.message ? err.message : err), true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function setSource(src) {
+    state.source = src;
+    state.cache = new Map();
+    load();
+  }
+
+  /* ---------- بناء ملف Markdown ---------- */
+
+  function buildMarkdown() {
+    var md = "# Project Overview: " + state.source.rootName + "\n\n";
+    state.items.forEach(function (it) {
+      if (!state.selected.has(it.rel)) return;
+      var name = it.rel.split("/").pop();
+      var lang = name.split(".").pop().toLowerCase();
+      if (lang === "py" || lang === "pyw") lang = "python";
+
+      var rec = state.cache.get(it.rel);
+      var body = rec && rec.text !== null ? rec.text : "--- Could not read file content ---";
+
+      // إن كان الملف نفسه يحتوي على ``` نستخدم سياجاً أطول حتى لا ينكسر التنسيق
+      var longest = 0, m, re = /`+/g;
+      while ((m = re.exec(body)) !== null) if (m[0].length > longest) longest = m[0].length;
+      var fence = new Array(Math.max(3, longest + 1) + 1).join("`");
+
+      md += "## File: `" + it.rel + "`\n\n" + fence + lang + "\n" + body + "\n" + fence + "\n\n";
+    });
+    return md;
+  }
+
+  /* ---------- العرض ---------- */
+
+  function updateOutput() {
+    state.md = buildMarkdown();
+    $("preview").value = state.md;
+    var bytes = new Blob([state.md]).size;
+    $("stats").innerHTML = "الملفات المحددة: <b>" + state.selected.size + "</b> من " + state.items.length +
+      "، حجم الناتج: <b dir=\"ltr\">" + fmtSize(bytes) + "</b>";
+    var none = state.selected.size === 0;
+    $("download").disabled = none;
+    $("copy").disabled = none;
+  }
+
+  function render() {
+    $("drop").classList.add("compact");
+    $("dropTitle").textContent = "اسحب مجلداً آخر أو اختره من الزر";
+    $("result").hidden = false;
+    $("projName").textContent = state.source.rootName;
+
+    var ul = $("files");
+    ul.innerHTML = "";
+    $("emptyMsg").hidden = state.items.length > 0;
+
+    state.items.forEach(function (it) {
+      var li = document.createElement("li");
+      var label = document.createElement("label");
+
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = state.selected.has(it.rel);
+      cb.addEventListener("change", function () {
+        if (cb.checked) state.selected.add(it.rel); else state.selected.delete(it.rel);
+        updateOutput();
+      });
+
+      var idx = it.rel.lastIndexOf("/");
+      var path = document.createElement("span");
+      path.className = "path";
+      path.dir = "ltr";
+      if (idx >= 0) {
+        var d = document.createElement("span");
+        d.className = "dir";
+        d.textContent = it.rel.slice(0, idx + 1);
+        path.appendChild(d);
+      }
+      var b = document.createElement("span");
+      b.className = "base";
+      b.textContent = it.rel.slice(idx + 1);
+      path.appendChild(b);
+
+      var size = document.createElement("span");
+      size.className = "size";
+      size.dir = "ltr";
+      var rec = state.cache.get(it.rel);
+      size.textContent = rec ? fmtSize(rec.size) : "";
+
+      label.appendChild(cb);
+      label.appendChild(path);
+      label.appendChild(size);
+      li.appendChild(label);
+      ul.appendChild(li);
+    });
+
+    updateOutput();
+  }
+
+  /* ---------- التنزيل والنسخ ---------- */
+
+  function download() {
+    var name = $("fname").value.trim() || "project_overview.md";
+    name = name.replace(/[\\\/:*?"<>|]/g, "_");
+    if (!/\.md$/i.test(name)) name += ".md";
+    var blob = new Blob([state.md], { type: "text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    toast("تم تنزيل الملف: " + name);
+  }
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(state.md);
+    } catch (e) {
+      var ta = $("preview");
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      ta.setSelectionRange(0, 0);
+    }
+    toast("تم نسخ المحتوى");
+  }
+
+  /* ---------- الأحداث ---------- */
+
+  var picker = $("picker");
+  $("pick").addEventListener("click", function () { picker.click(); });
+
+  picker.addEventListener("change", function () {
+    var files = Array.prototype.slice.call(picker.files);
+    picker.value = "";
+    if (!files.length) return;
+    var rootName = (files[0].webkitRelativePath || "").split("/")[0] || "project";
+    setSource({ type: "files", rootName: rootName, files: files });
+  });
+
+  var drop = $("drop");
+  ["dragenter", "dragover"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    drop.addEventListener(ev, function () { drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (e) {
+    e.preventDefault();
+    // يجب استدعاء webkitGetAsEntry بشكل متزامن قبل أي await
+    var entries = Array.prototype.slice.call(e.dataTransfer.items || [])
+      .map(function (i) { return i.webkitGetAsEntry ? i.webkitGetAsEntry() : null; })
+      .filter(Boolean);
+    var dir = entries.filter(function (en) { return en.isDirectory; })[0];
+    if (!dir) {
+      setStatus("أفلت مجلداً وليس ملفات مفردة.", true);
+      return;
+    }
+    setSource({ type: "entry", rootName: dir.name, entry: dir });
+  });
+
+  // منع المتصفح من فتح الملف إذا أُفلت خارج المنطقة
+  window.addEventListener("dragover", function (e) { e.preventDefault(); });
+  window.addEventListener("drop", function (e) { e.preventDefault(); });
+
+  $("applySettings").addEventListener("click", function () {
+    if (!state.source) { toast("تم حفظ الإعدادات"); return; }
+    load();
+  });
+  $("resetSettings").addEventListener("click", function () {
+    fillDefaults();
+    if (state.source) load();
+  });
+
+  $("selAll").addEventListener("click", function () {
+    state.selected = new Set(state.items.map(function (it) { return it.rel; }));
+    render();
+  });
+  $("selNone").addEventListener("click", function () {
+    state.selected = new Set();
+    render();
+  });
+
+  $("download").addEventListener("click", download);
+  $("copy").addEventListener("click", copy);
+})();
+</script>
+</body>
+</html>

@@ -10,9 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>
     window.__pfCDN = {
-      pdfMin: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-      pdfWorker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
-      jspdf: "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+      pdfMin: ["vendor/pdfjs/pdf.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"],
+      pdfWorker: ["vendor/pdfjs/pdf.worker.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"],
+      jspdf: ["vendor/jspdf/jspdf.umd.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]
     };
   </script>
   <style>
@@ -455,6 +455,8 @@
     .statusbar .status-item svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
     .statusbar .spacer{flex:1;}
     .zoom-display{font-family:var(--pf-mono);font-weight:500;color:var(--pf-accent);}
+    .statusbar #netState.online #netDot{background:#3ddc97;box-shadow:0 0 6px rgba(61,220,151,0.6);}
+    .statusbar #netState.offline #netDot{background:#ffb454;box-shadow:0 0 6px rgba(255,180,84,0.6);}
 
     /* Loading */
     .loading-overlay{position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;
@@ -1590,6 +1592,9 @@
     <div class="status-item"><span id="statusSize">—</span></div>
     <div class="spacer"></div>
     <div class="status-item"><span id="statusHint" style="color:var(--pf-text-muted);font-size:10px;">Drop a folder of images = open each in its own tab &middot; All JPG / All PNG = save everything to one folder &middot; ? = shortcuts</span></div>
+    <div class="status-item" id="netState" title="App works fully offline — only remote fonts and PDF fallback need the internet." style="display:none;font-size:10px;">
+      <span style="width:7px;height:7px;border-radius:50%;display:inline-block;" id="netDot"></span><span id="netLabel">Online</span>
+    </div>
     <div class="status-item">
       <button class="ib" id="zoomOutBtn" style="width:20px;height:20px;"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       <span class="zoom-display" id="zoomLevel">100%</span>
@@ -1729,34 +1734,31 @@
         <div class="shortcut-row"><span>Move tool</span><span class="kbd">V</span></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-primary" id="closeShortcutsBtn">OK</button></div>
-  </div>
-</div>
-
-<!-- About PhotoForge -->
-<div class="modal-overlay" id="aboutModal">
-  <div class="modal" style="width:520px;max-width:92vw;">
+    <div class="modal-overlay" id="aboutModal">
+  <div class="modal" style="width:580px;max-width:94vw;">
     <div class="modal-header"><h3>About PhotoForge</h3><button class="modal-close" id="closeAbout">&times;</button></div>
     <div class="modal-body">
-      <div style="display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--pf-border);padding-bottom:12px;">
-        <div class="mb-logo" style="width:42px;height:42px;border-radius:10px;font-size:16px;">PF</div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="mb-logo" style="width:44px;height:44px;font-size:16px;border-radius:12px;flex:0 0 auto;">PF</div>
         <div>
           <div style="font-size:15px;font-weight:700;color:var(--pf-text);">PhotoForge — Pro Image Editor</div>
-          <div style="font-size:11px;color:var(--pf-text-dim);">Version <b>2.0</b> &bull; September 2026</div>
+          <div style="font-size:11px;color:var(--pf-text-muted);margin-top:2px;">Version 2.0 &mdash; a generator-class tool from the <b>Generative Tools</b> showcase.</div>
         </div>
       </div>
-      <div style="font-size:11.5px;color:var(--pf-text-dim);line-height:1.7;margin-top:10px;">Fully in-browser editor — everything runs on your device, images are never uploaded. Open directly from the file or host on GitHub Pages.</div>
-      <div style="font-size:11px;color:var(--pf-text-dim);margin-top:12px;">
-        <div style="font-weight:700;color:var(--pf-text);margin-bottom:4px;">What's new in 2.0</div>
-        <ul style="margin:0;padding-left:18px;line-height:1.8;">
-          <li>Drop a whole folder &rarr; every image opens in its own tab</li>
-          <li>Save All as JPG (chosen quality) or PNG straight into a folder</li>
-          <li>Close All + quick shortcuts &mdash; Alt+J / Alt+P / Alt+W</li>
-          <li>One JPG quality picker for the current image or all open</li>
-          <li>Stability: serialized loading, tab-aware rendering, save progress</li>
-          <li>JPG transparency notice before export</li>
-          <li>Faster first paint &mdash; PDF &amp; export libraries load only on first use</li>
-        </ul>
+      <div style="border-top:1px solid var(--pf-border);margin-top:14px;padding-top:12px;font-size:11.5px;color:var(--pf-text-muted);line-height:1.8;">
+        <div style="font-weight:700;color:var(--pf-text);margin-bottom:4px;">Works offline</div>
+        <div>PhotoForge runs fully in your browser and uses no network for image editing. PDF &amp; JsPDF libraries are bundled locally first, with a CDN fallback — so everything keeps working even when the internet is disconnected.</div>
+      </div>
+      <div style="border-top:1px solid var(--pf-border);margin-top:14px;padding-top:12px;">
+        <div style="font-weight:700;color:var(--pf-text);margin-bottom:8px;font-size:12px;">What's new in 2.0</div>
+        <div class="shortcuts-grid">
+          <div class="shortcut-row"><span><b>Folder drop</b> &mdash; drop a whole folder, every image opens in its own tab</span></div>
+          <div class="shortcut-row"><span><b>Save All JPG / PNG</b> &mdash; one folder, every open tab saved; JPG uses a unified quality chooser</span></div>
+          <div class="shortcut-row"><span><b>Close All</b> + per-tab state; shortcuts modal from the  menu</span></div>
+          <div class="shortcut-row"><span><b>Stability</b> &mdash; serialized loading, tab-aware rendering, safe exports</span></div>
+          <div class="shortcut-row"><span><b>PDF</b> &mdash; local-first PDF.js, page navigation, combined PDF export</span></div>
+          <div class="shortcut-row"><span><b>Offline</b> &mdash; no internet needed after first load of libraries</span></div>
+        </div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-primary" id="closeAboutBtn">OK</button></div>
@@ -1835,19 +1837,32 @@
     scriptCache.set(src,p);
     return p;
   }
+  function loadScriptCandidates(cands){
+    const list=(Array.isArray(cands)?cands.map(c=>c&&typeof c==="string"?c.trim():"").filter(Boolean):[String(cands||"").trim()]).filter(Boolean);
+    if(!list.length)return Promise.reject(new Error("No script source configured"));
+    const tryOne=idx=>{
+      if(idx>=list.length)return Promise.reject(new Error("Failed to load script from all sources: "+list.join(", ")));
+      return loadScript(list[idx]).then(()=>list[idx]).catch(()=>tryOne(idx+1));
+    };
+    return tryOne(0);
+  }
   function ensurePdfJs(){
     if(window.pdfjsLib)return Promise.resolve();
     const cdn=(window.__pfCDN||{});
-    if(!cdn.pdfMin)return Promise.reject(new Error("PDF CDN config missing"));
-    return loadScript(cdn.pdfMin).then(()=>{
-      if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc=cdn.pdfWorker||(cdn.pdfMin.replace(/pdf\.min\.js$/,"pdf.worker.min.js"));
+    if(!cdn.pdfMin)return Promise.reject(new Error("PDF engine config missing"));
+    return loadScriptCandidates(cdn.pdfMin).then(mainSrc=>{
+      if(window.pdfjsLib){
+        const w=cdn.pdfWorker;
+        const workerSrc=(typeof w==="string"&&w)?w:(mainSrc||"").replace(/pdf\.min\.js$/,"pdf.worker.min.js");
+        pdfjsLib.GlobalWorkerOptions.workerSrc=workerSrc;
+      }
     });
   }
   function ensureJsPdf(){
     if(window.jspdf)return Promise.resolve();
     const cdn=(window.__pfCDN||{});
-    if(!cdn.jspdf)return Promise.reject(new Error("jspdf CDN config missing"));
-    return loadScript(cdn.jspdf);
+    if(!cdn.jspdf)return Promise.reject(new Error("jspdf config missing"));
+    return loadScriptCandidates(cdn.jspdf);
   }
 
   /* ===================== DEFAULTS ===================== */
@@ -4268,6 +4283,16 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   /* ===================== NEW: SHORTCUTS MODAL ===================== */
   function showShortcutsModal(){$("shortcutsModal").classList.add("open");}
   function showAboutModal(){$("aboutModal").classList.add("open");}
+  function updateNetState(){
+    const ns=$("netState");if(!ns)return;
+    const on=navigator.onLine!==false;
+    ns.style.display="flex";
+    ns.classList.toggle("online",on);
+    ns.classList.toggle("offline",!on);
+    const l=$("netLabel");if(l)l.textContent=on?"Online":"Offline — works locally";
+  }
+  window.addEventListener("online",updateNetState);
+  window.addEventListener("offline",updateNetState);
 
   /* ===================== NEW: LAYER CONTEXT MENU ===================== */
   let layerCtxIdx=-1;
@@ -7381,6 +7406,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   resetPanelUi();
   restoreProject();
   applyToolUi(getToolMode());
+  updateNetState();
 })();
 </script>
 </body>
