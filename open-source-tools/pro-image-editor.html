@@ -2778,7 +2778,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   /* ===================== EXPORT ===================== */
   function composeOutputCanvas(){const c=mkCanvas(imageCanvas.width,imageCanvas.height),cx=c.getContext("2d");cx.drawImage(imageCanvas,0,0);if(!state.showOriginal)cx.drawImage(drawCanvas,0,0);return c;}
   function exportFileName(ext){return(currentFileNameBase||"edit")+"-edited."+ext;}
-  function downloadCanvas(c,fn,mime,q){const a=document.createElement("a");a.href=c.toDataURL(mime,q);a.download=fn;a.click();const cur=activeTab();if(cur)cur.dirty=false;renderTabBar();saveProject();}
+  function downloadCanvas(c,fn,mime,q){if(mime==="image/jpeg"&&canvasHasTransparency(c))toast("Notice: transparent areas will be white in JPG.","warning",3200);const a=document.createElement("a");a.href=c.toDataURL(mime,q);a.download=fn;a.click();const cur=activeTab();if(cur)cur.dirty=false;renderTabBar();saveProject();}
   async function openInNewTab(){if(!originalImage){toast("Open an image first.","warning");return;}const nt=window.open("","_blank");if(!nt){toast("Allow popups.","warning");return;}try{const b=await new Promise(r=>composeOutputCanvas().toBlob(r,"image/png"));if(b){const url=URL.createObjectURL(b);nt.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),60000);return;}}catch(e){}nt.location.href=composeOutputCanvas().toDataURL("image/png");}
   async function copyImage(){
     if(!originalImage){toast("Open an image first.","warning");return false;}
@@ -2864,6 +2864,20 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     rc.fillStyle="#ffffff";rc.fillRect(0,0,c.width,c.height);
     rc.drawImage(c,0,0);return r;
   }
+  function canvasHasTransparency(c){
+    try{
+      if(!c||!c.width||!c.height)return false;
+      const tw=48,th=Math.max(1,Math.round(c.height*(tw/c.width)));
+      const t=mkCanvas(tw,th),x=t.getContext("2d");
+      x.fillStyle="#000";x.fillRect(0,0,tw,th);
+      x.globalCompositeOperation="destination-out";
+      x.drawImage(c,0,0,tw,th);
+      const d=x.getImageData(0,0,tw,th).data;
+      let blank=0,total=0;
+      for(let i=3;i<d.length;i+=4){total++;if(d[i]>225)blank++;}
+      return total>0&&(blank/total)>0.03;
+    }catch(e){return false;}
+  }
   function composeTabCanvas(t){
     if(t.session)putSession(t.session);
     renderImmediately();
@@ -2899,12 +2913,13 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(back){if(back.session)putSession(back.session);else noDoc();renderImmediately();refreshAfterSwitch();}
     const mime=format==="png"?"image/png":"image/jpeg";
     const q=format==="png"?undefined:(typeof quality==="number"&&quality>0&&quality<=1?quality:0.92);
-    let savedCount=0;
+    let savedCount=0,transJobs=0;
     if(window.showDirectoryPicker&&typeof window.showDirectoryPicker==="function"){
       try{
         const dir=await window.showDirectoryPicker({mode:"readwrite"});
         showLoading("Saving 0/"+jobs.length+" as "+format.toUpperCase()+"...");
         for(const job of jobs){
+          if(format==="jpg"&&canvasHasTransparency(job.canvas))transJobs++;
           const out=format==="jpg"?jpgSafeCanvas(job.canvas):job.canvas;
           const blob=await new Promise(r=>{try{out.toBlob(b=>r(b),mime,q);}catch(e){r(null);}});
           if(!blob)continue;
@@ -2917,6 +2932,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
         }
         hideLoading();
         toast("Saved "+savedCount+" image(s) as "+format.toUpperCase()+" into the chosen folder.","success",3400);
+        if(transJobs)toast("Notice: transparent areas became white in "+transJobs+" JPG(s).","warning",3600);
       }catch(err){
         if(err&&(err.name==="AbortError"||(err.message&&/abort|cancel/i.test(err.message)))){hideLoading();toast("Save cancelled.","info");return;}
         hideLoading();
@@ -2930,8 +2946,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   }
   async function downloadAllFallback(jobs,format,q){
     const mime=format==="png"?"image/png":"image/jpeg";
-    let count=0,total=jobs.length;
+    let count=0,total=jobs.length,transJobs=0;
     for(const job of jobs){
+      if(format==="jpg"&&canvasHasTransparency(job.canvas))transJobs++;
       const out=format==="jpg"?jpgSafeCanvas(job.canvas):job.canvas;
       const blob=await new Promise(r=>{try{out.toBlob(b=>r(b),mime,q);}catch(e){r(null);}});
       if(!blob)continue;
@@ -2944,6 +2961,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
       if(total>1)showLoading("Saving "+count+"/"+total+"...");
     }
     if(count)toast("Saved "+count+" image(s) — check your Downloads folder.","success",3600);
+    if(transJobs)toast("Notice: transparent areas became white in "+transJobs+" JPG(s).","warning",3600);
     return count;
   }
   function doCloseAllTabs(){
@@ -3233,7 +3251,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(typeof activeIdx==="number")activeLayerIdx=clamp(activeIdx,0,layers.length-1);
     renderLayers();renderImmediately();
   }
-  function installSource(img,saved){
+  function installSource(img,saved,slot){
     const __te=document.getElementById("typeEditor");if(__te&&__te.style&&__te.style.display!=="none"){try{__te.blur();}catch(e){}}
     const total=img.width*img.height;
     if(total>MAX_PIXELS){const ratio=Math.sqrt(MAX_PIXELS/total),nw=Math.max(1,Math.round(img.width*ratio)),nh=Math.max(1,Math.round(img.height*ratio));const c=mkCanvas(nw,nh);c.getContext("2d").drawImage(img,0,0,nw,nh);originalImage=c;toast("Image resized for performance.","info",3400);}
@@ -3257,7 +3275,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     }
     syncControlsFromState();updateValueLabels();updateToggleButtons();undoStack=[];redoStack=[];renderHistory();renderImmediately();drawRulers();
     updateQe();
-    const curI=activeTab();if(curI){curI.dirty=false;curI.loading=false;}
+    const curI=slot||activeTab();if(curI){curI.dirty=false;curI.loading=false;}
     renderTabBar();
     applyToolUi(getToolMode());
     if(!saved)resetPanelUi();
@@ -3280,38 +3298,41 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     const b=$("backdropTransparent");if(b)b.classList.toggle("active",!state.backdrop);
   }
   function loadImageFile(file){loadImageFileP(file);}
+  let imageLoadChain=Promise.resolve();
   function loadImageFileP(file,slot){
-    return new Promise(resolve=>{
+    const run=imageLoadChain.then(()=>new Promise(resolve=>{
       if(!file)return resolve(false);
       const base=(file.name||"").replace(/\.[^.]*$/,"").trim()||"edit";
       slot=slot||openDocSlot(base);
       currentFileName=file.name||"-";currentFileSize=file.size>1024?(file.size/1024).toFixed(1)+" KB":file.size+" B";currentFileNameBase=base;
       if(file.type==="application/pdf"||(file.name&&file.name.toLowerCase().endsWith(".pdf"))){
-        (async()=>{await loadPdfFile(file);resolve(true);})();
+        (async()=>{try{await loadPdfFile(file,slot);}catch(e){}resolve(true);})();
         return;
       }
       if(!file.type||!file.type.startsWith("image/")){toast("Select an image or PDF.","error");return resolve(false);}
       showLoading("Reading image...");const reader=new FileReader();
-      reader.onload=e=>{const img=new Image();img.onload=()=>{installSource(img);if(slot){slot.name=base;}hideLoading();renderTabBar();resolve(true);};img.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to load image.","error");resolve(false);};img.src=e.target.result;};
+      reader.onload=e=>{const img=new Image();img.onload=()=>{installSource(img,null,slot);if(slot){slot.name=base;}hideLoading();renderTabBar();resolve(true);};img.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to load image.","error");resolve(false);};img.src=e.target.result;};
       reader.onerror=()=>{if(slot)slot.loading=false;hideLoading();toast("Failed to read file.","error");resolve(false);};reader.readAsDataURL(file);
-    });
+    }));
+    imageLoadChain=run.then(()=>{},()=>{});
+    return run;
   }
   function addImageFile(file){
     if(!file)return;
     if(originalImage&&layers[0]&&layers[0].canvas&&file.type&&file.type.startsWith("image/"))placeImageLayer(file);
     else loadImageFile(file);
   }
-  async function loadPdfPage(num){
+  async function loadPdfPage(num,slot){
     if(!pdfDoc)return;try{showLoading("Rendering page "+num+" of "+pdfTotalPages+"...");const page=await pdfDoc.getPage(num);pdfCurrentPage=num;
       const vp=page.getViewport({scale:pdfScale}),c=mkCanvas(vp.width,vp.height);await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
-      await new Promise(res=>{const img=new Image();img.onload=()=>{installSource(img);hideLoading();res();};img.onerror=res;img.src=c.toDataURL("image/png");});}catch(e){const c2=activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to render PDF.","error");}
+      await new Promise(res=>{const img=new Image();img.onload=()=>{installSource(img,null,slot);hideLoading();res();};img.onerror=res;img.src=c.toDataURL("image/png");});}catch(e){const c2=slot||activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to render PDF.","error");}
   }
-  async function loadPdfFile(file){
+  async function loadPdfFile(file,slot){
     try{
       await ensurePdfJs();
       if(!window.pdfjsLib)throw new Error("PDF engine unavailable");
-      showLoading("Analyzing PDF...");const ab=await file.arrayBuffer();pdfDoc=await pdfjsLib.getDocument({data:ab}).promise;pdfTotalPages=pdfDoc.numPages;pdfCurrentPage=1;updatePdfNav();await loadPdfPage(1);
-    }catch(e){const c2=activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to load PDF.","error");}
+      showLoading("Analyzing PDF...");const ab=await file.arrayBuffer();pdfDoc=await pdfjsLib.getDocument({data:ab}).promise;pdfTotalPages=pdfDoc.numPages;pdfCurrentPage=1;updatePdfNav();await loadPdfPage(1,slot);
+    }catch(e){const c2=slot||activeTab();if(c2)c2.loading=false;hideLoading();toast("Failed to load PDF.","error");}
   }
   function updatePdfNav(){$("pdfNav").classList.add("visible");$("pdfPageInput").value=pdfCurrentPage;$("pdfPageTotal").textContent="/ "+pdfTotalPages;}
   function hidePdfNav(){$("pdfNav").classList.remove("visible");pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;}
