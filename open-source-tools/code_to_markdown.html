@@ -546,6 +546,9 @@
 
   function setSource(src) {
     state.source = src;
+    // اسم الملف الافتراضي: اسم المجلد + _project_overview
+    var safeRoot = src.rootName.replace(/[\\\/:*?"<>|]/g, "_");
+    $("fname").value = safeRoot + "_project_overview.md";
     state.cache = new Map();
     load();
   }
