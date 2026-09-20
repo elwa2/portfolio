@@ -1611,6 +1611,9 @@
   <button class="ctx-item" id="ctxCopy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy image</button>
   <button class="ctx-item" id="ctxDownloadPng"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Save as PNG</button>
   <button class="ctx-item" id="ctxDownloadJpg"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Save as JPG</button>
+  <div style="border-top:1px solid var(--pf-border);margin:4px 0;"></div>
+  <button class="ctx-item" id="ctxOpenDataUrl"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Open as Data URL</button>
+  <button class="ctx-item" id="ctxCopyDataUrl"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><rect x="9" y="9" width="13" height="13" rx="2" opacity="0.3"/></svg>Copy Data URL</button>
 </div>
 
 <div class="ctx-menu layer-ctx" id="layerCtxMenu">
@@ -2829,6 +2832,41 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   function exportFileName(ext){return(currentFileNameBase||"edit")+"-edited."+ext;}
   function downloadCanvas(c,fn,mime,q){if(mime==="image/jpeg"&&canvasHasTransparency(c))toast("Notice: transparent areas will be white in JPG.","warning",3200);const a=document.createElement("a");a.href=c.toDataURL(mime,q);a.download=fn;a.click();const cur=activeTab();if(cur)cur.dirty=false;renderTabBar();saveProject();}
   async function openInNewTab(){if(!originalImage){toast("Open an image first.","warning");return;}const nt=window.open("","_blank");if(!nt){toast("Allow popups.","warning");return;}try{const b=await new Promise(r=>composeOutputCanvas().toBlob(r,"image/png"));if(b){const url=URL.createObjectURL(b);nt.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),60000);return;}}catch(e){}nt.location.href=composeOutputCanvas().toDataURL("image/png");}
+  
+  async function openAsDataUrl(){
+    if(!originalImage){toast("Open an image first.","warning");return;}
+    const dataUrl=composeOutputCanvas().toDataURL("image/png");
+    const w=window.open();
+    if(!w){toast("Allow popups.","warning");return;}
+    w.document.write('<html><head><style>body{margin:0;padding:20px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;}img{max-width:95vw;max-height:95vh;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);}</style></head><body><img src="'+dataUrl+'"></body></html>');
+    w.document.close();
+  }
+  
+  async function copyDataUrl(){
+    if(!originalImage){toast("Open an image first.","warning");return;}
+    try{
+      const dataUrl=composeOutputCanvas().toDataURL("image/png");
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(dataUrl);
+        toast("Copied ("+Math.round(dataUrl.length/1024)+"KB)","success");
+      }else{
+        const ta=document.createElement("textarea");
+        ta.value=dataUrl;
+        ta.style.position="fixed";
+        ta.style.left="-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        if(document.execCommand("copy")){
+          toast("Copied ("+Math.round(dataUrl.length/1024)+"KB)","success");
+        }else{
+          toast("Copy failed","error");
+        }
+        document.body.removeChild(ta);
+      }
+    }catch(e){
+      toast("Error: "+e.message,"error");
+    }
+  }
   async function copyImage(){
     if(!originalImage){toast("Open an image first.","warning");return false;}
     try{const b=await new Promise(r=>composeOutputCanvas().toBlob(r,"image/png"));
@@ -7113,6 +7151,8 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     $("ctxCopy").addEventListener("click",async()=>{const ok=await copyImage();toast(ok?"Image copied.":"Copy failed.",ok?"success":"error");});
     $("ctxDownloadPng").addEventListener("click",()=>{if(originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("png"),"image/png");});
     $("ctxDownloadJpg").addEventListener("click",()=>{if(originalImage)downloadCanvas(composeOutputCanvas(),exportFileName("jpg"),"image/jpeg",0.92);});
+    $("ctxOpenDataUrl").addEventListener("click",openAsDataUrl);
+    $("ctxCopyDataUrl").addEventListener("click",copyDataUrl);
 
     /* Panel Tabs (vertical icon rail) */
     document.querySelectorAll(".panel-tab[data-panel]").forEach(t=>{
