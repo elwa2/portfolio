@@ -790,6 +790,13 @@
     .cp-prev .cp-old,.cp-prev .cp-new{flex:1;display:flex;align-items:center;justify-content:center;font-family:var(--pf-mono);font-size:9px;color:rgba(255,255,255,.9);text-shadow:0 1px 2px rgba(0,0,0,.5);position:relative;}
     .cp-prev .cp-old{background:var(--pf-bg-4);}
     .cp-prev .cp-lbl{position:absolute;top:2px;left:5px;font-size:8px;text-transform:uppercase;letter-spacing:.5px;opacity:.7;}
+    .cp-rgb{display:flex;gap:5px;margin-bottom:10px;}
+    .cp-rgb-i{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--pf-bg-4);border:1px solid var(--pf-border);border-radius:7px;padding:4px 2px;font-family:var(--pf-mono);font-size:10px;color:var(--pf-text);white-space:nowrap;}
+    .cp-rgb-i .c{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none;}
+    .cp-rgb-i .c.r{background:#ff5252;}
+    .cp-rgb-i .c.g{background:#4de05e;}
+    .cp-rgb-i .c.b{background:#4facfe;}
+    .cp-rgb-i b{font-weight:700;}
     .cp-sv{position:relative;width:100%;height:132px;border-radius:8px;cursor:crosshair;touch-action:none;margin-bottom:8px;border:1px solid var(--pf-border);user-select:none;}
     .cp-sv::after{content:"";position:absolute;left:var(--sx,50%);top:var(--sy,50%);width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.7);pointer-events:none;}
     .cp-hue{position:relative;width:100%;height:14px;border-radius:7px;cursor:pointer;touch-action:none;margin-bottom:10px;background:linear-gradient(90deg,#f00 0%,#ff0 16.66%,#0f0 33.33%,#0ff 50%,#00f 66.66%,#f0f 83.33%,#f00 100%);border:1px solid var(--pf-border);}
@@ -4649,6 +4656,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     pop.dataset.built="1";
     pop.innerHTML='<div class="cp-head"><span class="cp-title">Color Picker</span><button type="button" class="cp-close" title="Close (Esc)">✕</button></div>'+
       '<div class="cp-prev"><div class="cp-old"><span class="cp-lbl">old</span></div><div class="cp-new"><span class="cp-lbl">new</span></div></div>'+
+      '<div class="cp-rgb"><span class="cp-rgb-i"><i class="c r"></i>R <b id="cpRv">0</b></span><span class="cp-rgb-i"><i class="c g"></i>G <b id="cpGv">0</b></span><span class="cp-rgb-i"><i class="c b"></i>B <b id="cpBv">0</b></span></div>'+
       '<div class="cp-sv" id="cpSV"></div><div class="cp-hue" id="cpHue"></div>'+
       '<div class="cp-fields"><input class="cp-hex" id="cpHex" maxlength="7" spellcheck="false" placeholder="#ffffff" /><input class="cp-num" id="cpR" type="number" min="0" max="255" /><input class="cp-num" id="cpG" type="number" min="0" max="255" /><input class="cp-num" id="cpB" type="number" min="0" max="255" /></div>'+
       '<button type="button" class="cp-dropper" id="cpDrop"><svg viewBox="0 0 24 24"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>Pick color from the image</button>'+
@@ -4718,6 +4726,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const nums={r:pop.querySelector("#cpR"),g:pop.querySelector("#cpG"),b:pop.querySelector("#cpB")};
     const c=hexToRgb(cpState.hex);
     if(nums.r)nums.r.value=c.r;if(nums.g)nums.g.value=c.g;if(nums.b)nums.b.value=c.b;
+    const rv=pop.querySelector("#cpRv"),gv=pop.querySelector("#cpGv"),bv=pop.querySelector("#cpBv");
+    if(rv)rv.textContent=c.r;if(gv)gv.textContent=c.g;if(bv)bv.textContent=c.b;
     const old=pop.querySelector(".cp-old"),neu=pop.querySelector(".cp-new");
     if(old)old.style.background=cpState.oldHex;if(neu)neu.style.background=cpState.hex;
   }
