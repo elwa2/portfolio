@@ -797,6 +797,9 @@
     .cp-rgb-i .c.g{background:#4de05e;}
     .cp-rgb-i .c.b{background:#4facfe;}
     .cp-rgb-i b{font-weight:700;}
+    .cp-rgb .cp-rgb-i{cursor:pointer;font-family:inherit;}
+    .cp-rgb .cp-rgb-i:hover{border-color:var(--pf-accent);background:rgba(79,172,254,.12);}
+    .cp-rgb .cp-rgb-i:active{transform:scale(.96);}
     .cp-sv{position:relative;width:100%;height:132px;border-radius:8px;cursor:crosshair;touch-action:none;margin-bottom:8px;border:1px solid var(--pf-border);user-select:none;}
     .cp-sv::after{content:"";position:absolute;left:var(--sx,50%);top:var(--sy,50%);width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.7);pointer-events:none;}
     .cp-hue{position:relative;width:100%;height:14px;border-radius:7px;cursor:pointer;touch-action:none;margin-bottom:10px;background:linear-gradient(90deg,#f00 0%,#ff0 16.66%,#0f0 33.33%,#0ff 50%,#00f 66.66%,#f0f 83.33%,#f00 100%);border:1px solid var(--pf-border);}
@@ -4654,9 +4657,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   function cpBuildUI(){
     const pop=$("colorPickerPop");if(!pop||pop.dataset.built)return;
     pop.dataset.built="1";
-    pop.innerHTML='<div class="cp-head"><span class="cp-title">Color Picker</span><button type="button" class="cp-close" title="Close (Esc)">✕</button></div>'+
       '<div class="cp-prev"><div class="cp-old"><span class="cp-lbl">old</span></div><div class="cp-new"><span class="cp-lbl">new</span></div></div>'+
-      '<div class="cp-rgb"><span class="cp-rgb-i"><i class="c r"></i>R <b id="cpRv">0</b></span><span class="cp-rgb-i"><i class="c g"></i>G <b id="cpGv">0</b></span><span class="cp-rgb-i"><i class="c b"></i>B <b id="cpBv">0</b></span></div>'+
+      '<div class="cp-rgb"><button type="button" class="cp-rgb-i" data-cp="R" title="Copy R value"><i class="c r"></i>R <b id="cpRv">0</b></button><button type="button" class="cp-rgb-i" data-cp="G" title="Copy G value"><i class="c g"></i>G <b id="cpGv">0</b></button><button type="button" class="cp-rgb-i" data-cp="B" title="Copy B value"><i class="c b"></i>B <b id="cpBv">0</b></button></div>'+
       '<div class="cp-sv" id="cpSV"></div><div class="cp-hue" id="cpHue"></div>'+
       '<div class="cp-fields"><input class="cp-hex" id="cpHex" maxlength="7" spellcheck="false" placeholder="#ffffff" /><input class="cp-num" id="cpR" type="number" min="0" max="255" /><input class="cp-num" id="cpG" type="number" min="0" max="255" /><input class="cp-num" id="cpB" type="number" min="0" max="255" /></div>'+
       '<button type="button" class="cp-dropper" id="cpDrop"><svg viewBox="0 0 24 24"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>Pick color from the image</button>'+
@@ -4673,6 +4675,17 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     pop.querySelector(".cp-close").addEventListener("click",(e)=>{e.stopPropagation();closeColorPicker(false);});
     pop.querySelector(".cp-cancel").addEventListener("click",(e)=>{e.stopPropagation();closeColorPicker(false);});
     pop.querySelector(".cp-ok").addEventListener("click",(e)=>{e.stopPropagation();closeColorPicker(true);});
+    pop.querySelectorAll(".cp-rgb-i").forEach(btn=>{
+      btn.addEventListener("click",e=>{
+        e.stopPropagation();
+        const b=btn.querySelector("b");if(!b)return;
+        const v=b.textContent;
+        const done=()=>toast(btn.dataset.cp+" = "+v+"  copied","info",1400);
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(v).then(done).catch(()=>{legacyCopy(v);done();});
+        }else{legacyCopy(v);done();}
+      });
+    });
     pop.addEventListener("pointerdown",e=>e.stopPropagation());
     const hexEl=pop.querySelector(".cp-hex");
     hexEl.addEventListener("input",()=>{
