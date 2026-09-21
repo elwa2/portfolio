@@ -4654,9 +4654,17 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     cpState.hex=hex;const hsv=cpHexToHsv(hex);cpState.h=hsv.h;cpState.s=hsv.s;cpState.v=hsv.v;
     cpRefreshUI();applyPickerColor(hex);
   }
+  function legacyCopy(text){
+    const ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.left="-9999px";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");}catch(e){}
+    document.body.removeChild(ta);
+  }
   function cpBuildUI(){
     const pop=$("colorPickerPop");if(!pop||pop.dataset.built)return;
     pop.dataset.built="1";
+    pop.innerHTML='<div class="cp-head"><span class="cp-title">Color Picker</span><button type="button" class="cp-close" title="Close (Esc)">✕</button></div>'+
       '<div class="cp-prev"><div class="cp-old"><span class="cp-lbl">old</span></div><div class="cp-new"><span class="cp-lbl">new</span></div></div>'+
       '<div class="cp-rgb"><button type="button" class="cp-rgb-i" data-cp="R" title="Copy R value"><i class="c r"></i>R <b id="cpRv">0</b></button><button type="button" class="cp-rgb-i" data-cp="G" title="Copy G value"><i class="c g"></i>G <b id="cpGv">0</b></button><button type="button" class="cp-rgb-i" data-cp="B" title="Copy B value"><i class="c b"></i>B <b id="cpBv">0</b></button></div>'+
       '<div class="cp-sv" id="cpSV"></div><div class="cp-hue" id="cpHue"></div>'+
