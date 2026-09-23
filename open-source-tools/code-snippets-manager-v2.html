@@ -2045,8 +2045,7 @@
     <span class="ecp-aval" id="ecpAVal">100%</span>
   </div>
   <div class="ecp-actions">
-    <button class="btn-primary" id="ecpOk">تطبيق</button>
-    <button class="btn-cancel" id="ecpCancel">إلغاء</button>
+    <button class="btn-primary" id="ecpOk">تم</button>
   </div>
 </div>
 
@@ -4137,28 +4136,28 @@
     edColTarget = null;
   }
 
-  function edPopApply(){
+  function edPopLive(){
     const input = document.getElementById('edInput');
     if (!input || !edColTarget) return;
     const t = edColTarget;
     let val = input.value;
     if (val !== edColSnap){
-      const idx = val.indexOf(t.text, Math.max(0, t.from - 200));
-      if (idx === -1){ showToast('تغيّر النص — أعد المحاولة'); edCloseColor(); return; }
+      const idx = val.indexOf(t.text, Math.max(0, t.from - 300));
+      if (idx === -1) return;
       t.from = idx; t.to = idx + t.text.length;
     }
     const out = edRgbToHex(edPopColor);
-    if (out === val.slice(t.from, t.to)){ showToast('اللون نفسه'); edCloseColor(); return; }
+    if (out === val.slice(t.from, t.to)) return;
     val = val.slice(0, t.from) + out + val.slice(t.to);
     input.value = val;
-    input.selectionStart = input.selectionEnd = t.from + out.length;
+    t.text = out;
+    t.to = t.from + out.length;
+    edColSnap = val;
     const sn = activeVdSnippet();
     sn.draft = val;
     saveVd();
-    edCloseColor();
     edSync();
     edStatus();
-    showToast('تم تغيير اللون');
   }
 
   function edColorInit(){
@@ -4171,25 +4170,24 @@
     const rEl = q('ecpR'), gEl = q('ecpG'), bEl = q('ecpB'), aEl = q('ecpA');
     nativeEl.addEventListener('input', () => {
       const p = edParseColor(nativeEl.value);
-      if (p){ edPopColor = { r: p.r, g: p.g, b: p.b, a: 1 }; edPopRender(); }
+      if (p){ edPopColor = { r: p.r, g: p.g, b: p.b, a: 1 }; edPopRender(); edPopLive(); }
     });
     hexEl.addEventListener('input', () => {
       const p = edParseColor(hexEl.value);
-      if (p){ edPopColor = { r: p.r, g: p.g, b: p.b, a: p.a }; edPopRender(); }
+      if (p){ edPopColor = { r: p.r, g: p.g, b: p.b, a: p.a }; edPopRender(); edPopLive(); }
     });
-    hexEl.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); edPopApply(); } });
+    hexEl.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); edCloseColor(); } });
     [[rEl, 'r'], [gEl, 'g'], [bEl, 'b']].forEach(pair => {
       pair[0].addEventListener('input', () => {
         edPopColor[pair[1]] = Math.min(255, Math.max(0, parseInt(pair[0].value, 10) || 0));
-        edPopRender();
+        edPopRender(); edPopLive();
       });
     });
     aEl.addEventListener('input', () => {
       edPopColor.a = (parseInt(aEl.value, 10) || 100) / 100;
-      edPopRender();
+      edPopRender(); edPopLive();
     });
-    q('ecpOk').addEventListener('click', edPopApply);
-    q('ecpCancel').addEventListener('click', () => edCloseColor());
+    q('ecpOk').addEventListener('click', () => edCloseColor());
     document.addEventListener('click', e => {
       if (!edColActive) return;
       if (pop.contains(e.target)) return;
