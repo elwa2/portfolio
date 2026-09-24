@@ -1861,6 +1861,169 @@
   @media (prefers-reduced-motion: no-preference) {
     .section { transition: border-color 0.2s, box-shadow 0.2s; }
   }
+
+  /* ===== HOME DASHBOARD ===== */
+  .home-dash { grid-column: 1 / -1; }
+
+  .home-banner {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg);
+    padding: 26px 28px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(420px 190px at 88% 0%, var(--accent-glow), transparent 65%);
+    pointer-events: none;
+  }
+  .home-banner-ic {
+    width: 60px; height: 60px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md);
+    background: var(--accent-glow);
+    border: 1px solid var(--border-acc);
+    font-size: 28px; color: var(--accent);
+  }
+  .home-banner-txt { min-width: 0; }
+  .home-banner-title {
+    font-size: 20px; font-weight: 800; color: var(--text-1);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .home-banner-title .now-d { font-size: 12px; color: var(--accent-cool); font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+  .home-banner-sub { font-size: 12.5px; color: var(--text-3); margin-top: 4px; line-height: 1.7; }
+
+  .home-title {
+    font-size: 13px; font-weight: 800; color: var(--text-1);
+    display: flex; align-items: center; gap: 8px;
+    margin: 22px 0 12px;
+  }
+  .home-title i { font-size: 15px; color: var(--accent); }
+  .home-title .hln { margin-inline-start: auto; font-size: 10.5px; color: var(--text-3); font-weight: 500; font-family: 'JetBrains Mono', monospace; }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+  }
+  .home-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none; color: inherit;
+    transition: border-color 0.18s, transform 0.18s, background 0.18s;
+  }
+  .home-card:hover { border-color: var(--border-acc); transform: translateY(-2px); background: var(--bg-elevated); }
+  .home-card-ic {
+    width: 38px; height: 38px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    background: var(--bg-overlay);
+    border: 1px solid var(--border-sub);
+    font-size: 17px; color: var(--accent);
+  }
+  .home-card.c-blue .home-card-ic { color: var(--accent-cool); }
+  .home-card.c-purple .home-card-ic { color: #8b5cf6; }
+  .home-card.c-gold .home-card-ic { color: var(--accent-warm); }
+  .home-card.c-teal .home-card-ic { color: #14b8a6; }
+  .home-card.c-green .home-card-ic { color: var(--success); }
+  .home-card.c-red .home-card-ic { color: var(--danger); }
+  .home-card-t { font-size: 12.5px; font-weight: 700; color: var(--text-1); line-height: 1.4; }
+  .home-card-s { font-size: 10.5px; color: var(--text-3); margin-top: 2px; line-height: 1.5; }
+
+  .home-grid.tools .home-card { min-height: 74px; }
+
+  .home-note {
+    margin-top: 16px;
+    border: 1px dashed var(--border-sub);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 11.5px; color: var(--text-3); line-height: 1.8;
+  }
+  .home-note b { color: var(--text-2); }
+
+  .home-title .gs-refresh {
+    margin-inline-start: auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border-def);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--accent);
+    font-size: 10.5px; font-weight: 700;
+    padding: 5px 12px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .home-title .gs-refresh:hover { background: var(--accent-glow); border-color: var(--border-acc); }
+  .gs-img-ic { width: 20px; height: 20px; border-radius: 5px; object-fit: contain; }
+  .gs-emoji { font-size: 18px; line-height: 1; }
+  .gs-live-notice {
+    margin-top: 12px;
+    font-size: 10.5px; color: var(--text-3);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gs-live-notice i { color: var(--success); }
+
+  @media (max-width: 640px) {
+    .home-banner { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; }
+    .home-grid { grid-template-columns: 1fr 1fr; }
+    .home-card { padding: 12px; }
+  }
+
+  /* ===== GROUPED MAIN ===== */
+  .group-wrap { grid-column: 1 / -1; margin-bottom: 12px; }
+  .group-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+    cursor: pointer; user-select: none;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .group-head:hover { border-color: var(--border-def); background: var(--bg-elevated); }
+  .group-ic {
+    width: 32px; height: 32px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: var(--bg-overlay);
+    border: 1px solid var(--border-sub);
+    font-size: 15px; color: var(--accent);
+  }
+  .group-head.g-css .group-ic { color: var(--accent-cool); }
+  .group-head.g-responsive .group-ic { color: #38bdf8; }
+  .group-head.g-brand .group-ic { color: #f472b6; }
+  .group-head.g-salla .group-ic { color: var(--accent-warm); }
+  .group-head.g-has .group-ic { color: var(--accent); }
+  .group-head.g-javascript .group-ic { color: #a3e635; }
+  .group-title { font-size: 13.5px; font-weight: 800; color: var(--text-1); }
+  .group-count {
+    margin-inline-start: auto; font-size: 10.5px; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+  }
+  .group-arrow { font-size: 13px; color: var(--text-3); transition: transform 0.2s; flex-shrink: 0; }
+  .group-head.open .group-arrow { transform: rotate(90deg); color: var(--accent); }
+  .group-body {
+    display: none;
+    margin-top: 6px;
+  }
+  .group-body.open {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  @media (max-width: 820px) { .group-body.open { grid-template-columns: 1fr; } }
+
+  /* ===== HOME ACTIVE STATE (topbar) ===== */
+  .topbar-btn.home-active { background: var(--accent-glow); color: var(--accent); border-color: var(--border-acc); }
 </style>
 </head>
 <body>
@@ -1885,6 +2048,10 @@
   <span class="count-badge" id="countBadge">0 كود</span>
 
   <div class="topbar-actions">
+    <button class="topbar-btn" id="homeBtn" onclick="toggleHomeDash()" title="الصفحة الرئيسية">
+      <i class="ti ti-home-2" aria-hidden="true"></i>
+      <span>الرئيسية</span>
+    </button>
     <button class="topbar-btn" onclick="openModal()" title="إضافة كود جديد">
       <i class="ti ti-plus" aria-hidden="true"></i>
       <span>إضافة</span>
@@ -2161,12 +2328,14 @@
   let _deleteSnippetId = null;
   let _initDone = false;
   let varValues = new Map();
+  let showHomeDash = false;
   let showHasDash = false;
   let showVdDash = false;
   let showEdDash = false;
   let showCpDash = false;
   let showRtDash = false;
   let showPvDash = false;
+  let collapsedGroups = new Set();
 
   // ── SYNTAX HIGHLIGHT ──
   function syntaxHL(code){
@@ -2483,6 +2652,8 @@
     document.getElementById('sbDashBtn').classList.toggle('scrollbar-active', showScrollbarDash);
     if(showScrollbarDash){
       document.querySelectorAll('.filter-tag:not(#sbDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showHasDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       showCvDash = false;
@@ -2740,6 +2911,11 @@
 
   // ── FILTER ──
   function setTag(el){
+    if(showHomeDash){
+      showHomeDash = false;
+      const hb = document.getElementById('homeBtn');
+      if (hb) hb.classList.remove('home-active');
+    }
     if(showHasDash){
       showHasDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
@@ -2799,12 +2975,300 @@
     });
   }
 
+  // ── SECTION GROUPS ──
+  const GROUP_LIST = [
+    { key:'css',        label:'CSS',              icon:'ti-palette' },
+    { key:'responsive', label:'Responsive',       icon:'ti-devices' },
+    { key:'brand',      label:'Brand',            icon:'ti-swatch' },
+    { key:'salla',      label:'Salla',            icon:'ti-shopping-bag' },
+    { key:'has',        label:':has()',          icon:'ti-code' },
+    { key:'javascript', label:'JavaScript',       icon:'ti-brand-javascript' }
+  ];
+  function sectionGroup(s){
+    const tags = s.tags || [];
+    if(tags.some(t=>['responsive','media','layout','respons'].includes(t.toLowerCase()))) return 'responsive';
+    if(tags.some(t=>['brand','logo','identity'].includes(t.toLowerCase()))) return 'brand';
+    if(tags.some(t=>t.toLowerCase()==='has')) return 'has';
+    if(tags.some(t=>['salla','zid','cart','product','footer','button','store'].includes(t.toLowerCase()))) return 'salla';
+    if(tags.some(t=>t.toLowerCase()==='javascript' || t.toLowerCase()==='js')) return 'javascript';
+    const code = (s.codes||[]).map(c=>c.code).join('\n');
+    if(isJS(code)) return 'javascript';
+    return 'css';
+  }
+  function toggleGroup(key, ev){
+    if(ev){ ev.stopPropagation(); }
+    if(collapsedGroups.has(key)) collapsedGroups.delete(key);
+    else collapsedGroups.add(key);
+    renderAll();
+  }
+
+  // ── HOME DASHBOARD ──
+  function toggleHomeDash(){
+    showHomeDash = !showHomeDash;
+    document.getElementById('homeBtn').classList.toggle('home-active', showHomeDash);
+    if(showHomeDash){
+      document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
+      showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false;
+      showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
+      showCpDash = false; showRtDash = false; showPvDash = false;
+      const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+        vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
+        b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active',
+        pvDashBtn:'pv-active' };
+      Object.keys(map).forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove(map[id]);
+      });
+    }
+    renderAll();
+  }
+
+  function renderHomeDash(){
+    document.getElementById('countBadge').textContent = DATA.length + ' كود';
+    const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
+    const featured = DATA.filter(s => starredIds.has(s.id)).slice(0, 8);
+
+    const dashCards = [
+      { id:'hasDashBtn', t:'لوحة :has()', s:'محددات حديثة', i:'ti-code', c:'c-purple' },
+      { id:'sbDashBtn', t:'سكرول بار', s:'توليد CSS', i:'ti-scroll', c:'c-teal' },
+      { id:'cvDashBtn', t:'محول الأكواد', s:'HTML/CSS صحيح', i:'ti-arrows-shuffle', c:'c-blue' },
+      { id:'vdDashBtn', t:'مقارنة النسخ', s:'نسخ ومقارنة', i:'ti-versions', c:'c-gold' },
+      { id:'edDashBtn', t:'المحرر', s:'أكواد بترقيم', i:'ti-code', c:'c-blue' },
+      { id:'devDashBtn', t:'أدوات المطور', s:'Dev Tools', i:'ti-tool', c:'c-teal' },
+      { id:'b64DashBtn', t:'Base64', s:'ترميز وفك', i:'ti-database', c:'c-purple' },
+      { id:'qrDashBtn', t:'QR Code', s:'مولد QR', i:'ti-qrcode', c:'c-green' },
+      { id:'cpDashBtn', t:'لون CSS', s:'أدوات الألوان', i:'ti-color-swatch', c:'c-red' },
+      { id:'rtDashBtn', t:'Real-Time', s:'نسخ مباشر', i:'ti-bolt', c:'c-gold' },
+      { id:'pvDashBtn', t:'معاينة', s:'Preview', i:'ti-eye', c:'c-red' }
+    ];
+
+    const toolLinks = [
+      { href:'gradient-generator.html',     t:'مولد التدرجات',     i:'ti-gradient', c:'c-purple' },
+      { href:'color-tools.html',            t:'أدوات الألوان',     i:'ti-color-swatch', c:'c-red' },
+      { href:'primary-color-variables-generator.html', t:'متغيرات اللون', i:'ti-variables', c:'c-blue' },
+      { href:'brand-color-palette-lab.html',t:'لوحة الهوية',       i:'ti-palette', c:'c-gold' },
+      { href:'before-after-comparison.html',t:'قبل وبعد',          i:'ti-compare', c:'c-teal' },
+      { href:'article-image-seo.html',      t:'SEO الصور',         i:'ti-photo', c:'c-green' },
+      { href:'image-optimizer.html',        t:'تحسين الصور',       i:'ti-photo-scan', c:'c-blue' },
+      { href:'image-resizer.html',          t:'تصغير الصور',       i:'ti-resize', c:'c-purple' },
+      { href:'glass-generator.html',        t:'زجاج عليه',          i:'ti-float-none', c:'c-teal' },
+      { href:'megasplit.html',              t:'MegaSplit',         i:'ti-cut', c:'c-red' },
+      { href:'file-toolkit.html',           t:'ملفات',             i:'ti-file', c:'c-blue' },
+      { href:'pro-image-editor.html',       t:'محرر صور',          i:'ti-edit', c:'c-gold' },
+      { href:'kdp-tools.html',              t:'أدوات KDP',         i:'ti-book', c:'c-purple' },
+      { href:'base64-tool.html',            t:'Base64',            i:'ti-database', c:'c-teal' },
+      { href:'github-cdn.html',             t:'GitHub CDN',        i:'ti-brand-github', c:'c-green' },
+      { href:'useful-links.html',           t:'روابط مهمة',        i:'ti-link', c:'c-blue' },
+      { href:'qr-generator.html',           t:'QR Generator',      i:'ti-qrcode', c:'c-green' },
+      { href:'password-generator.html',     t:'مولد كلمات مرور',   i:'ti-lock', c:'c-red' },
+      { href:'webp-converter.html',         t:'WebP محول',         i:'ti-photo', c:'c-teal' },
+      { href:'smart-image-compressor.html', t:'ضغط ذكي للصور',     i:'ti-brackets-contain', c:'c-purple' },
+      { href:'css-optimizer.html',          t:'تحسين CSS',         i:'ti-brush', c:'c-blue' },
+      { href:'text-case-converter.html',    t:'تحويل النصوص',      i:'ti-case-toggle', c:'c-gold' },
+      { href:'translator.html',             t:'مترجم',             i:'ti-language', c:'c-teal' },
+      { href:'calendar.html',               t:'آلة حاسبة',         i:'ti-calculator', c:'c-red' },
+      { href:'todo.html',                   t:'مهام',              i:'ti-list-check', c:'c-green' },
+      { href:'dev-tools.html',              t:'Dev Tools',         i:'ti-tool', c:'c-purple' }
+    ];
+
+    const mainLinks = [
+      { href:'../index.html',     t:'الصفحة الرئيسية', i:'ti-home', c:'c-blue' },
+      { href:'../works.html',     t:'أعمالي',           i:'ti-briefcase', c:'c-gold' },
+      { href:'../contact.html',   t:'تواصل معي',        i:'ti-mail', c:'c-teal' },
+      { href:'index.html',        t:'كل الأدوات',       i:'ti-grid-dots', c:'c-purple' }
+    ];
+
+    const socialLinks = [
+      { href:'https://wa.me/201002241591',              t:'واتساب',     i:'ti-brand-whatsapp', c:'c-green' },
+      { href:'https://www.instagram.com/salla1zid/',    t:'إنستجرام',   i:'ti-brand-instagram', c:'c-purple' },
+      { href:'https://t.me/cssfree1',                    t:'تيليجرام',   i:'ti-brand-telegram', c:'c-blue' },
+      { href:'https://www.behance.net/3lwaaa1',          t:'بيهانس',     i:'ti-brand-behance', c:'c-blue' }
+    ];
+
+    const card = (d, dash) => `
+      <div class="home-card ${d.c}" onclick="${dash ? `toggleById('${d.id}')` : `window.open('${d.href}','_blank')`}" title="${d.t}" ${dash ? 'style="cursor:pointer"' : ''}>
+        <div class="home-card-ic"><i class="ti ${d.i}" aria-hidden="true"></i></div>
+        <div><div class="home-card-t">${escHtml(d.t)}</div><div class="home-card-s">${escHtml(d.s||'')}</div></div>
+      </div>`;
+
+    const dashHtml = dashCards.map(d => card(d, true)).join('');
+    const toolsHtml = toolLinks.map(d => card(d, false)).join('');
+    const mainHtml = mainLinks.map(d => card(d, false)).join('');
+    const socialHtml = socialLinks.map(d => card(d, false)).join('');
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-EG', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    const h = now.getHours();
+    const greet = h < 12 ? 'صباح الخير' : (h < 18 ? 'مساء الخير' : 'مساءً سعيدًا');
+
+    const starredHtml = featured.length ? `
+      <div class="home-title"><i class="ti ti-star" aria-hidden="true"></i> محفوظاتي <span class="hln">${featured.length} عنصر</span></div>
+      <div class="home-grid">
+        ${featured.map(s=>`
+          <div class="home-card c-gold" onclick="goHomeTo('${s.id}')" title="${escHtml(s.title)}" style="cursor:pointer">
+            <div class="home-card-ic"><i class="ti ti-code" aria-hidden="true"></i></div>
+            <div><div class="home-card-t">${escHtml(s.title)}</div><div class="home-card-s">${s.codes.length} أكواد</div></div>
+          </div>`).join('')}
+      </div>` : '';
+
+    document.getElementById('mainBody').innerHTML = `
+      <div class="home-dash">
+        <div class="home-banner">
+          <div class="home-banner-ic"><i class="ti ti-home-2" aria-hidden="true"></i></div>
+          <div class="home-banner-txt">
+            <div class="home-banner-title">${greet} 👋 <span class="now-d">${escHtml(dateStr)}</span></div>
+            <div class="home-banner-sub">ملّخصك والأدوات الأكثر استخدامًا — ولوحاتك الخاصة كلها في مكان واحد.</div>
+          </div>
+        </div>
+
+        <div class="home-title"><i class="ti ti-home" aria-hidden="true"></i> لوحاتي <span class="hln">${dashCards.length} لوحة</span></div>
+        <div class="home-grid">${dashHtml}</div>
+
+        ${starredHtml}
+
+        <div class="home-title"><i class="ti ti-layout-grid" aria-hidden="true"></i> أدواتي المفتوحة المصدر <span class="hln">${toolLinks.length} أداة</span></div>
+        <div class="home-grid tools">${toolsHtml}</div>
+
+        <div class="home-title"><i class="ti ti-link" aria-hidden="true"></i> روابط سريعة</div>
+        <div class="home-grid">${mainHtml}</div>
+
+<div class="home-title"><i class="ti ti-users" aria-hidden="true"></i> تواصل</div>
+        <div class="home-grid">${socialHtml}</div>
+
+        <div class="home-title" id="gsBox">
+          <i class="ti ti-table" aria-hidden="true"></i> قاعدة البيانات
+          <span class="hln" id="gsCountBadge">0 رابط</span>
+          <button class="gs-refresh" onclick="loadSheetLinks(true)" title="تحديث من جوجل شيت">
+            <i class="ti ti-refresh" aria-hidden="true"></i> تحديث
+          </button>
+        </div>
+        <div class="home-grid" id="gsGrid"></div>
+        <div class="gs-live-notice"><i class="ti ti-database" aria-hidden="true"></i> مرتبط بجوجل شيت — أضف رابطًا في الشيت ثم اضغط "تحديث" (كاش 6 ساعات محليًا)</div>
+
+        <div class="home-note"><b>نصيحة:</b> اضغط "الكل" أعلى الفلتر للعودة لقائمة الأكواد, أو "الرئيسية" في أي وقت للرجوع لهذه الصفحة. بحثك الحالي: ${q ? '<b style="color:var(--text-1)">'+escHtml(q)+'</b>' : '<b style="color:var(--text-1)">بدون بحث</b>'}.</div>
+      </div>`;
+    loadSheetLinks(false);
+  }
+
+  function toggleById(id){
+    const fn = { hasDashBtn:toggleHasDash, sbDashBtn:toggleScrollbarDash, cvDashBtn:toggleCvDash,
+      vdDashBtn:toggleVdDash, edDashBtn:toggleEdDash, devDashBtn:toggleDevDash,
+      b64DashBtn:toggleB64Dash, qrDashBtn:toggleQrDash, cpDashBtn:toggleCpDash,
+      rtDashBtn:toggleRtDash, pvDashBtn:togglePvDash }[id];
+    if (fn) fn();
+  }
+
+  function goHomeTo(id){
+    showHomeDash = false;
+    const b = document.getElementById('homeBtn');
+    if (b) b.classList.remove('home-active');
+    activeTag = 'all';
+    document.querySelectorAll('.filter-tag').forEach(x=>x.classList.remove('active'));
+    openIds = new Set(openIds).add(id);
+    const allBtn = document.querySelector('.filter-tag[data-tag="all"]');
+    if (allBtn) allBtn.classList.add('active');
+    renderAll();
+  }
+
+  // ── GOOGLE SHEETS LINKS (قاعدة البيانات) ──
+  const GS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzi1VPP6FIaBhLTdytoevyC2ByxyaZYSd-xJoyeaKLZU5nOYnjn-x2VXs_A95Srf7d4/exec';
+  const GS_CACHE_KEY = 'csman_gs_links_v1';
+  const GS_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 ساعات
+
+  function gsCacheGet(){
+    try {
+      const raw = localStorage.getItem(GS_CACHE_KEY);
+      if(!raw) return null;
+      const c = JSON.parse(raw);
+      if(!c || !Array.isArray(c.links)) return null;
+      if(Date.now() - (c.t || 0) > GS_CACHE_TTL) return null;
+      return c.links;
+    } catch(e){ return null; }
+  }
+  function gsCacheSet(links){
+    try { localStorage.setItem(GS_CACHE_KEY, JSON.stringify({ t: Date.now(), links: links })); } catch(e){}
+  }
+  function gsIconHtml(icon){
+    icon = String(icon || '').trim();
+    if(!icon) return '<i class="ti ti-link" aria-hidden="true"></i>';
+    if(/^ti/i.test(icon)) return `<i class="${escHtml(icon)}" aria-hidden="true"></i>`;
+    if(/^https?:\/\//i.test(icon)) return `<img src="${escHtml(icon)}" alt="" class="gs-img-ic" loading="lazy">`;
+    return `<span class="gs-emoji">${escHtml(icon)}</span>`;
+  }
+  function gsCardHtml(d){
+    const colorClass = (d.color && ['c-blue','c-teal','c-green','c-gold','c-purple','c-red'].includes('c-' + String(d.color))) ? 'c-' + d.color : 'c-blue';
+    return `<a class="home-card ${colorClass}" href="${escHtml(d.url)}" target="_blank" rel="noopener" title="${escHtml(d.title)}">
+      <div class="home-card-ic">${gsIconHtml(d.icon || d.icon_url || d.emoji)}</div>
+      <div><div class="home-card-t">${escHtml(d.title)}</div><div class="home-card-s">${escHtml(d.group || d.type || 'رابط')}</div></div>
+    </a>`;
+  }
+  function renderGSLinks(links){
+    const wrap = document.getElementById('gsGrid');
+    if(!wrap) return;
+    wrap.innerHTML = links.length
+      ? links.map(gsCardHtml).join('')
+      : '<div class="home-note"><b>لا توجد روابط</b> — أضف صفوفًا في جوجل شيت ثم حدّث.</div>';
+    const badge = document.getElementById('gsCountBadge');
+    if(badge) badge.textContent = links.length ? links.length + ' رابط' : 'لا توجد روابط';
+    const box = document.getElementById('gsBox');
+    if(box) box.style.display = '';
+  }
+  function loadSheetLinks(force){
+    const cached = force ? null : gsCacheGet();
+    if(cached && cached.length){
+      renderGSLinks(cached);
+    } else {
+      renderGSLinks([]);
+    }
+    const url = GS_SHEET_URL + (force ? '?v=' + Date.now() : '');
+    fetch(url).then(r => r.text()).then(raw => {
+        const j = JSON.parse(raw);
+        const links = Array.isArray(j) ? j : (Array.isArray(j.links) ? j.links : null);
+        if(!links){ throw new Error(j.error || 'بنية غير صحيحة'); }
+        gsCacheSet(links);
+        renderGSLinks(links);
+      })
+      .catch(err => gsHandleError(err));
+  }
+  function gsHandleError(err){
+    // fallback: JSONP (يعمل حتى من file:// ومن أي أصل)
+    try {
+      const cb = 'gsCallback' + Date.now();
+      window[cb] = function(j){
+        delete window[cb];
+        const links = Array.isArray(j) ? j : (Array.isArray(j.links) ? j.links : null);
+        if(!links){ gsFail(err); return; }
+        gsCacheSet(links);
+        renderGSLinks(links);
+      };
+      const s = document.createElement('script');
+      s.src = GS_SHEET_URL + '?callback=' + cb + (force ? '&v=' + Date.now() : '');
+      s.onerror = function(){ delete window[cb]; gsFail(err); };
+      document.head.appendChild(s);
+    } catch(e2){ gsFail(err); }
+  }
+  function gsFail(err){
+    const stale = gsCacheGet();
+    if(stale && stale.length){ renderGSLinks(stale); }
+    else {
+      renderGSLinks([]);
+      const wrap = document.getElementById('gsGrid');
+      if(wrap && !wrap.querySelector('.home-card')){
+        wrap.innerHTML = '<div class="home-note"><b>تعذّر الاتصال بقاعدة البيانات.</b><br>تحقق من نشر التطبيق كـ "أي شخص", ومن الرابط, ومن الاتصال بالإنترنت.<br><span style="font-size:10.5px;color:var(--text-3)">' + escHtml(String(err && err.message)) + '</span></div>';
+      }
+      const box = document.getElementById('gsBox');
+      if(box) box.style.display = '';
+    }
+  }
+
   // ── HAS DASHBOARD ──
   function toggleHasDash(){
     showHasDash = !showHasDash;
     document.getElementById('hasDashBtn').classList.toggle('has-active', showHasDash);
     if(showHasDash){
       document.querySelectorAll('.filter-tag:not(#hasDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
       showCvDash = false;
@@ -2990,6 +3454,9 @@
     document.getElementById('cvDashBtn').classList.toggle('cv-active', showCvDash);
     if(showCvDash){
       document.querySelectorAll('.filter-tag:not(#cvDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHomeDash = false;
+      const __hb = document.getElementById('homeBtn');
+      if (__hb) __hb.classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
@@ -3252,6 +3719,9 @@
     document.getElementById('vdDashBtn').classList.toggle('vd-active', showVdDash);
     if(showVdDash){
       document.querySelectorAll('.filter-tag:not(#vdDashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      const __hb = document.getElementById('homeBtn');
+      if (__hb) __hb.classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       showCvDash = false;
@@ -3723,6 +4193,8 @@
     document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
     if(showEdDash){
       document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showHasDash = false; showScrollbarDash = false; showCvDash = false; showVdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false; showRtDash = false;
       document.getElementById('hasDashBtn').classList.remove('has-active');
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
@@ -4338,6 +4810,7 @@
     document.body.classList.toggle('pv-active', !!showPvDash);
     persistDashState();
     setDashHash(currentDashId());
+    if(showHomeDash) return renderHomeDash();
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
@@ -4361,7 +4834,7 @@
       return;
     }
 
-    body.innerHTML = list.map(s=>{
+    const cardsHtml = list.map(s=>{
       const isOpen  = openIds.has(s.id);
       const isStar  = starredIds.has(s.id);
       const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
@@ -4463,7 +4936,23 @@
         </div>
         ${bodyHtml}
       </div>`;
+    });
+    const groupsHtml = GROUP_LIST.map(g=>{
+      const idxs = list.map((s,i) => [s,i]).filter(([s,i]) => sectionGroup(s) === g.key).map(([s,i]) => i);
+      if(!idxs.length) return '';
+      const itemsHtml = idxs.map(i => cardsHtml[i]).join('');
+      const isOpen = !collapsedGroups.has(g.key);
+      return `<div class="group-wrap">
+        <div class="group-head g-${g.key}${isOpen ? ' open' : ''}" onclick="toggleGroup('${g.key}', event)">
+          <i class="ti ${g.icon} group-ic" aria-hidden="true"></i>
+          <span class="group-title">${g.label}</span>
+          <span class="group-count">${idxs.length} كود</span>
+          <i class="ti ti-chevron-right group-arrow" aria-hidden="true"></i>
+        </div>
+        <div class="group-body${isOpen ? ' open' : ''}">${itemsHtml}</div>
+      </div>`;
     }).join('');
+    body.innerHTML = groupsHtml || `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p></div>`;
   }
 
   // ── MODAL ──
@@ -4554,6 +5043,9 @@
     document.getElementById('devDashBtn').classList.toggle('dev-active', showDevDash);
     if(showDevDash){
       document.querySelectorAll('.filter-tag:not(#devDashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      const __hb = document.getElementById('homeBtn');
+      if (__hb) __hb.classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       showCvDash = false;
@@ -5248,6 +5740,8 @@ function hello() {
     document.getElementById('b64DashBtn').classList.toggle('b64-active', showB64Dash);
     if(showB64Dash){
       document.querySelectorAll('.filter-tag:not(#b64DashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       showCvDash = false;
@@ -5275,6 +5769,8 @@ function hello() {
     document.getElementById('qrDashBtn').classList.toggle('qr-active', showQrDash);
     if(showQrDash){
       document.querySelectorAll('.filter-tag:not(#qrDashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       showCvDash = false;
@@ -5302,6 +5798,8 @@ function hello() {
     document.getElementById('cpDashBtn').classList.toggle('cp-active', showCpDash);
     if(showCpDash){
       document.querySelectorAll('.filter-tag:not(#cpDashBtn)').forEach(b => b.classList.remove('active'));
+      showHomeDash = false;
+      document.getElementById('homeBtn').classList.remove('home-active');
       showHasDash = false;
       showScrollbarDash = false;
       showCvDash = false;
@@ -7456,6 +7954,9 @@ function hello() {
     document.getElementById('rtDashBtn').classList.toggle('rt-active', showRtDash);
     if(showRtDash){
       document.querySelectorAll('.filter-tag:not(#rtDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHomeDash=false;
+      const __hb=document.getElementById('homeBtn');
+      if(__hb) __hb.classList.remove('home-active');
       showHasDash=false; showScrollbarDash=false; showCvDash=false; showVdDash=false;
       showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false;
       [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
@@ -7709,6 +8210,9 @@ function hello() {
     document.getElementById('pvDashBtn').classList.toggle('pv-active', showPvDash);
     if(showPvDash){
       document.querySelectorAll('.filter-tag:not(#pvDashBtn)').forEach(b=>b.classList.remove('active'));
+      showHomeDash=false;
+      const __hb=document.getElementById('homeBtn');
+      if(__hb) __hb.classList.remove('home-active');
       showHasDash=false; showScrollbarDash=false; showCvDash=false; showVdDash=false;
       showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false; showRtDash=false;
       [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
@@ -8036,6 +8540,7 @@ function hello() {
   const DASH_SUB_KEY = 'csman_v2_dash_sub_v1';
 
   function currentDashId(){
+    if(showHomeDash) return 'home';
     if(showHasDash) return 'has';
     if(showScrollbarDash) return 'sb';
     if(showCvDash) return 'cv';
@@ -8058,14 +8563,15 @@ function hello() {
   }
 
   function restoreDashState(){
-    let id = 'main';
-    try { id = localStorage.getItem(DASH_KEY) || 'main'; } catch (e) {}
-    if (!['has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'].includes(id)) id = 'main';
+    let id = 'home';
+    try { id = localStorage.getItem(DASH_KEY) || 'home'; } catch (e) {}
+    if (!['home','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'].includes(id)) id = 'home';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
       if (sub && sub.b64) b64ActiveTab = sub.b64;
     } catch (e) {}
+    showHomeDash = id === 'home';
     showHasDash = id === 'has';
     showScrollbarDash = id === 'sb';
     showCvDash = id === 'cv';
@@ -8081,6 +8587,7 @@ function hello() {
       const b = document.getElementById(btnId);
       if (b) b.classList.toggle(cls, on);
     };
+    mark('homeBtn', 'home-active', showHomeDash);
     mark('hasDashBtn', 'has-active', showHasDash);
     mark('sbDashBtn', 'scrollbar-active', showScrollbarDash);
     mark('cvDashBtn', 'cv-active', showCvDash);
@@ -8101,10 +8608,10 @@ function hello() {
     } catch (e) { return ''; }
   }
   function clearDashFlags(){
-    showHasDash = false; showScrollbarDash = false; showCvDash = false;
+    showHomeDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
     showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
     showCpDash = false; showRtDash = false; showPvDash = false;
-    const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+    const map = { homeBtn:'home-active', hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
       vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
       b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active',
       pvDashBtn:'pv-active' };
@@ -8117,7 +8624,7 @@ function hello() {
   }
   function setDashHash(id){
     try {
-      const target = (id && id !== 'main') ? '#' + id : '#tool';
+      const target = (id && id !== 'main' && id !== 'home') ? '#' + id : (id === 'home' ? '#home' : '#tool');
       const cur = (typeof location !== 'undefined' && location) ? location.hash : '';
       if (cur === target) return;
       if (typeof history !== 'undefined' && history.replaceState) {
@@ -8129,7 +8636,7 @@ function hello() {
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
+    const ids = ['home','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -8137,12 +8644,13 @@ function hello() {
     } catch (e) {}
     clearDashFlags();
     if (h && ids.includes(h)) {
-      const map = { has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
+      const map = { home:['homeBtn','home-active'], has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
         vd:['vdDashBtn','vd-active'], ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
         b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
         rt:['rtDashBtn','rt-active'], pv:['pvDashBtn','pv-active'] };
       const btn = map[h];
-      if (h === 'has') showHasDash = true;
+      if (h === 'home') showHomeDash = true;
+      else if (h === 'has') showHasDash = true;
       else if (h === 'sb') showScrollbarDash = true;
       else if (h === 'cv') showCvDash = true;
       else if (h === 'vd') showVdDash = true;
