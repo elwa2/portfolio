@@ -55,25 +55,54 @@
   button, input { font-family: inherit; }
 
   .topbar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 12px clamp(10px, 2vw, 26px);
-    background: linear-gradient(120deg, #4f6ef7, #7c5cfc 55%, #6b86ff);
-    box-shadow: 0 10px 30px rgba(79,110,247,.30);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 0 clamp(12px, 2.2vw, 28px);
+    min-height: 62px;
+    background: linear-gradient(115deg, #3f5efb 0%, #6a4dfb 42%, #8b5cf6 72%, #6b86ff 100%);
+    box-shadow: 0 10px 30px rgba(79, 110, 247, .28), inset 0 1px 0 rgba(255, 255, 255, .18);
     position: sticky; top: 0; z-index: 60;
   }
-  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+  /* ---- صف واحد مضغوط: لوجو + عنوان + سنة + شرح + شريحة اليوم ---- */
+  .brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1 1 auto; }
   .logo {
-    width: 42px; height: 42px; border-radius: 13px; flex: none;
-    display: grid; place-items: center; font-size: 20px;
-    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34);
+    width: 38px; height: 38px; border-radius: 12px; flex: none;
+    display: grid; place-items: center; font-size: 19px; line-height: 1;
+    background: rgba(255, 255, 255, .20); border: 1px solid rgba(255, 255, 255, .38);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
   }
-  .brand h1 { font-size: clamp(16px, 2.2vw, 22px); font-weight: 900; line-height: 1.3; }
-  .brand p { font-size: 12px; opacity: .9; font-weight: 600; }
+  .brand h1 {
+    font-size: clamp(15px, 1.9vw, 20px); font-weight: 900; line-height: 1;
+    margin: 0; white-space: nowrap; letter-spacing: -.2px;
+  }
+  .brand .yr {
+    font-size: 11px; font-weight: 900; line-height: 1; padding: 4px 8px; border-radius: 999px;
+    background: rgba(255, 255, 255, .22); border: 1px solid rgba(255, 255, 255, .32);
+    white-space: nowrap; flex: none;
+  }
+  .brand .tagline {
+    display: flex; align-items: center; gap: 6px; min-width: 0;
+    font-size: 12px; font-weight: 700; opacity: .92; line-height: 1;
+    padding-inline-start: 13px; margin-inline-start: 3px;
+    border-inline-start: 1px solid rgba(255, 255, 255, .30);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
   .top-actions { display: flex; gap: 8px; flex: none; align-items: center; }
   .today-chip {
-    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34);
-    color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 800;
-    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: rgba(255, 255, 255, .17); border: 1px solid rgba(255, 255, 255, .34);
+    color: #fff; border-radius: 999px; padding: 7px 14px 7px 11px;
+    font-size: 12.5px; font-weight: 800; line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
+  }
+  .today-chip .live {
+    width: 8px; height: 8px; border-radius: 50%; flex: none; background: #4ade80;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, .7); animation: pulse 2.2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, .55); }
+    70% { box-shadow: 0 0 0 7px rgba(74, 222, 128, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
   }
 
   .btn {
@@ -191,7 +220,7 @@
   .grid .cell-td { height: 40px; background: var(--surface); }
   .cell {
     width: 100%; height: 40px; border: 0; background: transparent; cursor: pointer;
-    display: grid; place-items: center; transition: background .18s;
+    display: grid; place-items: center; transition: background .18s; position: relative;
   }
   .cell i {
     width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center;
@@ -202,7 +231,51 @@
   .cell.done i { background: linear-gradient(120deg, var(--ok-deep), var(--ok)); border-color: transparent; color: #04121d; }
   .cell.pop i { animation: pop .34s cubic-bezier(.34,1.56,.64,1); }
   @keyframes pop { 0% { transform: scale(.7); } 58% { transform: scale(1.22); } 100% { transform: scale(1); } }
+
+  /* ===== حالة اليوم: اليوم مميّز، الماضي قابل للتعديل، المستقبل مقفل ===== */
+  /* عمود/صف اليوم */
+  .grid th.day-head.today, .gdays .dcol.today, .gdays .pctcol.today {
+    background: linear-gradient(180deg, rgba(79, 110, 247, .30), rgba(79, 110, 247, .14)) !important;
+    color: var(--accent); position: relative;
+  }
+  .grid th.day-head.future { opacity: .5; }
+  .grid th.day-head.today::after, .gdays .dcol.today::after {
+    content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 3px;
+    background: var(--accent); border-radius: 3px 3px 0 0;
+  }
+  .grid th.day-head.today .dn, .gdays .dcol.today .dn { color: var(--accent); font-weight: 900; }
+
+  /* خانة اليوم نفسه */
+  .cell-td.is-today { background: rgba(79, 110, 247, .13); box-shadow: inset 1px 0 0 rgba(79, 110, 247, .30), inset -1px 0 0 rgba(79, 110, 247, .30); }
+  .cell.is-today i { border-color: var(--accent); border-width: 2px; box-shadow: 0 0 0 3px rgba(79, 110, 247, .16); }
+  .cell.is-today:not(.done) i::after {
+    content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); transform: translate(11px, -11px);
+  }
+
+  /* المستقبل: مقفل — غير قابل للتعديل */
+  .cell.is-future { cursor: not-allowed; }
+  .cell.is-future i {
+    border-style: dashed; border-color: var(--border); opacity: .45;
+    background: transparent; color: transparent;
+  }
+  .cell.is-future:hover i { border-color: var(--border); background: transparent; }
+  .cell.is-future::after {
+    content: "🔒"; position: absolute; font-size: 9px; opacity: .5;
+    transform: translate(9px, -9px); pointer-events: none;
+  }
+  .cell-td.is-future { background: repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(255, 255, 255, .022) 5px, rgba(255, 255, 255, .022) 10px); }
+  .cell-td.is-future .cell { pointer-events: none; }
+  .cell.is-past i { border-color: var(--border-strong); }
+
+  /* صف اليوم المستقبلي في جدول الأيام (موبايل) */
+  .gdays tr.day-row.is-future { opacity: .55; }
+  .gdays tr.day-row.is-future .dcol, .gdays tr.day-row.is-future .pctcol { color: var(--muted); }
+  .gdays tr.day-row.is-today { background: rgba(79, 110, 247, .10); }
+
   .grid .habit-row:hover .habit-cell, .grid .habit-row:hover .cell-td { background: var(--surface-2); }
+  .grid .habit-row:hover .cell-td.is-today { background: rgba(79, 110, 247, .17); }
+  .grid .habit-row:hover .cell-td.is-future { background: repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(255, 255, 255, .022) 5px, rgba(255, 255, 255, .022) 10px); }
   .habit-cell { display: flex; align-items: center; gap: 7px; }
   .habit-cell .h-name { font-size: 12.5px; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .habit-cell .h-actions { display: flex; gap: 4px; opacity: .3; transition: opacity .2s; }
@@ -249,20 +322,67 @@
     .gdays { display: block; }
     .gdays { width: 100%; table-layout: fixed; font-size: 12px; }
     .gdays .dcol { width: 58px; min-width: 58px; }
-    .brand p { display: none; }
+    .brand .tagline { display: none; }
+  }
+  @media (max-width: 620px) {
+    .brand .tagline { display: none; }
+    .brand { gap: 9px; }
   }
   @media (max-width: 520px) {
-    .topbar { padding: 10px 10px; }
+    .topbar { padding: 0 10px; min-height: 56px; gap: 8px; }
+    .logo { width: 34px; height: 34px; font-size: 17px; border-radius: 11px; }
+    .brand h1 { font-size: 15px; }
+    .brand .yr { display: none; }
     .card { padding: 12px 9px; }
-    .today-chip { display: none; }
+    .today-chip { padding: 6px 11px 6px 9px; font-size: 11.5px; }
     .gdays .dcol { width: 52px; min-width: 52px; }
     .gdays .pctcol { width: 46px; min-width: 46px; }
     .gdays .cell { height: 48px; }
     .gdays .cell i { width: 34px; height: 34px; }
   }
 
-  .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-  .mcard {
+  /* ======== Google Sheets sync ======== */
+  .gs { display: grid; gap: 10px; }
+  .gs-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .gs-row input[type="text"] {
+    flex: 1 1 260px; min-width: 0; padding: 10px 12px; border-radius: 11px; font-size: 12.5px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .gs-row input[type="text"]::placeholder { color: var(--muted); opacity: .75; }
+  .gs-row input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .gs-row label { font-size: 12px; font-weight: 700; color: var(--muted); flex: none; }
+  .gs-status {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+    padding: 9px 12px; border-radius: 11px; background: var(--surface-2);
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .gs-status.ok { color: var(--ok); border-color: rgba(45,212,160,.35); background: var(--ok-soft); }
+  .gs-status.err { color: var(--danger); border-color: rgba(248,113,113,.35); background: var(--danger-soft); }
+  .gs-status.busy { color: var(--warn); border-color: rgba(251,191,36,.35); }
+  .gs-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+  .gs-note { font-size: 11.5px; color: var(--muted); font-weight: 600; line-height: 1.85; }
+  .gs-note a { color: var(--accent); }
+  .btn.mini { padding: 8px 12px; font-size: 12px; }
+  .switch { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; user-select: none; }
+  .switch input { accent-color: var(--ok); width: 16px; height: 16px; cursor: pointer; }
+  .gs-more { border: 1px solid var(--border); border-radius: 13px; background: var(--surface-2); padding: 10px 12px; }
+  .gs-more > summary {
+    font-size: 12.5px; font-weight: 800; color: var(--text); cursor: pointer;
+    list-style: none; display: flex; align-items: center; gap: 6px;
+  }
+  .gs-more > summary::-webkit-details-marker { display: none; }
+  .gs-more > summary::after { content: "▾"; margin-inline-start: auto; color: var(--muted); }
+  .gs-more[open] > summary::after { content: "▴"; }
+  .gs-more > *:not(summary) { margin-top: 10px; }
+  #gsExcel {
+    width: 100%; resize: vertical; padding: 10px 12px; border-radius: 11px;
+    font-size: 12.5px; line-height: 1.7; font-family: ui-monospace, "Cairo", monospace;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none;
+  }
+  #gsExcel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }  .mcard {
     text-align: start; border: 1px solid var(--border); background: var(--surface-2);
     border-radius: 14px; padding: 12px; cursor: pointer; transition: all .2s;
   }
@@ -317,14 +437,13 @@
 
 <header class="topbar">
   <div class="brand">
-    <div class="logo">✅</div>
-    <div>
-      <h1>متتبع العادات 2026</h1>
-      <p>اضغط على المربّع لتعليم العادة كمنجزة — الدائرة الخضراء = تم</p>
-    </div>
+    <span class="logo" aria-hidden="true">✅</span>
+    <h1>متتبع العادات</h1>
+    <span class="yr">2026</span>
+    <span class="tagline">اضغط المربّع لتعليم العادة — الدائرة الخضراء = تم · اليوم مميّز والأيام الجاية مقفولة</span>
   </div>
   <div class="top-actions">
-    <span class="today-chip" id="todayChip"></span>
+    <span class="today-chip" id="todayChip"><i class="live" aria-hidden="true"></i><span class="txt"></span></span>
   </div>
 </header>
 
@@ -332,6 +451,59 @@
   <nav class="tabs" id="tabs" aria-label="الأشهر"></nav>
 
   <section id="monthView">
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> ☁️ ربط Google Sheets</h2>
+        <span class="hint" id="gsBadge">غير مفعّل</span>
+      </div>
+      <div class="gs">
+        <div class="gs-row">
+          <label for="gsUrl">رابط السكربت</label>
+          <input id="gsUrl" type="text" spellcheck="false" placeholder="https://script.google.com/macros/s/XXXX.../exec" />
+        </div>
+        <div class="gs-row">
+          <label for="gsSheetId">Sheet ID</label>
+          <input id="gsSheetId" type="text" spellcheck="false" placeholder="1AbCdEfGhIjKlMnOpQrStUvWxYz... (اختياري)" />
+        </div>
+        <div class="gs-row">
+          <button class="btn ghost mini" id="gsSave" type="button">💾 حفظ الإعدادات</button>
+          <button class="btn primary mini" id="gsPush" type="button">⬆️ تصدير إلى Sheets</button>
+          <button class="btn primary mini" id="gsPull" type="button">⬇️ استيراد من Sheets</button>
+          <button class="btn ghost mini" id="gsSync" type="button">🔄 مزامنة</button>
+          <label class="switch" title="استيراد تلقائي من الـ Sheet كل ما تفتح الصفحة"><input type="checkbox" id="gsAutoImport" /> استيراد عند الفتح</label>
+          <label class="switch"><input type="checkbox" id="gsAuto" /> رفع تلقائي</label>
+        </div>
+        <div class="gs-status" id="gsStatus"><span class="gs-dot"></span><span id="gsStatusText">لم يتم ربط Google Sheets بعد.</span></div>
+        <p class="gs-note">
+          🔗 <b>رابط مباشر:</b> <code id="gsLink">habit-tracker.html#den</code> — افتحه في أي تبويب واحفظه في المفضلة.
+          شهر محدد: <code>#den-01</code> … <code>#den-12</code> · ملخص السنة: <code>#den-year</code>
+        </p>
+        <details class="gs-more">
+          <summary>📥 استيراد من ملف Excel (نسخ ولصق)</summary>
+          <p class="gs-note">
+            انسخ الصفوف من Excel والصقها هنا. الصيغ المدعومة:
+            <b>عادة</b>: <code>الاسم</code> أو <code>الاسم &lt;TAB&gt; الأيقونة &lt;TAB&gt; TRUE/FALSE</code>
+            — و<b>علامة</b>: <code>اسم-العادة | الشهر | اليوم</code> (مثال: <code>قراءة 10 صفحات|8|15</code>، الشهر من 0 إلى 11).
+            يمكن استخدام الاسم بدل الـ id.
+          </p>
+          <textarea id="gsExcel" rows="5" spellcheck="false" placeholder="قراءة 10 صفحات&#9;📚&#9;TRUE&#10;جيم ساعة&#9;🏋️&#9;TRUE&#10;قراءة 10 صفحات|8|15"></textarea>
+          <div class="gs-row">
+            <button class="btn ghost mini" id="gsExcelGo" type="button">⬇️ استيراد من النص</button>
+            <span class="hint">يُدمج مع بياناتك الحالية</span>
+          </div>
+        </details>
+        <p class="gs-note">
+          طريقة الربط: انسخ ملف <code>google-apps-script/Code.gs</code> إلى
+          <strong>Extensions → Apps Script</strong> في ملف الـ Google Sheet، شغّل دالة
+          <code>setupSheets()</code> مرة واحدة (هتعمل جداول <code>Habits</code> و
+          <code>Daily</code> و <code>Meta</code> و <code>لوحة التحكم</code>)، بعدين اعمل
+          <strong>Deploy → New deployment → Web app</strong> والصق الرابط هنا.
+          أي تعديل تكتبه في جداول الـ Sheet يظهر في الموقع عبر «⬇️ استيراد».
+          التفاصيل في <code>google-apps-script/README.md</code>.
+        </p>
+      </div>
+    </div>
+
     <div class="cards">
       <div class="stat"><div class="stat-v" id="mPct">0%</div><div class="stat-l">إنجاز الشهر</div></div>
       <div class="stat"><div class="stat-v ok" id="mDone">0</div><div class="stat-l">منجزة / الخطة</div></div>
@@ -453,6 +625,9 @@
   var defaultMonth = now.getFullYear() === YEAR ? now.getMonth() : 0;
   var TODAY_M = defaultMonth, TODAY_D = now.getDate();
 
+  var CFG_KEY = "habit-tracker-2026-config";
+  var cfg = { url: "", sheetId: "", auto: false, autoImport: true, lastSync: "" };
+
   var state = { month: defaultMonth, view: defaultMonth, habits: [], checks: {} };
 
   function q(s, r) { return (r || document).querySelector(s); }
@@ -466,6 +641,19 @@
   function ckey(id, m, d) { return id + "|" + m + "|" + d; }
   function isDone(id, m, d) { return state.checks[ckey(id, m, d)] === 1; }
   function isTodayCell(m, d) { return m === TODAY_M && d === TODAY_D; }
+
+  /**
+   * حالة اليوم بالنسبة لليوم الحقيقي:
+   *   "past"    = يوم فات  -> قابل للتعديل
+   *   "today"   = النهارده -> مميّز ( والقابل للتعديل)
+   *   "future"  = يوم لسه  -> مقفل، غير قابل للتعديل
+   */
+  function dayState(m, d) {
+    if (m < TODAY_M) return "past";
+    if (m > TODAY_M) return "future";
+    return d < TODAY_D ? "past" : (d > TODAY_D ? "future" : "today");
+  }
+  function isFuture(m, d) { return dayState(m, d) === "future"; }
 
   function makeDefaults() {
     return DEFAULTS.map(function (h, i) { return { id: "h" + (i + 1), icon: h.icon, name: h.name }; });
@@ -539,13 +727,24 @@
     q("#yearView").hidden = !isYear;
     if (isYear) renderYear(); else renderMonth();
     save();
+    writeHash();   // يبقي رابط المتصفح على التبويب الحالي (…#den-09)
   }
 
   function dayCell(h, m, d) {
     var on = isDone(h.id, m, d);
-    return '<td class="cell-td"><button type="button" class="cell' + (on ? " done" : "") + '" data-cell="' + h.id + "|" + d +
-      '" aria-pressed="' + on + '" aria-label="' + esc(h.name) + " — يوم " + d + " " + MONTHS[m] +
-      '" title="' + esc(h.name) + ' — ' + d + ' ' + MONTHS[m] + '"><i>✓</i></button></td>';
+    var st = dayState(m, d);
+    var cls = "cell" + (on ? " done" : "") + (st === "today" ? " is-today" : st === "future" ? " is-future" : " is-past");
+    var tip = st === "future"
+      ? esc(h.name) + " — " + d + " " + MONTHS[m] + " (يوم مستقبلي — غير قابل للتعديل)"
+      : st === "today"
+        ? esc(h.name) + " — اليوم " + d + " " + MONTHS[m]
+        : esc(h.name) + " — " + d + " " + MONTHS[m];
+    return '<td class="cell-td' + (st === "today" ? " is-today" : st === "future" ? " is-future" : "") + '">' +
+      '<button type="button" class="' + cls + '" data-cell="' + h.id + "|" + d + '"' +
+      ' aria-pressed="' + on + '"' +
+      (st === "future" ? ' disabled aria-disabled="true" tabindex="-1"' : "") +
+      ' aria-label="' + esc(h.name) + " — يوم " + d + " " + MONTHS[m] +
+      '" title="' + tip + '"><i>✓</i></button></td>';
   }
 
   function buildGrid() {
@@ -571,7 +770,9 @@
     var dayHead = "";
     for (var i = 1; i <= days; i++) {
       var wd = new Date(YEAR, m, i).getDay();
-      var cls = "day-head" + (wd >= 5 ? " we" : "") + (isTodayCell(m, i) ? " today" : "") + (((i - 1) % 7 === 0 && i !== 1) ? " wk" : "");
+      var stH = dayState(m, i);
+      var cls = "day-head" + (wd >= 5 ? " we" : "") + (stH === "today" ? " today" : stH === "future" ? " future" : " past") +
+        (((i - 1) % 7 === 0 && i !== 1) ? " wk" : "");
       dayHead += '<th class="' + cls + '" scope="col"><span class="wd">' + WEEK_DAYS[wd] + '</span><span class="dn">' + i + "</span></th>";
     }
 
@@ -617,8 +818,9 @@
     for (var i2 = 1; i2 <= days; i2++) {
       var wd2 = new Date(YEAR, m, i2).getDay();
       var ds = dayStats(m, i2);
-      var rowCls = (wd2 >= 5 ? "we " : "") + (isTodayCell(m, i2) ? "today" : "");
-      dHead += '<tr class="day-row" data-d="' + i2 + '"><th class="dcol ' + rowCls + '" scope="row"><span class="dn">' + i2 + "</span> " +
+      var st2 = dayState(m, i2);
+      var rowCls = (wd2 >= 5 ? "we " : "") + (st2 === "today" ? "today" : st2 === "future" ? "future" : "past");
+      dHead += '<tr class="day-row is-' + st2 + '" data-d="' + i2 + '"><th class="dcol ' + rowCls + '" scope="row"><span class="dn">' + i2 + "</span> " +
         '<span class="wd">' + WEEK_DAYS[wd2] + '</span> <span class="cnt">' + ds.done + "/" + ds.total + "</span></th>";
       habits.forEach(function (h) { dHead += dayCell(h, m, i2); });
       dHead += '<td class="pctcol ' + rowCls + '" data-dp="' + i2 + '">' + ds.pct + "%</td></tr>";
@@ -772,21 +974,35 @@
       (rows || '<tr><td colspan="6" style="text-align:center;color:var(--muted);font-weight:700">لا توجد عادات بعد</td></tr>') + "</tbody>";
   }
 
+  /** يزامن زر "اليوم" السريع في قائمة العادات */
+  function syncTodayBtn(id) {
+    var on = isDone(id, TODAY_M, TODAY_D);
+    var b = qa("[data-today]").filter(function (x) { return x.dataset.today === id; })[0];
+    if (!b) return;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", String(on));
+    b.textContent = on ? "✓ تم اليوم" : "اليوم";
+  }
+
   function setCheck(id, m, d, on) {
+    if (isFuture(m, d)) { toast("🔒 يوم مستقبلي — مش قابل للتعديل"); return; }   // الأيام الجاية مقفولة
     var k = ckey(id, m, d);
     if (on) state.checks[k] = 1; else delete state.checks[k];
     qa('[data-cell="' + id + "|" + d + '"]').forEach(function (b) {
       b.classList.toggle("done", on);
       b.setAttribute("aria-pressed", String(on));
     });
+    syncTodayBtn(id);
     save();
     updateStats();
     renderChart();
+    gsAutoPush();
   }
 
   function toggleCell(btn) {
     var p = btn.dataset.cell.split("|");
     var id = p[0], d = Number(p[1]);
+    if (isFuture(state.month, d)) { toast("🔒 يوم مستقبلي — مش قابل للتعديل"); return; }
     var on = !isDone(id, state.month, d);
     setCheck(id, state.month, d, on);
     btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
@@ -814,7 +1030,7 @@
       state.habits.push({ id: "h" + Date.now().toString(36), icon: icon, name: name });
       toast("تمت إضافة العادة ✓");
     }
-    save(); closeModal(); renderMonth();
+    save(); closeModal(); renderMonth(); gsAutoPush();
   }
   function deleteHabit(id) {
     var h = state.habits.filter(function (x) { return x.id === id; })[0];
@@ -822,7 +1038,7 @@
     if (!confirm('حذف عادة "' + h.name + '" وجميع سجلاتها؟')) return;
     state.habits = state.habits.filter(function (x) { return x.id !== id; });
     Object.keys(state.checks).forEach(function (k) { if (k.split("|")[0] === id) delete state.checks[k]; });
-    save(); renderMonth(); toast("تم حذف العادة");
+    save(); renderMonth(); toast("تم حذف العادة"); gsAutoPush();
   }
 
   var toastTimer = null;
@@ -831,6 +1047,342 @@
     t.textContent = msg; t.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2000);
+  }
+
+  /* ======================================================================
+     GOOGLE SHEETS SYNC
+     ====================================================================== */
+
+  function loadCfg() {
+    try {
+      var raw = localStorage.getItem(CFG_KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        cfg.url = typeof d.url === "string" ? d.url : "";
+        cfg.sheetId = typeof d.sheetId === "string" ? d.sheetId : "";
+        cfg.auto = d.auto === true;
+        cfg.autoImport = d.autoImport !== false;   // استيراد عند الفتح = مفعّل افتراضيًا
+        cfg.lastSync = typeof d.lastSync === "string" ? d.lastSync : "";
+      }
+    } catch (e) {}
+  }
+  function saveCfg() {
+    try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
+
+  function gsStatus(kind, msg) {
+    var box = q("#gsStatus"), txt = q("#gsStatusText");
+    box.className = "gs-status" + (kind ? " " + kind : "");
+    txt.textContent = msg;
+    q("#gsBadge").textContent = kind === "ok" ? "✅ متصل" : kind === "busy" ? "⏳ جاري…" : kind === "err" ? "⚠️ خطأ" : (cfg.url ? "غير مفعّل" : "غير مربوط");
+  }
+
+  function gsReady() {
+    if (!cfg.url) { gsStatus("err", "❌ ضع رابط الـ Web App أولًا (Deploy → Web app)."); return false; }
+    return true;
+  }
+
+  function withSheet(url) {
+    // إضافة sheetId كـ query param حتى لو السكربت standalone
+    if (!cfg.sheetId) return url;
+    return url + (url.indexOf("?") === -1 ? "?" : "&") + "sheetId=" + encodeURIComponent(cfg.sheetId.trim());
+  }
+
+  function gsGet(action) {
+    var url = withSheet(cfg.url) + (cfg.url.indexOf("?") === -1 ? "?" : "&") + "action=" + encodeURIComponent(action);
+    return fetch(url, { method: "GET", redirect: "follow" })
+      .then(function (r) { return r.text(); })
+      .then(function (t) {
+        try { return JSON.parse(t); }
+        catch (e) { throw new Error("رد غير صالح من الخادم. تأكد أن الرابط هو Web App URL وليس رابط النشر."); }
+      });
+  }
+
+  function gsPost(payload) {
+    // "text/plain" => simple request => sin preflight CORS ( Apps Script responde bien )
+    return fetch(withSheet(cfg.url), {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      redirect: "follow"
+    })
+      .then(function (r) { return r.text(); })
+      .then(function (t) {
+        try { return JSON.parse(t); }
+        catch (e) { throw new Error("رد غير صالح عند الحفظ."); }
+      });
+  }
+
+  /**
+   * Lee datos: intenta primero por POST (más fiable, sin redirección CORS),
+   * y si falla usa GET como plan B.
+   */
+  function gsRead(action) {
+    return gsPost({ action: action })
+      .catch(function () { return gsGet(action); });
+  }
+
+  function serializeHabits() {
+    return state.habits.map(function (h, i) {
+      return { id: h.id, name: h.name, icon: h.icon, sort: i + 1, active: true };
+    });
+  }
+
+  function gsPush(silent) {
+    if (!gsReady()) return Promise.resolve(false);
+    gsStatus("busy", "⏳ جاري الرفع إلى Google Sheets…");
+    return gsPost({ action: "saveAll", habits: serializeHabits(), checks: state.checks })
+      .then(function (res) {
+        if (!res || res.ok !== true) throw new Error((res && res.error) || "فشل الحفظ على الخادم.");
+        cfg.lastSync = new Date().toISOString();
+        saveCfg();
+        var n = res.checks != null ? res.checks : Object.keys(state.checks).length;
+        gsStatus("ok", "✅ تم الرفع — " + n + " علامة محفوظة في Google Sheets.");
+        if (!silent) toast("تم الرفع إلى Google Sheets ✓");
+        return true;
+      })
+      .catch(function (err) {
+        gsStatus("err", "⚠️ فشل الرفع: " + (err && err.message ? err.message : err));
+        return false;
+      });
+  }
+
+  function gsPull(silent) {
+    if (!gsReady()) return Promise.resolve(false);
+    gsStatus("busy", "⏳ جاري الاستيراد من Google Sheets…");
+    // action=import يرجع نفس البيانات + ملخص عن المكتوب في الـ Sheet
+    return gsRead("import")
+      .catch(function () { return gsRead("getAll"); })
+      .then(function (res) {
+        if (!res || res.ok !== true) throw new Error((res && res.error) || "فشل القراءة من الخادم.");
+        if (res.habits && res.habits.length) state.habits = res.habits;
+        if (res.checks) state.checks = res.checks;
+        cfg.lastSync = new Date().toISOString();
+        save();
+        saveCfg();
+        renderTabs();
+        updateView();
+        var n = Object.keys(state.checks).length;
+        var extra = res.summary && res.summary.daysWritten
+          ? " (على " + res.summary.daysWritten + " يوم)"
+          : "";
+        gsStatus("ok", "✅ تم الاستيراد — " + state.habits.length + " عادة و " + n + " علامة" + extra + ".");
+        if (!silent) toast("تم الاستيراد من Google Sheets ✓");
+        return true;
+      })
+      .catch(function (err) {
+        gsStatus("err", "⚠️ فشل الاستيراد: " + (err && err.message ? err.message : err));
+        return false;
+      });
+  }
+
+  function gsSyncAll() {
+    if (!gsReady()) return;
+    gsStatus("busy", "⏳ جاري المزامنة…");
+    return gsPush(true)
+      .then(function (ok) { return ok ? gsPull(true) : false; })
+      .then(function (ok) {
+        if (ok) toast("تمت المزامنة مع Google Sheets ✓");
+        else gsStatus("err", "⚠️ المزامنة فشلت. تأكد من إعدادات النشر (Anyone) ومن رابط Web App.");
+      });
+  }
+
+  function gsAutoPush() {
+    if (!cfg.auto || !cfg.url) return;
+    clearTimeout(gsAutoPush._t);
+    gsAutoPush._t = setTimeout(function () { gsPush(true); }, 1500);
+  }
+
+  /* ======================================================================
+     استيراد من Excel: نسخ/لصق
+     ====================================================================== */
+
+  /** يحوّل نصًا إلى id آمن (نفس فكرة slugify في Code.gs). */
+  function slugify(s) {
+    return String(s || "").trim().toLowerCase()
+      .replace(/[\u064B-\u0652\u0640]/g, "")
+      .replace(/[^\p{L}\p{N}]+/gu, "-")
+      .replace(/^-+|-+$/g, "")
+      .substring(0, 40);
+  }
+  /** يقرأ الشهر من رقم (0..11) أو اسم عربي. */
+  function normMonth(v) {
+    if (v === null || v === undefined || v === "") return NaN;
+    if (typeof v === "number" || /^-?\d+(\.\d+)?$/.test(String(v).trim())) {
+      var n = Math.floor(Number(v));
+      if (n >= 0 && n <= 11) return n;
+      if (n === 12) return 11;          // 12 = ديسمبر
+      return NaN;
+    }
+    var alias = {
+      "يناير": 0, "كانون الثاني": 0, "فبراير": 1, "شباط": 1, "مارس": 2, "اذار": 2,
+      "ابريل": 3, "أبريل": 3, "مايو": 4, "يونيو": 5, "يونية": 5, "يوليو": 6, "يوليه": 6,
+      "اغسطس": 7, "أغسطس": 7, "سبتمبر": 8, "اكتوبر": 9, "أكتوبر": 9,
+      "نوفمبر": 10, "ديسمبر": 11
+    };
+    var k = String(v).trim().toLowerCase().replace(/[\u064B-\u0652\u0640]/g, "");
+    return alias.hasOwnProperty(k) ? alias[k] : NaN;
+  }
+  /** يقرأ TRUE/✓/نعم/1/X como "مفعّل". */
+  function truthy(v) {
+    var t = String(v === null || v === undefined ? "" : v).trim().toLowerCase();
+    if (t === "") return true;   // فارغ = مفعّل
+    return ["false", "0", "no", "n", "✗", "لا", "off"].indexOf(t) === -1;
+  }
+
+  /**
+   * يستورد نصًا ملصوقًا من Excel.
+     * كل سطر إما "اسم العادة" (عادة) أو "اسم العادة|شهر|يوم" (علامة).
+   * @return {{habits:number, checks:number, skipped:number, added:number, changed:number}}
+   */
+  function importFromText(text) {
+    var res = { habits: 0, checks: 0, skipped: 0, added: 0, changed: 0 };
+    var byName = {};
+    state.habits.forEach(function (h) {
+      byName[h.id] = h.id;
+      byName[h.name] = h.id;
+      byName[h.name.toLowerCase()] = h.id;
+    });
+    function resolveId(v) {
+      var raw = String(v || "").trim();
+      if (!raw) return "";
+      if (byName[raw]) return byName[raw];
+      if (byName[raw.toLowerCase()]) return byName[raw.toLowerCase()];
+      var sl = slugify(raw);
+      if (byName[sl]) return byName[sl];
+      return "";
+    }
+
+    var lines = String(text || "").replace(/\r/g, "").split("\n");
+    lines.forEach(function (line) {
+      if (!line.trim()) return;
+      var sep = line.indexOf("\t") > -1 ? "\t" : "|";
+      var cells = line.split(sep);
+      cells = cells.map(function (c) { return c.trim(); });
+
+      /*
+       * التفرقة بين "علامة" و"عادة" لما يكون في 3 خانات:
+       * لو الشهر صحيح (0..11) واليوم 1..31 يبقى السطر علامة.
+       * لو اسم العادة مش موجود -> السطر يتجاهل (ماينتجش عادة بالغلط).
+       */
+      var mkM = normMonth(cells[1]);
+      var mkD = Math.floor(Number(cells[2]));
+      var looksLikeMark = cells.length === 3 && !isNaN(mkM) && !isNaN(mkD) && mkD >= 1 && mkD <= 31;
+
+      if (looksLikeMark) {
+        var id = resolveId(cells[0]);
+        if (!id) { res.skipped++; return; }        // اسم غير معروف -> تجاهل
+        var key = id + "|" + mkM + "|" + mkD;
+        if (state.checks[key]) res.checks++; else { state.checks[key] = 1; res.added++; }
+        return;
+      }
+
+      /* ---------- عادة: الاسم [TAB] الأيقونة [TAB] مفعّل ---------- */
+      var name = cells[0];
+      if (!name) { res.skipped++; return; }
+      if (/^(name|الاسم|عادة|habit)$/i.test(name)) { res.skipped++; return; }  // صف العناوين
+      // الأيقونة تُقبل فقط إذا كانت نصًا (وليس رقمًا = شهر)
+      var icon = (cells.length > 1 && cells[1] && !/^-?\d+(\.\d+)?$/.test(cells[1])) ? cells[1] : "🎯";
+      var active = true;
+      if (cells.length > 2 && /^(true|false|1|0|yes|no|y|n|✓|✗|☑|نعم|لا|صح)$/i.test(cells[2])) {
+        active = truthy(cells[2]);
+      }
+      var existing = resolveId(name);
+      if (existing) {
+        state.habits.forEach(function (h) {
+          if (h.id === existing) {
+            h.name = name;
+            if (icon !== "🎯") h.icon = icon;
+            h.active = active;
+          }
+        });
+        res.changed++;
+      } else {
+        var nid = slugify(name) || ("h" + Date.now().toString(36));
+        if (byName[nid]) { var k = 2; while (byName[nid + "-" + k]) k++; nid = nid + "-" + k; }
+        state.habits.push({ id: nid, name: name, icon: icon, sort: state.habits.length + 1, active: active });
+        byName[nid] = nid; byName[name] = nid; byName[name.toLowerCase()] = nid;
+        res.habits++; res.added++;
+      }
+    });
+
+    state.habits.forEach(function (h, i) { h.sort = i + 1; });
+    save();
+    renderTabs(); updateView();
+    return res;
+  }
+
+  /* ======================================================================
+     رابط مباشر للتبويب:  habit-tracker.html#den
+     ====================================================================== */
+  var HASH_BASE = "den";
+
+  /** #den | #den-09 (شهر سبتمبر) | #den-year */
+  function applyHash(doRender) {
+    var raw = (location.hash || "").replace(/^#/, "");
+    if (raw !== HASH_BASE && raw.indexOf(HASH_BASE + "-") !== 0 && raw.indexOf(HASH_BASE + "/") !== 0) return false;
+    var tail = raw.slice(HASH_BASE.length).replace(/^[-/=]+/, "");
+    if (!tail) {                       // #den -> شهر اليوم
+      state.month = TODAY_M; state.view = TODAY_M;
+    } else if (tail === "year") {      // #den-year
+      state.view = "year";
+    } else {
+      var mm = parseInt(tail, 10) - 1;
+      if (isNaN(mm) || mm < 0 || mm > 11) return false;
+      state.month = mm; state.view = mm;
+    }
+    if (doRender) { renderTabs(); updateView(); }
+    return true;
+  }
+
+  /** يكتب الرابط الحالي في الـ address bar عشان يمكن مشاركته/حفظه. */
+  function writeHash() {
+    var want = state.view === "year"
+      ? "#" + HASH_BASE + "-year"
+      : "#" + HASH_BASE + "-" + String(state.month + 1).padStart(2, "0");
+    if (location.hash !== want) {
+      try { history.replaceState(null, "", want); }
+      catch (e) { location.hash = want; }   // fallback لـ file://
+    }
+    var link = q("#gsLink");
+    if (link) {
+      link.textContent = location.pathname.split("/").pop() + want;
+      link.title = "انسخ هذا الرابط — بيفتح التبويب ده مباشرة";
+    }
+  }
+
+  function initGsUi() {
+    loadCfg();
+    q("#gsUrl").value = cfg.url;
+    q("#gsSheetId").value = cfg.sheetId;
+    q("#gsAuto").checked = cfg.auto;
+    q("#gsAutoImport").checked = cfg.autoImport;
+    if (cfg.url) gsStatus("", "محفوظ: جاهز للمزامنة. آخر مزامنة: " + (cfg.lastSync ? cfg.lastSync.slice(0, 16).replace("T", " ") : "لا يوجد"));
+
+    q("#gsSave").addEventListener("click", function () {
+      cfg.url = q("#gsUrl").value.trim();
+      cfg.sheetId = q("#gsSheetId").value.trim();
+      cfg.auto = q("#gsAuto").checked;
+      cfg.autoImport = q("#gsAutoImport").checked;
+      saveCfg();
+      if (cfg.url) { gsStatus("", "تم الحفظ ✓ اضغط «🔄 مزامنة» للربط."); toast("تم حفظ إعدادات Google Sheets"); }
+      else gsStatus("err", "❌ ضع رابط الـ Web App أولًا.");
+    });
+    q("#gsPush").addEventListener("click", function () { gsPush(); });
+    q("#gsPull").addEventListener("click", function () { gsPull(); });
+    q("#gsSync").addEventListener("click", function () { gsSyncAll(); });
+    q("#gsExcelGo").addEventListener("click", function () {
+      var txt = q("#gsExcel").value;
+      if (!txt.trim()) { toast("الصق البيانات أولاً 📋"); return; }
+      var r = importFromText(txt);
+      q("#gsExcel").value = "";
+      var msg = "✅ تم الاستيراد: " + r.habits + " عادة جديدة، " + (r.checks + r.added) + " علامة";
+      if (r.changed) msg += "، " + r.changed + " عادة محدّثة";
+      if (r.skipped) msg += "، " + r.skipped + " سطر متجاهَل";
+      toast(msg);
+      gsStatus("ok", msg);
+    });
   }
 
   q("#tabs").addEventListener("click", function (e) {
@@ -876,9 +1428,19 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !q("#modal").hidden) closeModal(); });
 
   load();
-  q("#todayChip").textContent = "📅 " + MONTHS[TODAY_M] + " " + TODAY_D + " — " + YEAR;
+  initGsUi();
+  q("#todayChip .txt").textContent = MONTHS[TODAY_M] + " " + TODAY_D + " — " + YEAR;
+  applyHash(false);          // #den | #den-09 | #den-year
   renderTabs();
   updateView();
+
+  // استيراد تلقائي من الـ Sheet عند الفتح (الـ Sheet هو المصدر الحقيقي)
+  if (cfg.url && cfg.autoImport) gsPull(true);
+
+  // اختصارات الرابط: #den-07 يفتح يوليو، #den-year يفتح ملخص السنة
+  window.addEventListener("hashchange", function () {
+    if (applyHash(true)) window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 })();
 </script>
 </body>
