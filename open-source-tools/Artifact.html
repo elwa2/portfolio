@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>استوديو التصميم المعماري</title>
+<style>
+:root{
+  --bg:#0a0e14; --panel:#0f151d; --line:rgba(79,209,232,.28); --cyan:#4fd1e8;
+  --amber:#e8a33d; --text:#dbe4ea; --muted:#7d8b96; --danger:#e2665c;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){ --bg:#f4f6f8; --panel:#ffffff; --line:rgba(30,110,130,.25); --cyan:#0e7c96; --text:#152029; --muted:#5b6b76; }
+}
+:root[data-theme="light"]{ --bg:#f4f6f8; --panel:#ffffff; --line:rgba(30,110,130,.25); --cyan:#0e7c96; --text:#152029; --muted:#5b6b76; }
+*{box-sizing:border-box;}
+html,body{background:var(--bg);}
+body{margin:0;color:var(--text);font-family:-apple-system,'Segoe UI',Tahoma,sans-serif;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 14px calc(24px + env(safe-area-inset-bottom,0px));}
+.wrap{max-width:720px;margin:0 auto;}
+header{text-align:center;margin-bottom:20px;}
+header h1{font-size:1.3rem;font-weight:700;margin:0 0 6px;}
+header p{color:var(--muted);font-size:.82rem;margin:0;line-height:1.5;}
+section.panel,section.blueprint-card{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:16px;margin-bottom:16px;}
+h2{font-size:.85rem;font-weight:600;color:var(--cyan);margin:0 0 10px;}
+.titleblock{display:flex;justify-content:space-between;font-family:'SFMono-Regular',Consolas,monospace;font-size:.72rem;color:var(--muted);border:1px solid var(--line);padding:6px 10px;margin-bottom:10px;}
+.titleblock b{color:var(--text);}
+.toolbar{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.tool{border:1px solid var(--line);background:transparent;color:var(--text);font-size:.78rem;padding:7px 12px;border-radius:3px;cursor:pointer;}
+.tool.active{background:var(--cyan);color:#04141a;border-color:var(--cyan);font-weight:700;}
+.hint{font-size:.68rem;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+.board{position:relative;width:100%;min-height:200px;max-height:480px;border:1px solid var(--line);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:20px 20px;background-color:rgba(79,209,232,.02);overflow:hidden;touch-action:none;}
+.plotInputs{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:.78rem;}
+.plotInputs label{display:flex;align-items:center;gap:6px;color:var(--muted);}
+.plotInputs input{width:64px;background:transparent;border:1px solid var(--line);color:var(--text);padding:4px 6px;border-radius:2px;font-family:'SFMono-Regular',Consolas,monospace;}
+.snapSel{margin-inline-start:auto;}
+select.small{border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:.72rem;padding:4px 8px;border-radius:2px;}
+.room{position:absolute;border:1px solid var(--cyan);background:rgba(79,209,232,.06);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;padding:2px;overflow:hidden;cursor:move;}
+.room::before{content:'';position:absolute;inset:0;background:var(--rc,transparent);opacity:.14;pointer-events:none;}
+.room select,.room input,.room .dims{position:relative;z-index:1;}
+.room select{background:var(--panel);color:var(--text);border:1px solid var(--line);font-size:.66rem;max-width:92%;}
+.room input.labelInput{width:90%;text-align:center;background:transparent;border:none;border-bottom:1px dotted var(--line);color:var(--text);font-size:.74rem;font-weight:600;padding:1px 0;}
+.room .dims{font-family:'SFMono-Regular',Consolas,monospace;font-size:.62rem;color:var(--muted);}
+.delRoomBtn{position:absolute;top:1px;left:1px;background:none;border:none;color:var(--danger);font-size:.7rem;cursor:pointer;z-index:2;padding:2px;}
+.resizeHandle{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:nwse-resize;color:var(--amber);
+  font-size:.75rem;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);z-index:2;}
+.previewRect{position:absolute;border:2px dashed var(--amber);background:rgba(232,163,61,.15);pointer-events:none;}
+#lightsLayer{position:absolute;inset:0;pointer-events:none;}
+.light{position:absolute;width:28px;height:28px;border-radius:50%;pointer-events:auto;cursor:grab;
+  display:flex;align-items:center;justify-content:center;font-size:14px;transform:translate(-50%,-50%);touch-action:none;}
+.boardActions{display:flex;justify-content:space-between;margin-top:8px;}
+.lightRow{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line);flex-wrap:wrap;}
+.lightRow:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.lightRow .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.lightRow .sliders{flex:1;min-width:140px;display:flex;flex-direction:column;gap:4px;}
+.lightRow label{font-size:.65rem;color:var(--muted);display:flex;justify-content:space-between;}
+.lightRow input[type=range]{width:100%;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{border:1px solid var(--line);background:transparent;color:var(--text);font-size:.78rem;padding:6px 12px;border-radius:3px;cursor:pointer;}
+.chip.active{background:var(--amber);border-color:var(--amber);color:#20140a;font-weight:600;}
+button{font-family:inherit;}
+button.small{background:transparent;border:1px solid var(--line);color:var(--text);font-size:.7rem;padding:5px 10px;border-radius:2px;cursor:pointer;}
+button.small.danger{border-color:var(--danger);color:var(--danger);}
+button.primary{width:100%;background:var(--amber);color:#20140a;border:none;font-size:.9rem;font-weight:700;padding:12px;border-radius:3px;cursor:pointer;margin-bottom:8px;}
+button.ghost{width:100%;background:transparent;border:1px solid var(--line);color:var(--muted);font-size:.8rem;padding:10px;border-radius:3px;cursor:pointer;}
+textarea{width:100%;min-height:170px;border-radius:3px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:10px;font-size:.78rem;font-family:'SFMono-Regular',Consolas,monospace;direction:ltr;text-align:left;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>استوديو التصميم المعماري</h1>
+  <p>ارسم الغرف بالقلم مباشرة، اسحب وأفلت لنقلها أو تغيير حجمها، تحكم في الإضاءة والنمط، واحصل على برومبت احترافي</p>
+</header>
+
+<section class="blueprint-card">
+  <div class="titleblock">
+    <span>الإجمالي: <b id="totalArea">0</b> م²</span>
+    <span>المستخدم: <b id="usedArea">0</b> م²</span>
+    <span>المتبقي: <b id="remainArea">0</b> م²</span>
+    <span>الغرف: <b id="totalRooms">0</b></span>
+  </div>
+  <div class="plotInputs">
+    <label>طول القطعة <input id="plotL" type="number" step="0.1" min="1" value="13.92"> م</label>
+    <label>عرض القطعة <input id="plotW" type="number" step="0.1" min="1" value="6.2"> م</label>
+    <label class="snapSel">دقة الشبكة
+      <select id="snapSel" class="small">
+        <option value="0.1">0.10 م</option>
+        <option value="0.25" selected>0.25 م</option>
+        <option value="0.5">0.50 م</option>
+        <option value="1">1.00 م</option>
+      </select>
+    </label>
+  </div>
+  <div class="toolbar">
+    <button class="tool active" data-tool="select">🖐 تحريك وتعديل</button>
+    <button class="tool" data-tool="draw">✏️ رسم غرفة جديدة</button>
+  </div>
+  <p class="hint">وضع الرسم: اضغط واسحب على أي مساحة فاضية لرسم غرفة. وضع التحريك: اسحب أي غرفة لنقلها، أو اسحب الزاوية 🔧 لتغيير حجمها.</p>
+  <div class="board" id="board"></div>
+  <div class="boardActions">
+    <button class="small" id="clearBtn">🗑 مسح الكل</button>
+    <button class="small" id="resetBtn">↺ رجوع للمثال الأصلي</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>مصادر الإضاءة (اسحب ☀️ على المخطط)</h2>
+  <div id="lightsList"></div>
+  <button class="small" id="addLight" style="margin-top:6px;">+ إضافة مصدر إضاءة</button>
+</section>
+
+<section class="panel">
+  <h2>نمط التصميم الداخلي</h2>
+  <div class="chips" id="styleChips"></div>
+</section>
+
+<section class="panel">
+  <h2>زاوية العرض</h2>
+  <div class="chips" id="viewChips"></div>
+</section>
+
+<button class="primary" id="genBtn">✨ توليد البرومبت الاحترافي</button>
+
+<section class="panel" id="outputCard" style="display:none">
+  <h2>البرومبت الجاهز</h2>
+  <textarea id="output" readonly></textarea>
+  <button class="ghost" id="copyBtn">نسخ البرومبت</button>
+</section>
+</div>
+
+<script>
+let WORLD_W=13.92, WORLD_H=6.2, snapSize=0.25;
+const TYPES = {
+  bedroom:{label:'غرفة نوم',color:'#6b8fb5',furn:'a bed, wardrobe, and nightstands'},
+  living:{label:'صالة معيشة',color:'#c98a4b',furn:'a sofa, coffee table, and TV console'},
+  kitchen:{label:'مطبخ',color:'#7fae6f',furn:'kitchen cabinetry, an island, and a dining table'},
+  bathroom:{label:'حمام',color:'#4fd1e8',furn:'a vanity, shower enclosure, and mirror'},
+  dressing:{label:'غرفة ملابس',color:'#b56b9e',furn:'built-in wardrobes and a dressing mirror'},
+  storage:{label:'تخزين',color:'#8b98a5',furn:'shelving units'},
+  balcony:{label:'بلكونة',color:'#6fae7f',furn:'outdoor seating and potted plants'},
+  hallway:{label:'ممر / مدخل',color:'#a5a5a5',furn:'a console table and wall art'}
+};
+const STYLES = {
+  modern:{label:'عصري',desc:'Modern minimalist interior design, neutral palette with wood and beige accents, clean furniture lines.'},
+  luxury:{label:'كلاسيك فاخر',desc:'Luxurious classic interior design, marble flooring, gold accents, and elegant upholstered furniture.'},
+  bohemian:{label:'بوهيمي',desc:'Eclectic bohemian interior design, warm earthy tones, layered textiles, plants, and rattan furniture.'},
+  industrial:{label:'صناعي',desc:'Industrial-style interior design, exposed brick accents, black metal fixtures, and concrete surfaces.'},
+  scandi:{label:'إسكندنافي',desc:'Scandinavian minimalist interior design, light oak wood, white walls, and cozy natural textiles.'}
+};
+const VIEWS = {
+  isometric:{label:'مجسم علوي (Dollhouse)',build:d=>`Ultra-realistic 3D architectural cutaway visualization of a residential apartment, isometric dollhouse view with the roof removed, camera angled 45 degrees from above. ${d}`},
+  topdown:{label:'مسقط علوي',build:d=>`Photorealistic 3D top-down floor plan render, camera directly overhead looking straight down, roof removed. ${d}`},
+  elevation:{label:'واجهة مقطعية',build:d=>`Photorealistic 3D front elevation render of the building facade with a vertical cutaway revealing the interior layout behind it. ${d}`},
+  walkthrough:{label:'من الداخل',build:d=>`Photorealistic first-person interior walkthrough render, eye-level camera standing inside the main living space looking across the apartment. ${d}`}
+};
+
+let uid=100, tool='select', dragState=null;
+let rooms=[
+  {id:1,x:0,y:0,w:4.11,h:3,label:'غرفة نوم 1',type:'bedroom'},
+  {id:2,x:4.11,y:0,w:5.00,h:3,label:'صالة معيشة',type:'living'},
+  {id:3,x:9.11,y:0,w:4.81,h:3,label:'غرفة نوم 2',type:'bedroom'},
+  {id:4,x:0,y:3,w:6.0,h:3.2,label:'مطبخ وسفرة',type:'kitchen'},
+  {id:5,x:6.0,y:3,w:7.09,h:3.2,label:'غرفة نوم رئيسية',type:'bedroom'}
+];
+let lights=[{id:1,x:78,y:15,warmth:75,intensity:70},{id:2,x:20,y:80,warmth:35,intensity:45}];
+let style='modern', view='isometric';
+const initial = {rooms:JSON.parse(JSON.stringify(rooms)),lights:JSON.parse(JSON.stringify(lights)),style,view,worldW:WORLD_W,worldH:WORLD_H};
+
+const board = document.getElementById('board');
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const round1=v=>Math.round(v*10)/10;
+const snapv=v=>Math.round(v/snapSize)*snapSize;
+const pctX=v=>(v/WORLD_W*100)+'%', pctY=v=>(v/WORLD_H*100)+'%';
+const typeOptions=sel=>Object.keys(TYPES).map(k=>`<option value="${k}" ${k===sel?'selected':''}>${TYPES[k].label}</option>`).join('');
+
+function renderBoard(){
+  board.querySelectorAll('.room').forEach(e=>e.remove());
+  rooms.forEach(room=>{
+    const el=document.createElement('div');
+    el.className='room';
+    el.style.left=pctX(room.x); el.style.top=pctY(room.y);
+    el.style.width=pctX(room.w); el.style.height=pctY(room.h);
+    el.style.setProperty('--rc',TYPES[room.type].color);
+    el.innerHTML=`<button class="delRoomBtn" data-del="${room.id}">✕</button>
+      <select data-type="${room.id}">${typeOptions(room.type)}</select>
+      <input class="labelInput" value="${room.label}" data-label="${room.id}">
+      <div class="dims">${room.w.toFixed(1)} × ${room.h.toFixed(1)} م (${(room.w*room.h).toFixed(1)} م²)</div>
+      <div class="resizeHandle">🔧</div>`;
+    el.addEventListener('pointerdown',e=>{
+      if(tool!=='select') return;
+      if(['SELECT','INPUT','BUTTON'].includes(e.target.tagName)) return;
+      dragState={type:'move',room,el,startX:e.clientX,startY:e.clientY,origX:room.x,origY:room.y};
+    });
+    el.querySelector('.resizeHandle').addEventListener('pointerdown',e=>{
+      e.stopPropagation();
+      dragState={type:'resize',room,el,startX:e.clientX,startY:e.clientY,origW:room.w,origH:room.h};
+    });
+    el.querySelector('[data-del]').addEventListener('click',()=>{
+      rooms=rooms.filter(r=>r.id!==room.id); renderBoard(); updateStats();
+    });
+    el.querySelector('[data-type]').addEventListener('change',e=>{ room.type=e.target.value; renderBoard(); });
+    el.querySelector('[data-label]').addEventListener('input',e=>{ room.label=e.target.value; });
+    board.appendChild(el);
+  });
+  let layer=document.getElementById('lightsLayer');
+  if(!layer){ layer=document.createElement('div'); layer.id='lightsLayer'; board.appendChild(layer); }
+  renderLights();
+}
+
+function renderLights(){
+  let layer=document.getElementById('lightsLayer');
+  if(!layer){ layer=document.createElement('div'); layer.id='lightsLayer'; board.appendChild(layer); }
+  layer.innerHTML='';
+  lights.forEach(light=>{
+    const el=document.createElement('div');
+    el.className='light'; el.textContent='☀️';
+    el.style.left=light.x+'%'; el.style.top=light.y+'%';
+    el.style.boxShadow=`0 0 18px 6px rgba(${light.warmth>50?'255,190,110':'110,190,255'},${0.3+light.intensity/200})`;
+    el.addEventListener('pointerdown',()=>{ dragState={type:'light',light,el}; });
+    layer.appendChild(el);
+  });
+}
+
+document.addEventListener('pointermove',e=>{
+  if(!dragState) return;
+  const rect=board.getBoundingClientRect();
+  if(dragState.type==='move'){
+    const dx=(e.clientX-dragState.startX)/rect.width*WORLD_W;
+    const dy=(e.clientY-dragState.startY)/rect.height*WORLD_H;
+    const r=dragState.room;
+    r.x=clamp(snapv(dragState.origX+dx),0,WORLD_W-r.w); r.y=clamp(snapv(dragState.origY+dy),0,WORLD_H-r.h);
+    dragState.el.style.left=pctX(r.x); dragState.el.style.top=pctY(r.y);
+  } else if(dragState.type==='resize'){
+    const dx=(e.clientX-dragState.startX)/rect.width*WORLD_W;
+    const dy=(e.clientY-dragState.startY)/rect.height*WORLD_H;
+    const r=dragState.room;
+    r.w=clamp(snapv(dragState.origW+dx),snapSize,WORLD_W-r.x); r.h=clamp(snapv(dragState.origH+dy),snapSize,WORLD_H-r.y);
+    dragState.el.style.width=pctX(r.w); dragState.el.style.height=pctY(r.h);
+    const d=dragState.el.querySelector('.dims');
+    if(d) d.textContent=`${r.w.toFixed(1)} × ${r.h.toFixed(1)} م (${(r.w*r.h).toFixed(1)} م²)`;
+  } else if(dragState.type==='draw'){
+    const x1=dragState.startX,y1=dragState.startY;
+    const left=Math.min(x1,e.clientX)-rect.left, top=Math.min(y1,e.clientY)-rect.top;
+    const w=Math.abs(e.clientX-x1), h=Math.abs(e.clientY-y1);
+    dragState.el.style.left=(left/rect.width*100)+'%'; dragState.el.style.top=(top/rect.height*100)+'%';
+    dragState.el.style.width=(w/rect.width*100)+'%'; dragState.el.style.height=(h/rect.height*100)+'%';
+  } else if(dragState.type==='light'){
+    dragState.light.x=clamp((e.clientX-rect.left)/rect.width*100,0,100);
+    dragState.light.y=clamp((e.clientY-rect.top)/rect.height*100,0,100);
+    dragState.el.style.left=dragState.light.x+'%'; dragState.el.style.top=dragState.light.y+'%';
+  }
+});
+
+document.addEventListener('pointerup',()=>{
+  if(!dragState) return;
+  if(dragState.type==='move'){ dragState.room.x=snapv(dragState.room.x); dragState.room.y=snapv(dragState.room.y); renderBoard(); updateStats(); }
+  else if(dragState.type==='resize'){ dragState.room.w=snapv(dragState.room.w); dragState.room.h=snapv(dragState.room.h); renderBoard(); updateStats(); }
+  else if(dragState.type==='draw'){
+    const rect=board.getBoundingClientRect();
+    const wM=parseFloat(dragState.el.style.width)/100*WORLD_W, hM=parseFloat(dragState.el.style.height)/100*WORLD_H;
+    const xM=parseFloat(dragState.el.style.left)/100*WORLD_W, yM=parseFloat(dragState.el.style.top)/100*WORLD_H;
+    dragState.el.remove();
+    if(wM>=0.4 && hM>=0.4){
+      rooms.push({id:++uid,x:snapv(xM),y:snapv(yM),w:Math.max(snapSize,snapv(wM)),h:Math.max(snapSize,snapv(hM)),label:'غرفة جديدة',type:'bedroom'});
+      renderBoard(); updateStats();
+    }
+  } else if(dragState.type==='light'){ renderLightsList(); }
+  dragState=null;
+});
+
+board.addEventListener('pointerdown',e=>{
+  if(e.target!==board || tool!=='draw') return;
+  const rect=board.getBoundingClientRect();
+  const preview=document.createElement('div'); preview.className='previewRect';
+  preview.style.left=((e.clientX-rect.left)/rect.width*100)+'%';
+  preview.style.top=((e.clientY-rect.top)/rect.height*100)+'%';
+  preview.style.width='0%'; preview.style.height='0%';
+  board.appendChild(preview);
+  dragState={type:'draw',startX:e.clientX,startY:e.clientY,el:preview};
+});
+
+document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>{
+  tool=b.dataset.tool;
+  document.querySelectorAll('.tool').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+function renderLightsList(){
+  const box=document.getElementById('lightsList'); box.innerHTML='';
+  lights.forEach(light=>{
+    const row=document.createElement('div'); row.className='lightRow';
+    row.innerHTML=`<span class="dot" style="background:${light.warmth>50?'#e8a33d':'#4fd1e8'}"></span>
+      <div class="sliders">
+        <label>دفء الضوء <input type="range" min="0" max="100" value="${light.warmth}" data-warm="${light.id}"></label>
+        <label>الشدة <input type="range" min="0" max="100" value="${light.intensity}" data-int="${light.id}"></label>
+      </div>
+      ${lights.length>1?`<button class="small danger" data-dellight="${light.id}">حذف</button>`:''}`;
+    box.appendChild(row);
+  });
+  document.querySelectorAll('[data-warm]').forEach(el=>el.addEventListener('input',()=>{ lights.find(l=>l.id==el.dataset.warm).warmth=+el.value; renderLights(); renderLightsList(); }));
+  document.querySelectorAll('[data-int]').forEach(el=>el.addEventListener('input',()=>{ lights.find(l=>l.id==el.dataset.int).intensity=+el.value; renderLights(); renderLightsList(); }));
+  document.querySelectorAll('[data-dellight]').forEach(el=>el.addEventListener('click',()=>{ lights=lights.filter(l=>l.id!=el.dataset.dellight); renderLights(); renderLightsList(); }));
+}
+
+function renderChips(){
+  const sBox=document.getElementById('styleChips'); sBox.innerHTML='';
+  Object.keys(STYLES).forEach(k=>{
+    const b=document.createElement('button'); b.className='chip'+(style===k?' active':'');
+    b.textContent=STYLES[k].label; b.addEventListener('click',()=>{style=k; renderChips();});
+    sBox.appendChild(b);
+  });
+  const vBox=document.getElementById('viewChips'); vBox.innerHTML='';
+  Object.keys(VIEWS).forEach(k=>{
+    const b=document.createElement('button'); b.className='chip'+(view===k?' active':'');
+    b.textContent=VIEWS[k].label; b.addEventListener('click',()=>{view=k; renderChips();});
+    vBox.appendChild(b);
+  });
+}
+
+function updateStats(){
+  const total=WORLD_W*WORLD_H;
+  const used=rooms.reduce((s,r)=>s+r.w*r.h,0);
+  document.getElementById('totalArea').textContent=total.toFixed(1);
+  document.getElementById('usedArea').textContent=used.toFixed(1);
+  document.getElementById('remainArea').textContent=(total-used).toFixed(1);
+  document.getElementById('totalRooms').textContent=rooms.length;
+}
+
+function applyPlotSize(newL,newH){
+  const rx=newL/WORLD_W, ry=newH/WORLD_H;
+  rooms.forEach(r=>{ r.x=snapv(r.x*rx); r.y=snapv(r.y*ry); r.w=snapv(r.w*rx); r.h=snapv(r.h*ry); });
+  WORLD_W=newL; WORLD_H=newH;
+  board.style.aspectRatio=WORLD_W+'/'+WORLD_H;
+  renderBoard(); updateStats();
+}
+document.getElementById('plotL').addEventListener('change',e=>applyPlotSize(Math.max(1,parseFloat(e.target.value)||WORLD_W),WORLD_H));
+document.getElementById('plotW').addEventListener('change',e=>applyPlotSize(WORLD_W,Math.max(1,parseFloat(e.target.value)||WORLD_H)));
+document.getElementById('snapSel').addEventListener('change',e=>{ snapSize=parseFloat(e.target.value); });
+
+function generatePrompt(){
+  if(rooms.length===0) return 'أضف غرفة واحدة على الأقل قبل توليد البرومبت.';
+  const sorted=[...rooms].sort((a,b)=>a.y-b.y||a.x-b.x);
+  const roomsDesc=sorted.map(r=>`${TYPES[r.type].label} labeled "${r.label}" (${r.w.toFixed(1)}m × ${r.h.toFixed(1)}m) furnished with ${TYPES[r.type].furn}`).join(', ');
+  const lightsDesc=lights.map(l=>{
+    const h=l.x<33?'left':l.x<66?'center':'right', v=l.y<40?'front':l.y<70?'middle':'back';
+    const warm=l.warmth>60?'warm golden':l.warmth>30?'neutral white':'cool bluish';
+    const inten=l.intensity>65?'bright':l.intensity>35?'soft':'dim';
+    return `a ${inten}, ${warm} light source at the ${v}-${h} of the space`;
+  }).join(', and ');
+  const totalArea=rooms.reduce((s,r)=>s+r.w*r.h,0).toFixed(1);
+  const desc=`On a plot measuring ${WORLD_W.toFixed(2)}m by ${WORLD_H.toFixed(2)}m, the apartment totals ${totalArea} square meters across ${rooms.length} rooms: ${roomsDesc}. ${STYLES[style].desc} Lighting: ${lightsDesc}, with soft realistic shadows and ambient occlusion. Clean architectural lines, high level of detail, octane render, unreal engine 5 style, professional architectural visualization, sharp focus, 8k quality --ar 16:9 --v 6`;
+  return VIEWS[view].build(desc);
+}
+
+document.getElementById('addLight').addEventListener('click',()=>{
+  if(lights.length>=5) return;
+  lights.push({id:++uid,x:50,y:50,warmth:60,intensity:55});
+  renderLights(); renderLightsList();
+});
+document.getElementById('clearBtn').addEventListener('click',()=>{ rooms=[]; renderBoard(); updateStats(); });
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  rooms=JSON.parse(JSON.stringify(initial.rooms)); lights=JSON.parse(JSON.stringify(initial.lights));
+  style=initial.style; view=initial.view; WORLD_W=initial.worldW; WORLD_H=initial.worldH; snapSize=0.25;
+  document.getElementById('plotL').value=WORLD_W; document.getElementById('plotW').value=WORLD_H; document.getElementById('snapSel').value='0.25';
+  board.style.aspectRatio=WORLD_W+'/'+WORLD_H;
+  renderBoard(); renderLightsList(); renderChips(); updateStats();
+  document.getElementById('outputCard').style.display='none';
+});
+document.getElementById('genBtn').addEventListener('click',()=>{
+  document.getElementById('output').value=generatePrompt();
+  document.getElementById('outputCard').style.display='block';
+  document.getElementById('outputCard').scrollIntoView({behavior:'smooth'});
+});
+document.getElementById('copyBtn').addEventListener('click',()=>{
+  const ta=document.getElementById('output'); ta.select();
+  try{ navigator.clipboard.writeText(ta.value); }catch(e){ document.execCommand('copy'); }
+});
+
+board.style.aspectRatio=WORLD_W+'/'+WORLD_H;
+renderBoard(); renderLightsList(); renderChips(); updateStats();
+</script>
+</body>
+</html>
