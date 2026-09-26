@@ -97,6 +97,80 @@
     font-size: 15px; color: var(--text-3); pointer-events: none;
   }
 
+  .search-sug {
+    position: absolute; top: calc(100% + 6px); right: 0; left: 0;
+    min-width: 320px; max-height: 340px; overflow: auto;
+    background: var(--bg-raised); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md); z-index: 999;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.38);
+    display: none; text-align: right;
+  }
+  .search-sug.open { display: block; }
+  .search-sug::-webkit-scrollbar { width: 8px; }
+  .sug-empty { padding: 14px; font-size: 12px; color: var(--text-3); }
+  .sug-foot {
+    display: flex; gap: 12px; padding: 7px 12px;
+    font-size: 10px; color: var(--text-3);
+    border-top: 1px solid var(--border-sub);
+    background: color-mix(in srgb, var(--bg-elevated) 35%, transparent);
+    position: sticky; bottom: 0;
+  }
+  .sug-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; cursor: pointer;
+    border-bottom: 1px solid var(--border-sub);
+  }
+  .sug-item:last-of-type { border-bottom: none; }
+  .sug-item:hover, .sug-item.active { background: var(--accent-glow); }
+  .sug-ic {
+    flex: 0 0 auto; width: 28px; height: 28px; border-radius: 8px;
+    display: grid; place-items: center;
+    background: var(--bg-elevated); border: 1px solid var(--border-sub);
+    color: var(--text-2); font-size: 14px;
+  }
+  .sug-ic.star { color: var(--gold, var(--accent)); }
+  .sug-body { flex: 1 1 auto; min-width: 0; }
+  .sug-title { font-size: 12.5px; font-weight: 700; color: var(--text-1); }
+  .sug-sub { display: flex; gap: 5px; align-items: center; margin-top: 3px; white-space: nowrap; overflow: hidden; }
+  .sug-tag {
+    font-size: 9.5px; font-weight: 600; padding: 1.5px 7px;
+    border-radius: 20px; background: var(--bg-elevated);
+    border: 1px solid var(--border-sub); color: var(--text-2);
+  }
+  .sug-code {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--text-3); overflow: hidden; text-overflow: ellipsis;
+    direction: ltr; text-align: left;
+    background: var(--bg-elevated); border-radius: 5px; padding: 2px 7px;
+    border: 1px solid var(--border-sub);
+  }
+  .sug-code mark, .sug-title mark { background: rgba(212,168,67,0.35); color: var(--text-1); border-radius: 2px; }
+  .sug-score {
+    flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-3);
+    background: var(--bg-elevated); border-radius: 6px; padding: 2px 6px;
+  }
+  .flat-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 800; color: var(--text-2);
+    margin: 4px 0 14px; padding: 8px 12px;
+    background: var(--bg-raised); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md);
+  }
+  .flat-head i { color: var(--accent); }
+  .section.flash { animation: secFlash 1.8s ease; }
+  @keyframes secFlash {
+    0%, 25% { box-shadow: 0 0 0 3px var(--accent); background: var(--accent-glow); }
+    100% { box-shadow: none; }
+  }
+  .code-hit { background: rgba(212,168,67,0.28); color: inherit; border-radius: 2px; }
+  .sug-kbd-row { display: inline-flex; gap: 4px; align-items: center; margin-inline-end: 2px; }
+  .sug-kbd {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    border: 1px solid var(--border-sub); border-bottom-width: 2px;
+    border-radius: 4px; padding: 0 5px; color: var(--text-2);
+  }
+
   .count-badge {
     font-size: 11px; font-weight: 500; padding: 4px 12px;
     background: var(--bg-elevated); border: 1px solid var(--border-sub);
@@ -2041,8 +2115,9 @@
   </div>
 
   <div class="search-wrap">
-    <input class="search-input" id="searchInput" type="text" placeholder="ابحث عن كود..." autocomplete="off" oninput="renderAll()">
+    <input class="search-input" id="searchInput" type="text" placeholder="ابحث عن كود... tag: -css" autocomplete="off" oninput="renderAll(); onSearchInput()">
     <i class="ti ti-search search-icon" aria-hidden="true"></i>
+    <div class="search-sug" id="searchSug"></div>
   </div>
 
   <span class="count-badge" id="countBadge">0 كود</span>
@@ -2352,6 +2427,24 @@
     if(!q) return escHtml(text);
     const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
     return escHtml(text).replace(re, '<span class="hl">$1</span>');
+  }
+
+  // تلوين كلمات البحث داخل الكود بعد التظليل المبدئي (يحافظ على وسوم الـ span)
+  function hlCode(html, words){
+    if(!words || !words.length) return html;
+    const kept = [];
+    // حماية وسوم الـ span من التلوين داخل الوصفات
+    html = html.replace(/(<span[^>]*>|<\/span>|\x00)/g, m => {
+      kept.push(m);
+      return '\x00';
+    });
+    const esc = w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    for(const w of words){
+      if(!w || w.length < 2) continue;
+      html = html.replace(new RegExp(esc(w), 'gi'), m => `<span class="code-hit">${m}</span>`);
+    }
+    let i = 0;
+    return html.replace(/\x00/g, () => kept[i++]);
   }
 
   // ── COLOR HELPERS ──
@@ -2962,18 +3055,208 @@
     renderAll();
   }
 
-  function getFiltered(){
+function getFiltered(){
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
+    const p = parseQuery(q);
     return DATA.filter(s=>{
       if(activeTag==='starred' && !starredIds.has(s.id)) return false;
       if(activeTag!=='all' && activeTag!=='starred' && !s.tags.includes(activeTag)) return false;
       if(!q) return true;
-      return s.title.toLowerCase().includes(q)
-        || s.desc.toLowerCase().includes(q)
-        || s.tags.some(t=>t.includes(q))
-        || s.codes.some(c=>c.code.toLowerCase().includes(q));
+      // عمليات tag: و -
+      if(p.tags.length && !p.tags.every(t => s.tags.some(x => x.toLowerCase().includes(t)))) return false;
+      const hay = s.title.toLowerCase() + ' ' + s.desc.toLowerCase() + ' ' + s.tags.join(' ').toLowerCase() + ' ' + s.codes.map(c=>c.code.toLowerCase()).join('\n');
+      if(p.excl.length && p.excl.some(e => hay.includes(e))) return false;
+      if(!p.words.length) return true;
+      return p.words.some(w => hay.includes(w.toLowerCase()))
+        || fuzzyMatch(s.title, p.words.join(' ')) >= 60;
     });
   }
+
+  // ── SMART SEARCH ──
+  let _sugResults = [];   // آخر نتائج منبثقة للبحث
+  let _sugSel = -1;       // العنصر المظلل في القائمة المنبثقة
+  let _sugTimer = null;
+
+  function parseQuery(q){
+    const out = { words: [], tags: [], excl: [] };
+    (q || '').split(/\s+/).filter(Boolean).forEach(tk => {
+      tk = tk.trim();
+      const low = tk.toLowerCase();
+      if(low.startsWith('tag:')) out.tags.push(low.slice(4).trim());
+      else if(low.startsWith('-')) out.excl.push(low.slice(1).trim());
+      else out.words.push(tk);
+    });
+    return out;
+  }
+
+  function smartScore(s, p){
+    const hay = s.title.toLowerCase() + ' ' + s.desc.toLowerCase() + ' ' + s.tags.join(' ').toLowerCase();
+    const codeAll = s.codes.map(c => c.lang.toLowerCase() + '\n' + c.code.toLowerCase()).join('\n');
+    let score = 0, fav = 0;
+    for(const w of p.words){
+      const wl = w.toLowerCase();
+      if(s.title.toLowerCase().includes(wl)) score += 100;
+      else if(fuzzyMatch(s.title, wl) >= 60) score += 55;
+      if(s.tags.some(t => t.toLowerCase().includes(wl))) score += 35;
+      if(s.desc.toLowerCase().includes(wl)) score += 20;
+      const ci = codeAll.indexOf(wl);
+      if(ci !== -1){ score += 25; if(!fav){ fav = findFavLine(s, wl); } }
+    }
+    // مطابقة fuzzy على العنوان حتى لو مش كلمة كاملة
+    if(score > 0 && starredIds.has(s.id)) score += 10;
+    if(!p.words.length) score = 0;
+    const max = p.words.length ? 100 : 1;
+    return { score, max, fav, hay: hay + ' ' + codeAll };
+  }
+
+  function fuzzyMatch(str, q){
+    str = str.toLowerCase();
+    if(!q) return 0;
+    if(str.includes(q)) return 100;
+    if(q.length < 2) return str.includes(q) ? 40 : 0;
+    let s = 0, j = 0;
+    for(const ch of q){
+      const k = str.indexOf(ch, j);
+      if(k === -1) return 0;
+      s += (k === j) ? 3 : 1;
+      j = k + 1;
+    }
+    return Math.min(100, Math.round(s * 100 / (q.length * 3)));
+  }
+
+  function findFavLine(s, wl){
+    for(const c of s.codes){
+      const lines = c.code.split('\n');
+      for(let i = 0; i < lines.length; i++){
+        const L = lines[i].toLowerCase();
+        if(L.includes(wl)) return { lang: c.lang, line: L.trim() };
+      }
+    }
+    return null;
+  }
+
+  function smartSearch(){
+    const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
+    const p = parseQuery(q);
+    const base = DATA.filter(s=>{
+      if(activeTag==='starred' && !starredIds.has(s.id)) return false;
+      if(activeTag!=='all' && activeTag!=='starred' && !s.tags.includes(activeTag)) return false;
+      return true;
+    });
+    const rows = base.map(s => {
+      const r = smartScore(s, p);
+      return { s, ...r };
+    }).filter(r => {
+      // فلتر العمليات: tag: و -
+      if(p.tags.length && !p.tags.every(t => r.s.tags.some(x => x.toLowerCase().includes(t)))) return false;
+      if(p.excl.length && p.excl.some(e => r.hay.includes(e))) return false;
+      return r.score >= (p.words.length ? 5 : 0);
+    });
+    rows.sort((a, b) => (b.score / b.max) - (a.score / a.max) || b.score - a.score);
+    return { rows, p };
+  }
+
+  function renderSuggest(){
+    const box = document.getElementById('searchSug');
+    const si = document.getElementById('searchInput');
+    if(!box || !si) return;
+    const q = si.value.trim().toLowerCase();
+    if(!q){ box.className = 'search-sug'; box.innerHTML = ''; _sugResults = []; _sugSel = -1; return; }
+    const { rows } = smartSearch();
+    _sugResults = rows.slice(0, 7);
+    if(!_sugResults.length){
+      box.className = 'search-sug open';
+      box.innerHTML = '<div class="sug-empty"><i class="ti ti-search-off" aria-hidden="true"></i> لا توجد نتائج — جرّب كلمة أوسع أو أزل العملية tag:</div>';
+      _sugSel = -1;
+      return;
+    }
+    _sugSel = Math.min(_sugSel, _sugResults.length - 1);
+    box.className = 'search-sug open';
+    box.innerHTML = _sugResults.map((r, i) => {
+      const isStar = starredIds.has(r.s.id);
+      const titleH = hlQuery(r.s.title, q);
+      const tagsH = r.s.tags.slice(0, 3).map(t => `<span class="sug-tag">${escHtml(t)}</span>`).join('');
+      const prev = r.fav
+        ? `<span class="sug-code" dir="ltr">${hlQuery(r.fav.line, q)}</span>`
+        : '';
+      return `<div class="sug-item${i === _sugSel ? ' active' : ''}" data-id="${r.s.id}"
+        onmouseenter="sugHover(${i})" onclick="sugJump('${r.s.id}')">
+        <span class="sug-ic${isStar ? ' star' : ''}"><i class="ti ${isStar ? 'ti-star-filled' : 'ti-file-code'}" aria-hidden="true"></i></span>
+        <div class="sug-body">
+          <div class="sug-title">${titleH}</div>
+          <div class="sug-sub">${tagsH}${prev}</div>
+        </div>
+        <span class="sug-score">${r.score}</span>
+      </div>`;
+    }).join('') + `<div class="sug-foot">
+      <span class="sug-kbd-row"><span class="sug-kbd">↑↓</span> تنقل</span>
+      <span class="sug-kbd-row"><span class="sug-kbd">Enter</span> افتح</span>
+      <span class="sug-kbd-row"><span class="sug-kbd">Esc</span> أغلق</span>
+    </div>`;
+  }
+
+  function sugHover(i){
+    _sugSel = i;
+    document.querySelectorAll('#searchSug .sug-item').forEach((el, k) => el.classList.toggle('active', k === i));
+  }
+
+  function sugJump(id){
+    const box = document.getElementById('searchSug');
+    if(box) box.className = 'search-sug';
+    const s = DATA.find(d => d.id === id);
+    if(!s) return;
+    if(!openIds.has(id)) openIds.add(id);
+    // لو القسم مش ضمن الفلتر الحالي، بدّل "الكل" مؤقتًا عشان يظهر
+    if(!getFiltered().some(d => d.id === id)){
+      const allBtn = document.querySelector('.filter-tag[data-tag="all"]');
+      if(allBtn) setTag(allBtn);
+      else { activeTag = 'all'; renderAll(); }
+    }
+    renderAll();
+    requestAnimationFrame(() => {
+      const sec = document.querySelector('#mainBody [data-id="'+id+'"]');
+      if(sec){
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        sec.classList.add('flash');
+        setTimeout(() => sec.classList.remove('flash'), 1900);
+      }
+    });
+  }
+
+  function onSearchInput(){
+    renderAll();
+    if(_sugTimer) clearTimeout(_sugTimer);
+    _sugTimer = setTimeout(renderSuggest, 120);
+  }
+
+  function closeSugIfOutside(ev){
+    const box = document.getElementById('searchSug');
+    const si = document.getElementById('searchInput');
+    if(!box || !si) return;
+    if(ev.target !== si && !box.contains(ev.target) && box.classList.contains('open')){
+      box.className = 'search-sug';
+    }
+  }
+
+  (function initSmartSearch(){
+    const si = document.getElementById('searchInput');
+    if(!si) return;
+    si.addEventListener('keydown', e => {
+      if(e.key === 'ArrowDown'){ e.preventDefault(); if(_sugSel < _sugResults.length - 1) sugHover(_sugSel + 1); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); if(_sugSel > 0) sugHover(_sugSel - 1); }
+      else if(e.key === 'Enter'){
+        if(_sugResults.length && _sugSel >= 0){
+          e.preventDefault();
+          sugJump(_sugResults[_sugSel].s.id);
+        }
+      }
+      else if(e.key === 'Escape'){
+        const box = document.getElementById('searchSug');
+        if(box && box.classList.contains('open')){ box.className = 'search-sug'; e.preventDefault(); }
+      }
+    });
+    document.addEventListener('click', e => closeSugIfOutside(e));
+  })();
 
   // ── SECTION GROUPS ──
   const GROUP_LIST = [
@@ -3378,7 +3661,7 @@
                     <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
                   </div>
                 </div>
-                <pre class="code-pre${wrapMode?' wrap':''}">${syntaxHL(liveCode)}</pre>
+<pre class="code-pre${wrapMode?' wrap':''}">${hlCode(syntaxHL(liveCode), window._smartWords || [])}</pre>
               </div>
             </div>`;
           }
@@ -4827,6 +5110,15 @@
     const q     = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
     const list  = getFiltered();
 
+    const _searchWords = q ? parseQuery(q).words : [];
+    window._smartWords = _searchWords;
+    if(_searchWords.length && list.length > 1){
+      const p = parseQuery(q);
+      const scored = list.map(s => ({ s, sc: smartScore(s, p).score }));
+      scored.sort((a,b) => b.sc - a.sc);
+      scored.forEach((x, i) => { list[i] = x.s; });
+    }
+
     badge.textContent = list.length + ' كود';
 
     if(!list.length){
@@ -4899,7 +5191,7 @@
                 </button>
               </div>
             </div>
-            <pre class="code-pre${wrapMode?' wrap':''}">${syntaxHL(liveCode)}</pre>
+            <pre class="code-pre${wrapMode?' wrap':''}">${hlCode(syntaxHL(liveCode), _searchWords)}</pre>
           </div>`;
         }).join('');
 
@@ -4952,7 +5244,11 @@
         <div class="group-body${isOpen ? ' open' : ''}">${itemsHtml}</div>
       </div>`;
     }).join('');
-    body.innerHTML = groupsHtml || `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p></div>`;
+    const useFlat = !!q || _searchWords.length || parseQuery((document.getElementById('searchInput')||{}).value||'').tags.length || parseQuery((document.getElementById('searchInput')||{}).value||'').excl.length;
+    const body2 = useFlat && list.length
+      ? `<div class="flat-head"><i class="ti ti-sparkles" aria-hidden="true"></i> أفضل النتائج لعبارة «${escHtml((document.getElementById('searchInput')||{}).value.trim())}» — ${list.length} كود</div>` + cardsHtml.join('')
+      : groupsHtml;
+    body.innerHTML = body2 || `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p></div>`;
   }
 
   // ── MODAL ──
@@ -8670,6 +8966,25 @@ function hello() {
 
   // ── INIT ──
   DATA.forEach(s => openIds.add(s.id));
+  // اختصارات: "/" للبحث و Ctrl/Cmd+K للوحة بحث سريعة
+  document.addEventListener('keydown', e => {
+    const tag = (e.target && e.target.tagName || '').toLowerCase();
+    const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
+    if(e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault();
+      const si = document.getElementById('searchInput');
+      if(si){ si.focus(); si.value = ''; renderAll(); renderSuggest(); }
+    }
+    else if((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey) && !typing){
+      e.preventDefault();
+      const si = document.getElementById('searchInput');
+      if(si){ si.focus(); si.select(); renderSuggest(); }
+    }
+    else if(e.key === 'Escape'){
+      const box = document.getElementById('searchSug');
+      if(box && box.classList.contains('open')) box.className = 'search-sug';
+    }
+  });
   if (currentHash()) { hashGo(); }
   else { restoreDashState(); renderAll(); }
   document.getElementById('wrapBtn').classList.add('active');
