@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>متتبع العادات 2026 | Habit Tracker</title>
+<meta name="description" content="أداة متابعة العادات اليومية لسنة 2026 — جدول تفاعلي لكل شهر، إحصائيات ورسوم بيانية، وحفظ تلقائي في المتصفح." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a0f1c;
+    --bg-grad: radial-gradient(1200px 520px at 90% -10%, rgba(99,132,255,.16), transparent 60%),
+               radial-gradient(900px 420px at 0% 0%, rgba(45,212,160,.10), transparent 55%);
+    --surface: #111a2e;
+    --surface-2: #16203a;
+    --surface-3: #1c2745;
+    --border: #24314f;
+    --border-strong: #35456a;
+    --text: #e9eefb;
+    --muted: #93a2c2;
+    --accent: #6b86ff;
+    --accent-2: #9a7dff;
+    --accent-soft: rgba(107,134,255,.18);
+    --ok: #2dd4a0;
+    --ok-deep: #10b981;
+    --ok-soft: rgba(45,212,160,.18);
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --danger-soft: rgba(248,113,113,.14);
+    --weekend: rgba(251,191,36,.09);
+    --hover: rgba(107,134,255,.14);
+    --shadow: 0 6px 26px rgba(0,0,0,.40);
+    --shadow-lg: 0 18px 50px rgba(0,0,0,.55);
+    --radius: 18px;
+    --radius-sm: 11px;
+    --cell: 34px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+    background-color: var(--bg);
+    background-image: var(--bg-grad);
+    background-attachment: fixed;
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  button, input { font-family: inherit; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px clamp(10px, 2vw, 26px);
+    background: linear-gradient(120deg, #4f6ef7, #7c5cfc 55%, #6b86ff);
+    box-shadow: 0 10px 30px rgba(79,110,247,.30);
+    position: sticky; top: 0; z-index: 60;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo {
+    width: 42px; height: 42px; border-radius: 13px; flex: none;
+    display: grid; place-items: center; font-size: 20px;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34);
+  }
+  .brand h1 { font-size: clamp(16px, 2.2vw, 22px); font-weight: 900; line-height: 1.3; }
+  .brand p { font-size: 12px; opacity: .9; font-weight: 600; }
+  .top-actions { display: flex; gap: 8px; flex: none; align-items: center; }
+  .today-chip {
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34);
+    color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .btn {
+    border: 1px solid transparent; cursor: pointer; border-radius: 12px;
+    padding: 9px 15px; font-size: 13px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn.primary { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 8px 20px rgba(107,134,255,.34); }
+  .btn.ghost { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  .btn.ghost:hover { border-color: var(--accent); background: var(--hover); }
+  .btn.danger { background: var(--danger-soft); color: var(--danger); }
+
+  .wrap { width: 100%; padding: 12px clamp(6px, 1.4vw, 20px) 48px; }
+
+  .tabs {
+    display: flex; gap: 7px; overflow-x: auto; padding: 2px 2px 8px;
+    scrollbar-width: thin; margin-bottom: 12px; scroll-snap-type: x proximity;
+  }
+  .tabs::-webkit-scrollbar { height: 6px; }
+  .tabs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+  .tab {
+    flex: none; border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); padding: 8px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all .2s; white-space: nowrap; scroll-snap-align: start;
+  }
+  .tab:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+  .tab.active { background: linear-gradient(120deg, var(--accent), var(--accent-2)); border-color: transparent; color: #fff; box-shadow: 0 8px 18px rgba(107,134,255,.32); }
+  .tab.year.active { background: linear-gradient(120deg, var(--ok-deep), var(--ok)); box-shadow: 0 8px 18px rgba(16,185,129,.32); }
+
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 13px 10px; text-align: center; box-shadow: var(--shadow); transition: transform .2s, border-color .2s;
+  }
+  .stat:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .stat-v { font-size: clamp(19px, 2.4vw, 26px); font-weight: 900; color: var(--accent); line-height: 1.3; }
+  .stat-v.ok { color: var(--ok); }
+  .stat-l { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px clamp(10px, 1.4vw, 18px); margin-bottom: 12px;
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .card-head h2 { font-size: 15.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .card-head h2 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); flex: none; }
+  .hint { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+
+  .chart-scroll, .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .chart-scroll::-webkit-scrollbar, .table-scroll::-webkit-scrollbar { height: 8px; }
+  .chart-scroll::-webkit-scrollbar-thumb, .table-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+  #chart svg, #yearChart svg { display: block; width: 100%; height: auto; }
+  .bar { fill: url(#barGradM); }
+  .bar.perfect { fill: url(#barOkM); }
+  .gl { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 5; }
+  .xl { fill: var(--muted); font-size: 10px; font-weight: 700; }
+  .yl { fill: var(--muted); font-size: 10px; font-weight: 700; }
+  .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .chart-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-inline-start: 5px; vertical-align: -1px; }
+
+  .habits-list { display: grid; gap: 9px; }
+  .habit-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); transition: border-color .2s, transform .2s;
+  }
+  .habit-item:hover { border-color: var(--accent); transform: translateX(-3px); }
+  .h-icon {
+    width: 36px; height: 36px; flex: none; border-radius: 10px; font-size: 17px;
+    display: grid; place-items: center; background: var(--accent-soft);
+  }
+  .h-info { flex: 1; min-width: 0; }
+  .h-name { font-size: 13.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; margin-top: 5px; }
+  .bar-track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .45s cubic-bezier(.22,1,.36,1); }
+  .bar-track i.full { background: linear-gradient(90deg, var(--ok-deep), var(--ok)); }
+  .h-pct { font-size: 13px; font-weight: 900; color: var(--accent); min-width: 44px; text-align: center; }
+  .today-btn {
+    flex: none; border: 1px solid var(--ok-deep); background: var(--ok-soft); color: var(--ok);
+    border-radius: 10px; padding: 7px 11px; font-size: 12px; font-weight: 800; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px; transition: all .18s; white-space: nowrap;
+  }
+  .today-btn:hover { background: var(--ok); color: #06121f; transform: translateY(-2px); }
+  .today-btn.on { background: linear-gradient(120deg, var(--ok-deep), var(--ok)); color: #06121f; box-shadow: 0 6px 16px rgba(16,185,129,.34); }
+  .ico {
+    width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; font-size: 12px; color: var(--muted);
+    display: grid; place-items: center; transition: all .18s; flex: none;
+  }
+  .ico:hover { color: var(--accent); border-color: var(--accent); background: var(--hover); }
+  .ico.del:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+
+  /* ======== جدول العادات: صفوف = عادات، أعمدة = أيام ======== */
+  .grid { border-collapse: separate; border-spacing: 0; width: 100%; table-layout: fixed; font-size: 12px; }
+  .grid th, .grid td { border-bottom: 1px solid var(--border); border-inline-end: 1px solid var(--border); text-align: center; padding: 0; overflow: hidden; }
+  .grid thead th { background: var(--surface-3); font-weight: 800; border-top: 1px solid var(--border); }
+  .grid .corner, .grid .habit-cell, .grid .row-label {
+    position: sticky; inset-inline-start: 0; z-index: 3; background: var(--surface);
+    text-align: start; padding: 6px 8px; border-top: 1px solid var(--border);
+  }
+  .grid thead .corner { background: var(--surface-3); z-index: 6; }
+  .grid .row-label { font-weight: 800; font-size: 11.5px; color: var(--muted); }
+  .grid .week-head { background: var(--accent-soft); color: var(--accent); font-size: 11px; }
+  .grid .sum-head { background: var(--ok-soft); color: var(--ok); }
+  .grid th.day-head { padding: 4px 0; line-height: 1.2; background: var(--surface-2); }
+  .grid th.day-head .wd { display: block; font-size: 9px; color: var(--muted); font-weight: 700; }
+  .grid th.day-head .dn { display: block; font-size: 11.5px; font-weight: 900; }
+  .grid .we { background: var(--weekend); }
+  .grid .wk { border-inline-start: 2px solid var(--border-strong); }
+  .grid .today { box-shadow: inset 0 0 0 2px var(--accent); }
+  .grid .cell-td { height: 40px; background: var(--surface); }
+  .cell {
+    width: 100%; height: 40px; border: 0; background: transparent; cursor: pointer;
+    display: grid; place-items: center; transition: background .18s;
+  }
+  .cell i {
+    width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center;
+    border: 2px solid var(--border-strong); color: transparent; font-size: 14px; font-weight: 900;
+    font-style: normal; transition: all .2s; line-height: 1;
+  }
+  .cell:hover i { border-color: var(--accent); background: var(--hover); }
+  .cell.done i { background: linear-gradient(120deg, var(--ok-deep), var(--ok)); border-color: transparent; color: #04121d; }
+  .cell.pop i { animation: pop .34s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop { 0% { transform: scale(.7); } 58% { transform: scale(1.22); } 100% { transform: scale(1); } }
+  .grid .habit-row:hover .habit-cell, .grid .habit-row:hover .cell-td { background: var(--surface-2); }
+  .habit-cell { display: flex; align-items: center; gap: 7px; }
+  .habit-cell .h-name { font-size: 12.5px; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .habit-cell .h-actions { display: flex; gap: 4px; opacity: .3; transition: opacity .2s; }
+  .habit-cell:hover .h-actions { opacity: 1; }
+  .grid .sum { background: var(--surface-2); font-weight: 800; }
+  .grid .sum.pc { color: var(--accent); }
+  .grid .sum.dn { color: var(--ok); }
+  .grid tr.stat-row th, .grid tr.stat-row td { background: var(--surface-3); font-weight: 800; font-size: 11px; height: 28px; }
+  .grid tr.stat-row .row-label { background: var(--surface-3); color: var(--text); }
+  .grid tr.stat-row td[data-ds] { color: var(--ok); }
+  .grid tr.stat-row td[data-dm] { color: var(--danger); }
+  .grid tr.stat-row td[data-dp] { color: var(--accent); }
+  .empty-row td { padding: 24px 12px; color: var(--muted); font-weight: 700; }
+  .note { margin-top: 10px; font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.9; }
+
+  /* ======== جدول الأيام: صفوف = أيام (للموبايل) ======== */
+  .gdays { display: none; }
+  .gdays th, .gdays td { border-bottom: 1px solid var(--border); border-inline-end: 1px solid var(--border); text-align: center; padding: 0; overflow: hidden; }
+  .gdays thead th { background: var(--surface-3); font-weight: 800; border-top: 1px solid var(--border); }
+  .gdays .dcol {
+    position: sticky; inset-inline-start: 0; z-index: 3; background: var(--surface);
+    width: 62px; min-width: 62px; text-align: start; padding: 6px 8px; font-weight: 800;
+  }
+  .gdays thead .dcol { background: var(--surface-3); z-index: 6; }
+  .gdays .dcol .dn { font-size: 15px; font-weight: 900; line-height: 1.1; }
+  .gdays .dcol .wd { font-size: 10px; color: var(--muted); font-weight: 700; }
+  .gdays .dcol .cnt { font-size: 10px; color: var(--accent); font-weight: 800; }
+  .gdays th.hab-head { padding: 6px 2px; }
+  .gdays th.hab-head .hi { font-size: 15px; display: block; }
+  .gdays th.hab-head .hn { font-size: 9.5px; font-weight: 700; color: var(--muted); }
+  .gdays .pctcol { width: 54px; min-width: 54px; background: var(--surface-2); font-weight: 800; color: var(--accent); }
+  .gdays .we { background: var(--weekend); }
+  .gdays .today { box-shadow: inset 0 0 0 2px var(--accent); }
+  .gdays .cell { height: 46px; }
+  .gdays .cell i { width: 32px; height: 32px; font-size: 16px; }
+  .gdays tr.day-row:hover td { background: var(--surface-2); }
+  .gdays tfoot th, .gdays tfoot td { background: var(--surface-3); font-weight: 800; font-size: 11px; height: 32px; }
+  .gdays tfoot .pctcol { color: var(--accent); }
+
+  @media (max-width: 880px) {
+    :root { --cell: 40px; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .grid { display: none; }
+    .gdays { display: block; }
+    .gdays { width: 100%; table-layout: fixed; font-size: 12px; }
+    .gdays .dcol { width: 58px; min-width: 58px; }
+    .brand p { display: none; }
+  }
+  @media (max-width: 520px) {
+    .topbar { padding: 10px 10px; }
+    .card { padding: 12px 9px; }
+    .today-chip { display: none; }
+    .gdays .dcol { width: 52px; min-width: 52px; }
+    .gdays .pctcol { width: 46px; min-width: 46px; }
+    .gdays .cell { height: 48px; }
+    .gdays .cell i { width: 34px; height: 34px; }
+  }
+
+  .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .mcard {
+    text-align: start; border: 1px solid var(--border); background: var(--surface-2);
+    border-radius: 14px; padding: 12px; cursor: pointer; transition: all .2s;
+  }
+  .mcard:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--shadow-lg); }
+  .mcard.cur { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .mc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .mc-top span { font-size: 13px; font-weight: 800; }
+  .mc-top b { font-size: 15px; font-weight: 900; color: var(--accent); }
+  .mc-sub { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 7px; }
+
+  .simple { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .simple th, .simple td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: center; }
+  .simple thead th { background: var(--surface-3); font-weight: 800; font-size: 12px; }
+  .simple tbody td:first-child { text-align: start; font-weight: 700; }
+  .simple tbody tr:hover { background: var(--surface-2); }
+  .pname { display: flex; align-items: center; gap: 8px; }
+  .tbl-wrap { overflow-x: auto; }
+
+  .modal {
+    position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+    background: rgba(4,8,18,.72); backdrop-filter: blur(6px); padding: 14px; animation: fadeIn .2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-box {
+    width: 100%; max-width: 400px; background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+    box-shadow: var(--shadow-lg); animation: up .28s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes up { from { transform: translateY(22px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-box h3 { font-size: 16.5px; font-weight: 900; margin-bottom: 14px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .field input {
+    width: 100%; padding: 11px 13px; border-radius: 11px; font-size: 14px;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .modal-actions { display: flex; gap: 9px; margin-top: 16px; }
+  .modal-actions .btn { flex: 1; justify-content: center; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 90px);
+    background: var(--surface-3); color: var(--text); padding: 11px 20px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; z-index: 200; opacity: 0; border: 1px solid var(--border-strong);
+    transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .35s; pointer-events: none; box-shadow: var(--shadow-lg);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">✅</div>
+    <div>
+      <h1>متتبع العادات 2026</h1>
+      <p>اضغط على المربّع لتعليم العادة كمنجزة — الدائرة الخضراء = تم</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <span class="today-chip" id="todayChip"></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="tabs" id="tabs" aria-label="الأشهر"></nav>
+
+  <section id="monthView">
+    <div class="cards">
+      <div class="stat"><div class="stat-v" id="mPct">0%</div><div class="stat-l">إنجاز الشهر</div></div>
+      <div class="stat"><div class="stat-v ok" id="mDone">0</div><div class="stat-l">منجزة / الخطة</div></div>
+      <div class="stat"><div class="stat-v" id="mPerfect">0</div><div class="stat-l">أيام 100%</div></div>
+      <div class="stat"><div class="stat-v" id="mHabits">0</div><div class="stat-l">عدد العادات</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> مؤشر الإنجاز اليومي</h2>
+        <span class="hint" id="chartHint"></span>
+      </div>
+      <div class="chart-scroll"><div id="chart"></div></div>
+      <div class="chart-legend">
+        <span><i style="background:linear-gradient(90deg,var(--accent),var(--accent-2))"></i> نسبة اليوم</span>
+        <span><i style="background:linear-gradient(90deg,var(--ok-deep),var(--ok))"></i> يوم مكتمل 100%</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> عاديتي + زر «اليوم» السريع</h2>
+        <button class="btn primary" id="addBtn" type="button">＋ إضافة عادة</button>
+      </div>
+      <div class="habits-list" id="habitsList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> <span id="monthTitle">جدول الشهر</span></h2>
+        <span class="hint" id="monthHint"></span>
+      </div>
+
+      <div class="table-scroll"><table class="grid" id="grid"></table></div>
+      <div class="table-scroll"><table class="gdays" id="gridDays"></table></div>
+
+      <p class="note">
+        كل خانة زر: اضغط مرة واحدة لتعليم العادة <strong>✓</strong> واضغط مرة أخرى لإلغاء التعليم.
+        الصفوف السفلية تعرض النسبة اليومية و«عادات تمت / لم تتم»، وعمود <strong>التحليل الشهري</strong>
+        يلخّص كل عادة مقابل هدف الشهر. البيانات تُحفظ تلقائيًا في متصفحك.
+      </p>
+    </div>
+  </section>
+
+  <section id="yearView" hidden>
+    <div class="cards">
+      <div class="stat"><div class="stat-v" id="yPct">0%</div><div class="stat-l">إنجاز السنة</div></div>
+      <div class="stat"><div class="stat-v ok" id="yDone">0</div><div class="stat-l">إجمالي المنجز</div></div>
+      <div class="stat"><div class="stat-v" id="yPerfect">0</div><div class="stat-l">أيام 100%</div></div>
+      <div class="stat"><div class="stat-v" id="yBest">—</div><div class="stat-l">أفضل شهر</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> أداء الأشهر الـ 12</h2>
+        <span class="hint">نسبة الإنجاز الإجمالية لكل شهر</span>
+      </div>
+      <div class="chart-scroll"><div id="yearChart"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> ملخص كل شهر</h2>
+        <span class="hint">اضغط على شهر للانتقال إلى جدوله</span>
+      </div>
+      <div class="mgrid" id="monthGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="dot"></span> أداء العادات على مدار السنة</h2>
+        <span class="hint">الهدف السنوي = 365 يومًا لكل عادة</span>
+      </div>
+      <div class="tbl-wrap"><table class="simple" id="yearHabits"></table></div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">إضافة عادة جديدة</h3>
+    <div class="field">
+      <label for="habitName">اسم العادة</label>
+      <input id="habitName" type="text" maxlength="60" placeholder="مثال: قرآن 5 صفحات" />
+    </div>
+    <div class="field">
+      <label for="habitIcon">الأيقونة (إيموجي واحد)</label>
+      <input id="habitIcon" type="text" maxlength="4" placeholder="📖" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" id="saveHabit" type="button">حفظ العادة</button>
+      <button class="btn ghost" id="cancelHabit" type="button">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var YEAR = 2026;
+  var STORE = "habit-tracker-2026";
+  var MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  var WEEK_DAYS = ["ح","ن","ث","ر","خ","ج","س"];
+  var WEEK_ORD = ["الأول","الثاني","الثالث","الرابع","الخامس","السادس"];
+  var DEFAULTS = [
+    { icon: "⏰", name: "استيقاظ 5:00" },
+    { icon: "🚿", name: "دوش بارد" },
+    { icon: "🕌", name: "صلاة 5 مرات" },
+    { icon: "📖", name: "قرآن 5 صفحات" },
+    { icon: "🏋️", name: "جيم ساعة" },
+    { icon: "📚", name: "قراءة 10 صفحات" },
+    { icon: "💻", name: "العمل على المشروع" }
+  ];
+
+  var now = new Date();
+  var defaultMonth = now.getFullYear() === YEAR ? now.getMonth() : 0;
+  var TODAY_M = defaultMonth, TODAY_D = now.getDate();
+
+  var state = { month: defaultMonth, view: defaultMonth, habits: [], checks: {} };
+
+  function q(s, r) { return (r || document).querySelector(s); }
+  function qa(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function daysInMonth(m) { return new Date(YEAR, m + 1, 0).getDate(); }
+  function ckey(id, m, d) { return id + "|" + m + "|" + d; }
+  function isDone(id, m, d) { return state.checks[ckey(id, m, d)] === 1; }
+  function isTodayCell(m, d) { return m === TODAY_M && d === TODAY_D; }
+
+  function makeDefaults() {
+    return DEFAULTS.map(function (h, i) { return { id: "h" + (i + 1), icon: h.icon, name: h.name }; });
+  }
+
+  function load() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORE); } catch (e) {}
+    if (!raw) { state.habits = makeDefaults(); return; }
+    try {
+      var d = JSON.parse(raw);
+      state.habits = Array.isArray(d.habits) ? d.habits : makeDefaults();
+      state.checks = d.checks && typeof d.checks === "object" ? d.checks : {};
+      if (typeof d.month === "number" && d.month >= 0 && d.month <= 11) state.month = d.month;
+      state.view = d.view === "year" ? "year" : (typeof d.view === "number" && d.view >= 0 && d.view <= 11 ? d.view : state.month);
+    } catch (e) { state.habits = makeDefaults(); state.checks = {}; }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ habits: state.habits, checks: state.checks, month: state.month, view: state.view }));
+    } catch (e) {}
+  }
+
+  function dayStats(m, d) {
+    var c = 0, n = state.habits.length;
+    for (var i = 0; i < n; i++) if (isDone(state.habits[i].id, m, d)) c++;
+    return { total: n, done: c, miss: n - c, pct: n ? Math.round(c / n * 100) : 0 };
+  }
+  function habitStats(h, m) {
+    var days = daysInMonth(m), c = 0;
+    for (var d = 1; d <= days; d++) if (isDone(h.id, m, d)) c++;
+    return { goal: days, done: c, pct: Math.round(c / days * 100) };
+  }
+  function monthStats(m) {
+    var days = daysInMonth(m), n = state.habits.length, done = 0, perfect = 0;
+    for (var d = 1; d <= days; d++) {
+      var s = dayStats(m, d);
+      done += s.done;
+      if (n > 0 && s.done === n) perfect++;
+    }
+    var total = days * n;
+    return { days: days, n: n, done: done, total: total, perfect: perfect, pct: total ? Math.round(done / total * 100) : 0 };
+  }
+  function yearStats() {
+    var perMonth = [], done = 0, total = 0, perfect = 0, best = 0;
+    for (var m = 0; m < 12; m++) {
+      var s = monthStats(m);
+      perMonth.push(s); done += s.done; total += s.total; perfect += s.perfect;
+      if (s.pct > perMonth[best].pct) best = m;
+    }
+    return { perMonth: perMonth, done: done, total: total, perfect: perfect, pct: total ? Math.round(done / total * 100) : 0, best: best };
+  }
+
+  function renderTabs() {
+    var h = "";
+    for (var i = 0; i < 12; i++) h += '<button type="button" class="tab" data-m="' + i + '">' + MONTHS[i] + "</button>";
+    h += '<button type="button" class="tab year" data-m="year">ملخص السنة</button>';
+    q("#tabs").innerHTML = h;
+  }
+  function syncTabs() {
+    qa(".tab").forEach(function (t) {
+      var v = t.dataset.m;
+      t.classList.toggle("active", v === "year" ? state.view === "year" : Number(v) === state.view);
+    });
+  }
+  function updateView() {
+    syncTabs();
+    var isYear = state.view === "year";
+    q("#monthView").hidden = isYear;
+    q("#yearView").hidden = !isYear;
+    if (isYear) renderYear(); else renderMonth();
+    save();
+  }
+
+  function dayCell(h, m, d) {
+    var on = isDone(h.id, m, d);
+    return '<td class="cell-td"><button type="button" class="cell' + (on ? " done" : "") + '" data-cell="' + h.id + "|" + d +
+      '" aria-pressed="' + on + '" aria-label="' + esc(h.name) + " — يوم " + d + " " + MONTHS[m] +
+      '" title="' + esc(h.name) + ' — ' + d + ' ' + MONTHS[m] + '"><i>✓</i></button></td>';
+  }
+
+  function buildGrid() {
+    var m = state.month, days = daysInMonth(m), habits = state.habits, n = habits.length;
+    var table = q("#grid");
+    q("#monthTitle").textContent = "جدول " + MONTHS[m] + " " + YEAR;
+    q("#monthHint").textContent = n + " عادات × " + days + " يومًا = " + (n * days) + " خانة";
+    q("#chartHint").textContent = MONTHS[m] + " " + YEAR + " — " + days + " يومًا";
+
+    if (!n) {
+      table.innerHTML = '<tbody><tr class="empty-row"><td>لا توجد عادات — اضغط «إضافة عادة» للبدء ✨</td></tr></tbody>';
+      q("#gridDays").innerHTML = '<tbody><tr class="empty-row"><td>لا توجد عادات — اضغط «إضافة عادة» للبدء ✨</td></tr></tbody>';
+      return;
+    }
+
+    var weeks = "", d = 1, wi = 0;
+    while (d <= days) {
+      var span = Math.min(7, days - d + 1);
+      weeks += '<th class="week-head" colspan="' + span + '">الأسبوع ' + WEEK_ORD[wi] + "</th>";
+      d += span; wi++;
+    }
+
+    var dayHead = "";
+    for (var i = 1; i <= days; i++) {
+      var wd = new Date(YEAR, m, i).getDay();
+      var cls = "day-head" + (wd >= 5 ? " we" : "") + (isTodayCell(m, i) ? " today" : "") + (((i - 1) % 7 === 0 && i !== 1) ? " wk" : "");
+      dayHead += '<th class="' + cls + '" scope="col"><span class="wd">' + WEEK_DAYS[wd] + '</span><span class="dn">' + i + "</span></th>";
+    }
+
+    var head = "<thead><tr>" +
+      '<th class="corner" rowspan="2" style="width:clamp(120px,17vw,250px)">العادات اليومية</th>' + weeks +
+      '<th class="sum-head" colspan="3" style="width:132px">التحليل الشهري</th></tr><tr>' + dayHead +
+      '<th class="sum">الهدف</th><th class="sum dn">إنجاز</th><th class="sum pc">النسبة</th></tr></thead>';
+
+    var body = "<tbody>";
+    habits.forEach(function (h) {
+      var cells = "";
+      for (var i = 1; i <= days; i++) cells += dayCell(h, m, i);
+      body += '<tr class="habit-row">' +
+        '<th class="habit-cell" scope="row"><span class="h-name">' + esc(h.name) + "</span>" +
+        '<span class="h-actions"><button type="button" class="ico" data-edit="' + h.id + '" title="تعديل">✎</button>' +
+        '<button type="button" class="ico del" data-del="' + h.id + '" title="حذف">🗑</button></span></th>' +
+        cells + '<td class="sum">' + days + '</td><td class="sum dn" data-hs="' + h.id + '">0</td>' +
+        '<td class="sum pc" data-hp="' + h.id + '">0%</td></tr>';
+    });
+
+    function statRow(label, attr, extra) {
+      var cells = "";
+      for (var i = 1; i <= days; i++) {
+        var wd = new Date(YEAR, m, i).getDay();
+        var cls = (wd >= 5 ? "we " : "") + (((i - 1) % 7 === 0 && i !== 1) ? "wk" : "");
+        cells += '<td class="' + cls + '" data-' + attr + '="' + i + '">0</td>';
+      }
+      return '<tr class="stat-row"><th class="row-label" scope="row">' + label + "</th>" + cells + extra + "</tr>";
+    }
+    body += statRow("النسبة اليومية", "dp", '<td class="sum"></td><td class="sum"></td><td class="sum pc" data-mdp>0%</td>');
+    body += statRow("عادات تمت", "ds", '<td class="sum"></td><td class="sum dn" data-mds>0</td><td class="sum"></td>');
+    body += statRow("عادات لم تتم", "dm", '<td class="sum"></td><td class="sum"></td><td class="sum" style="color:var(--danger)" data-mdm>0</td>');
+    body += "</tbody>";
+    table.innerHTML = head + body;
+
+    /* ===== جدول الأيام (موبايل): صفوف = أيام، أعمدة = عادات ===== */
+    var dHead = '<thead><tr><th class="dcol">اليوم</th>';
+    habits.forEach(function (h) {
+      dHead += '<th class="hab-head" title="' + esc(h.name) + '"><span class="hi">' + h.icon + '</span><span class="hn">' + esc(h.name.length > 12 ? h.name.slice(0, 11) + "…" : h.name) + "</span></th>";
+    });
+    dHead += '<th class="pctcol">النسبة</th></tr></thead><tbody>';
+
+    for (var i2 = 1; i2 <= days; i2++) {
+      var wd2 = new Date(YEAR, m, i2).getDay();
+      var ds = dayStats(m, i2);
+      var rowCls = (wd2 >= 5 ? "we " : "") + (isTodayCell(m, i2) ? "today" : "");
+      dHead += '<tr class="day-row" data-d="' + i2 + '"><th class="dcol ' + rowCls + '" scope="row"><span class="dn">' + i2 + "</span> " +
+        '<span class="wd">' + WEEK_DAYS[wd2] + '</span> <span class="cnt">' + ds.done + "/" + ds.total + "</span></th>";
+      habits.forEach(function (h) { dHead += dayCell(h, m, i2); });
+      dHead += '<td class="pctcol ' + rowCls + '" data-dp="' + i2 + '">' + ds.pct + "%</td></tr>";
+    }
+    dHead += "</tbody><tfoot><tr><th class=\"dcol\">إنجاز</th>";
+    habits.forEach(function (h) {
+      dHead += '<td data-hs="' + h.id + '">0</td>';
+    });
+    var ms = monthStats(m);
+    dHead += '<td class="pctcol" data-mdp>' + ms.pct + "%</td></tr></tfoot>";
+    q("#gridDays").innerHTML = dHead;
+  }
+
+  function renderHabitsList() {
+    var el = q("#habitsList");
+    if (!state.habits.length) {
+      el.innerHTML = '<div class="habit-item"><div class="h-info"><div class="h-name">لا توجد عادات — أضف أول عادة لتبدأ 💪</div></div></div>';
+      return;
+    }
+    var m = state.month;
+    el.innerHTML = state.habits.map(function (h) {
+      var s = habitStats(h, m);
+      var todayOn = isDone(h.id, TODAY_M, TODAY_D);
+      return '<div class="habit-item">' +
+        '<span class="h-icon">' + h.icon + "</span>" +
+        '<div class="h-info"><div class="h-name">' + esc(h.name) + "</div>" +
+        '<div class="bar-track"><i class="' + (s.pct >= 100 ? "full" : "") + '" style="width:' + s.pct + '%"></i></div></div>' +
+        '<span class="h-pct">' + s.pct + "%</span>" +
+        '<button type="button" class="today-btn' + (todayOn ? " on" : "") + '" data-today="' + h.id + '" ' +
+        'aria-pressed="' + todayOn + '">' + (todayOn ? "✓ تم اليوم" : "اليوم") + "</button>" +
+        '<button type="button" class="ico" data-edit="' + h.id + '" title="تعديل">✎</button>' +
+        '<button type="button" class="ico del" data-del="' + h.id + '" title="حذف">🗑</button>' +
+        "</div>";
+    }).join("");
+  }
+
+  function updateStats() {
+    var m = state.month, days = daysInMonth(m), habits = state.habits, n = habits.length;
+    var mDone = 0, perfect = 0;
+
+    habits.forEach(function (h) {
+      var s = habitStats(h, m);
+      mDone += s.done;
+      qa('[data-hs="' + h.id + '"]').forEach(function (e) { e.textContent = s.done; });
+      qa('[data-hp="' + h.id + '"]').forEach(function (e) { e.textContent = s.pct + "%"; });
+    });
+
+    for (var d = 1; d <= days; d++) {
+      var ds = dayStats(m, d);
+      if (n > 0 && ds.done === n) perfect++;
+      qa('[data-dp="' + d + '"]').forEach(function (e) { e.textContent = ds.pct + "%"; });
+      qa('[data-ds="' + d + '"]').forEach(function (e) { e.textContent = ds.done; });
+      qa('[data-dm="' + d + '"]').forEach(function (e) { e.textContent = ds.miss; });
+      var dcol = q('#gridDays .day-row[data-d="' + d + '"] .cnt');
+      if (dcol) dcol.textContent = ds.done + "/" + ds.total;
+    }
+
+    var total = days * n, pct = total ? Math.round(mDone / total * 100) : 0;
+    q("#mPct").textContent = pct + "%";
+    q("#mDone").textContent = mDone + " / " + total;
+    q("#mPerfect").textContent = perfect + " / " + days;
+    q("#mHabits").textContent = n;
+    qa("[data-mds]").forEach(function (e) { e.textContent = mDone; });
+    qa("[data-mdm]").forEach(function (e) { e.textContent = total - mDone; });
+    qa("[data-mdp]").forEach(function (e) { e.textContent = pct + "%"; });
+    renderHabitsList();
+  }
+
+  function gradientDefs(s) {
+    return "<defs>" +
+      '<linearGradient id="barGrad' + s + '" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#6b86ff"/><stop offset="100%" stop-color="#9a7dff"/></linearGradient>' +
+      '<linearGradient id="barOk' + s + '" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#2dd4a0"/></linearGradient></defs>';
+  }
+
+  function renderChart() {
+    var m = state.month, days = daysInMonth(m), n = state.habits.length;
+    var H = 230, padT = 14, padB = 24, padR = 44, padL = 8;
+    var W = Math.max(560, days * 30 + padR + padL);
+    var plotH = H - padT - padB, plotW = W - padR - padL, step = plotW / days, bw = Math.min(18, step * 0.62);
+    var out = gradientDefs("M");
+    [0, 25, 50, 75, 100].forEach(function (p) {
+      var y = padT + plotH - p / 100 * plotH;
+      out += '<line class="gl" x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y + '"/>';
+      out += '<text class="yl" x="' + (W - padR + 6) + '" y="' + (y + 3) + '" text-anchor="start">' + p + "%</text>";
+    });
+    for (var d = 1; d <= days; d++) {
+      var s = dayStats(m, d);
+      var h = n ? s.pct / 100 * plotH : 0;
+      var cx = W - padR - (d - 0.5) * step;
+      if (s.pct > 0) {
+        out += '<rect class="' + (n && s.pct === 100 ? "bar perfect" : "bar") + '" x="' + (cx - bw / 2).toFixed(1) +
+          '" y="' + Math.max(padT + plotH - h, padT).toFixed(1) + '" width="' + bw.toFixed(1) +
+          '" height="' + Math.max(h, 3).toFixed(1) + '" rx="4"><title>يوم ' + d + " " + MONTHS[m] + " — " +
+          s.done + "/" + n + " (" + s.pct + "%)</title></rect>";
+      }
+      out += '<text class="xl" x="' + cx.toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle">' + d + "</text>";
+    }
+    q("#chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="مؤشر الإنجاز اليومي">' + out + "</svg>";
+  }
+
+  function renderMonth() { buildGrid(); updateStats(); renderChart(); }
+
+  function renderYear() {
+    var ys = yearStats();
+    q("#yPct").textContent = ys.pct + "%";
+    q("#yDone").textContent = ys.done + " / " + ys.total;
+    q("#yPerfect").textContent = ys.perfect;
+    q("#yBest").textContent = ys.total ? MONTHS[ys.best] : "—";
+
+    var H = 230, padT = 16, padB = 30, padR = 44, padL = 8;
+    var W = Math.max(640, 12 * 58 + padR + padL);
+    var plotH = H - padT - padB, plotW = W - padR - padL, step = plotW / 12, bw = Math.min(28, step * 0.58);
+    var out = gradientDefs("Y");
+    [0, 25, 50, 75, 100].forEach(function (p) {
+      var y = padT + plotH - p / 100 * plotH;
+      out += '<line class="gl" x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y + '"/>';
+      out += '<text class="yl" x="' + (W - padR + 6) + '" y="' + (y + 3) + '" text-anchor="start">' + p + "%</text>";
+    });
+    for (var i = 0; i < 12; i++) {
+      var s = ys.perMonth[i];
+      var h = s.pct / 100 * plotH, cx = W - padR - (i + 0.5) * step;
+      if (s.pct > 0) {
+        out += '<rect class="' + (s.total && s.pct === 100 ? "bar perfect" : "bar") + '" x="' + (cx - bw / 2).toFixed(1) +
+          '" y="' + Math.max(padT + plotH - h, padT).toFixed(1) + '" width="' + bw.toFixed(1) +
+          '" height="' + Math.max(h, 3).toFixed(1) + '" rx="6"><title>' + MONTHS[i] + " — " + s.pct + "% (" +
+          s.done + "/" + s.total + ")</title></rect>";
+      }
+      out += '<text class="xl" x="' + cx.toFixed(1) + '" y="' + Math.max(padT + plotH - h - 6, 10).toFixed(1) +
+        '" text-anchor="middle">' + s.pct + "%</text>";
+      out += '<text class="xl" x="' + cx.toFixed(1) + '" y="' + (H - 9) + '" text-anchor="middle">' + MONTHS[i] + "</text>";
+    }
+    q("#yearChart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="أداء الأشهر">' + out + "</svg>";
+
+    q("#monthGrid").innerHTML = ys.perMonth.map(function (s, i) {
+      return '<button type="button" class="mcard' + (i === state.month ? " cur" : "") + '" data-goto="' + i + '">' +
+        '<div class="mc-top"><span>' + MONTHS[i] + "</span><b>" + s.pct + "%</b></div>" +
+        '<div class="bar-track"><i class="' + (s.pct >= 100 ? "full" : "") + '" style="width:' + s.pct + '%"></i></div>' +
+        '<div class="mc-sub">' + s.done + " / " + s.total + " إنجاز · " + s.perfect + " يوم 100%</div></button>";
+    }).join("");
+
+    var rows = state.habits.map(function (h) {
+      var c = 0;
+      for (var m = 0; m < 12; m++) c += habitStats(h, m).done;
+      var pct = Math.round(c / 365 * 100);
+      return "<tr><td><span class=\"pname\"><span class=\"h-icon\">" + h.icon + "</span>" + esc(h.name) + "</span></td>" +
+        "<td>365</td><td>" + c + "</td><td>" + (365 - c) + '</td><td style="min-width:150px"><div class="bar-track"><i class="' +
+        (pct >= 100 ? "full" : "") + '" style="width:' + pct + '%"></i></div></td><td><b>' + pct + "%</b></td></tr>";
+    }).join("");
+
+    q("#yearHabits").innerHTML = "<thead><tr><th>العادة</th><th>الهدف</th><th>إنجاز</th><th>لم تتم</th><th>مؤشر التقدم</th><th>النسبة</th></tr></thead><tbody>" +
+      (rows || '<tr><td colspan="6" style="text-align:center;color:var(--muted);font-weight:700">لا توجد عادات بعد</td></tr>') + "</tbody>";
+  }
+
+  function setCheck(id, m, d, on) {
+    var k = ckey(id, m, d);
+    if (on) state.checks[k] = 1; else delete state.checks[k];
+    qa('[data-cell="' + id + "|" + d + '"]').forEach(function (b) {
+      b.classList.toggle("done", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    save();
+    updateStats();
+    renderChart();
+  }
+
+  function toggleCell(btn) {
+    var p = btn.dataset.cell.split("|");
+    var id = p[0], d = Number(p[1]);
+    var on = !isDone(id, state.month, d);
+    setCheck(id, state.month, d, on);
+    btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+  }
+
+  var editingId = null;
+  function openModal(id) {
+    editingId = id || null;
+    var h = id ? state.habits.filter(function (x) { return x.id === id; })[0] : null;
+    q("#modalTitle").textContent = h ? "تعديل العادة" : "إضافة عادة جديدة";
+    q("#habitName").value = h ? h.name : "";
+    q("#habitIcon").value = h ? h.icon : "🎯";
+    q("#modal").hidden = false;
+    setTimeout(function () { q("#habitName").focus(); }, 40);
+  }
+  function closeModal() { q("#modal").hidden = true; editingId = null; }
+  function saveHabit() {
+    var name = q("#habitName").value.trim();
+    var icon = q("#habitIcon").value.trim() || "🎯";
+    if (!name) { q("#habitName").focus(); toast("اكتب اسم العادة أولًا"); return; }
+    if (editingId) {
+      state.habits.forEach(function (h) { if (h.id === editingId) { h.name = name; h.icon = icon; } });
+      toast("تم تحديث العادة ✓");
+    } else {
+      state.habits.push({ id: "h" + Date.now().toString(36), icon: icon, name: name });
+      toast("تمت إضافة العادة ✓");
+    }
+    save(); closeModal(); renderMonth();
+  }
+  function deleteHabit(id) {
+    var h = state.habits.filter(function (x) { return x.id === id; })[0];
+    if (!h) return;
+    if (!confirm('حذف عادة "' + h.name + '" وجميع سجلاتها؟')) return;
+    state.habits = state.habits.filter(function (x) { return x.id !== id; });
+    Object.keys(state.checks).forEach(function (k) { if (k.split("|")[0] === id) delete state.checks[k]; });
+    save(); renderMonth(); toast("تم حذف العادة");
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var t = q("#toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2000);
+  }
+
+  q("#tabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".tab"); if (!b) return;
+    var v = b.dataset.m;
+    if (v === "year") state.view = "year";
+    else { state.month = Number(v); state.view = state.month; }
+    updateView();
+  });
+
+  function gridClick(e) {
+    var cell = e.target.closest(".cell");
+    if (cell) { toggleCell(cell); return; }
+    var ed = e.target.closest("[data-edit]"); if (ed) { openModal(ed.dataset.edit); return; }
+    var dl = e.target.closest("[data-del]"); if (dl) { deleteHabit(dl.dataset.del); }
+  }
+  q("#grid").addEventListener("click", gridClick);
+  q("#gridDays").addEventListener("click", gridClick);
+
+  q("#habitsList").addEventListener("click", function (e) {
+    var td = e.target.closest("[data-today]");
+    if (td) {
+      var on = !isDone(td.dataset.today, TODAY_M, TODAY_D);
+      setCheck(td.dataset.today, TODAY_M, TODAY_D, on);
+      toast(on ? "تم تنفيذ العادة اليوم ✓" : "تم إلغاء تنفيذ اليوم");
+      return;
+    }
+    var ed = e.target.closest("[data-edit]"); if (ed) { openModal(ed.dataset.edit); return; }
+    var dl = e.target.closest("[data-del]"); if (dl) { deleteHabit(dl.dataset.del); }
+  });
+
+  q("#monthGrid").addEventListener("click", function (e) {
+    var c = e.target.closest("[data-goto]"); if (!c) return;
+    state.month = Number(c.dataset.goto); state.view = state.month;
+    updateView(); window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  q("#addBtn").addEventListener("click", function () { openModal(null); });
+  q("#saveHabit").addEventListener("click", saveHabit);
+  q("#cancelHabit").addEventListener("click", closeModal);
+  q("#modal").addEventListener("click", function (e) { if (e.target === q("#modal")) closeModal(); });
+  q("#habitName").addEventListener("keydown", function (e) { if (e.key === "Enter") saveHabit(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !q("#modal").hidden) closeModal(); });
+
+  load();
+  q("#todayChip").textContent = "📅 " + MONTHS[TODAY_M] + " " + TODAY_D + " — " + YEAR;
+  renderTabs();
+  updateView();
+})();
+</script>
+</body>
+</html>
