@@ -137,11 +137,12 @@
     .tab.dragging{opacity:0.45;}
     .tab .tab-name{overflow:hidden;text-overflow:ellipsis;flex-shrink:0;font-weight:600;}
     .tab .tab-meta{color:var(--pf-text-muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;flex:1;}
-    .tab-x{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
-      border-radius:50%;font-size:12px;line-height:1;color:var(--pf-text-muted);cursor:pointer;
-      transition:all var(--pf-transition);opacity:0;flex-shrink:0;}
-    .tab:hover .tab-x{opacity:1;}
-    .tab-x:hover{background:var(--pf-danger);color:#fff;}
+    .tab-x{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-inline-end:-4px;
+      border-radius:50%;font-size:14px;line-height:1;color:var(--pf-text-dim);cursor:pointer;
+      transition:all var(--pf-transition);opacity:1;flex-shrink:0;}
+    .tab:hover .tab-x{opacity:1;color:var(--pf-text);}
+    .tab.active .tab-x{color:var(--pf-text-dim);}
+    .tab-x:hover{background:var(--pf-danger);color:#fff;opacity:1;}
     /* NEW: New Tab button */
     .tab-new-btn{display:flex;align-items:center;justify-content:center;width:26px;height:26px;margin:auto 2px;border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);
       background:var(--pf-bg-3);color:var(--pf-text-dim);cursor:pointer;transition:all var(--pf-transition);flex-shrink:0;}
@@ -183,6 +184,10 @@
     .tab-more-item.active{color:var(--pf-text);}
     .tab-more-item .dot-star{color:var(--pf-accent);}
     .tab-more-item .tm-name{flex:1;overflow:hidden;text-overflow:ellipsis;}
+    .tab-more-item .tm-x{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+      border-radius:50%;font-size:13px;line-height:1;color:var(--pf-text-muted);cursor:pointer;flex-shrink:0;
+      transition:all var(--pf-transition);}
+    .tab-more-item .tm-x:hover{background:var(--pf-danger);color:#fff;}
     .unsaved-actions{justify-content:space-between;}
     .btn-group{display:flex;gap:8px;}
 
@@ -1863,6 +1868,8 @@
         <div class="shortcut-row"><span>Save all open as JPG (choose quality)</span><span class="kbd">Alt+J</span></div>
         <div class="shortcut-row"><span>Save all open as PNG</span><span class="kbd">Alt+P</span></div>
         <div class="shortcut-row"><span>Close all tabs</span><span class="kbd">Alt+W</span></div>
+        <div class="shortcut-row"><span>Close current tab</span><span class="kbd">Ctrl+W</span></div>
+        <div class="shortcut-row"><span>Next / previous tab</span><span class="kbd">Ctrl+Tab / Ctrl+Shift+Tab</span></div>
         <div class="shortcut-row"><span>Select all</span><span class="kbd">Ctrl+A</span></div>
         <div class="shortcut-row"><span>Copy selection / canvas</span><span class="kbd">Ctrl+C</span></div>
         <div class="shortcut-row"><span>Paste as layer into current canvas</span><span class="kbd">Ctrl+V</span></div>
@@ -2252,7 +2259,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       const ly=(t.id===activeTabId)?layerActive():tabLayerName(t);
       const nm=document.createElement("span");nm.className="tab-name";nm.textContent=t.name;
       const meta=document.createElement("span");meta.className="tab-meta";meta.textContent=Math.round(zo*100)+"% ("+ly+", RGB/8#)";
-      const xs=document.createElement("span");xs.className="tab-x";xs.textContent="×";xs.title="Close";
+      const xs=document.createElement("span");
+      xs.className="tab-x";xs.textContent="×";xs.title="Close tab";xs.setAttribute("role","button");
+      xs.setAttribute("tabindex","0");xs.setAttribute("aria-label","Close "+t.name);
       el.appendChild(nm);el.appendChild(meta);el.appendChild(xs);
       el.title=(t.dirty?"* ":"")+t.name+"   "+meta.textContent;
       bar.appendChild(el);
@@ -6614,6 +6623,12 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       if(xs){e.stopPropagation();closeTab(id);return;}
       focusTab(id);
     });
+    tabBar.addEventListener("keydown",e=>{
+      if(e.key!=="Enter"&&e.key!==" "&&e.key!=="Spacebar")return;
+      const xs=e.target.closest(".tab-x");if(!xs)return;
+      const el=e.target.closest(".tab");if(!el)return;
+      e.preventDefault();e.stopPropagation();closeTab(Number(el.dataset.id));
+    });
     tabBar.addEventListener("dragstart",e=>{
       const el=e.target.closest(".tab");if(!el)return;
       el.classList.add("dragging");
@@ -6644,7 +6659,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
         const star=document.createElement("span");star.className="dot-star";star.textContent=t.dirty?"*":"";
         const nm=document.createElement("span");nm.className="tm-name";nm.textContent=t.name;
         const zo=document.createElement("span");zo.style.cssText="font-size:10px;color:var(--pf-text-muted);";zo.textContent=Math.round(((t.id===activeTabId)?state.zoom:tabZoom(t))*100)+"%";
-        b.appendChild(star);b.appendChild(nm);b.appendChild(zo);
+        const x=document.createElement("span");x.className="tm-x";x.textContent="×";x.title="Close tab";x.setAttribute("aria-label","Close "+t.name);
+        x.addEventListener("click",ev=>{ev.stopPropagation();moreMenu.classList.remove("visible");closeTab(t.id);});
+        b.appendChild(star);b.appendChild(nm);b.appendChild(zo);b.appendChild(x);
         b.addEventListener("click",()=>{moreMenu.classList.remove("visible");focusTab(t.id);});
         moreMenu.appendChild(b);
       });
@@ -6743,6 +6760,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       if(c&&e.shiftKey&&e.key.toLowerCase()==="t"&&!editable){e.preventDefault();newEmptyTab();return;}
       if(c&&e.key.toLowerCase()==="j"&&!editable){e.preventDefault();e.shiftKey?layerViaCut():layerViaCopy();return;}
       if(c&&e.key==="Tab"&&tabs.length>1){e.preventDefault();const ix=tabs.findIndex(t=>t.id===activeTabId);const nt=tabs[(ix+(e.shiftKey?-1:1)+tabs.length)%tabs.length];if(nt)focusTab(nt.id);return;}
+      if(c&&!e.altKey&&!e.shiftKey&&(e.key==="w"||e.key==="W")&&!editable){e.preventDefault();if(activeTabId!=null)closeTab(activeTabId);return;}
       if(c&&e.key.toLowerCase()==="g"&&!editable){e.preventDefault();state.gridOverlay=!state.gridOverlay;drawCropOverlay();return;}
       if(c&&e.key.toLowerCase()==="d"&&!editable){e.preventDefault();clearSelection();return;}
       if(c&&e.key.toLowerCase()==="i"&&!editable){e.preventDefault();if(state.maskPaint&&activeHasMask())invertMask();else invertSelection();return;}
