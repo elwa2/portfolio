@@ -277,9 +277,10 @@ function buildDashboard_() {
   dash.getRange(guideRow + 1, 1, guide.length, 1).setWrap(true);
 
   // Coloca la hoja al inicio para que sea la "página" principal.
+  // moveActiveSheet() usa índice 0-based -> 0 = أول ورقة.
   try {
     ss.setActiveSheet(dash);
-    ss.moveActiveSheet(1);
+    ss.moveActiveSheet(0);
   } catch (e) { /* no crítico */ }
 
   return dash;
@@ -668,23 +669,47 @@ function countDays_(checks) {
  * Cuenta días reales del calendario, así una racha que cruza de fin de mes
  * a inicio del siguiente sigue siendo una sola racha.
  */
+/** Días reales de un mes (0=Enero). Todo en UTC para no mezcliar zonas. */
+function daysInMonth_(year, m) {
+  return new Date(Date.UTC(year, m + 1, 0)).getUTCDate();
+}
+
 function bestStreak_(habitId, checks, year) {
-  var times = [];
+  var y = Number(year) || new Date().getFullYear();
+  // Longitud real del año (365 o 366) calculada en UTC.
+  var yearLen = Math.round((Date.UTC(y, 11, 31) - Date.UTC(y, 0, 1)) / 86400000) + 1;
+  var y0 = Date.UTC(y, 0, 1);
+  var flags = new Array(yearLen);
+  for (var i = 0; i < yearLen; i++) flags[i] = 0;
+
   Object.keys(checks || {}).forEach(function (k) {
     if (checks[k] !== 1) return;
     var p = String(k).split('|');
     if (p[0] !== habitId) return;
     var m = Number(p[1]), d = Number(p[2]);
-    if (!(m >= 0 && m <= 11) || !(d >= 1 && d <= 31)) return;
-    times.push(new Date(year, m, d).getTime());
+    if (!(m >= 0 && m <= 11) || !(d >= 1)) return;
+    // Rechaza días imposibles (31 de agosto, 30 de febrero...) en vez de
+    // dejar que la fecha los corra al mes siguiente.
+    if (d > daysInMonth_(y, m)) return;
+    var idx = Math.round((Date.UTC(y, m, d) - y0) / 86400000);
+    if (idx >= 0 && idx < yearLen) flags[idx] = 1;
   });
-  if (!times.length) return 0;
-  times.sort(function (a, b) { return a - b; });
-  var best = 1, run = 1;
-  for (var i = 1; i < times.length; i++) {
-    var diff = Math.round((times[i] - times[i - 1]) / 86400000);
-    if (diff === 1) { run++; if (run > best) best = run; }
-    else if (diff > 1) { run = 1; }
+
+  var total = 0;
+  for (i = 0; i < yearLen; i++) total += flags[i];
+  if (!total) return 0;
+  if (total === yearLen) return yearLen;
+
+  // El año es circular: 31 de diciembre y 1 de enero son días consecutivos.
+  var best = 0, run = 0;
+  for (i = 0; i < yearLen * 2; i++) {
+    if (flags[i % yearLen]) {
+      run++;
+      if (run > best) best = run;
+    } else {
+      run = 0;
+    }
+    if (best >= total) break;      // ya no puede crecer más
   }
   return best;
 }
