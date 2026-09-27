@@ -4754,7 +4754,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     CP_PALETTE.forEach(h=>{
       const s=document.createElement("button");s.type="button";s.className="cp-swat";s.style.background=h;s.dataset.h=h;
       s.title=h;
-      s.addEventListener("click",()=>cpApplyHex(h));
+      s.addEventListener("click",()=>{cpApplyHex(h);closeColorPicker(true);});
       pal.appendChild(s);
     });
     pop.querySelector(".cp-close").addEventListener("click",(e)=>{e.stopPropagation();closeColorPicker(false);});

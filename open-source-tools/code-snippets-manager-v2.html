@@ -2143,6 +2143,10 @@
       <i class="ti ti-arrows-minimize" aria-hidden="true"></i>
       <span>إغلاق الكل</span>
     </button>
+    <button class="topbar-btn" onclick="openFindReplace()" title="البحث والاستبدال">
+      <i class="ti ti-find-replace" aria-hidden="true"></i>
+      <span>بحث/استبدال</span>
+    </button>
     <button class="topbar-btn" onclick="exportData()" title="تصدير JSON">
       <i class="ti ti-download" aria-hidden="true"></i>
       <span>تصدير</span>
@@ -2263,6 +2267,41 @@
 <div class="toast" id="toast" role="status" aria-live="polite">
   <i class="ti ti-check" aria-hidden="true"></i>
   <span id="toastMsg">تم النسخ!</span>
+</div>
+
+<!-- FIND & REPLACE MODAL -->
+<div class="modal-overlay" id="findReplaceOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="البحث والاستبدال" style="max-width:520px">
+    <div class="modal-title">🔍 البحث والاستبدال</div>
+    
+    <div class="form-group">
+      <label class="form-label" for="frSearch">ابحث عن</label>
+      <input class="form-input" id="frSearch" type="text" placeholder="ادخل النص للبحث..." autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="frReplace">استبدل ب</label>
+      <input class="form-input" id="frReplace" type="text" placeholder="ادخل النص البديل..." autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-2)">
+        <input type="checkbox" id="frCaseSensitive" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+        <span>حساس لحالة الأحرف (Case Sensitive)</span>
+      </label>
+    </div>
+
+    <div id="frResults" style="margin:16px 0;padding:12px;background:var(--bg-overlay);border-radius:var(--radius-sm);display:none">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">النتائج:</div>
+      <div id="frResultsText" style="font-size:13px;color:var(--text-1);font-weight:600"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" id="frFindBtn" style="flex:1">البحث عن الكل</button>
+      <button class="btn-primary" id="frReplaceBtn" style="flex:1;background:var(--accent-warm)" onclick="performReplace()">استبدل الكل</button>
+      <button class="btn-cancel" onclick="closeFindReplace()">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <!-- EDITOR COLOR PICKER -->
@@ -5263,6 +5302,106 @@ function getFiltered(){
   }
   function closeModalOutside(e){ if(e.target===document.getElementById('modalOverlay')) closeModal(); }
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  // ── FIND & REPLACE ──
+  let frFindMatches = [];
+  function openFindReplace(){
+    document.getElementById('findReplaceOverlay').classList.add('open');
+    document.getElementById('frSearch').focus();
+    frFindMatches = [];
+    document.getElementById('frResults').style.display = 'none';
+  }
+  function closeFindReplace(){
+    document.getElementById('findReplaceOverlay').classList.remove('open');
+    frFindMatches = [];
+    document.getElementById('frResults').style.display = 'none';
+  }
+  document.addEventListener('keydown', e=>{ 
+    if(e.key==='Escape' && document.getElementById('findReplaceOverlay').classList.contains('open')) closeFindReplace(); 
+  });
+
+  document.getElementById('frFindBtn')?.addEventListener('click', performFind);
+  document.getElementById('frSearch')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter') performFind(); });
+  document.getElementById('frReplace')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter') performReplace(); });
+
+  function performFind(){
+    const searchTerm = document.getElementById('frSearch').value.trim();
+    const caseSensitive = document.getElementById('frCaseSensitive').checked;
+    
+    if(!searchTerm){ 
+      showToast('ادخل نص للبحث'); 
+      return; 
+    }
+
+    frFindMatches = [];
+    let totalMatches = 0;
+    let totalSections = 0;
+
+    DATA.forEach(section => {
+      let matchCount = 0;
+      section.codes.forEach(codeObj => {
+        const code = codeObj.code;
+        const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), caseSensitive ? 'g' : 'gi');
+        const matches = code.match(regex) || [];
+        matchCount += matches.length;
+      });
+
+      if(matchCount > 0){
+        frFindMatches.push({sectionId: section.id, title: section.title, matchCount});
+        totalMatches += matchCount;
+        totalSections++;
+      }
+    });
+
+    const resultsDiv = document.getElementById('frResults');
+    const resultsText = document.getElementById('frResultsText');
+    
+    if(frFindMatches.length > 0){
+      resultsText.innerHTML = `✅ عثرت على <strong>${totalMatches}</strong> تطابق في <strong>${totalSections}</strong> أقسام`;
+      resultsDiv.style.display = 'block';
+    } else {
+      resultsText.innerHTML = '❌ لم تجد أي نتائج';
+      resultsDiv.style.display = 'block';
+    }
+  }
+
+  function performReplace(){
+    const searchTerm = document.getElementById('frSearch').value.trim();
+    const replaceTerm = document.getElementById('frReplace').value.trim();
+    const caseSensitive = document.getElementById('frCaseSensitive').checked;
+    
+    if(!searchTerm){ 
+      showToast('ادخل نص للبحث'); 
+      return; 
+    }
+
+    let totalReplaced = 0;
+
+    DATA.forEach(section => {
+      section.codes.forEach(codeObj => {
+        const originalCode = codeObj.code;
+        const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), caseSensitive ? 'g' : 'gi');
+        const matches = originalCode.match(regex) || [];
+        totalReplaced += matches.length;
+        codeObj.code = originalCode.replace(regex, replaceTerm);
+      });
+    });
+
+    if(totalReplaced > 0){
+      const resultsDiv = document.getElementById('frResults');
+      const resultsText = document.getElementById('frResultsText');
+      resultsText.innerHTML = `✅ تم استبدال <strong>${totalReplaced}</strong> نصوص بنجاح!`;
+      resultsDiv.style.display = 'block';
+      
+      localStorage.setItem('codeSnippets', JSON.stringify(DATA));
+      renderAll();
+      showToast(`تم استبدال ${totalReplaced} نص!`);
+      
+      setTimeout(() => closeFindReplace(), 1500);
+    } else {
+      showToast('لم يتم العثور على نصوص للاستبدال');
+    }
+  }
 
   function addSection(){
     const title = document.getElementById('inp-title').value.trim();
