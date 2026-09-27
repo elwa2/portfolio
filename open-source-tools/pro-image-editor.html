@@ -6317,13 +6317,19 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     stampMasked(lctx,c=>{c.save();c.globalAlpha=paintOpacity();c.drawImage(sc,x-size/2,y-size/2);c.restore();});
   }
   function doHeal(x,y){
-    const L=layers[activeLayerIdx];if(!L||!cloneSource||!cloneOffset)return;
+    const L=layers[activeLayerIdx];if(!L)return;
     const lctx=L.canvas.getContext("2d",{willReadFrequently:true});
     const size=Math.max(2,Number(state.healSize)||20);
     const hardness=Math.max(1,Number(state.healHardness)||40);
     const mode=state.healModeBrush||"blend";
     const brush=softBrush(size,hardness);
-    const sx=x+cloneOffset.dx,sy=y+cloneOffset.dy;
+    
+    // Auto-sample from nearby area (radius = size)
+    const sampleRadius=Math.max(size*1.5,size+20);
+    const angle=Math.random()*Math.PI*2;
+    const sx=x+Math.cos(angle)*sampleRadius;
+    const sy=y+Math.sin(angle)*sampleRadius;
+    
     const cw=L.canvas.width,chh=L.canvas.height;
     const srcX=Math.max(0,Math.floor(clamp(sx-size/2,0,cw))),srcY=Math.max(0,Math.floor(clamp(sy-size/2,0,chh)));
     const w=Math.min(size,cw-srcX),hh=Math.min(size,chh-srcY);
@@ -6376,6 +6382,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     }
     
     lctx.putImageData(destImageData,Math.floor(x-size/2),Math.floor(y-size/2));
+    renderImmediately();
   }
   function paintSegmentTo(p){
     const L=layers[activeLayerIdx];if(!L)return;
