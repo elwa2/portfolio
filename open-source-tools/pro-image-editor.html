@@ -2362,9 +2362,11 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
 
   /* ===================== HISTORY ===================== */
   function cloneStrokes(){return strokes.map(s=>({...s,points:s.points.slice()}));}
-  function cloneLayersRefs(){
-    return layers.map(l=>{
+  function cloneLayersRefs(src){
+    return (src||layers).map(l=>{
       const layerCopy={...l};
+      if(l.textProps)layerCopy.textProps=textPropsClone(l.textProps);
+      if(l.adjust)layerCopy.adjust=adjDeep(l.adjust);
       if(l.canvas){
         const tempCanvas=mkCanvas(l.canvas.width,l.canvas.height);
         tempCanvas.getContext("2d").drawImage(l.canvas,0,0);
@@ -2391,7 +2393,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   function applyEntry(e){
     if(!e)return;
     Object.assign(state,e.adjust||{});state.textOverlay=e.textOverlay?{...e.textOverlay}:null;strokes=e.strokes||[];
-    if(e.layers){layers=e.layers;if(layers[0])originalImage=layers[0].canvas;}
+    if(e.layers){layers=cloneLayersRefs(e.layers);if(layers[0])originalImage=layers[0].canvas;}
     if(e.groups)groups=e.groups.map(g=>({...g}));
     if(typeof e.layerIdx==="number")activeLayerIdx=Math.max(0,Math.min(e.layerIdx,layers.length-1));
   }
@@ -4159,12 +4161,10 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       for(let k=1;k<layers.length;k++){if(layers[k]&&layers[k].group===gid)multiSel.add(layers[k].id);}
       activeLayerIdx=i;shiftAnchorIdx=i;
       renderLayers();updateLayerControls();
-      if(state.showTransformCtl&&getToolMode()==="move")autoTransformMove();
       return i;
     }
     setSingleSelection(i);
     renderLayers();updateLayerControls();
-    if(state.showTransformCtl&&getToolMode()==="move")autoTransformMove();
     return i;
   }
   function alignableSelected(){
@@ -6243,7 +6243,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   function paintHardness(){const t=getToolMode();if(t==="clone")return state.cloneHardness;return state.drawHardness;}
   function paintOpacity(){const t=getToolMode();if(t==="clone")return state.cloneOpacity/100;return (state.drawOpacity/100)*(typeof state.drawFlow==="number"?clamp(state.drawFlow,0,100)/100:1);}
   function paintColor(){const t=getToolMode();if(t==="pen")return state.penColor||state.fgColor||"#ffffff";return state.fgColor||state.drawColor||"#ffffff";}
-  function layerLocalPt(p){const L=layers[activeLayerIdx];return{x:p.x-(L.dx||0),y:p.y-(L.dy||0)};}
+  function layerLocalPt(p){const L=layers[activeLayerIdx];if(!L)return{x:p.x,y:p.y};return{x:p.x-(L.dx||0),y:p.y-(L.dy||0)};}
   function stampMasked(lctx,drawfn){
     const L=layers[activeLayerIdx];
     if(!selectionData||!L){drawfn(lctx);return;}
@@ -6462,8 +6462,11 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     renderImmediately();
   }
   function applyGradient(p0,p1){
-    const L=layers[activeLayerIdx];if(!L)return;
-    const target=editTargetCanvas();
+    let L=layers[activeLayerIdx];if(!L)return;
+    if(L.lockPixels){toast('Layer "'+L.name+'" pixels are locked.','warning',1400);return;}
+    if(!beginLayerEdit("Gradient"))return;
+    L=layers[activeLayerIdx];if(!L)return;
+    const target=editTargetCanvas();if(!target)return;
     const lctx=target.getContext("2d");
     const onMask=target!==L.canvas;
     const lp0=layerLocalPt(p0),lp1=layerLocalPt(p1);
@@ -6526,17 +6529,21 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   }
   function magicEraseAt(x,y){
     const L=layers[activeLayerIdx];if(!L)return;
-    if(!beginLayerEdit("Magic Eraser"))return;
-    const target=editTargetCanvas();
-    const tol=clamp(state.wandTolerance!=null?state.wandTolerance:32,0,128);
-    const lctx=target.getContext("2d",{willReadFrequently:true});
+    const target=editTargetCanvas();if(!target)return;
     const w=target.width,h=target.height;
     if(w<1||h<1)return;
-    const ix=clamp(Math.floor(x),0,w-1),iy=clamp(Math.floor(y),0,h-1);
+    const onMask=target!==L.canvas;
+    const mdx=(onMask&&L.mask.linked===false)?(L.mask.dx||0):0;
+    const mdy=(onMask&&L.mask.linked===false)?(L.mask.dy||0):0;
+    const lx=Math.floor(x-(L.dx||0)+mdx),ly=Math.floor(y-(L.dy||0)+mdy);
+    if(lx<0||ly<0||lx>=w||ly>=h)return;
+    if(!beginLayerEdit("Magic Eraser"))return;
+    const tol=clamp(state.wandTolerance!=null?state.wandTolerance:32,0,128);
+    const lctx=target.getContext("2d",{willReadFrequently:true});
     const img=lctx.getImageData(0,0,w,h),d=img.data;
-    const si=(iy*w+ix)*4,tr=d[si],tg=d[si+1],tb=d[si+2],ta=d[si+3];
+    const si=(ly*w+lx)*4,tr=d[si],tg=d[si+1],tb=d[si+2],ta=d[si+3];
     const mask=new Uint8Array(w*h),vis=new Uint8Array(w*h);
-    const stack=[iy*w+ix];vis[iy*w+ix]=1;
+    const stack=[ly*w+lx];vis[ly*w+lx]=1;
     while(stack.length){
       const cur=stack.pop();
       const i=cur*4;
@@ -6694,8 +6701,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const s=shapePreview;shapePreview=null;isDraggingShape=false;
     if(!s)return;
     if(Math.abs(s.w)<=1&&Math.abs(s.h)<=1){drawCropOverlay();return;}
-    beginLayerEdit("Shape");
-    const L=layers[activeLayerIdx];const lctx=L.canvas.getContext("2d");
+    if(!beginLayerEdit("Shape")){drawCropOverlay();return;}
+    const L=layers[activeLayerIdx];if(!L)return;
+    const lctx=L.canvas.getContext("2d");
     const hp=layerLocalPt({x:Math.min(s.x,s.x+s.w),y:Math.min(s.y,s.y+s.h)});
     const x=hp.x,y=hp.y,w=Math.abs(s.w),h=Math.abs(s.h);
     const sl={...s,x,y,w,h};
@@ -7927,7 +7935,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     $("invertSel2")&&$("invertSel2").addEventListener("click",()=>{invertSelection();});
     overlayCanvas.addEventListener("contextmenu",e=>{
       if(state.cloneMode&&originalImage){
-        e.preventDefault();const p=canvasPoint(e);if(p.x>=0&&p.y>=0){cloneSource={x:p.x,y:p.y};toast("Clone source set.");}
+        e.preventDefault();const p=canvasPoint(e);const L=layers[activeLayerIdx];
+        if(L&&p.x>=0&&p.y>=0){cloneSource=layerLocalPt(p);toast("Clone source set.");}
       }
     });
 
