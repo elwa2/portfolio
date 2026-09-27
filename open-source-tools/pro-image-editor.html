@@ -2740,7 +2740,7 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
     if(!layerCanEdit())return;
     commit("Free Transform");
     if(hasSel){
-      rasterizeForSelectionTransform();
+      if(L.kind==="bg")rasterizeForSelectionTransform();
       const cL=layers[activeLayerIdx];
       const bb=selectionBBox();if(!bb){toast("Select content to transform.","warning",1500);return;}
       const src=mkCanvas(bb.w,bb.h),sc=src.getContext("2d");
@@ -3996,7 +3996,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const hasSel=!!selectionData;
     commit("Transform");
     if(hasSel){
-      rasterizeForSelectionTransform();
+      if(L.kind==="bg")rasterizeForSelectionTransform();
       const cL=layers[activeLayerIdx];
       const bb=selectionBBox();if(!bb){undo();return;}
       const src=mkCanvas(bb.w,bb.h),sc=src.getContext("2d");
@@ -4152,6 +4152,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   function autoselectAt(px,py){
     const i=layerAtPoint(px,py);
     if(i<0){return i;}
+    if(selectionData&&i!==activeLayerIdx){clearSelection();}
     if(state.autoSelectMode==="group"&&layers[i].group){
       const gid=layers[i].group;
       multiSel=new Set();
