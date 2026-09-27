@@ -5143,7 +5143,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   function initLayers(canvas){const bg=makeLayer("Background","bg",canvas);bg.id=1;nextLayerId=2;layers=[bg];activeLayerIdx=0;groups=[];nextGroupId=1;}
   function cloneCanvas(c){const cc=mkCanvas(c.width,c.height);cc.getContext("2d").drawImage(c,0,0);return cc;}
   function cloneLayerObj(l){const n={...l,clipTo:(typeof l.clipTo==="number")?l.clipTo:null,textProps:(l.kind==="text"&&l.textProps)?textPropsClone(l.textProps):l.textProps,adjust:(l.adjust?adjDeep(l.adjust):null)};if(l.mask&&l.mask.canvas)n.mask={visible:l.mask.visible!==false,linked:l.mask.linked!==false,dx:l.mask.dx||0,dy:l.mask.dy||0,canvas:cloneCanvas(l.mask.canvas)};return n;}
-  function cloneLayersRefs(){return layers.map(l=>({...l}));}
+  /* NOTE: cloneLayersRefs() (deep-cloning, undo-safe) is defined near the History section above.
+     A duplicate shallow definition that used to sit here was silently overriding it and has been removed. */
   function isBgIdx(i){return !!layers[i]&&layers[i].kind==="bg";}
   function layerCanEdit(i){const L=layers[i==null?activeLayerIdx:i];if(!L)return false;if(L.locked){toast('Layer "'+L.name+'" is locked.','warning',1400);return false;}return true;}
   function bgNeedsRaster(){
