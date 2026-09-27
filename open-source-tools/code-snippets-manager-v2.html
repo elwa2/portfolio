@@ -1121,38 +1121,34 @@
   .ed-find-box::-webkit-scrollbar { width: 8px; }
   .ed-find-box::-webkit-scrollbar-thumb { background: var(--border-str); border-radius: 4px; }
 
-  /* ===== ALARM TAB (منبه) ===== */
-  .ed-subtabs {
-    display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 4px; padding: 5px;
-    background: var(--bg-overlay); border: 1px solid var(--border-sub);
-    border-radius: var(--radius-md);
+  /* ===== ALARM DASH (منبه) ===== */
+  .al-builder {
+    background: var(--bg-raised); border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 20px;
   }
-  .ed-subtab {
-    display: inline-flex; align-items: center; gap: 7px; position: relative;
-    padding: 8px 16px; border: none; border-radius: var(--radius-sm);
-    background: transparent; color: var(--text-2);
-    font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 600;
-    cursor: pointer; transition: all 0.18s;
+  .al-builder-title {
+    font-size: 15px; font-weight: 700; color: var(--text-1);
+    margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   }
-  .ed-subtab:hover { color: var(--text-1); background: var(--glass-mod); }
-  .ed-subtab i { font-size: 15px; }
-  .ed-subtab.active { background: #38bdf8; color: #0e0e10; box-shadow: 0 4px 14px rgba(56,189,248,0.3); }
-  .ed-subtab .al-dot {
-    width: 7px; height: 7px; border-radius: 50%; background: var(--danger);
-    display: none; flex-shrink: 0;
+  .al-builder-title i { color: #38bdf8; font-size: 18px; }
+  .al-builder-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
+
+  .topbar-btn.al-active {
+    background: #38bdf8; color: #0e0e10; border-color: #38bdf8;
+    box-shadow: 0 2px 12px rgba(56,189,248,0.3);
   }
-  .ed-subtab.has-alarm .al-dot { display: block; animation: alPulse 1s ease-in-out infinite; }
-  .ed-subtab .al-tag {
-    font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 9px;
-    background: rgba(248,113,113,0.2); color: var(--danger); white-space: nowrap;
-  }
-  #edDashBtn { position: relative; }
-  #edDashBtn.al-badge::after {
+  #alDashBtn { position: relative; }
+  #alDashBtn.al-badge::after {
     content: ''; position: absolute; top: 4px; inset-inline-end: 5px;
     width: 6px; height: 6px; border-radius: 50%; background: var(--danger);
     animation: alPulse 1s ease-in-out infinite;
   }
-  #edDashBtn.al-ringing { background: var(--danger) !important; color: #fff !important; border-color: var(--danger) !important; }
+  #alDashBtn.al-ringing {
+    background: var(--danger) !important; color: #fff !important;
+    border-color: var(--danger) !important;
+    box-shadow: 0 2px 12px rgba(248,113,113,0.4) !important;
+  }
+  #alDashBtn.al-ringing i { animation: alBell 0.9s ease-in-out infinite; }
 
   .al-grid { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 18px; }
   .al-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
@@ -1187,10 +1183,88 @@
     color: var(--text-1); direction: ltr; line-height: 1;
     font-variant-numeric: tabular-nums;
   }
+  .al-ring-num.isclock { font-size: 30px; }
   .al-ring-lbl { font-size: 11px; color: var(--text-3); }
+  .al-ring-cap {
+    font-size: 9.5px; color: var(--text-3); opacity: .7; margin-top: 1px;
+    letter-spacing: .2px; direction: rtl;
+  }
+  .al-ring-cap[hidden] { display: none; }
   .al-state { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-3); margin-top: 10px; }
   .al-state.on { color: var(--success); }
   .al-state.ring { color: var(--danger); }
+  .al-state.rest { color: #fbbf24; }
+  .al-clock b.al-ap { font-size: 20px; color: #38bdf8; margin-inline-start: 6px; }
+  .al-next { margin-top: 10px; font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .al-next i { color: #fbbf24; font-size: 15px; }
+  .al-next b { color: var(--text-1); }
+
+  /* محدد النوع + الوقت + الصلاة */
+  .al-seg { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .al-segi {
+    flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 9px 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-overlay); color: var(--text-2); cursor: pointer;
+    font-family: 'Cairo', sans-serif; font-size: 12.5px; font-weight: 600; transition: all 0.18s;
+  }
+  .al-segi:hover { color: var(--text-1); border-color: var(--border-def); }
+  .al-segi.on { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
+  .al-tp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .al-tp-c { color: var(--text-3); font-size: 18px; font-weight: 700; }
+  .al-sel {
+    background: var(--bg-overlay); color: var(--text-1); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 8px 10px; font-family: 'Cairo', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .al-sel.wide { flex: 1 1 auto; min-width: 110px; }
+  .al-ampm {
+    min-width: 46px; padding: 8px 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-overlay); color: #38bdf8; cursor: pointer; font-family: 'Cairo', sans-serif;
+    font-size: 13px; font-weight: 700;
+  }
+  .al-ampm.pm { background: rgba(56,189,248,0.16); border-color: #38bdf8; }
+  .al-ptable { display: grid; gap: 5px; margin: 12px 0; }
+  .al-prow {
+    display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px;
+    padding: 8px 12px; background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+  }
+  .al-prow.sel { border-color: rgba(56,189,248,0.5); background: rgba(56,189,248,0.07); }
+  .al-pt { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .al-rem {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500;
+    color: #38bdf8; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3);
+    border-radius: 999px; padding: 2px 8px; font-variant-numeric: tabular-nums;
+  }
+  .al-prow-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .al-pn { font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; }
+  .al-pn i { color: #fbbf24; font-size: 15px; }
+  .al-pt { font-size: 12.5px; color: var(--text-1); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .al-unit { color: var(--text-3); font-size: 12px; margin-inline-end: 4px; }
+  .al-btn.mini { flex: 0 0 auto; padding: 5px 12px; font-size: 11.5px; }
+  .al-btn.mini.on { background: #38bdf8; color: #0e0e10; border-color: #38bdf8; }
+  .al-btn.mini:disabled { opacity: 0.4; cursor: not-allowed; }
+  .al-num.wide { flex: 1 1 100px; }
+
+  /* الصوت المرفوع */
+  .al-snd.up { border-style: dashed; color: var(--text-2); }
+  .al-snd.up i { font-size: 16px; }
+  .al-snd.up.on { border-style: solid; }
+  .al-cfile {
+    display: flex; align-items: center; gap: 9px; margin-top: 11px; padding: 9px 12px;
+    background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.28); border-radius: var(--radius-sm);
+    font-size: 12px; color: var(--text-1);
+  }
+  .al-cfile i { color: #38bdf8; font-size: 16px; }
+  .al-cname { flex: 1 1 auto; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .al-x {
+    background: transparent; border: none; color: var(--text-3); cursor: pointer; padding: 2px 4px;
+    font-size: 15px; border-radius: 5px;
+  }
+  .al-x:hover { color: var(--danger); background: rgba(248,113,113,0.14); }
+  .al-chips.inline { margin: 0; flex: 1 1 auto; }
+  .al-chip.sm { padding: 6px 11px; font-size: 11.5px; }
+  #alArc.rest { stroke: #fbbf24; }
   .al-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
   .al-btn {
     flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -2363,9 +2437,13 @@
     <div class="search-sug" id="searchSug"></div>
   </div>
 
-  <span class="count-badge" id="countBadge">0 كود</span>
+  <span class="count-badge" id="countBadge">منبه</span>
 
   <div class="topbar-actions">
+    <button class="topbar-btn" id="alDashBtn" onclick="toggleAlDash()" title="المنبه — ساعة وتنبيه صوتي (يرن كل 5 دقائق حتى توقفه)">
+      <i class="ti ti-alarm" aria-hidden="true"></i>
+      <span>المنبه</span>
+    </button>
     <button class="topbar-btn" id="homeBtn" onclick="toggleHomeDash()" title="الصفحة الرئيسية">
       <i class="ti ti-home-2" aria-hidden="true"></i>
       <span>الرئيسية</span>
@@ -5202,13 +5280,14 @@ function getFiltered(){
 
   /* ══════════ ALARM — المنبه (تبويب داخل المحرر) ══════════ */
   const AL_KEY = 'csman_v2_alarm_v1';
-  const ED_TAB_KEY = 'csman_v2_ed_tab_v1';
   const AL_MIN = 60000;
   const AL_RING_GAP = 1700;
   const AL_R = 96;
   const AL_CIRC = 2 * Math.PI * AL_R;
   const AL_DAYS = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   const AL_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const AL_HIJRI = ['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+  const AL_CUSTOM_ID = 'custom';
 
   /* كل نغمة = [نوع الموجة, تردد البداية, تردد النهاية, تأخير ث, طول ث, قوة] */
   const AL_SOUNDS = [
@@ -5226,40 +5305,135 @@ function getFiltered(){
     { m:10, label:'10 دقائق' }, { m:15, label:'15 دقيقة' }, { m:30, label:'30 دقيقة' },
     { m:60, label:'ساعة' }
   ];
+  const AL_RING_FOR = [
+    { m:1, label:'1 د' }, { m:3, label:'3 د' }, { m:5, label:'5 د' },
+    { m:10, label:'10 د' }, { m:15, label:'15 د' }, { m:30, label:'30 د' }
+  ];
+  const AL_REST_FOR = [
+    { s:15, label:'15 ث' }, { s:30, label:'30 ث' }, { s:60, label:'دقيقة' },
+    { s:120, label:'دقيقتين' }, { s:300, label:'5 د' }
+  ];
+  /* مقدار التذكير قبل الصلاة (بالدقائق) */
+  const AL_LEAD = [
+    { m:0,  label:'عند الصلاة' }, { m:5,  label:'قبلها 5 د' },
+    { m:10, label:'قبلها 10 د' }, { m:15, label:'قبلها 15 د' },
+    { m:20, label:'قبلها 20 د' }, { m:30, label:'قبلها 30 د' },
+    { m:45, label:'قبلها 45 د' }, { m:60, label:'قبلها ساعة' },
+    { m:90, label:'قبلها ساعة ونص' }, { m:120, label:'قبلها ساعتين' }
+  ];
+
+  /* ── المواقيت: حساب شمسي محلي (مفيش إنترنت) ── */
+  const AL_PRAYERS = [
+    { id:'fajr',    name:'الفجر',   ico:'ti-moon' },
+    { id:'sunrise', name:'الشروق',  ico:'ti-sunrise' },
+    { id:'dhuhr',   name:'الظهر',   ico:'ti-sun' },
+    { id:'asr',     name:'العصر',   ico:'ti-cloud' },
+    { id:'maghrib', name:'المغرب',  ico:'ti-sunset' },
+    { id:'isha',    name:'العشاء',  ico:'ti-moon-stars' },
+    { id:'jumua',   name:'الجمعة',  ico:'ti-users' }
+  ];
+  /* tz = فرق توقيت المدينة عن UTC بالساعات (الوقت الرسمي بدون التوقيت الصيفي) */
+  const AL_CITIES = [
+    { n:'القاهرة',     lat:30.0444, lng:31.2357, tz:2 },
+    { n:'الجيزة',      lat:30.0131, lng:31.2089, tz:2 },
+    { n:'الإسكندرية',  lat:31.2001, lng:29.9187, tz:2 },
+    { n:'المنصورة',    lat:31.0409, lng:31.3789, tz:2 },
+    { n:'طنطا',        lat:30.7865, lng:31.0004, tz:2 },
+    { n:'أسيوط',       lat:27.1801, lng:31.1837, tz:2 },
+    { n:'بورسعيد',     lat:31.2653, lng:32.3019, tz:2 },
+    { n:'السويس',      lat:29.9668, lng:32.5498, tz:2 },
+    { n:'الأقصر',      lat:25.6872, lng:32.6396, tz:2 },
+    { n:'أسوان',       lat:24.0889, lng:32.8998, tz:2 },
+    { n:'الرياض',      lat:24.7136, lng:46.6753, tz:3 },
+    { n:'دبي',         lat:25.2048, lng:55.2708, tz:4 },
+    { n:'تونس',        lat:36.8065, lng:10.1815, tz:1 },
+    { n:'الجزائر',     lat:36.7538, lng:3.0588, tz:1 },
+    { n:'الرباط',      lat:34.0209, lng:6.8416, tz:1 },
+    { n:'عمّان',       lat:31.9454, lng:35.9284, tz:3 },
+    { n:'بغداد',       lat:33.3152, lng:44.3661, tz:3 },
+    { n:'إسطنبول',     lat:41.0082, lng:28.9784, tz:3 },
+    { n:'لندن',        lat:51.5074, lng:-0.1278, tz:0 },
+    { n:'باريس',       lat:48.8566, lng:2.3522, tz:1 },
+    { n:'نيويورك',     lat:40.7128, lng:-74.0060, tz:-5 }
+  ];
 
   let alCtx = null, alTickTimer = null, alRingTimer = null, alRingStep = 0;
   let alTitleOn = false, alTitleWas = '';
   let alOverlayBuilt = false;
-  let edTab = loadEdTab();
+  let alAudioEl = null, alCustomPlay = false;
+  let alFileInput = null;
+  let showAlDash = false;
   let alStore = loadAl();
 
   function defaultAl(){
-    return { armed:false, ringing:false, dueAt:0, dur:5*AL_MIN, sound:AL_MIX_ID,
-             vol:0.7, repeat:true, label:'', h:0, m:5, s:0, hms:'0:5:0' };
+    return { armed:false, ringing:false, dueAt:0, dur:5*AL_MIN, mode:'dur',
+             sound:AL_MIX_ID, vol:0.7, repeat:true, label:'', h:0, m:5, s:0, hms:'0:5:0',
+             ringFor:5*AL_MIN, restFor:1*AL_MIN, phase:'ring', phaseEndsAt:0,
+             th:5, tm:0, tap:'ص', daily:false, prayer:'', lead:0,
+             city:'القاهرة', lat:30.0444, lng:31.2357, tz:-new Date().getTimezoneOffset() / 60, allAdj:0,
+             fajrAng:19.5, ishaAng:18, ishaMin:0, asr:1, asrAdj:0,
+             custom:null };
+  }
+  function alNum(v, def, lo, hi){
+    const n = typeof v === 'number' ? v : parseFloat(v);
+    if (!isFinite(n)) return def;
+    return Math.max(lo, Math.min(hi, n));
   }
   function loadAl(){
     try {
       const d = JSON.parse(localStorage.getItem(AL_KEY) || 'null');
       if (d && typeof d === 'object'){
         const a = Object.assign(defaultAl(), d);
-        a.vol = (typeof a.vol === 'number') ? Math.max(0, Math.min(1, a.vol)) : 0.7;
-        if (a.sound !== AL_MIX_ID && !AL_SOUNDS.some(x => x.id === a.sound)) a.sound = AL_MIX_ID;
+        a.vol = alNum(a.vol, 0.7, 0, 1);
+        a.dur = alNum(a.dur, 5*AL_MIN, 1000, 24*60*AL_MIN);
+        a.ringFor = alNum(a.ringFor, 5*AL_MIN, 5000, 6*60*AL_MIN);
+        a.restFor = alNum(a.restFor, AL_MIN, 5000, 60*AL_MIN);
+        a.h = alNum(a.h, 0, 0, 23); a.m = alNum(a.m, 5, 0, 59); a.s = alNum(a.s, 0, 0, 59);
+        a.th = Math.round(alNum(a.th, 5, 1, 12));
+        a.tm = Math.round(alNum(a.tm, 0, 0, 59));
+        a.tap = a.tap === 'م' ? 'م' : 'ص';
+        a.lat = alNum(a.lat, 30.0444, -66, 66);
+        a.lng = alNum(a.lng, 31.2357, -180, 180);
+        a.tz = alNum(a.tz, -new Date().getTimezoneOffset() / 60, -12, 14);
+        a.allAdj = alNum(a.allAdj, 0, -90, 90);
+        a.fajrAng = alNum(a.fajrAng, 19.5, 10, 22);
+        a.ishaAng = alNum(a.ishaAng, 18, 10, 22);
+        a.ishaMin = alNum(a.ishaMin, 0, 0, 120);
+        a.asrAdj = alNum(a.asrAdj, 0, -90, 90);
+        a.lead = Math.round(alNum(a.lead, 0, 0, 24*60));
+        a.asr = a.asr === 2 ? 2 : 1;
+        a.mode = (a.mode === 'time' || a.mode === 'prayer') ? a.mode : 'dur';
+        a.phase = a.phase === 'rest' ? 'rest' : 'ring';
+        a.daily = !!a.daily;
+        if (a.sound === AL_CUSTOM_ID && (!a.custom || !a.custom.data)) a.sound = AL_MIX_ID;
+        else if (a.sound !== AL_MIX_ID && a.sound !== AL_CUSTOM_ID && !AL_SOUNDS.some(x => x.id === a.sound)) a.sound = AL_MIX_ID;
+        if (a.custom && typeof a.custom.data !== 'string') a.custom = null;
         return a;
       }
     } catch (e) {}
     return defaultAl();
   }
   function saveAl(){ try { localStorage.setItem(AL_KEY, JSON.stringify(alStore)); } catch (e) {} }
-  function loadEdTab(){ try { return localStorage.getItem(ED_TAB_KEY) === 'alarm' ? 'alarm' : 'editor'; } catch (e) { return 'editor'; } }
-  function saveEdTab(){ try { localStorage.setItem(ED_TAB_KEY, edTab); } catch (e) {} }
-  function edSetTab(t){ edTab = (t === 'alarm') ? 'alarm' : 'editor'; saveEdTab(); renderEdDash(); }
 
+  /* ── تنسيق 12 ساعة (ص/م) ── */
   function alTwo(n){ return (n < 10 ? '0' : '') + n; }
+  function alAp(h24){ return h24 < 12 ? 'ص' : 'م'; }
+  function alH12(h24){ const h = h24 % 12; return h === 0 ? 12 : h; }
+  function alFmt12Num(d, withSec){
+    const h = d.getHours();
+    return alH12(h) + ':' + alTwo(d.getMinutes()) + (withSec ? ':' + alTwo(d.getSeconds()) : '') + ' ' + alAp(h);
+  }
+  function alTo24(th, tm, tap){
+    let h = Math.round(alNum(th, 12, 1, 12)) % 12;
+    const m = Math.round(alNum(tm, 0, 0, 59));
+    if (tap === 'م') h += 12;
+    return { h:h, m:m };
+  }
   function alFmtDur(ms){
     const s = Math.max(0, Math.round(ms / 1000));
     const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-    if (h) return h + ' ساعة ' + alTwo(m) + ':' + alTwo(sec);
-    if (m) return m + ' دقيقة ' + alTwo(sec) + ' ثانية';
+    if (h) return h + ' ساعة' + (m ? ' ' + m + ' د' : '') + (sec ? ' ' + sec + ' ث' : '');
+    if (m) return m + ' دقيقة' + (sec ? ' ' + sec + ' ثانية' : '');
     return sec + ' ثانية';
   }
   function alFmtClock(ms){
@@ -5267,8 +5441,134 @@ function getFiltered(){
     const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
     return (h ? h + ':' : '') + alTwo(m) + ':' + alTwo(sec);
   }
+  function alFmtDate12(d){
+    const h = d.getHours();
+    return alH12(h) + ':' + alTwo(d.getMinutes()) + ' ' + alAp(h);
+  }
   function alDateText(d){
     return AL_DAYS[d.getDay()] + ' ' + d.getDate() + ' ' + AL_MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function alHijri(d){
+    try {
+      let y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+      if (m <= 2){ y -= 1; m += 12; }
+      const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+      const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + B - 1524.5;
+      const l0 = Math.floor(jd) - 1 - 1948440 + 10632;
+      const n = Math.floor((l0 - 1) / 10631);
+      let l = l0 - 10631 * n + 354;
+      const j = Math.floor((10985 - l) / 5316) * Math.floor((50 * l) / 17719)
+              + Math.floor(l / 5670) * Math.floor((43 * l) / 15238);
+      l = l - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50)
+            - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29;
+      const mo = Math.floor((24 * l) / 709);
+      return { y:30 * n + j - 30, m:mo, d:l - Math.floor((709 * mo) / 24) };
+    } catch (e) { return null; }
+  }
+
+  /* ── محرك الفلك: موقع الشمس → مواقيت الصلاة ── */
+  const AL_D2R = Math.PI / 180;
+  function alSin(x){ return Math.sin(x * AL_D2R); }
+  function alCos(x){ return Math.cos(x * AL_D2R); }
+  function alTan(x){ return Math.tan(x * AL_D2R); }
+  function alAsinD(x){ return Math.asin(Math.max(-1, Math.min(1, x))) / AL_D2R; }
+  function alAcosD(x){ return Math.acos(Math.max(-1, Math.min(1, x))) / AL_D2R; }
+  function alAtan2D(y, x){ return Math.atan2(y, x) / AL_D2R; }
+  function alWrap360(a){ const r = a % 360; return r < 0 ? r + 360 : r; }
+  function alJd(date){
+    let y = date.getFullYear(), m = date.getMonth() + 1;
+    const d = date.getDate();
+    if (m <= 2){ y -= 1; m += 12; }
+    const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5;
+  }
+  function alSunPos(jd){
+    const D = jd - 2451545.0;
+    const g = alWrap360(357.529 + 0.98560028 * D);
+    const q = alWrap360(280.459 + 0.98564736 * D);
+    const L = alWrap360(q + 1.915 * alSin(g) + 0.020 * alSin(2 * g));
+    const e = 23.439 - 0.00000036 * D;
+    // خط الميمين بالساعات (من -12 لـ +12) — نرجعه لنطاق 0..24 قبل طرحه
+    let Ra = alAtan2D(alCos(e) * alSin(L), alCos(L)) / 15;
+    if (Ra < 0) Ra += 24;
+    return { dec: alAsinD(alSin(e) * alSin(L)), eqt: q / 15 - Ra };
+  }
+  function alTz(){ return alNum(alStore.tz, -new Date().getTimezoneOffset() / 60, -12, 14); }
+  /* مواقيت اليوم = دقائق من منتصف ليل *توقيت المدينة* (مش توقيت المتصفح) — null لو مش موجودة */
+  function alSolarDay(date){
+    const tz = alTz();
+    const lat = alStore.lat, lng = alStore.lng;
+    const jd = alJd(date);
+    const eqt = alSunPos(jd + 0.5).eqt;
+    // eqt = (الشمس الحقيقية − الشمس المتوسطة)؛ الزوال لما eqt موجب بيحصل قبل 12:00
+    const dhuhr = 12 + tz - lng / 15 - eqt;
+    const dec = alSunPos(jd + (dhuhr - tz) / 24).dec;
+    // T(alt) = فرق الزاوية الساعية عن الظهر، لدول الشمس على ارتفاع alt (بالساعات)
+    const T = alt => {
+      const den = alCos(lat) * alCos(dec);
+      if (Math.abs(den) < 1e-9) return null;
+      const v = (alSin(alt) - alSin(lat) * alSin(dec)) / den;
+      if (!(v >= -1 && v <= 1)) return null;
+      return (1 / 15) * alAcosD(v);
+    };
+    const set = T(-0.833);
+    // العصر: زاوية الشمس وقت استواء الظل = arccot(طول الظل + tan(|خط العرض - الميل الشمسي|))
+    const shadow = alStore.asr === 2 ? 2 : 1;
+    const dLat = Math.abs(lat - dec);
+    const asrAlt = Math.abs(alCos(dLat)) < 1e-9 ? 45 : alAtan2D(1, shadow + alTan(dLat));
+    const fT = T(-alStore.fajrAng);
+    const aT = T(asrAlt);
+    const iT = alStore.ishaMin > 0 ? (set == null ? null : set + alStore.ishaMin / 60) : T(-alStore.ishaAng);
+    const mn = h => (h == null || !isFinite(h)) ? null : Math.round(h * 60);
+    const all = alStore.allAdj || 0;
+    const out = {
+      fajr: fT == null ? null : mn(dhuhr - fT) + all,
+      sunrise: set == null ? null : mn(dhuhr - set) + all,
+      dhuhr: mn(dhuhr) + all,
+      asr: aT == null ? null : mn(dhuhr + aT) + all + (alStore.asrAdj || 0),
+      maghrib: set == null ? null : mn(dhuhr + set) + all,
+      isha: iT == null ? null : mn(dhuhr + iT) + all,
+      jumua: mn(dhuhr + 40 / 60)
+    };
+    Object.keys(out).forEach(k => { if (out[k] != null && (out[k] < 0 || out[k] > 1439)) out[k] = null; });
+    return out;
+  }
+  function alFmtMins(mins){
+    if (mins == null || !isFinite(mins)) return '—';
+    const m = Math.round(mins);
+    return alTwo(Math.floor(m / 60)) + ':' + alTwo(m % 60) + ' ' + alAp(Math.floor(m / 60));
+  }
+  /* وقت الصلاة = تاريخ حقيقي (epoch) — بيحوّل وقت المدينة للتوقيت المحلي */
+  function alPrayerEpoch(id, date){
+    const day = alSolarDay(date);
+    if (!day) return null;
+    const mins = day[id];
+    if (mins == null) return null;
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, Math.round(mins) * 60000) - alTz() * 3600000;
+  }
+  /* الجمعة: آخر جمعة قبل اليوم ده، بعد الظهر بـ 40 دقيقة */
+  function alPrayerDate(id, date){
+    if (id === 'jumua'){
+      const back = (date.getDay() - 5 + 7) % 7;
+      const base = new Date(date.getFullYear(), date.getMonth(), date.getDate() - back, 0, 0, 0, 0);
+      return alPrayerEpoch('jumua', base);
+    }
+    return alPrayerEpoch(id, date);
+  }
+  function alNextPrayer(date){
+    const nowMs = date.getTime();
+    for (let k = 0; k < 8; k++){
+      const base = new Date(date.getFullYear(), date.getMonth(), date.getDate() + k, 0, 0, 0, 0);
+      let best = null;
+      AL_PRAYERS.forEach(p => {
+        if (p.id === 'jumua') return;
+        const ms = alPrayerDate(p.id, base);
+        if (ms == null) return;
+        if (ms > nowMs + 1000 && (!best || ms < best.ms)) best = { name:p.name, ico:p.ico, ms:ms };
+      });
+      if (best) return { name:best.name, ico:best.ico, at:new Date(best.ms) };
+    }
+    return null;
   }
 
   /* ── الصوت (Web Audio — بدون ملفات خارجية) ── */
@@ -5309,13 +5609,77 @@ function getFiltered(){
   function alSoundIds(){
     return (alStore.sound === AL_MIX_ID) ? AL_SOUNDS.map(s => s.id) : [alStore.sound];
   }
+  /* ── الصوت المرفوع من المستخدم (عصافير / بحر / أي ملف) ── */
+  const AL_MAX_FILE = 2.6 * 1024 * 1024;
+  function alCustomEl(){
+    if (!alStore.custom || !alStore.custom.data) return null;
+    try {
+      if (!alAudioEl){
+        alAudioEl = new Audio();
+        alAudioEl.preload = 'auto';
+        alAudioEl.loop = true;
+      }
+      if (alAudioEl.dataset.src !== alStore.custom.data){
+        alAudioEl.src = alStore.custom.data;
+        alAudioEl.dataset.src = alStore.custom.data;
+        alAudioEl.load();
+      }
+      alAudioEl.volume = Math.max(0, Math.min(1, alStore.vol));
+      return alAudioEl;
+    } catch (e) { return null; }
+  }
+  function alPickFile(input){
+    const f = input && input.files && input.files[0];
+    if (!f) return;
+    if (f.size > AL_MAX_FILE){
+      input.value = '';
+      showToast('الملف كبير (' + Math.round(f.size / 1048576) + ' ميجا) — الحد 2.5 ميجا');
+      return;
+    }
+    const fr = new FileReader();
+    fr.onload = () => {
+      const url = String(fr.result || '');
+      try {
+        localStorage.setItem(AL_KEY + '_probe', url);
+        localStorage.removeItem(AL_KEY + '_probe');
+      } catch (e) {
+        input.value = '';
+        showToast('المساحة المتاحة مش كافية للصوت ده — جرّب ملف أصغر');
+        return;
+      }
+      alStore.custom = { name:String(f.name || 'صوتي').slice(0, 40), data:url, type:String(f.type || 'audio/mpeg') };
+      alStore.sound = AL_CUSTOM_ID;
+      saveAl();
+      renderAlDash();
+      showToast('تم رفع الصوت: ' + alStore.custom.name);
+    };
+    fr.onerror = () => { input.value = ''; showToast('مش قادر أقرا الملف ده'); };
+    fr.readAsDataURL(f);
+  }
+  function alClearCustom(){
+    if (alCustomPlay && alAudioEl){ try { alAudioEl.pause(); } catch (e) {} }
+    alCustomPlay = false;
+    alStore.custom = null;
+    if (alStore.sound === AL_CUSTOM_ID) alStore.sound = AL_MIX_ID;
+    saveAl();
+    renderAlDash();
+    showToast('تم مسح الصوت المرفوع');
+  }
+  function alOpenFile(){ alFileInput = document.getElementById('alFileInput'); if (alFileInput) alFileInput.click(); }
 
   function alRingStart(){
-    if (alRingTimer) return;
+    if (alRingTimer || alCustomPlay) return;
     alRingStep = 0;
+    if (alStore.sound === AL_CUSTOM_ID && alStore.custom && alStore.custom.data){
+      const el = alCustomEl();
+      if (el){ try { el.currentTime = 0; el.play(); alCustomPlay = true; return; } catch (e) {} }
+    }
+    const ids = alSoundIds();
+    if (ids.indexOf(AL_CUSTOM_ID) > -1) return;
     const cycle = () => {
-      const ids = alSoundIds();
-      alPlaySound(ids[alRingStep % ids.length], alStore.vol);
+      const list = alSoundIds();
+      if (list.indexOf(AL_CUSTOM_ID) > -1) return;
+      alPlaySound(list[alRingStep % list.length], alStore.vol);
       alRingStep++;
     };
     cycle();
@@ -5323,14 +5687,17 @@ function getFiltered(){
   }
   function alRingStop(){
     if (alRingTimer){ clearInterval(alRingTimer); alRingTimer = null; }
+    if (alCustomPlay && alAudioEl){ try { alAudioEl.pause(); alAudioEl.currentTime = 0; } catch (e) {} }
+    alCustomPlay = false;
     alRingStep = 0;
   }
 
   /* ── التشغيل / الإيقاف ── */
-  function alArm(ms, label){
-    const d = Math.max(1000, Math.min(24 * 60 * AL_MIN, Math.round(ms || 0)));
+  function alArmAt(target, label){
+    const d = Math.max(1000, target - Date.now());
     alRingStop();
     alStore.ringing = false;
+    alStore.phase = 'ring';
     alStore.armed = true;
     alStore.dur = d;
     alStore.dueAt = Date.now() + d;
@@ -5339,16 +5706,27 @@ function getFiltered(){
     alAudioCtx();
     alEnsureTick();
     alPaint();
-    showToast('المنبه اتفعّل — هيشتغل بعد ' + alFmtDur(d));
+    showToast('المنبه اتفعّل — ' + label + ' بعد ' + alFmtDur(d));
   }
+  function alArm(ms, label){ alArmAt(Date.now() + Math.max(1000, ms || 0), label); }
   function alDisarm(silent){
+    const wasDaily = alStore.daily && (alStore.mode === 'time' || alStore.mode === 'prayer');
+    const keep = { mode:alStore.mode, prayer:alStore.prayer, th:alStore.th, tm:alStore.tm, tap:alStore.tap };
     alRingStop();
     alStore.armed = false;
     alStore.ringing = false;
     alStore.dueAt = 0;
+    alStore.phaseEndsAt = 0;
     alStore.label = '';
     saveAl();
     alTitleOff();
+    if (wasDaily && !silent){
+      alStore.daily = true;
+      if (keep.mode === 'prayer' && keep.prayer) alArmPrayer(keep.prayer, true);
+      else alArmClock(true);
+      showToast('اتعاد لليوم التاني — ' + alStore.label);
+      return;
+    }
     alPaint();
     if (!silent) showToast('تم إيقاف المنبه');
   }
@@ -5356,6 +5734,8 @@ function getFiltered(){
     if (alStore.ringing) return;
     alStore.armed = false;
     alStore.ringing = true;
+    alStore.phase = 'ring';
+    alStore.phaseEndsAt = Date.now() + alStore.ringFor;
     saveAl();
     alEnsureTick();
     alRingStart();
@@ -5363,36 +5743,46 @@ function getFiltered(){
     alNotify();
     showToast('⏰ حان وقت المنبه!');
   }
-  function alDismiss(){
-    if (!alStore.ringing && !alStore.armed) return;
-    const rep = !!alStore.repeat;
-    alRingStop();
-    alStore.ringing = false;
-    alTitleOff();
-    if (rep){
-      alStore.armed = true;
-      alStore.dueAt = Date.now() + alStore.dur;
+  /* دورة الرن: يرن ringFor ثم rests restFor ثم يرجع — لحد ما تضغط إيقاف */
+  function alCycle(){
+    const now = Date.now();
+    if (alStore.phase === 'ring'){
+      alRingStop();
+      alTitleOff();
+      if (!alStore.repeat){ alDisarm(); return; }
+      alStore.phase = 'rest';
+      alStore.phaseEndsAt = now + alStore.restFor;
     } else {
-      alStore.armed = false;
-      alStore.dueAt = 0;
+      alStore.phase = 'ring';
+      alStore.phaseEndsAt = now + alStore.ringFor;
+      alRingStart();
+      alNotify();
     }
     saveAl();
     alPaint();
-    showToast(rep ? 'تم الإيقاف — هيرجع تاني بعد ' + alFmtDur(alStore.dur) : 'تم إيقاف المنبه نهائيًا');
+  }
+  function alDismiss(){
+    if (!alStore.ringing && !alStore.armed) return;
+    alDisarm();
   }
   function alSnooze(min){
+    if (!alStore.ringing) return;
     alRingStop();
-    alStore.ringing = false;
     alTitleOff();
-    alStore.armed = true;
-    alStore.dur = Math.max(1000, (min || 5) * AL_MIN);
-    alStore.dueAt = Date.now() + alStore.dur;
+    alStore.phase = 'rest';
+    alStore.phaseEndsAt = Date.now() + Math.max(5000, (min || 5) * AL_MIN);
     saveAl();
     alPaint();
     showToast('تم التأجيل ' + (min || 5) + ' دقيقة');
   }
   function alTest(){
     alAudioCtx();
+    if (alStore.sound === AL_CUSTOM_ID && alStore.custom && alStore.custom.data){
+      const el = alCustomEl();
+      if (el){ try { el.currentTime = 0; el.volume = Math.max(0, Math.min(1, alStore.vol)); el.play(); setTimeout(() => { try { el.pause(); } catch (e) {} }, 4500); showToast('تجربة: ' + alStore.custom.name); return; } catch (e) {} }
+      showToast('الصوت المرفوع مش متاح');
+      return;
+    }
     const ids = alSoundIds();
     if (ids.length > 1){
       ids.forEach((id, i) => setTimeout(() => alPlaySound(id, alStore.vol), i * 950));
@@ -5408,7 +5798,7 @@ function getFiltered(){
   function alNotify(){
     try {
       if (window.Notification && Notification.permission === 'granted'){
-        new Notification('⏰ المنبه', { body:(alStore.label ? alStore.label + ' — ' : '') + 'حان الوقت، بيتكرر كل ' + alFmtDur(alStore.dur), tag:'csman_alarm', requireInteraction:true });
+        new Notification('⏰ المنبه', { body:(alStore.label ? alStore.label + ' — ' : '') + 'بيرن ' + alFmtDur(alStore.ringFor) + (alStore.repeat ? ' ثم يكمّل' : ''), tag:'csman_alarm', requireInteraction:true });
       }
     } catch (e) {}
   }
@@ -5425,11 +5815,18 @@ function getFiltered(){
   function alSyncHmsInputs(){
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
     set('alHh', alStore.h); set('alMm', alStore.m); set('alSs', alStore.s);
+    set('alTh', alStore.th); set('alTm', alStore.tm);
+  }
+  function alSetMode(m){
+    alStore.mode = (m === 'time' || m === 'prayer') ? m : 'dur';
+    saveAl();
+    renderAlDash();
   }
   function alChipStart(ms, label){
     alStore.h = Math.floor(ms / 3600000);
     alStore.m = Math.floor((ms % 3600000) / 60000);
     alStore.s = Math.floor((ms % 60000) / 1000);
+    alStore.mode = 'dur';
     alSyncHmsInputs();
     alArm(ms, label);
   }
@@ -5439,18 +5836,135 @@ function getFiltered(){
     const s = Math.max(0, Math.min(59, parseInt((document.getElementById('alSs') || {}).value, 10) || 0));
     alStore.h = h; alStore.m = m; alStore.s = s;
     alStore.hms = h + ':' + m + ':' + s;
-    alStore.dur = Math.max(1000, (h * 3600 + m * 60 + s) * 1000);
+    alStore.dur = Math.max(0, (h * 3600 + m * 60 + s) * 1000);
     saveAl();
     alPaint();
     return alStore.dur;
   }
   function alStartHms(){
-    const d = alSetHms();
-    if (d < 1000){ showToast('اكتب مدة أكبر من صفر'); return; }
-    alArm(d, 'منبه ' + alStore.hms);
+    const raw = alSetHms();
+    if (raw < 1000){ showToast('اكتب مدة أكبر من صفر'); return; }
+    alStore.mode = 'dur';
+    alArm(raw, 'منبه ' + alStore.hms);
+  }
+  /* ── وقت محدد (12 ساعة) ── */
+  function alSetClock(){
+    const th = Math.round(alNum((document.getElementById('alTh') || {}).value, 12, 1, 12));
+    const tm = Math.round(alNum((document.getElementById('alTm') || {}).value, 0, 0, 59));
+    alStore.th = th; alStore.tm = tm;
+    saveAl();
+    const t = alClockTarget();
+    const hint = document.getElementById('alClockHint');
+    if (hint) hint.textContent = t ? ('هيشتغل ' + (t.tomorrow ? 'بكرة ' : 'النهارده ') + alFmtDate12(t.at)) : 'اختر وقت أكبر من دلوقتي';
+    alPaint();
+    return t;
+  }
+  function alClockTarget(){
+    const v = alTo24(alStore.th, alStore.tm, alStore.tap);
+    const now = new Date();
+    const at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), v.h, v.m, 0, 0);
+    let tomorrow = false;
+    if (at.getTime() <= Date.now() + 30000){
+      at.setDate(at.getDate() + 1);
+      tomorrow = true;
+    }
+    return { at:at, tomorrow:tomorrow };
+  }
+  function alToggleAmPm(){
+    alStore.tap = alStore.tap === 'ص' ? 'م' : 'ص';
+    saveAl();
+    alSetClock();
+    renderAlDash();
+  }
+  function alArmClock(silent){
+    const t = alClockTarget();
+    if (!t) return;
+    alStore.mode = 'time';
+    alArmAt(t.at.getTime(), 'منبه ' + alStore.th + ':' + alTwo(alStore.tm) + ' ' + alStore.tap + (t.tomorrow ? ' (بكرة)' : ''));
+  }
+  function alSetDaily(on){
+    alStore.daily = !!on;
+    saveAl();
+    renderAlDash();
+  }
+  /* ── مواقيت الصلاة ── */
+  function alArmPrayer(id, silent){
+    const p = AL_PRAYERS.find(x => x.id === id);
+    if (!p) return;
+    // دوّر على أقرب يوم متاح: الجمعة بتبعد 7 أيام، والباقي 3 أيام (خط عرض عالي ممكن الصلاة ماتظهرش نهارده)
+    const now = Date.now();
+    const lead = (id === 'jumua') ? 0 : alStore.lead;   // الجمعة التذكير بيكون عند الصلاة نفسها
+    const days = (id === 'jumua') ? [0, 7, 14] : [0, 1, 2];
+    let ms = null, shift = 0;
+    for (let i = 0; i < days.length && ms == null; i++){
+      const base = new Date();
+      base.setDate(base.getDate() + days[i]);
+      const t = alPrayerDate(id, base);
+      if (t == null) continue;
+      const at = t - lead * AL_MIN;
+      if (at > now){ ms = at; shift = days[i]; }
+    }
+    if (ms == null){ showToast('الوقت ده مش متاح عند خط العرض ده'); return; }
+    alStore.mode = 'prayer';
+    alStore.prayer = id;
+    const when = shift ? (id === 'jumua' ? ' (الجمعة الجاية)' : ' (بكرة)') : '';
+    alArmAt(ms, lead ? (p.name + ' — ' + alLeadLabel()) : ('أذان ' + p.name + when));
+  }
+  function alSetCity(name){
+    const c = AL_CITIES.find(x => x.n === name);
+    if (c){
+      alStore.city = c.n; alStore.lat = c.lat; alStore.lng = c.lng;
+      // لو الفارق بين توقيت جهازك والتوقيت الرسمي للمدينة ≤ ساعة → نعتبر إنك في نفس الدولة (فرق صيفي) ونسيب توقيت جهازك
+      const mine = -new Date().getTimezoneOffset() / 60;
+      alStore.tz = Math.abs(mine - c.tz) <= 1 ? mine : c.tz;
+    }
+    saveAl();
+    renderAlDash();
+  }
+  function alSetTz(v){
+    alStore.tz = alNum(v, alTz(), -12, 14);
+    saveAl();
+    renderAlDash();
+  }
+  function alSetCoords(kind, v){
+    const n = alNum(v, NaN, kind === 'lat' ? -66 : -180, kind === 'lat' ? 66 : 180);
+    if (!isFinite(n)) return;
+    alStore[kind] = n;
+    alStore.city = 'مخصص';
+    saveAl();
+    renderAlDash();
+  }
+  function alSetMethod(){
+    const f = alNum((document.getElementById('alFajrAng') || {}).value, 19.5, 10, 22);
+    const i = alNum((document.getElementById('alIshaAng') || {}).value, 18, 10, 22);
+    const im = alNum((document.getElementById('alIshaMin') || {}).value, 0, 0, 120);
+    alStore.fajrAng = f; alStore.ishaAng = i; alStore.ishaMin = im;
+    const a = (document.getElementById('alAsr') || {}).value;
+    alStore.asr = (a === '2') ? 2 : 1;
+    saveAl();
+    renderAlDash();
+  }
+  function alSetAllAdj(v){
+    alStore.allAdj = alNum(v, 0, -90, 90);
+    saveAl();
+    renderAlDash();
+  }
+  function alSetAsrAdj(v){
+    alStore.asrAdj = alNum(v, 0, -90, 90);
+    saveAl();
+    renderAlDash();
+  }
+  function alSetLead(m){
+    alStore.lead = Math.round(alNum(m, 0, 0, 24*60));
+    saveAl();
+    renderAlDash();
+  }
+  function alLeadLabel(){
+    const l = AL_LEAD.find(x => x.m === alStore.lead);
+    return l ? l.label : ('قبلها ' + alFmtDur(alStore.lead * AL_MIN));
   }
   function alSetSound(id){
-    alStore.sound = (id === AL_MIX_ID || AL_SOUNDS.some(s => s.id === id)) ? id : AL_MIX_ID;
+    alStore.sound = (id === AL_MIX_ID || id === AL_CUSTOM_ID || AL_SOUNDS.some(s => s.id === id)) ? id : AL_MIX_ID;
     saveAl();
     const panel = document.getElementById('alSndGrid');
     if (panel) panel.querySelectorAll('.al-snd').forEach(b => b.classList.toggle('on', b.dataset.snd === alStore.sound));
@@ -5458,73 +5972,149 @@ function getFiltered(){
     if (lab) lab.textContent = alSoundLabel();
   }
   function alSoundLabel(){
-    return (alStore.sound === AL_MIX_ID) ? 'كل الأصوات بالتناوب' : (AL_SOUNDS.find(s => s.id === alStore.sound) || { name:'—' }).name;
+    if (alStore.sound === AL_MIX_ID) return 'كل الأصوات بالتناوب';
+    if (alStore.sound === AL_CUSTOM_ID) return alStore.custom ? alStore.custom.name : 'صوت مرفوع';
+    return (AL_SOUNDS.find(s => s.id === alStore.sound) || { name:'—' }).name;
   }
   function alSetVol(v){
     alStore.vol = Math.max(0, Math.min(1, (parseFloat(v) || 0)));
     saveAl();
     const lab = document.getElementById('alVol');
     if (lab) lab.textContent = Math.round(alStore.vol * 100) + '%';
+    if (alAudioEl) { try { alAudioEl.volume = alStore.vol; } catch (e) {} }
   }
   function alSetRepeat(on){
     alStore.repeat = !!on;
     saveAl();
     const sw = document.getElementById('alRepeat');
-    if (sw) sw.classList.toggle('on', alStore.repeat);
+    if (sw){
+      sw.classList.toggle('on', alStore.repeat);
+      sw.setAttribute('aria-checked', alStore.repeat ? 'true' : 'false');
+    }
+    const nt = document.getElementById('alRepNote');
+    if (nt) nt.textContent = alStore.repeat
+      ? 'يرن ' + alRepTxt(alStore.ringFor) + ' ثم يسكت ' + alRepTxt(alStore.restFor) + ' ويرجع تاني لحد ما تضغط إيقاف.'
+      : 'يرن مرة واحدة بس ' + alRepTxt(alStore.ringFor) + ' ويقف.';
+  }
+  function alRepTxt(ms){ return alFmtDur(ms); }
+  function alSetRingFor(ms){
+    alStore.ringFor = alNum(ms, 5*AL_MIN, 5000, 6*60*AL_MIN);
+    saveAl();
+    renderAlDash();
+  }
+  function alSetRestFor(ms){
+    alStore.restFor = alNum(ms, AL_MIN, 5000, 60*AL_MIN);
+    saveAl();
+    renderAlDash();
   }
 
   /* ── التحديث الدوري (ساعة + العدّاد + التحقق من الموعد) ── */
   function alEnsureTick(){ if (!alTickTimer) alTickTimer = setInterval(alTick, 250); }
   function alTick(){
-    if (alStore.armed && !alStore.ringing && Date.now() >= alStore.dueAt) alFire();
+    const now = Date.now();
+    if (alStore.armed && !alStore.ringing && now >= alStore.dueAt) alFire();
+    else if (alStore.ringing && alStore.phaseEndsAt && now >= alStore.phaseEndsAt) alCycle();
     alPaint();
   }
+  function alRingingNow(){ return !!(alStore.ringing && alStore.phase === 'ring'); }
 
   function alPaint(){
     const now = new Date();
+    const hj = alHijri(now);
     const clock = document.getElementById('alClock');
     if (clock){
-      clock.innerHTML = alTwo(now.getHours()) + ':' + alTwo(now.getMinutes()) +
+      clock.innerHTML = alH12(now.getHours()) + ':' + alTwo(now.getMinutes()) +
         ':<span class="al-sec">' + alTwo(now.getSeconds()) + '</span>' +
-        '<small>' + alDateText(now) + '</small>';
+        '<b class="al-ap">' + alAp(now.getHours()) + '</b>' +
+        '<small>' + alDateText(now) + (hj ? ' — ' + alTwo(hj.d) + ' ' + AL_HIJRI[hj.m - 1] + ' ' + hj.y + 'هـ <i>(تقريبي)</i>' : '') + '</small>';
     }
-    const ringOn = !!alStore.ringing;
+    const np = document.getElementById('alNextPrayer');
+    if (np){
+      const p = alNextPrayer(now);
+      np.innerHTML = p
+        ? '<i class="ti ' + p.ico + '" aria-hidden="true"></i> أقرب صلاة: <b>' + p.name + '</b> ' + alFmtDate12(p.at) +
+          ' <span class="al-val">(بعد ' + alFmtDur(p.at - now.getTime()) + ')</span>'
+        : '<i class="ti ti-calendar" aria-hidden="true"></i> مواقيت الصلاة مش متاحة عند خط العرض ده';
+    }
+
+    const ring = alRingingNow();
+    const rest = !!(alStore.ringing && alStore.phase === 'rest');
     const total = Math.max(1000, alStore.dur);
-    const left = ringOn ? total : (alStore.armed ? Math.max(0, alStore.dueAt - Date.now()) : total);
-    const p = Math.max(0, Math.min(1, left / total));
+    let left, lbl, p, numTxt, capTxt = null;
+    let atClock = false;
+    // الرقم الكبير = وقت رنين المنبه (لو الوقت محدد)، والعد التنازلي تحته بوحدات صريحة
+    const capFor = ms => (ms >= 3600000 ? 'ساعة : دقيقة : ثانية' : 'دقيقة : ثانية');
+    if (ring || rest){
+      left = Math.max(0, alStore.phaseEndsAt - Date.now());
+      p = ring ? (left / Math.max(1000, alStore.ringFor)) : (left / Math.max(1000, alStore.restFor));
+      lbl = ring ? 'يرن الآن' : 'استراحة — هيرن تاني';
+      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer') && !!alStore.dueAt;
+      numTxt = atClock ? alFmtDate12(new Date(alStore.dueAt)) : alFmtClock(left);
+      if (!atClock) capTxt = capFor(left);
+    }
+    else if (alStore.armed){
+      left = Math.max(0, alStore.dueAt - Date.now());
+      p = left / total;
+      // وضع الوقت/الصلاة: الرقم الكبير = وقت رنين المنبه، والعد التنازلي تحته بوحدات صريحة
+      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer') && !!alStore.dueAt;
+      if (atClock){
+        numTxt = alFmtDate12(new Date(alStore.dueAt));
+        lbl = 'المتبقي ' + alFmtDur(left);
+      } else {
+        numTxt = alFmtClock(left);
+        lbl = 'المتبقي';
+        capTxt = capFor(left);
+      }
+    }
+    else {
+      left = total; p = 1;
+      const idle = alStore.mode === 'prayer' ? 'وقت الصلاة' : (alStore.mode === 'time' ? 'الوقت المضبوط' : 'مدة المنبه');
+      if (alStore.mode === 'prayer' || alStore.mode === 'time'){ numTxt = idle; lbl = 'ابدأ المنبه'; }
+      else { numTxt = alFmtClock(total); lbl = idle; capTxt = capFor(total); }
+    }
     const num = document.getElementById('alRingNum');
-    if (num) num.textContent = alFmtClock(left);
-    const lbl = document.getElementById('alRingLbl');
-    if (lbl) lbl.textContent = ringOn ? 'يرن الآن' : (alStore.armed ? 'المتبقي' : 'مدة المنبه');
+    if (num){
+      num.textContent = numTxt;
+      num.classList.toggle('isclock', !!atClock);
+    }
+    const lblEl = document.getElementById('alRingLbl');
+    if (lblEl) lblEl.textContent = lbl;
+    const capEl = document.getElementById('alRingCap');
+    if (capEl){
+      if (capTxt){ capEl.textContent = capTxt; capEl.hidden = false; }
+      else capEl.hidden = true;
+    }
     const arc = document.getElementById('alArc');
-    if (arc) arc.style.strokeDashoffset = String(AL_CIRC * (1 - p));
+    if (arc){ arc.style.strokeDashoffset = String(AL_CIRC * (1 - Math.max(0, Math.min(1, p)))); arc.classList.toggle('rest', rest); }
     const card = document.getElementById('alRingCard');
-    if (card) card.classList.toggle('ring-flash', ringOn);
+    if (card) card.classList.toggle('ring-flash', ring);
     const st = document.getElementById('alState');
     if (st){
-      st.className = 'al-state' + (ringOn ? ' ring' : (alStore.armed ? ' on' : ''));
-      st.textContent = ringOn ? 'يرن الآن — أوقفه أو أجّله'
-        : (alStore.armed ? 'مفعّل · ' + (alStore.label || 'منبه') : 'متوقف — اضبط المدة وابدأ');
+      st.className = 'al-state' + (ring ? ' ring' : (rest ? ' rest' : (alStore.armed ? ' on' : '')));
+      st.textContent = ring ? '⏰ يرن الآن — اضغط إيقاف'
+        : (rest ? 'استراحة قصيرة — يرن تاني بعد ' + alFmtClock(Math.max(0, alStore.phaseEndsAt - Date.now()))
+        : (alStore.armed ? 'مفعّل · ' + (alStore.label || 'منبه') : 'متوقف — اختار المدة أو الوقت وابدأ'));
     }
     const go = document.getElementById('alGo');
-    if (go) go.innerHTML = (alStore.armed || ringOn)
+    if (go) go.innerHTML = (alStore.armed || alStore.ringing)
       ? '<i class="ti ti-refresh"></i> إعادة الضبط'
       : '<i class="ti ti-player-play"></i> ابدأ المنبه';
     const stop = document.getElementById('alStopBtn');
-    if (stop) stop.disabled = !alStore.armed && !ringOn;
+    if (stop) stop.disabled = !alStore.armed && !alStore.ringing;
     const sn = document.getElementById('alSnoozeBtn');
-    if (sn) sn.disabled = !ringOn;
-    if (ringOn) alTitleOnSet(); else alTitleOff();
+    if (sn) sn.disabled = !alStore.ringing;
+    if (ring) alTitleOnSet(); else alTitleOff();
 
-    const sb = document.getElementById('edDashBtn');
+    const sb = document.getElementById('alDashBtn');
     if (sb){
-      sb.classList.toggle('al-badge', !!(alStore.armed || ringOn));
-      sb.classList.toggle('al-ringing', ringOn);
+      sb.classList.toggle('al-badge', !!(alStore.armed || alStore.ringing));
+      sb.classList.toggle('al-ringing', ring);
     }
-    if (edTab === 'alarm'){
+    if (showAlDash){
       const badge = document.getElementById('countBadge');
-      if (badge) badge.textContent = ringOn ? 'المنبه يرن الآن'
-        : (alStore.armed ? 'منبه مفعّل · ' + alFmtClock(left) : 'منبه');
+      if (badge) badge.textContent = ring ? 'المنبه يرن الآن'
+        : (rest ? 'منبه · استراحة'
+        : (alStore.armed ? 'منبه · ' + alFmtClock(left) : 'منبه'));
     }
     alOverlaySync();
   }
@@ -5550,42 +6140,169 @@ function getFiltered(){
     document.body.appendChild(d);
   }
   function alOverlaySync(){
-    if (!alStore.ringing) return;
-    alBuildOverlay();
     const ov = document.getElementById('alOverlay');
     if (!ov) return;
-    const onPanel = edTab === 'alarm' && !!document.getElementById('alPanel');
+    if (!alRingingNow()){ ov.classList.remove('open'); return; }
+    alBuildOverlay();
+    const onPanel = showAlDash && !!document.getElementById('alPanel');
     ov.classList.toggle('open', !onPanel);
     if (!onPanel){
       const m = document.getElementById('alOvMsg');
-      if (m) m.textContent = (alStore.label ? alStore.label + ' — ' : '') + 'حان الوقت! بيرن كل ' + alFmtDur(alStore.dur) + ' لحد ما توقفه';
+      if (m) m.textContent = (alStore.label ? alStore.label + ' — ' : '') + 'بيرن ' + alFmtDur(alStore.ringFor) +
+        (alStore.repeat ? ' ثم يسكت شوية ويكمل' : ' لحد ما توقفه');
     }
   }
 
   /* ── الواجهة ── */
-  function alTabsHtml(){
-    const on = !!(alStore.armed || alStore.ringing);
-    return `<div class="ed-subtabs" role="tablist" aria-label="تبويبات المحرر">
-      <button class="ed-subtab${edTab === 'editor' ? ' active' : ''}" onclick="edSetTab('editor')" role="tab" aria-selected="${edTab === 'editor'}"><i class="ti ti-code" aria-hidden="true"></i> المحرر</button>
-      <button class="ed-subtab${edTab === 'alarm' ? ' active' : ''}${on ? ' has-alarm' : ''}" onclick="edSetTab('alarm')" role="tab" aria-selected="${edTab === 'alarm'}"><i class="ti ti-alarm" aria-hidden="true"></i> المنبه
-        <span class="al-dot"></span>${on ? '<span class="al-tag">' + (alStore.ringing ? 'يرن' : 'مفعّل') + '</span>' : ''}
-      </button>
-    </div>`;
+  function alOpts(from, to, step, lead, sel){
+    const st = step || 1, pad = !!lead;
+    let s = '';
+    for (let i = from; i <= to; i += st) s += '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + (pad ? alTwo(i) : i) + '</option>';
+    return s;
   }
-
-  function alPanelHtml(){
+  function alSegHtml(modes){
+    return `<div class="al-seg" role="tablist" aria-label="نوع المنبه">` + modes.map(x =>
+      `<button class="al-segi${alStore.mode === x[0] ? ' on' : ''}" onclick="alSetMode('${x[0]}')" role="tab" aria-selected="${alStore.mode === x[0]}">
+        <i class="ti ${x[2]}" aria-hidden="true"></i> ${x[1]}</button>`).join('') + `</div>`;
+  }
+  function alModeHtml(){
+    if (alStore.mode === 'time'){
+      const t = alClockTarget();
+      return `<div class="al-tp">
+          <select class="al-sel" id="alTh" onchange="alSetClock()" aria-label="الساعة">${alOpts(1, 12, 1, false, alStore.th)}</select>
+          <span class="al-tp-c">:</span>
+          <select class="al-sel" id="alTm" onchange="alSetClock()" aria-label="الدقيقة">${alOpts(0, 59, 1, true, alStore.tm)}</select>
+          <button class="al-ampm${alStore.tap === 'م' ? ' pm' : ''}" id="alAmPm" onclick="alToggleAmPm()" aria-label="صباح أم مساء">${alStore.tap}</button>
+          <button class="al-btn go" onclick="alArmClock()"><i class="ti ti-player-play"></i> ابدأ</button>
+        </div>
+        <div class="al-note" id="alClockHint">${t ? 'هيشتغل ' + (t.tomorrow ? 'بكرة ' : 'النهارده ') + alFmtDate12(t.at) : ''}</div>
+        <div class="al-row">
+          <label>يتكرر كل يوم</label>
+          <span class="al-sw${alStore.daily ? ' on' : ''}" id="alDaily" onclick="alSetDaily(!alStore.daily)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();alSetDaily(!alStore.daily)}" role="switch" aria-checked="${alStore.daily}" tabindex="0" aria-label="يتكرر كل يوم"></span>
+          <span class="al-note" style="margin:0">لو الوقت عدّى، بينتقل لليوم اللي بعده تلقائيًا</span>
+        </div>`;
+    }
+    if (alStore.mode === 'prayer'){
+      const now = new Date();
+      const day = alSolarDay(now);
+      const rows = AL_PRAYERS.map(p => {
+        const at = alPrayerDate(p.id, now);
+        const past = (at != null && at <= Date.now());
+        // الجمعة: لو آخر جمعة عدّت، اعرض الجمعة الجاية بنفس وقت الصلاة
+        let mins = (day || {})[p.id];
+        if (p.id === 'jumua' && past){
+          const nx = new Date(now.getTime() + 7*24*60*AL_MIN);
+          mins = (alSolarDay(new Date(nx.getFullYear(), nx.getMonth(), nx.getDate(), 0, 0, 0, 0)) || {}).jumua;
+        }
+        const shown = past && p.id !== 'jumua' && mins != null
+          ? alFmtMins(mins) + ' <span class="al-val">(عدّى)</span>'
+          : alFmtMins(mins) + (p.id === 'jumua' ? ' <span class="al-val">(آخر جمعة)</span>' : '');
+        // وقت التذكير الفعلي = وقت الصلاة − مدة التذكير المختارة
+        let rem = '';
+        const leadRow = (p.id === 'jumua') ? 0 : alStore.lead;
+        if (leadRow > 0 && mins != null){
+          const rm = mins - leadRow;
+          rem = rm >= 0
+            ? '<span class="al-rem">تنبيه ' + alFmtMins(rm) + '</span>'
+            : '<span class="al-rem">تنبيه اليوم اللي فات</span>';
+        }
+        return `<div class="al-prow${alStore.prayer === p.id ? ' sel' : ''}">
+          <span class="al-pn"><i class="ti ${p.ico}" aria-hidden="true"></i> ${p.name}</span>
+          <span class="al-pt">${shown}${rem}</span>
+          <button class="al-btn mini${alStore.prayer === p.id ? ' on' : ''}" onclick="alArmPrayer('${p.id}')" ${at ? '' : 'disabled'}>${alStore.prayer === p.id ? 'محدد' : 'اضبط'}</button>
+        </div>`;
+      }).join('');
+      const cities = AL_CITIES.map(c => `<option value="${c.n}"${alStore.city === c.n ? ' selected' : ''}>${c.n}</option>`).join('');
+      const leadChips = AL_LEAD.map(l => `<button class="al-chip sm${alStore.lead === l.m ? ' on' : ''}" onclick="alSetLead(${l.m})" title="اضبط المنبه ${l.label === 'عند الصلاة' ? 'في وقت الصلاة' : l.label}">${l.label}</button>`).join('');
+      const tzs = alTz();
+      const tzsTxt = (tzs >= 0 ? '+' : '') + alTwo(Math.floor(Math.abs(tzs))) + (Math.abs(tzs) % 1 ? ':30' : ':00');
+      return `<div class="al-prow-row">
+          <label for="alCity">المدينة</label>
+          <select class="al-sel wide" id="alCity" onchange="alSetCity(this.value)">${cities}<option value="مخصص"${AL_CITIES.some(c => c.n === alStore.city) ? '' : ' selected'}>مخصص</option></select>
+        </div>
+        <div class="al-row">
+          <label for="alLat">خط العرض</label>
+          <input class="al-num wide" id="alLat" type="number" step="0.01" min="-66" max="66" value="${alStore.lat.toFixed(3)}" onchange="alSetCoords('lat', this.value)" aria-label="خط العرض">
+          <label for="alLng">خط الطول</label>
+          <input class="al-num wide" id="alLng" type="number" step="0.01" min="-180" max="180" value="${alStore.lng.toFixed(3)}" onchange="alSetCoords('lng', this.value)" aria-label="خط الطول">
+        </div>
+        <div class="al-row">
+          <label for="alTz" title="فرق توقيت مدينتك عن Greenwich — زود ساعة لو عندك توقيت صيفي">التوقيت</label>
+          <input class="al-num" id="alTz" type="number" step="0.5" min="-12" max="14" value="${tzs}" onchange="alSetTz(this.value)" aria-label="فرق التوقيت عن UTC">
+          <span class="al-unit">UTC ${tzsTxt}</span>
+        </div>
+        <div class="al-prow-row" style="margin:14px 0 0">
+          <label>التنبيه قبل الصلاة</label>
+          <span class="al-chips inline" id="alLeadChips">${leadChips}</span>
+        </div>
+        <div class="al-row" style="margin-top:8px">
+          <label>يتكرر كل يوم</label>
+          <span class="al-sw${alStore.daily ? ' on' : ''}" id="alDaily" onclick="alSetDaily(!alStore.daily)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();alSetDaily(!alStore.daily)}" role="switch" aria-checked="${alStore.daily}" tabindex="0" aria-label="يتكرر كل يوم"></span>
+          <span class="al-note" style="margin:0">يعيد الضبط تلقائيًا كل يوم على نفس الصلاة بنفس مقدار التذكير</span>
+        </div>
+        <div class="al-ptable">${rows}</div>
+        <div class="al-row">
+          <label for="alFajrAng">الفجر</label>
+          <input class="al-num" id="alFajrAng" type="number" step="0.5" min="10" max="22" value="${alStore.fajrAng}" onchange="alSetMethod()" aria-label="زاوية الفجر">
+          <span class="al-unit">°</span>
+          <label for="alIshaAng">العشاء</label>
+          <input class="al-num" id="alIshaAng" type="number" step="0.5" min="10" max="22" value="${alStore.ishaAng}" onchange="alSetMethod()" aria-label="زاوية العشاء">
+          <span class="al-unit">°</span>
+          <label for="alAsr">العصر</label>
+          <select class="al-sel" id="alAsr" onchange="alSetMethod()" aria-label="مذهب العصر">
+            <option value="1"${alStore.asr === 1 ? ' selected' : ''}>شافعي</option>
+            <option value="2"${alStore.asr === 2 ? ' selected' : ''}>حنفي</option>
+          </select>
+        </div>
+        <div class="al-row">
+          <label for="alAllAdj" title="زيّ كل المواقيت معًا عشان تطابق جدول مسجدك">تصحيح عام</label>
+          <input class="al-num" id="alAllAdj" type="number" step="1" min="-90" max="90" value="${alStore.allAdj}" onchange="alSetAllAdj(this.value)" aria-label="تصحيح عام بالدقائق">
+          <span class="al-unit">د</span>
+          <label for="alAsrAdj" title="لو وقت العصر مختلف عندك">العصر</label>
+          <input class="al-num" id="alAsrAdj" type="number" step="1" min="-90" max="90" value="${alStore.asrAdj}" onchange="alSetAsrAdj(this.value)" aria-label="تصحيح وقت العصر بالدقائق">
+          <span class="al-unit">د</span>
+        </div>
+        <div class="al-note">محسوبة فلكيًا للمدينة المختارة (الافتراضي القاهرة، زاوية الفجر 19.5° والعشاء 18°). المواقيت بتوقيت مدينتك لا بتوقيت جهازك. <b>قارنها بجدول مسجدك</b> — دار الإفتاء المصرية بتنشر جداول بتوقيت شرعي مختلف عن الزوال الشمسي، استخدم «تصحيح عام» لمطابقتها.</div>`;
+    }
     const chips = AL_PRESETS.map(p => {
       const ms = p.m * AL_MIN;
       const on = !alStore.armed && !alStore.ringing && Math.abs(alStore.dur - ms) < 1000;
       return `<button class="al-chip${on ? ' on' : ''}${p.m === 5 ? ' hero' : ''}" onclick="alChipStart(${ms}, 'منبه ${p.label}')" title="ابدأ المنبه ${p.label}">${p.label}</button>`;
     }).join('');
+    return `<div class="al-chips">${chips}</div>
+      <div class="al-row">
+        <label for="alHh">ساعة : دقيقة : ثانية</label>
+        <input class="al-num" id="alHh" type="number" min="0" max="23" value="${alStore.h}" inputmode="numeric" oninput="alSetHms()" aria-label="ساعات">
+        <input class="al-num" id="alMm" type="number" min="0" max="59" value="${alStore.m}" inputmode="numeric" oninput="alSetHms()" aria-label="دقائق">
+        <input class="al-num" id="alSs" type="number" min="0" max="59" value="${alStore.s}" inputmode="numeric" oninput="alSetHms()" aria-label="ثواني">
+        <button class="al-btn go" onclick="alStartHms()"><i class="ti ti-player-play"></i> ابدأ</button>
+      </div>
+      <div class="al-note">الافتراضي <b>5 دقائق</b> من دلوقتي.</div>`;
+  }
+  function alPanelHtml(){
     const sounds = AL_SOUNDS.map(s => {
       const on = alStore.sound === s.id;
       const bars = s.eq.map(h => '<i style="height:' + h + 'px"></i>').join('');
       return `<button class="al-snd${on ? ' on' : ''}" data-snd="${s.id}" onclick="alSetSound('${s.id}')" title="جرّب: ${s.name}"><span class="al-eq">${bars}</span>${s.name}</button>`;
     }).join('');
-    const mixOn = alStore.sound === AL_MIX_ID;
     const mBars = [16,7,12,5,16,9,14,6].map(h => '<i style="height:' + h + 'px"></i>').join('');
+    const cOn = alStore.sound === AL_CUSTOM_ID;
+    const cTile = alStore.custom
+      ? `<div class="al-cfile">
+           <i class="ti ti-music" aria-hidden="true"></i>
+           <span class="al-cname" title="${alStore.custom.name}">${alStore.custom.name}</span>
+           <span class="al-val">${Math.round((alStore.custom.data.length * 0.75) / 1024)} ك.ب</span>
+           <button class="al-x" onclick="alClearCustom()" title="مسح الصوت المرفوع" aria-label="مسح الصوت المرفوع"><i class="ti ti-x"></i></button>
+         </div>`
+      : '';
+    const ringChips = AL_RING_FOR.map(r => {
+      const on = Math.abs(alStore.ringFor - r.m * AL_MIN) < 1000;
+      return `<button class="al-chip sm${on ? ' on' : ''}" onclick="alSetRingFor(${r.m * AL_MIN})">${r.label}</button>`;
+    }).join('');
+    const restChips = AL_REST_FOR.map(r => {
+      const on = Math.abs(alStore.restFor - r.s * 1000) < 1000;
+      return `<button class="al-chip sm${on ? ' on' : ''}" onclick="alSetRestFor(${r.s * 1000})">${r.label}</button>`;
+    }).join('');
 
     return `<div class="al-grid" id="alPanel">
       <div class="al-col">
@@ -5599,6 +6316,7 @@ function getFiltered(){
             <div class="al-ring-txt">
               <div class="al-ring-num" id="alRingNum">00:00</div>
               <div class="al-ring-lbl" id="alRingLbl">مدة المنبه</div>
+              <div class="al-ring-cap" id="alRingCap" hidden>ساعة : دقيقة : ثانية</div>
             </div>
           </div>
           <div class="al-state" id="alState">متوقف</div>
@@ -5614,30 +6332,30 @@ function getFiltered(){
 
         <div class="al-card">
           <div class="al-card-title"><i class="ti ti-clock" aria-hidden="true"></i> الساعة الآن</div>
-          <div class="al-clock" id="alClock">--:--:--</div>
+          <div class="al-clock" id="alClock">--:--:-- <b class="al-ap">—</b></div>
+          <div class="al-next" id="alNextPrayer"><i class="ti ti-calendar" aria-hidden="true"></i> …</div>
         </div>
       </div>
 
       <div class="al-col">
         <div class="al-card">
-          <div class="al-card-title"><i class="ti ti-timer" aria-hidden="true"></i> مدة المنبه — اضغط أي مدة للبدء فورًا</div>
-          <div class="al-chips">${chips}</div>
-          <div class="al-row">
-            <label for="alHh">ساعة : دقيقة : ثانية</label>
-            <input class="al-num" id="alHh" type="number" min="0" max="23" value="${alStore.h}" inputmode="numeric" oninput="alSetHms()" aria-label="ساعات">
-            <input class="al-num" id="alMm" type="number" min="0" max="59" value="${alStore.m}" inputmode="numeric" oninput="alSetHms()" aria-label="دقائق">
-            <input class="al-num" id="alSs" type="number" min="0" max="59" value="${alStore.s}" inputmode="numeric" oninput="alSetHms()" aria-label="ثواني">
-            <button class="al-btn go" onclick="alStartHms()"><i class="ti ti-player-play"></i> ابدأ</button>
-          </div>
-          <div class="al-note">الافتراضي <b>5 دقائق</b> — لو ما قفلتهوش بيرن تاني كل نفس المدة لحد ما تضغط <b>إيقاف</b>.</div>
+          <div class="al-card-title"><i class="ti ti-target" aria-hidden="true"></i> اضبط المنبه</div>
+          ${alSegHtml([['dur','مدة من دلوقتي','ti-timer'], ['time','وقت محدد','ti-clock'], ['prayer','صلاة','ti-moon']])}
+          ${alModeHtml()}
         </div>
 
         <div class="al-card">
           <div class="al-card-title"><i class="ti ti-volume" aria-hidden="true"></i> الصوت — المختار: <span id="alSndLabel">${alSoundLabel()}</span></div>
           <div class="al-sounds" id="alSndGrid">
-            <button class="al-snd${mixOn ? ' on' : ''}" data-snd="mix" onclick="alSetSound('mix')" title="كل الأصوات بالتناوب"><span class="al-eq">${mBars}</span>كل الأصوات</button>
+            <button class="al-snd${alStore.sound === AL_MIX_ID ? ' on' : ''}" data-snd="mix" onclick="alSetSound('mix')" title="كل الأصوات بالتناوب"><span class="al-eq">${mBars}</span>كل الأصوات</button>
             ${sounds}
+            <button class="al-snd up${cOn ? ' on' : ''}" data-snd="custom" onclick="alOpenFile()" title="ارفع صوتك (MP3/WAV/OGG) — الحد 2.5 ميجا">
+              <i class="ti ti-upload" aria-hidden="true"></i> ${alStore.custom ? 'تغيير الصوتي' : 'صوتي'}
+            </button>
           </div>
+          <input type="file" id="alFileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac" style="display:none" onchange="alPickFile(this)">
+          ${cTile}
+          ${cOn ? `<div class="al-note">الصوت المرفوع بيتكرر طول مدة الرن من أوله لآخره (loop).</div>` : ''}
           <div class="al-row" style="margin-top:14px">
             <label for="alVolRange">مستوى الصوت</label>
             <input class="al-range" id="alVolRange" type="range" min="0" max="100" value="${Math.round(alStore.vol * 100)}" oninput="alSetVol(this.value/100)" aria-label="مستوى الصوت">
@@ -5646,41 +6364,81 @@ function getFiltered(){
         </div>
 
         <div class="al-card">
-          <div class="al-card-title"><i class="ti ti-settings" aria-hidden="true"></i> خيارات</div>
+          <div class="al-card-title"><i class="ti ti-repeat" aria-hidden="true"></i> نمط الرن — لحد ما تصحى</div>
           <div class="al-row">
-            <label>تكرار الرن</label>
-            <span class="al-sw${alStore.repeat ? ' on' : ''}" id="alRepeat" onclick="alSetRepeat(!alStore.repeat)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();alSetRepeat(!alStore.repeat)}" role="switch" aria-checked="${alStore.repeat}" tabindex="0" aria-label="تكرار الرن"></span>
-            <span class="al-note" style="margin:0">لما يخلص الرن يرجع تاني كل ${alFmtDur(alStore.dur)}</span>
+            <label>يرن لمدة</label>
+            <span class="al-chips inline" id="alRingChips">${ringChips}</span>
+          </div>
+          <div class="al-row">
+            <label>ثم يسكت</label>
+            <span class="al-chips inline" id="alRestChips">${restChips}</span>
+          </div>
+          <div class="al-row">
+            <label>يكمّل بلا توقف</label>
+            <span class="al-sw${alStore.repeat ? ' on' : ''}" id="alRepeat" onclick="alSetRepeat(!alStore.repeat)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();alSetRepeat(!alStore.repeat)}" role="switch" aria-checked="${alStore.repeat}" tabindex="0" aria-label="يكمّل بلا توقف"></span>
+            <span class="al-note" style="margin:0" id="alRepNote">${alStore.repeat ? 'يرن ' + alRepTxt(alStore.ringFor) + ' ثم يسكت ' + alRepTxt(alStore.restFor) + ' ويرجع تاني لحد ما تضغط إيقاف.' : 'يرن مرة واحدة بس ' + alRepTxt(alStore.ringFor) + ' ويقف.'}</span>
           </div>
           <div class="al-row">
             <label>إشعارات النظام</label>
             <button class="al-btn" style="flex:0 0 auto;padding:7px 13px" onclick="alAskNotify()"><i class="ti ti-bell"></i> تفعيل</button>
             <span class="al-note" style="margin:0">عشان ينبهك حتى لو كنت في تاب تاني</span>
           </div>
-          <div class="al-note">الصفحة لازم تكون مفتوحة (أو في التاب ده) — المتصفح بيوقف المؤقتات في التاب المخفي، فبمجرد ما ترجع الصفحة بيرن فورًا لو الوقت عدّى.</div>
+          <div class="al-note">الصفحة لازم تكون مفتوحة — المتصفح بيوقف المؤقتات في التاب المخفي، فبمجرد ما ترجع الصفحة بيرن فورًا لو الوقت عدّى.</div>
         </div>
       </div>
     </div>`;
   }
 
   function alGoClick(){
+    if (alStore.mode === 'prayer'){
+      if (alStore.armed || alStore.ringing) alDisarm(true);
+      if (alStore.prayer) alArmPrayer(alStore.prayer); else { alSetMode('prayer'); showToast('اختار الصلاة اللي عايزها'); }
+      return;
+    }
+    if (alStore.mode === 'time'){
+      if (alStore.armed || alStore.ringing) alDisarm(true);
+      alArmClock();
+      return;
+    }
     if (alStore.armed || alStore.ringing) alDisarm(true);
     alStartHms();
   }
   function alGoToPanel(){
-    edTab = 'alarm';
-    saveEdTab();
-    if (showEdDash){ renderEdDash(); alOverlaySync(); return; }
-    toggleEdDash();
+    if (showAlDash) return;
+    toggleAlDash();
+  }
+  function alSyncDash(){
+    if (!showAlDash) return;
+    const other = showHomeDash || showHasDash || showScrollbarDash || showCvDash || showVdDash ||
+                  showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash ||
+                  showRtDash || showPvDash;
+    if (other){
+      showAlDash = false;
+      const b = document.getElementById('alDashBtn');
+      if (b) b.classList.remove('al-active');
+    }
+  }
+  function toggleAlDash(){
+    showAlDash = !showAlDash;
+    const btn = document.getElementById('alDashBtn');
+    if (btn) btn.classList.toggle('al-active', showAlDash);
+    if (showAlDash){
+      document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+      const home = document.getElementById('homeBtn');
+      if (home) home.classList.remove('home-active');
+      showHomeDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
+      showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false;
+      showQrDash = false; showCpDash = false; showRtDash = false; showPvDash = false;
+    }
+    renderAll();
   }
 
-  function renderAlPanel(){
+  function renderAlDash(){
     document.getElementById('mainBody').innerHTML = `<div class="has-dash">
-      <div class="ed-builder">
-        <div class="ed-builder-title"><i class="ti ti-alarm" style="color:#38bdf8" aria-hidden="true"></i> المنبه — ساعة وتنبيه صوتي
+      <div class="al-builder">
+        <div class="al-builder-title"><i class="ti ti-alarm" aria-hidden="true"></i> المنبه — ساعة وتنبيه صوتي
           <span>اضغط أي مدة وابدأ فورًا · لو ما قفلتهوش بيرن تاني بأصوات مختلفة لحد ما توقفه</span>
         </div>
-        ${alTabsHtml()}
         ${alPanelHtml()}
       </div>
     </div>`;
@@ -6019,12 +6777,6 @@ function getFiltered(){
   }
 
   function renderEdDash(){
-    if (edTab === 'alarm'){
-      const badge = document.getElementById('countBadge');
-      if (badge) badge.textContent = alStore.ringing ? 'المنبه يرن الآن'
-        : (alStore.armed ? 'منبه مفعّل · ' + alFmtClock(Math.max(0, alStore.dueAt - Date.now())) : 'منبه');
-      return renderAlPanel();
-    }
     const sn = activeVdSnippet();
     const totalVersions = vdStore.snippets.reduce((a, s) => a + s.versions.length, 0);
     document.getElementById('countBadge').textContent = totalVersions + ' نسخة · محرر';
@@ -6043,8 +6795,6 @@ function getFiltered(){
         <div class="ed-builder-title"><span style="display:inline-flex;color:#38bdf8">${svgIcon('code', 18)}</span> محرر الأكواد — تعديل سريع
           <span>كود ملون ومرقّم الأسطر، مرتبط بمربعات أداة «النسخ» — أي لصق أو حفظ ينشئ نسخة وترجع للمقارنة وقت ما تحب</span>
         </div>
-
-        ${alTabsHtml()}
 
         <div class="vd-section-title" style="margin-top:0"><i class="ti ti-folders" style="color:var(--accent-warm)"></i> المربعات (السنيبتات)</div>
         <div class="vd-tabs">${tabsHtml}</div>
@@ -6180,7 +6930,12 @@ function getFiltered(){
 
   // ── RENDER ──
   function renderAll(){
-    if(showPvDash && (showHasDash || showScrollbarDash || showCvDash || showVdDash || showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash || showRtDash)){
+    try { return renderAllInner(); }
+    finally { alOverlaySync(); }
+  }
+  function renderAllInner(){
+    alSyncDash();
+    if(showPvDash && (showHasDash || showScrollbarDash || showCvDash || showVdDash || showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash || showRtDash || showAlDash)){
       showPvDash = false;
       const b = document.getElementById('pvDashBtn');
       if (b) b.classList.remove('pv-active');
@@ -6190,6 +6945,7 @@ function getFiltered(){
     persistDashState();
     setDashHash(currentDashId());
     if(showHomeDash) return renderHomeDash();
+    if(showAlDash) return renderAlDash();
     if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
     if(showCvDash) return renderCvDash();
@@ -10033,6 +10789,7 @@ function hello() {
 
   function currentDashId(){
     if(showHomeDash) return 'home';
+    if(showAlDash) return 'al';
     if(showHasDash) return 'has';
     if(showScrollbarDash) return 'sb';
     if(showCvDash) return 'cv';
@@ -10057,13 +10814,14 @@ function hello() {
   function restoreDashState(){
     let id = 'home';
     try { id = localStorage.getItem(DASH_KEY) || 'home'; } catch (e) {}
-    if (!['home','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'].includes(id)) id = 'home';
+    if (!['home','al','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'].includes(id)) id = 'home';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
       if (sub && sub.b64) b64ActiveTab = sub.b64;
     } catch (e) {}
     showHomeDash = id === 'home';
+    showAlDash = id === 'al';
     showHasDash = id === 'has';
     showScrollbarDash = id === 'sb';
     showCvDash = id === 'cv';
@@ -10080,6 +10838,7 @@ function hello() {
       if (b) b.classList.toggle(cls, on);
     };
     mark('homeBtn', 'home-active', showHomeDash);
+    mark('alDashBtn', 'al-active', showAlDash);
     mark('hasDashBtn', 'has-active', showHasDash);
     mark('sbDashBtn', 'scrollbar-active', showScrollbarDash);
     mark('cvDashBtn', 'cv-active', showCvDash);
@@ -10100,10 +10859,10 @@ function hello() {
     } catch (e) { return ''; }
   }
   function clearDashFlags(){
-    showHomeDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
+    showHomeDash = false; showAlDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
     showVdDash = false; showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
     showCpDash = false; showRtDash = false; showPvDash = false;
-    const map = { homeBtn:'home-active', hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+    const map = { homeBtn:'home-active', alDashBtn:'al-active', hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
       vdDashBtn:'vd-active', edDashBtn:'ed-active', devDashBtn:'dev-active',
       b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active',
       pvDashBtn:'pv-active' };
@@ -10128,7 +10887,7 @@ function hello() {
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['home','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
+    const ids = ['home','al','has','sb','cv','vd','ed','dev','b64','qr','cp','rt','pv'];
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -10136,12 +10895,13 @@ function hello() {
     } catch (e) {}
     clearDashFlags();
     if (h && ids.includes(h)) {
-      const map = { home:['homeBtn','home-active'], has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
+      const map = { home:['homeBtn','home-active'], al:['alDashBtn','al-active'], has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
         vd:['vdDashBtn','vd-active'], ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
         b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
         rt:['rtDashBtn','rt-active'], pv:['pvDashBtn','pv-active'] };
       const btn = map[h];
       if (h === 'home') showHomeDash = true;
+      else if (h === 'al') showAlDash = true;
       else if (h === 'has') showHasDash = true;
       else if (h === 'sb') showScrollbarDash = true;
       else if (h === 'cv') showCvDash = true;
@@ -10184,7 +10944,18 @@ function hello() {
   // ── ALARM BOOTSTRAP — يشتغل مع الصفحة ويستمر في أي تاب ──
   alEnsureTick();
   alBuildOverlay();
-  if (alStore.armed && !alStore.ringing && Date.now() >= alStore.dueAt) alFire();
+  if (alStore.ringing){
+    // الصفحة اتقفلت وهو بيرن → كمّل نفس المرحلة، أو ارجع للرن لو الاستراحة خلصت
+    const restLeft = (alStore.phase === 'rest') ? alStore.phaseEndsAt - Date.now() : 0;
+    if (alStore.phase === 'rest' && restLeft > 1000){
+      alStore.phaseEndsAt = Date.now() + Math.min(restLeft, alStore.restFor);
+    } else {
+      alStore.phase = 'ring';
+      alStore.phaseEndsAt = Date.now() + alStore.ringFor;
+    }
+    saveAl();
+    alRingStart();
+  } else if (alStore.armed && Date.now() >= alStore.dueAt) alFire();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) alTick(); });
   window.addEventListener('focus', alTick);
   window.addEventListener('pageshow', alTick);
