@@ -1086,8 +1086,18 @@
       <span class="ob-label">Size <span id="val-healSize" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">20</span></span>
       <div class="range-wrap" id="wrap-healSize" style="width:90px;"><input id="healSize" type="range" min="1" max="200" value="20" /></div>
       <div class="ob-sep"></div>
+      <span class="ob-label">Hardness <span id="val-healHardness" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">40%</span></span>
+      <div class="range-wrap" id="wrap-healHardness" style="width:90px;"><input id="healHardness" type="range" min="1" max="100" value="40" /></div>
+      <div class="ob-sep"></div>
       <span class="ob-label">Opacity <span id="val-healOpacity" style="font-family:var(--pf-mono);color:var(--pf-text-muted);">100%</span></span>
       <div class="range-wrap" id="wrap-healOpacity" style="width:90px;"><input id="healOpacity" type="range" min="1" max="100" value="100" /></div>
+      <div class="ob-sep"></div>
+      <span class="ob-label">Mode:</span>
+      <select id="healMode" style="width:100px;">
+        <option value="blend">Blend (Default)</option>
+        <option value="enhance">Enhance</option>
+        <option value="strong">Strong</option>
+      </select>
       <div class="ob-sep"></div>
       <button class="ib" id="healSetSource" title="Pick source"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Source</button>
       <span class="ob-label ob-hint">Alt+click to set source</span>
@@ -1806,6 +1816,19 @@
   <button class="export-item" data-export="saveas"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Save As… (choose file name)</button>
 </div>
 
+<!-- New Canvas Modal -->
+<div class="modal-overlay" id="newCanvasModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Create New Canvas</h3><button class="modal-close" id="closeNewCanvas">&times;</button></div>
+    <div class="modal-body">
+      <div class="ctrl-row"><div class="ctrl-label">Width (px)</div><input type="number" id="ncW" class="color-input" value="800" min="1" max="10000" /></div>
+      <div class="ctrl-row"><div class="ctrl-label">Height (px)</div><input type="number" id="ncH" class="color-input" value="600" min="1" max="10000" /></div>
+      <div class="ctrl-row"><div class="ctrl-label">Name (optional)</div><input type="text" id="ncName" class="color-input" placeholder="e.g., My Design" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" id="cancelNewCanvas">Cancel</button><button class="btn btn-primary" id="createNewCanvas">Create</button></div>
+  </div>
+</div>
+
 <!-- Image Size Modal -->
 <div class="modal-overlay" id="imageSizeModal">
   <div class="modal">
@@ -2099,7 +2122,7 @@
     wandTolerance:32,qselSize:12,qselTol:35,selExpand:0,
     autoSelect:false,autoSelectMode:"layer",showTransformCtl:true,
     ployMode:false,samplerMode:false,rulerMode:false,mageraseMode:false,patternStamp:false,patchMode:false,bgEraser:false,spongeMode:"desaturate",
-    penColor:"#ffffff",penSize:4,cloneSize:20,cloneOpacity:100,cloneHardness:100,healSize:20,healOpacity:100,
+    penColor:"#ffffff",penSize:4,cloneSize:20,cloneOpacity:100,cloneHardness:100,healSize:20,healOpacity:100,healHardness:40,healModeBrush:"blend",
     artboards:[],artboardActive:null,artboardExportOnly:true};
   let strokes=[],originalImage=null;
   let layers=[],activeLayerIdx=0,nextLayerId=1;
@@ -2339,7 +2362,22 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
 
   /* ===================== HISTORY ===================== */
   function cloneStrokes(){return strokes.map(s=>({...s,points:s.points.slice()}));}
-  function cloneLayersRefs(){return layers.map(l=>({...l}));}
+  function cloneLayersRefs(){
+    return layers.map(l=>{
+      const layerCopy={...l};
+      if(l.canvas){
+        const tempCanvas=mkCanvas(l.canvas.width,l.canvas.height);
+        tempCanvas.getContext("2d").drawImage(l.canvas,0,0);
+        layerCopy.canvas=tempCanvas;
+      }
+      if(l.mask&&l.mask.canvas){
+        const maskCopy=mkCanvas(l.mask.canvas.width,l.mask.canvas.height);
+        maskCopy.getContext("2d").drawImage(l.mask.canvas,0,0);
+        layerCopy.mask={...l.mask,canvas:maskCopy};
+      }
+      return layerCopy;
+    });
+  }
   function mkEntry(label){
     return {label:label||"Edit",adjust:pickAdjust(),textOverlay:state.textOverlay?{...state.textOverlay}:null,strokes:cloneStrokes(),layers:cloneLayersRefs(),layerIdx:activeLayerIdx,groups:(groups||[]).map(g=>({...g}))};
   }
@@ -2353,19 +2391,20 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   function applyEntry(e){
     if(!e)return;
     Object.assign(state,e.adjust||{});state.textOverlay=e.textOverlay?{...e.textOverlay}:null;strokes=e.strokes||[];
-    if(e.layers){layers=e.layers.map(l=>({...l}));if(layers[0])originalImage=layers[0].canvas;}
+    if(e.layers){layers=e.layers;if(layers[0])originalImage=layers[0].canvas;}
     if(e.groups)groups=e.groups.map(g=>({...g}));
     if(typeof e.layerIdx==="number")activeLayerIdx=Math.max(0,Math.min(e.layerIdx,layers.length-1));
   }
   function undo(){
     if(!undoStack.length||!originalImage)return;
     redoStack.push(mkEntry("Redo: "+(undoStack[undoStack.length-1].label||"Edit")));
-    applyEntry(undoStack.pop());syncControlsFromState();updateToggleButtons();renderImmediately();renderHistory();renderLayers();saveProject();updateQe();renderTabBar();
+    applyEntry(undoStack.pop());syncControlsFromState();updateToggleButtons();renderImmediately();renderHistory();renderLayers();saveProject();updateQe();renderTabBar();toast("Undo: "+(undoStack[undoStack.length-1]?.label||"Edit"),"info",1000);
   }
   function redo(){
     if(!redoStack.length||!originalImage)return;
-    undoStack.push(mkEntry((redoStack[redoStack.length-1].label||"Edit").replace(/^Redo: /,"")));
-    applyEntry(redoStack.pop());syncControlsFromState();updateToggleButtons();renderImmediately();renderHistory();renderLayers();saveProject();updateQe();renderTabBar();
+    const redoLabel=(redoStack[redoStack.length-1].label||"Edit").replace(/^Redo: /,"");
+    undoStack.push(mkEntry(redoLabel));
+    applyEntry(redoStack.pop());syncControlsFromState();updateToggleButtons();renderImmediately();renderHistory();renderLayers();saveProject();updateQe();renderTabBar();toast("Redo: "+redoLabel,"info",1000);
   }
   function jumpHistory(idx){
     if(!undoStack.length)return;const entry=undoStack[idx];if(!entry)return;
@@ -2387,7 +2426,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     for(const r of RANGES){const inp=$(r.id);if(inp)inp.value=state[r.id];}
     const SMAP={drawSize:["val-drawSize",state.drawSize+""],drawOpacity:["val-drawOpacity",state.drawOpacity+"%"],drawHardness:["val-drawHardness",state.drawHardness+"%"],drawFlow:["val-drawFlow",state.drawFlow+"%"],
       penSize:["val-penSize",state.penSize+""],cloneSize:["val-cloneSize",state.cloneSize+""],cloneOpacity:["val-cloneOpacity",state.cloneOpacity+"%"],cloneHardness:["val-cloneHardness",state.cloneHardness+"%"],
-      healSize:["val-healSize",state.healSize+""],healOpacity:["val-healOpacity",state.healOpacity+"%"],wandTolerance:["val-wandTolerance",String(state.wandTolerance!=null?state.wandTolerance:32)],
+      healSize:["val-healSize",state.healSize+""],healOpacity:["val-healOpacity",state.healOpacity+"%"],healHardness:["val-healHardness",state.healHardness+"%"],wandTolerance:["val-wandTolerance",String(state.wandTolerance!=null?state.wandTolerance:32)],
       gradientOpacity:["val-gradientOpacity",state.gradientOpacity+"%"],smudgeSize:["val-smudgeSize",state.smudgeSize+""],smudgeStrength:["val-smudgeStrength",state.smudgeStrength+"%"],
       dodgeSize:["val-dodgeSize",state.dodgeSize+""],dodgeExposure:["val-dodgeExposure",state.dodgeExposure+"%"]};
     for(const id in SMAP){const inp=$(id);if(inp)inp.value=state[id];const v=$(SMAP[id][0]);if(v)v.textContent=SMAP[id][1];}
@@ -2414,8 +2453,8 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       commit("Adjust "+(SLIDER_LABELS[r.id]||r.id));
     }});
   }
-  const TOOL_SLIDER_FIELDS={drawSize:"drawSize",drawOpacity:"drawOpacity",drawHardness:"drawHardness",drawFlow:"drawFlow",penSize:"penSize",cloneSize:"cloneSize",cloneOpacity:"cloneOpacity",cloneHardness:"cloneHardness",healSize:"healSize",healOpacity:"healOpacity",wandTolerance:"wandTolerance",gradientOpacity:"gradientOpacity",smudgeSize:"smudgeSize",smudgeStrength:"smudgeStrength",dodgeSize:"dodgeSize",dodgeExposure:"dodgeExposure"};
-const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpacity:"%",cloneHardness:"%",healOpacity:"%",gradientOpacity:"%",smudgeStrength:"%",dodgeExposure:"%"};
+  const TOOL_SLIDER_FIELDS={drawSize:"drawSize",drawOpacity:"drawOpacity",drawHardness:"drawHardness",drawFlow:"drawFlow",penSize:"penSize",cloneSize:"cloneSize",cloneOpacity:"cloneOpacity",cloneHardness:"cloneHardness",healSize:"healSize",healOpacity:"healOpacity",healHardness:"healHardness",wandTolerance:"wandTolerance",gradientOpacity:"gradientOpacity",smudgeSize:"smudgeSize",smudgeStrength:"smudgeStrength",dodgeSize:"dodgeSize",dodgeExposure:"dodgeExposure"};
+const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpacity:"%",cloneHardness:"%",healOpacity:"%",healHardness:"%",gradientOpacity:"%",smudgeStrength:"%",dodgeExposure:"%"};
   function bindToolSlider(id){
     const input=$(id);if(!input)return;
     const wrap=$("wrap-"+id),bubble=wrap?wrap.querySelector(".range-bubble"):null;
@@ -3577,6 +3616,16 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const v=$("val-backdrop");if(v)v.textContent=state.backdrop||"Transparent";
     const c=$("backdropColor");if(c)c.value=state.backdrop||"#ffffff";
     const b=$("backdropTransparent");if(b)b.classList.toggle("active",!state.backdrop);
+  }
+  function showNewCanvasDialog(){
+    const modal=$("newCanvasModal");if(!modal)return;
+    const w=$("ncW"),h=$("ncH");
+    if(w)w.value="800";
+    if(h)h.value="600";
+    modal.classList.add("open");
+  }
+  function closeNewCanvasDialog(){
+    const modal=$("newCanvasModal");if(modal)modal.classList.remove("open");
   }
   function loadImageFile(file){loadImageFileP(file);}
   let imageLoadChain=Promise.resolve();
@@ -6269,21 +6318,64 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   }
   function doHeal(x,y){
     const L=layers[activeLayerIdx];if(!L||!cloneSource||!cloneOffset)return;
-    const lctx=L.canvas.getContext("2d");
-    const size=Math.max(2,Number(state.healSize)||20),brush=softBrush(size,40);
+    const lctx=L.canvas.getContext("2d",{willReadFrequently:true});
+    const size=Math.max(2,Number(state.healSize)||20);
+    const hardness=Math.max(1,Number(state.healHardness)||40);
+    const mode=state.healModeBrush||"blend";
+    const brush=softBrush(size,hardness);
     const sx=x+cloneOffset.dx,sy=y+cloneOffset.dy;
     const cw=L.canvas.width,chh=L.canvas.height;
     const srcX=Math.max(0,Math.floor(clamp(sx-size/2,0,cw))),srcY=Math.max(0,Math.floor(clamp(sy-size/2,0,chh)));
     const w=Math.min(size,cw-srcX),hh=Math.min(size,chh-srcY);
     if(w<=0||hh<=0)return;
+    
     const sc=mkCanvas(size,size),sctx=sc.getContext("2d");
     sctx.drawImage(L.canvas,srcX,srcY,w,hh,0,0,size,size);
     sctx.save();sctx.globalCompositeOperation="destination-in";sctx.drawImage(brush,0,0);sctx.restore();
+    
+    const destImageData=lctx.getImageData(Math.floor(x-size/2),Math.floor(y-size/2),size,size);
+    const srcImageData=sctx.getImageData(0,0,size,size);
+    const destData=destImageData.data;
+    const srcData=srcImageData.data;
     const op=clamp((state.healOpacity!=null?state.healOpacity:100)/100,0.05,1);
-    stampMasked(lctx,c=>{
-      c.save();c.globalAlpha=op*0.45;c.globalCompositeOperation="overlay";c.drawImage(sc,x-size/2,y-size/2);
-      c.globalAlpha=op*0.55;c.globalCompositeOperation="source-over";c.drawImage(sc,x-size/2,y-size/2);c.restore();
-    });
+    
+    if(mode==="enhance"){
+      for(let i=0;i<destData.length;i+=4){
+        const src_a=srcData[i+3]/255;
+        const dest_r=destData[i],dest_g=destData[i+1],dest_b=destData[i+2];
+        const src_r=srcData[i],src_g=srcData[i+1],src_b=srcData[i+2];
+        const lum_dest=0.299*dest_r+0.587*dest_g+0.114*dest_b;
+        const lum_src=0.299*src_r+0.587*src_g+0.114*src_b;
+        const lum_diff=lum_src-lum_dest;
+        const blend=op*src_a*0.6;
+        destData[i]=clamp(dest_r+lum_diff*blend,0,255);
+        destData[i+1]=clamp(dest_g+lum_diff*blend,0,255);
+        destData[i+2]=clamp(dest_b+lum_diff*blend,0,255);
+      }
+    }else if(mode==="strong"){
+      for(let i=0;i<destData.length;i+=4){
+        const src_a=srcData[i+3]/255;
+        const blend=op*src_a*0.8;
+        destData[i]=Math.round(destData[i]*(1-blend)+srcData[i]*blend);
+        destData[i+1]=Math.round(destData[i+1]*(1-blend)+srcData[i+1]*blend);
+        destData[i+2]=Math.round(destData[i+2]*(1-blend)+srcData[i+2]*blend);
+      }
+    }else{
+      for(let i=0;i<destData.length;i+=4){
+        const src_a=srcData[i+3]/255;
+        const dest_r=destData[i],dest_g=destData[i+1],dest_b=destData[i+2];
+        const src_r=srcData[i],src_g=srcData[i+1],src_b=srcData[i+2];
+        const lum_dest=0.299*dest_r+0.587*dest_g+0.114*dest_b;
+        const lum_src=0.299*src_r+0.587*src_g+0.114*src_b;
+        const lum_diff=lum_src-lum_dest;
+        const blend=op*src_a*0.45;
+        destData[i]=clamp(Math.round(destData[i]+lum_diff*blend),0,255);
+        destData[i+1]=clamp(Math.round(destData[i+1]+lum_diff*blend),0,255);
+        destData[i+2]=clamp(Math.round(destData[i+2]+lum_diff*blend),0,255);
+      }
+    }
+    
+    lctx.putImageData(destImageData,Math.floor(x-size/2),Math.floor(y-size/2));
   }
   function paintSegmentTo(p){
     const L=layers[activeLayerIdx];if(!L)return;
@@ -6347,10 +6439,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       else{c.strokeStyle=state.penColor||state.fgColor;}
       c.lineWidth=Math.max(1,state.penSize);c.lineCap="round";c.lineJoin="round";
       c.beginPath();
-      if(pts.length>=2){c.moveTo((pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2);
-        for(let i=1;i<pts.length-1;i++)c.quadraticCurveTo(pts[i].x,pts[i].y,(pts[i].x+pts[i+1].x)/2,(pts[i].y+pts[i+1].y)/2);
-        c.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);}
-      else{c.lineTo(pts[0].x+0.01,pts[0].y+0.01);}
+      if(pts.length>=1){c.moveTo(pts[0].x,pts[0].y);
+        for(let i=1;i<pts.length;i++)c.lineTo(pts[i].x,pts[i].y);}
+      else{c.lineTo(0.01,0.01);}
       c.stroke();c.restore();
     });
   }
@@ -6883,6 +6974,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>{if(longTimer){clearTimeout(longTimer);longTimer=null;}}));
       b.addEventListener("click",e=>{
         if(suppressClick){suppressClick=false;e.stopPropagation();return;}
+        if(!originalImage){e.preventDefault();showNewCanvasDialog();return;}
         if(b.dataset.group){
           const rect=b.getBoundingClientRect();
           const onArrow=(e.clientX-rect.left)>rect.width-14&&(e.clientY-rect.top)>rect.height-14;
@@ -7691,7 +7783,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     bindToolSlider("drawHardness");bindToolSlider("drawFlow");
     bindToolSlider("penSize");
     bindToolSlider("cloneSize");bindToolSlider("cloneOpacity");bindToolSlider("cloneHardness");
-    bindToolSlider("healSize");bindToolSlider("healOpacity");bindToolSlider("wandTolerance");
+    bindToolSlider("healSize");bindToolSlider("healOpacity");bindToolSlider("healHardness");bindToolSlider("wandTolerance");
     bindToolSlider("gradientOpacity");
     bindToolSlider("smudgeSize");bindToolSlider("smudgeStrength");
     bindToolSlider("dodgeSize");bindToolSlider("dodgeExposure");
@@ -7729,6 +7821,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     $("gradientType")&&$("gradientType").addEventListener("change",e=>{state.gradientType=e.target.value;});
     $("smudgeMode")&&$("smudgeMode").addEventListener("change",e=>{state.smudgeType=e.target.value;});
     $("dodgeMode")&&$("dodgeMode").addEventListener("change",e=>{state.dodgeType=e.target.value;});
+    $("healMode")&&$("healMode").addEventListener("change",e=>{state.healModeBrush=e.target.value;});
     const spM=$("spongeMode");
     if(spM)spM.addEventListener("change",e=>{state.spongeMode=e.target.value;});
     if($("lassoMode")){
@@ -7940,7 +8033,20 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     $("imgSizeW").addEventListener("input",()=>{if($("imgSizeLock").checked&&originalImage){const ratio=originalImage.height/originalImage.width;$("imgSizeH").value=Math.round(Number($("imgSizeW").value)*ratio);}});
     $("imgSizeH").addEventListener("input",()=>{if($("imgSizeLock").checked&&originalImage){const ratio=originalImage.width/originalImage.height;$("imgSizeW").value=Math.round(Number($("imgSizeH").value)*ratio);}});
 
-    /* NEW: New tab button */
+    /* New Canvas Modal */
+    $("closeNewCanvas")&&$("closeNewCanvas").addEventListener("click",closeNewCanvasDialog);
+    $("cancelNewCanvas")&&$("cancelNewCanvas").addEventListener("click",closeNewCanvasDialog);
+    $("createNewCanvas")&&$("createNewCanvas").addEventListener("click",()=>{
+      const w=Number($("ncW").value),h=Number($("ncH").value),name=$("ncName").value||"";
+      if(w<1||h<1||w>10000||h>10000){toast("Invalid canvas size.","error");return;}
+      closeNewCanvasDialog();
+      createBlankDocument(w,h,name);
+    });
+    $("ncW").addEventListener("keydown",e=>{if(e.key==="Enter")$("createNewCanvas").click();});
+    $("ncH").addEventListener("keydown",e=>{if(e.key==="Enter")$("createNewCanvas").click();});
+    $("ncName").addEventListener("keydown",e=>{if(e.key==="Enter")$("createNewCanvas").click();});
+
+    /* NEW: New tab button -->
     $("tabNewBtn")&&$("tabNewBtn").addEventListener("click",()=>newEmptyTab());
 
     /* NEW: Canvas Size modal */
