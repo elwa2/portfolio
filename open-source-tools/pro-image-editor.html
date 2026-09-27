@@ -6867,37 +6867,46 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     if(pasteNewBtn)pasteNewBtn.addEventListener("click",pasteFromClipboardNewTab);
 
     /* Keyboard */
+    /* e.key بيتغير مع لغة الكيبورد (عربي/إنجليزي)، e.code = المفتاح الفيزيائي.
+       بنطبّع كل الاختصارات على حروف US عشان تشتغل مع أي لوحة مفاتيح. */
+    const KEYMAP={BracketLeft:"[",BracketRight:"]",Semicolon:";",Quote:"'",Comma:",",Period:".",Slash:"/",Backslash:"\\",Minus:"-",Equal:"=",Backquote:"`",Space:" ",Tab:"Tab",Enter:"Enter",Escape:"Escape",Delete:"Delete",Backspace:"Backspace",ArrowLeft:"ArrowLeft",ArrowUp:"ArrowUp",ArrowRight:"ArrowRight",ArrowDown:"ArrowDown"};
+    const keyOf=e=>{
+      const c=e.code||"";
+      if(/^Key[A-Z]$/.test(c))return c.slice(3).toLowerCase();
+      if(/^Digit[0-9]$/.test(c))return c.slice(5);
+      if(KEYMAP[c]!==undefined)return KEYMAP[c];
+      return (e.key||"").toLowerCase();
+    };
     window.addEventListener("keydown",e=>{
-      const c=e.ctrlKey||e.metaKey,tag=(e.target.tagName||"").toLowerCase(),editable=tag==="input"||tag==="textarea"||e.target.isContentEditable;
-      if(c&&e.key.toLowerCase()==="z"&&!editable){e.preventDefault();undo();return;}
-      if(!editable&&((c&&e.key.toLowerCase()==="y")||(c&&e.shiftKey&&e.key.toLowerCase()==="z"))){e.preventDefault();redo();return;}
-      if(c&&e.key.toLowerCase()==="o"&&!editable){e.preventDefault();fileInput.value="";fileInput.click();return;}
-      if(c&&e.key.toLowerCase()==="a"&&!editable){if(originalImage){e.preventDefault();selectAllCanvas();}return;}
-      if(c&&!e.shiftKey&&e.key.toLowerCase()==="c"&&!editable){e.preventDefault();copyCurrentSelection(false);return;}
-      if(c&&e.key.toLowerCase()==="x"&&!editable){if(selectionData){e.preventDefault();copyCurrentSelection(true).then(ok=>{if(ok&&selectionData)deleteSelectionContent();});}return;}
-      if(c&&e.key.toLowerCase()==="v"&&!editable){if(appCopyBuffer){e.preventDefault();pasteBuffer();}return;}
-      if(c&&e.key.toLowerCase()==="t"&&!editable&&!e.shiftKey){e.preventDefault();if(transformState)applyTransform();else startTransform();return;}
-      if(c&&e.shiftKey&&e.key.toLowerCase()==="t"&&!editable){e.preventDefault();newEmptyTab();return;}
-      if(c&&e.key.toLowerCase()==="j"&&!editable){e.preventDefault();e.shiftKey?layerViaCut():layerViaCopy();return;}
-      if(c&&e.key==="Tab"&&tabs.length>1){e.preventDefault();const ix=tabs.findIndex(t=>t.id===activeTabId);const nt=tabs[(ix+(e.shiftKey?-1:1)+tabs.length)%tabs.length];if(nt)focusTab(nt.id);return;}
-      if(c&&!e.altKey&&!e.shiftKey&&(e.key==="w"||e.key==="W")&&!editable){e.preventDefault();if(activeTabId!=null)closeTab(activeTabId);return;}
-      if(c&&e.key.toLowerCase()==="g"&&!editable){e.preventDefault();state.gridOverlay=!state.gridOverlay;drawCropOverlay();return;}
-      if(c&&e.key.toLowerCase()==="d"&&!editable){e.preventDefault();clearSelection();return;}
-      if(c&&e.key.toLowerCase()==="i"&&!editable){e.preventDefault();if(state.maskPaint&&activeHasMask())invertMask();else invertSelection();return;}
+      const c=e.ctrlKey||e.metaKey,k=keyOf(e),tag=(e.target.tagName||"").toLowerCase(),editable=tag==="input"||tag==="textarea"||e.target.isContentEditable;
+      if(c&&k==="z"&&!editable){e.preventDefault();undo();return;}
+      if(!editable&&((c&&k==="y")||(c&&e.shiftKey&&k==="z"))){e.preventDefault();redo();return;}
+      if(c&&k==="o"&&!editable){e.preventDefault();fileInput.value="";fileInput.click();return;}
+      if(c&&k==="a"&&!editable){if(originalImage){e.preventDefault();selectAllCanvas();}return;}
+      if(c&&!e.shiftKey&&k==="c"&&!editable){e.preventDefault();copyCurrentSelection(false);return;}
+      if(c&&k==="x"&&!editable){if(selectionData){e.preventDefault();copyCurrentSelection(true).then(ok=>{if(ok&&selectionData)deleteSelectionContent();});}return;}
+      if(c&&k==="v"&&!editable){if(appCopyBuffer){e.preventDefault();pasteBuffer();}return;}
+      if(c&&k==="t"&&!editable&&!e.shiftKey){e.preventDefault();if(transformState)applyTransform();else startTransform();return;}
+      if(c&&e.shiftKey&&k==="t"&&!editable){e.preventDefault();newEmptyTab();return;}
+      if(c&&k==="j"&&!editable){e.preventDefault();e.shiftKey?layerViaCut():layerViaCopy();return;}
+      if(c&&k==="Tab"&&tabs.length>1){e.preventDefault();const ix=tabs.findIndex(t=>t.id===activeTabId);const nt=tabs[(ix+(e.shiftKey?-1:1)+tabs.length)%tabs.length];if(nt)focusTab(nt.id);return;}
+      if(c&&!e.altKey&&!e.shiftKey&&k==="w"&&!editable){e.preventDefault();if(activeTabId!=null)closeTab(activeTabId);return;}
+      if(c&&k==="g"&&!editable){e.preventDefault();state.gridOverlay=!state.gridOverlay;drawCropOverlay();return;}
+      if(c&&k==="d"&&!editable){e.preventDefault();clearSelection();return;}
+      if(c&&k==="i"&&!editable){e.preventDefault();if(state.maskPaint&&activeHasMask())invertMask();else invertSelection();return;}
       if(!c&&e.key==="Alt"&&!editable){e.preventDefault();startAltPick();return;}
       if((e.key==="Delete"||e.key==="Backspace")&&!editable&&originalImage){
         if(selectionData){if(!(state.drawMode||state.textMode)){e.preventDefault();deleteSelectionContent();}}
         else if(!state.textMode){e.preventDefault();deleteLayer();}
         return;
       }
-      if(e.key==="?"&&!editable){e.preventDefault();showShortcutsModal();return;}
+      if((k==="?"||(e.code==="Slash"&&e.shiftKey))&&!editable){e.preventDefault();showShortcutsModal();return;}
       if(!editable&&e.altKey&&!c){
-        const k=e.key.toLowerCase();
         if(k==="j"){e.preventDefault();openJpgQualityModal();return;}
         if(k==="p"){e.preventDefault();try{saveAllImages("png",true);}catch(err){hideLoading();toast("Save failed.","error");}return;}
         if(k==="w"){e.preventDefault();closeAllTabs();return;}
       }
-      if(e.key===" "&&!editable&&!c){e.preventDefault();if(originalImage&&hasAnyEdits()){state.showOriginal=!state.showOriginal;renderImmediately();}return;}
+      if(e.code==="Space"&&!editable&&!c){e.preventDefault();if(originalImage&&hasAnyEdits()){state.showOriginal=!state.showOriginal;renderImmediately();}return;}
       if(e.key==="Enter"&&state.ployMode){finalizePloy();return;}
       if(e.key==="Enter"&&state.cropMode){applyCrop();return;}
       if(e.key==="Enter"&&transformState){applyTransform();return;}
@@ -6926,12 +6935,12 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
           return;
         }
       }
-      if(e.key.toLowerCase()==="x"&&!editable&&!c){const tmp=state.fgColor;state.fgColor=state.bgColor;state.bgColor=tmp;updateColorSwatches();return;}
-      if(e.key.toLowerCase()==="d"&&!editable&&!c){state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");return;}
-      if(!editable&&!c&&(e.key==="["||e.key==="]")){e.preventDefault();changeBrushSize(e.key==="["?-1:1);return;}
+      if(k==="x"&&!editable&&!c){const tmp=state.fgColor;state.fgColor=state.bgColor;state.bgColor=tmp;updateColorSwatches();return;}
+      if(k==="d"&&!editable&&!c){state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");return;}
+      if(!editable&&!c&&(k==="["||k==="]")){e.preventDefault();changeBrushSize(k==="["?-1:1);return;}
       if(!editable&&!c){
         const tm={v:"move",m:"marquee",l:"lasso",w:"wand",q:"qsel",c:"crop",i:"eyedropper",a:"artboard",j:"heal",b:"brush",s:"clone",e:"eraser",g:"gradient",r:"blur",o:"dodge",p:"pen",t:"text",u:"shape",h:"hand",z:"zoom"};
-        const tool=tm[e.key.toLowerCase()];
+        const tool=tm[k];
         if(tool){if(TOOL_GROUPS[tool])selectGroupTool(tool);else selectTool(tool);}
       }
     });
