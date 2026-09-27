@@ -232,50 +232,47 @@
   .cell.pop i { animation: pop .34s cubic-bezier(.34,1.56,.64,1); }
   @keyframes pop { 0% { transform: scale(.7); } 58% { transform: scale(1.22); } 100% { transform: scale(1); } }
 
-  /* ===== حالة اليوم: اليوم مميّز، الماضي قابل للتعديل، المستقبل مقفل ===== */
-  /* عمود/صف اليوم */
-  .grid th.day-head.today, .gdays .dcol.today, .gdays .pctcol.today {
-    background: linear-gradient(180deg, rgba(79, 110, 247, .30), rgba(79, 110, 247, .14)) !important;
+  /* ===== حالة اليوم: كل الأيام شيك بوكس قابل للتعديل، واليوم مميّز بالستروك ===== */
+
+  /* --- عمود اليوم: خط رأسي (ستروك) ممتد من رأس العمود لآخر صف --- */
+  .grid th.day-head.today,
+  .grid td.cell-td.is-today,
+  .grid tr.stat-row td.is-today {
+    background: rgba(79, 110, 247, .12);
+    box-shadow: inset 3px 0 0 var(--accent), inset -3px 0 0 var(--accent);
+  }
+  .grid th.day-head.today {
+    background: linear-gradient(180deg, rgba(79, 110, 247, .34), rgba(79, 110, 247, .16)) !important;
     color: var(--accent); position: relative;
   }
-  .grid th.day-head.future { opacity: .5; }
-  .grid th.day-head.today::after, .gdays .dcol.today::after {
+  .grid th.day-head.today::after {
     content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 3px;
-    background: var(--accent); border-radius: 3px 3px 0 0;
+    background: var(--accent);
   }
-  .grid th.day-head.today .dn, .gdays .dcol.today .dn { color: var(--accent); font-weight: 900; }
+  .grid th.day-head.today .dn { color: var(--accent); font-weight: 900; }
 
-  /* خانة اليوم نفسه */
-  .cell-td.is-today { background: rgba(79, 110, 247, .13); box-shadow: inset 1px 0 0 rgba(79, 110, 247, .30), inset -1px 0 0 rgba(79, 110, 247, .30); }
-  .cell.is-today i { border-color: var(--accent); border-width: 2px; box-shadow: 0 0 0 3px rgba(79, 110, 247, .16); }
+  /* --- خانة اليوم: شيك بوكس بإطار مميّز --- */
+  .cell-td { position: relative; }
+  .cell.is-today i {
+    border-color: var(--accent); border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, .18);
+  }
+  .cell i { position: relative; }
   .cell.is-today:not(.done) i::after {
-    content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); transform: translate(11px, -11px);
+    content: ""; position: absolute; inset-inline-end: -3px; top: -3px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--surface);
   }
 
-  /* المستقبل: مقفل — غير قابل للتعديل */
-  .cell.is-future { cursor: not-allowed; }
-  .cell.is-future i {
-    border-style: dashed; border-color: var(--border); opacity: .45;
-    background: transparent; color: transparent;
-  }
-  .cell.is-future:hover i { border-color: var(--border); background: transparent; }
-  .cell.is-future::after {
-    content: "🔒"; position: absolute; font-size: 9px; opacity: .5;
-    transform: translate(9px, -9px); pointer-events: none;
-  }
-  .cell-td.is-future { background: repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(255, 255, 255, .022) 5px, rgba(255, 255, 255, .022) 10px); }
-  .cell-td.is-future .cell { pointer-events: none; }
-  .cell.is-past i { border-color: var(--border-strong); }
+  /* --- كل الأيام متاحة: مفيش قفل لأي يوم (بصريًا) --- */
+  .cell-td { transition: background .15s; }
 
-  /* صف اليوم المستقبلي في جدول الأيام (موبايل) */
-  .gdays tr.day-row.is-future { opacity: .55; }
-  .gdays tr.day-row.is-future .dcol, .gdays tr.day-row.is-future .pctcol { color: var(--muted); }
-  .gdays tr.day-row.is-today { background: rgba(79, 110, 247, .10); }
+  /* صفوف الأيام (موبايل): صفوف = أيام */
+  .gdays tr.day-row.is-today { background: rgba(79, 110, 247, .12); }
+  .gdays .dcol.today { box-shadow: inset 0 0 0 2px var(--accent); }
 
   .grid .habit-row:hover .habit-cell, .grid .habit-row:hover .cell-td { background: var(--surface-2); }
-  .grid .habit-row:hover .cell-td.is-today { background: rgba(79, 110, 247, .17); }
-  .grid .habit-row:hover .cell-td.is-future { background: repeating-linear-gradient(135deg, transparent, transparent 5px, rgba(255, 255, 255, .022) 5px, rgba(255, 255, 255, .022) 10px); }
+  .grid .habit-row:hover .cell-td.is-today { background: rgba(79, 110, 247, .18); }
   .habit-cell { display: flex; align-items: center; gap: 7px; }
   .habit-cell .h-name { font-size: 12.5px; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .habit-cell .h-actions { display: flex; gap: 4px; opacity: .3; transition: opacity .2s; }
@@ -340,6 +337,36 @@
     .gdays .cell { height: 48px; }
     .gdays .cell i { width: 34px; height: 34px; }
   }
+
+  /* ======== زر الإعدادات + لمبة حالة المزامنة ======== */
+  .gs-tools { display: flex; align-items: center; gap: 6px; flex: none; }
+  .icon-btn {
+    width: 34px; height: 34px; display: grid; place-items: center; flex: none;
+    border-radius: 11px; border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--muted); cursor: pointer; transition: all .2s;
+  }
+  .icon-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--hover); transform: rotate(35deg); }
+  .icon-btn svg { width: 18px; height: 18px; display: block; }
+  .icon-btn[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  .led-btn {
+    width: 22px; height: 34px; display: grid; place-items: center; flex: none;
+    border: 0; background: none; cursor: pointer; padding: 0;
+  }
+  .led {
+    width: 11px; height: 11px; border-radius: 50%; background: var(--border-strong);
+    box-shadow: 0 0 0 3px rgba(148,163,184,.10); transition: all .25s;
+  }
+  .led.off { background: var(--border-strong); }
+  .led.busy { background: var(--warn); box-shadow: 0 0 0 3px rgba(251,191,36,.18); animation: ledpulse 1s ease-in-out infinite; }
+  .led.ok { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft), 0 0 12px rgba(45,212,160,.75); animation: ledpulse 2.4s ease-in-out infinite; }
+  .led.err { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft), 0 0 12px rgba(248,113,113,.6); animation: ledshake 2.6s ease-in-out infinite; }
+  @keyframes ledpulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .62; transform: scale(.86); } }
+  @keyframes ledshake { 0%,84%,100% { transform: translateX(0); } 88% { transform: translateX(-2px); } 92% { transform: translateX(2px); } 96% { transform: translateX(-1px); } }
+
+  .gs-panel { animation: gsOpen .22s ease-out; margin-bottom: 12px; }
+  .gs-panel[hidden] { display: none; }
+  @keyframes gsOpen { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
   /* ======== Google Sheets sync ======== */
   .gs { display: grid; gap: 10px; }
@@ -440,10 +467,21 @@
     <span class="logo" aria-hidden="true">✅</span>
     <h1>متتبع العادات</h1>
     <span class="yr">2026</span>
-    <span class="tagline">اضغط المربّع لتعليم العادة — الدائرة الخضراء = تم · اليوم مميّز والأيام الجاية مقفولة</span>
+    <span class="tagline">اضغط المربّع لتعليم العادة — الدائرة الخضراء = تم · عمود النهارده مميّز</span>
   </div>
   <div class="top-actions">
     <span class="today-chip" id="todayChip"><i class="live" aria-hidden="true"></i><span class="txt"></span></span>
+    <div class="gs-tools">
+      <button class="icon-btn" id="gsToggle" type="button" aria-expanded="false" aria-controls="gsPanel" aria-label="إعدادات ربط Google Sheets" title="إعدادات ربط Google Sheets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.2" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9.1A1.7 1.7 0 0 0 10.13 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.05a1.7 1.7 0 0 0 1.56 1.02H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03z" />
+        </svg>
+      </button>
+      <button class="led-btn" id="gsLedBtn" type="button" title="حالة المزامنة" aria-label="حالة المزامنة">
+        <span class="led off" id="gsLed" aria-hidden="true"></span>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -451,58 +489,60 @@
   <nav class="tabs" id="tabs" aria-label="الأشهر"></nav>
 
   <section id="monthView">
-    <div class="card">
-      <div class="card-head">
-        <h2><span class="dot"></span> ☁️ ربط Google Sheets</h2>
-        <span class="hint" id="gsBadge">غير مفعّل</span>
-      </div>
-      <div class="gs">
-        <div class="gs-row">
-          <label for="gsUrl">رابط السكربت</label>
-          <input id="gsUrl" type="text" spellcheck="false" placeholder="https://script.google.com/macros/s/XXXX.../exec" />
+    <section class="gs-panel" id="gsPanel" hidden>
+      <div class="card">
+        <div class="card-head">
+          <h2><span class="dot"></span> ⚙️ ربط Google Sheets</h2>
+          <span class="hint" id="gsBadge">غير مربوط</span>
         </div>
-        <div class="gs-row">
-          <label for="gsSheetId">Sheet ID</label>
-          <input id="gsSheetId" type="text" spellcheck="false" placeholder="1AbCdEfGhIjKlMnOpQrStUvWxYz... (اختياري)" />
-        </div>
-        <div class="gs-row">
-          <button class="btn ghost mini" id="gsSave" type="button">💾 حفظ الإعدادات</button>
-          <button class="btn primary mini" id="gsPush" type="button">⬆️ تصدير إلى Sheets</button>
-          <button class="btn primary mini" id="gsPull" type="button">⬇️ استيراد من Sheets</button>
-          <button class="btn ghost mini" id="gsSync" type="button">🔄 مزامنة</button>
-          <label class="switch" title="استيراد تلقائي من الـ Sheet كل ما تفتح الصفحة"><input type="checkbox" id="gsAutoImport" /> استيراد عند الفتح</label>
-          <label class="switch"><input type="checkbox" id="gsAuto" /> رفع تلقائي</label>
-        </div>
-        <div class="gs-status" id="gsStatus"><span class="gs-dot"></span><span id="gsStatusText">لم يتم ربط Google Sheets بعد.</span></div>
-        <p class="gs-note">
-          🔗 <b>رابط مباشر:</b> <code id="gsLink">habit-tracker.html#den</code> — افتحه في أي تبويب واحفظه في المفضلة.
-          شهر محدد: <code>#den-01</code> … <code>#den-12</code> · ملخص السنة: <code>#den-year</code>
-        </p>
-        <details class="gs-more">
-          <summary>📥 استيراد من ملف Excel (نسخ ولصق)</summary>
-          <p class="gs-note">
-            انسخ الصفوف من Excel والصقها هنا. الصيغ المدعومة:
-            <b>عادة</b>: <code>الاسم</code> أو <code>الاسم &lt;TAB&gt; الأيقونة &lt;TAB&gt; TRUE/FALSE</code>
-            — و<b>علامة</b>: <code>اسم-العادة | الشهر | اليوم</code> (مثال: <code>قراءة 10 صفحات|8|15</code>، الشهر من 0 إلى 11).
-            يمكن استخدام الاسم بدل الـ id.
+        <div class="gs">
+          <p class="gs-note" style="margin:0">
+            🔄 <b>المزامنة والحفظ آليّين بالكامل</b>: بنحفظ الإعدادات وإنت بتكتب، وبترفع العلامات فورًا مع كل تغيير،
+            وبنجلب من الـ Sheet تلقائيًا كل ما تفتح الصفحة. <span id="gsLedNote">اللمبة في الهيدر بتقولك الحالة.</span>
           </p>
-          <textarea id="gsExcel" rows="5" spellcheck="false" placeholder="قراءة 10 صفحات&#9;📚&#9;TRUE&#10;جيم ساعة&#9;🏋️&#9;TRUE&#10;قراءة 10 صفحات|8|15"></textarea>
           <div class="gs-row">
-            <button class="btn ghost mini" id="gsExcelGo" type="button">⬇️ استيراد من النص</button>
-            <span class="hint">يُدمج مع بياناتك الحالية</span>
+            <label for="gsUrl">رابط السكربت</label>
+            <input id="gsUrl" type="text" spellcheck="false" placeholder="https://script.google.com/macros/s/XXXX.../exec" />
           </div>
-        </details>
-        <p class="gs-note">
-          طريقة الربط: انسخ ملف <code>google-apps-script/Code.gs</code> إلى
-          <strong>Extensions → Apps Script</strong> في ملف الـ Google Sheet، شغّل دالة
-          <code>setupSheets()</code> مرة واحدة (هتعمل جداول <code>Habits</code> و
-          <code>Daily</code> و <code>Meta</code> و <code>لوحة التحكم</code>)، بعدين اعمل
-          <strong>Deploy → New deployment → Web app</strong> والصق الرابط هنا.
-          أي تعديل تكتبه في جداول الـ Sheet يظهر في الموقع عبر «⬇️ استيراد».
-          التفاصيل في <code>google-apps-script/README.md</code>.
-        </p>
+          <div class="gs-row">
+            <label for="gsSheetId">Sheet ID</label>
+            <input id="gsSheetId" type="text" spellcheck="false" placeholder="1AbCdEfGhIjKlMnOpQrStUvWxYz... (اختياري)" />
+          </div>
+          <div class="gs-row">
+            <button class="btn ghost mini" id="gsPush" type="button">⬆️ رفع الآن</button>
+            <button class="btn ghost mini" id="gsPull" type="button">⬇️ جلب الآن</button>
+            <span class="hint" id="gsSaved">💾 الحفظ تلقائي</span>
+          </div>
+          <div class="gs-status" id="gsStatus"><span class="gs-dot"></span><span id="gsStatusText">لم يتم ربط Google Sheets بعد.</span></div>
+          <p class="gs-note">
+            🔗 <b>رابط مباشر:</b> <code id="gsLink">habit-tracker.html#den</code> — افتحه في أي تبويب واحفظه في المفضلة.
+            شهر محدد: <code>#den-01</code> … <code>#den-12</code> · ملخص السنة: <code>#den-year</code>
+          </p>
+          <details class="gs-more">
+            <summary>📥 استيراد من ملف Excel (نسخ ولصق)</summary>
+            <p class="gs-note">
+              انسخ الصفوف من Excel والصقها هنا. الصيغ المدعومة:
+              <b>عادة</b>: <code>الاسم</code> أو <code>الاسم &lt;TAB&gt; الأيقونة &lt;TAB&gt; TRUE/FALSE</code>
+              — و<b>علامة</b>: <code>اسم-العادة | الشهر | اليوم</code> (مثال: <code>قراءة 10 صفحات|8|15</code>، الشهر من 0 إلى 11).
+              يمكن استخدام الاسم بدل الـ id.
+            </p>
+            <textarea id="gsExcel" rows="5" spellcheck="false" placeholder="قراءة 10 صفحات&#9;📚&#9;TRUE&#10;جيم ساعة&#9;🏋️&#9;TRUE&#10;قراءة 10 صفحات|8|15"></textarea>
+            <div class="gs-row">
+              <button class="btn ghost mini" id="gsExcelGo" type="button">⬇️ استيراد من النص</button>
+              <span class="hint">يُدمج مع بياناتك الحالية</span>
+            </div>
+          </details>
+          <p class="gs-note">
+            طريقة الربط: انسخ ملف <code>google-apps-script/Code.gs</code> إلى
+            <strong>Extensions → Apps Script</strong> في ملف الـ Google Sheet، شغّل دالة
+            <code>setupSheets()</code> مرة واحدة (هتعمل جداول <code>Habits</code> و
+            <code>Daily</code> و <code>Meta</code> و <code>لوحة التحكم</code>)، بعدين اعمل
+            <strong>Deploy → New deployment → Web app</strong> والصق الرابط في «رابط السكربت» — والباقي آلي.
+            التفاصيل في <code>google-apps-script/README.md</code>.
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
 
     <div class="cards">
       <div class="stat"><div class="stat-v" id="mPct">0%</div><div class="stat-l">إنجاز الشهر</div></div>
@@ -622,11 +662,13 @@
   ];
 
   var now = new Date();
-  var defaultMonth = now.getFullYear() === YEAR ? now.getMonth() : 0;
-  var TODAY_M = defaultMonth, TODAY_D = now.getDate();
+  var NOW_YEAR = now.getFullYear();
+  var TODAY_M = now.getMonth();          // دايمًا الشهر الحقيقي 0..11
+  var TODAY_D = now.getDate();           // دايمًا اليوم الحقيقي 1..31
+  var defaultMonth = NOW_YEAR === YEAR ? TODAY_M : 0;
 
   var CFG_KEY = "habit-tracker-2026-config";
-  var cfg = { url: "", sheetId: "", auto: false, autoImport: true, lastSync: "" };
+  var cfg = { url: "", sheetId: "", lastSync: "", lastOk: "" };
 
   var state = { month: defaultMonth, view: defaultMonth, habits: [], checks: {} };
 
@@ -643,17 +685,12 @@
   function isTodayCell(m, d) { return m === TODAY_M && d === TODAY_D; }
 
   /**
-   * حالة اليوم بالنسبة لليوم الحقيقي:
-   *   "past"    = يوم فات  -> قابل للتعديل
-   *   "today"   = النهارده -> مميّز ( والقابل للتعديل)
-   *   "future"  = يوم لسه  -> مقفل، غير قابل للتعديل
+   * حالة اليوم: كل الأيام قابلة للتعديل والشيك بوكس يشتغل في أي شهر.
+   *   "today" = النهارده -> مميّز (عمود + ستروك)
+   *   "past"  = أي يوم تاني (ماضى أو مستقبل) -> شيك بوكس عادي
+   * مفيش أي يوم مقفول، عشان أي شهر يفضل قابل للتعديل بالكامل.
    */
-  function dayState(m, d) {
-    if (m < TODAY_M) return "past";
-    if (m > TODAY_M) return "future";
-    return d < TODAY_D ? "past" : (d > TODAY_D ? "future" : "today");
-  }
-  function isFuture(m, d) { return dayState(m, d) === "future"; }
+  function dayState(m, d) { return isTodayCell(m, d) ? "today" : "past"; }
 
   function makeDefaults() {
     return DEFAULTS.map(function (h, i) { return { id: "h" + (i + 1), icon: h.icon, name: h.name }; });
@@ -733,16 +770,13 @@
   function dayCell(h, m, d) {
     var on = isDone(h.id, m, d);
     var st = dayState(m, d);
-    var cls = "cell" + (on ? " done" : "") + (st === "today" ? " is-today" : st === "future" ? " is-future" : " is-past");
-    var tip = st === "future"
-      ? esc(h.name) + " — " + d + " " + MONTHS[m] + " (يوم مستقبلي — غير قابل للتعديل)"
-      : st === "today"
-        ? esc(h.name) + " — اليوم " + d + " " + MONTHS[m]
-        : esc(h.name) + " — " + d + " " + MONTHS[m];
-    return '<td class="cell-td' + (st === "today" ? " is-today" : st === "future" ? " is-future" : "") + '">' +
+    var cls = "cell" + (on ? " done" : "") + (st === "today" ? " is-today" : " is-past");
+    var tip = st === "today"
+      ? esc(h.name) + " — اليوم " + d + " " + MONTHS[m]
+      : esc(h.name) + " — " + d + " " + MONTHS[m];
+    return '<td class="cell-td' + (st === "today" ? " is-today" : "") + '">' +
       '<button type="button" class="' + cls + '" data-cell="' + h.id + "|" + d + '"' +
       ' aria-pressed="' + on + '"' +
-      (st === "future" ? ' disabled aria-disabled="true" tabindex="-1"' : "") +
       ' aria-label="' + esc(h.name) + " — يوم " + d + " " + MONTHS[m] +
       '" title="' + tip + '"><i>✓</i></button></td>';
   }
@@ -771,7 +805,7 @@
     for (var i = 1; i <= days; i++) {
       var wd = new Date(YEAR, m, i).getDay();
       var stH = dayState(m, i);
-      var cls = "day-head" + (wd >= 5 ? " we" : "") + (stH === "today" ? " today" : stH === "future" ? " future" : " past") +
+      var cls = "day-head" + (wd >= 5 ? " we" : "") + (stH === "today" ? " today" : " past") +
         (((i - 1) % 7 === 0 && i !== 1) ? " wk" : "");
       dayHead += '<th class="' + cls + '" scope="col"><span class="wd">' + WEEK_DAYS[wd] + '</span><span class="dn">' + i + "</span></th>";
     }
@@ -797,7 +831,9 @@
       var cells = "";
       for (var i = 1; i <= days; i++) {
         var wd = new Date(YEAR, m, i).getDay();
-        var cls = (wd >= 5 ? "we " : "") + (((i - 1) % 7 === 0 && i !== 1) ? "wk" : "");
+        var stS = dayState(m, i);
+        var cls = (wd >= 5 ? "we " : "") + (((i - 1) % 7 === 0 && i !== 1) ? "wk " : "") +
+          (stS === "today" ? " is-today" : "");
         cells += '<td class="' + cls + '" data-' + attr + '="' + i + '">0</td>';
       }
       return '<tr class="stat-row"><th class="row-label" scope="row">' + label + "</th>" + cells + extra + "</tr>";
@@ -819,7 +855,7 @@
       var wd2 = new Date(YEAR, m, i2).getDay();
       var ds = dayStats(m, i2);
       var st2 = dayState(m, i2);
-      var rowCls = (wd2 >= 5 ? "we " : "") + (st2 === "today" ? "today" : st2 === "future" ? "future" : "past");
+      var rowCls = (wd2 >= 5 ? "we " : "") + (st2 === "today" ? "today" : "past");
       dHead += '<tr class="day-row is-' + st2 + '" data-d="' + i2 + '"><th class="dcol ' + rowCls + '" scope="row"><span class="dn">' + i2 + "</span> " +
         '<span class="wd">' + WEEK_DAYS[wd2] + '</span> <span class="cnt">' + ds.done + "/" + ds.total + "</span></th>";
       habits.forEach(function (h) { dHead += dayCell(h, m, i2); });
@@ -985,7 +1021,6 @@
   }
 
   function setCheck(id, m, d, on) {
-    if (isFuture(m, d)) { toast("🔒 يوم مستقبلي — مش قابل للتعديل"); return; }   // الأيام الجاية مقفولة
     var k = ckey(id, m, d);
     if (on) state.checks[k] = 1; else delete state.checks[k];
     qa('[data-cell="' + id + "|" + d + '"]').forEach(function (b) {
@@ -1002,7 +1037,6 @@
   function toggleCell(btn) {
     var p = btn.dataset.cell.split("|");
     var id = p[0], d = Number(p[1]);
-    if (isFuture(state.month, d)) { toast("🔒 يوم مستقبلي — مش قابل للتعديل"); return; }
     var on = !isDone(id, state.month, d);
     setCheck(id, state.month, d, on);
     btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
@@ -1060,9 +1094,8 @@
         var d = JSON.parse(raw);
         cfg.url = typeof d.url === "string" ? d.url : "";
         cfg.sheetId = typeof d.sheetId === "string" ? d.sheetId : "";
-        cfg.auto = d.auto === true;
-        cfg.autoImport = d.autoImport !== false;   // استيراد عند الفتح = مفعّل افتراضيًا
         cfg.lastSync = typeof d.lastSync === "string" ? d.lastSync : "";
+        cfg.lastOk = typeof d.lastOk === "string" ? d.lastOk : "";
       }
     } catch (e) {}
   }
@@ -1070,15 +1103,35 @@
     try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
   }
 
+  /* ===== لمبة الحالة في الهيدر: أخضر = شغال / أحمر = خطأ / رمادي = غير مربوط ===== */
+  var ledKind = "";
+  function setLed(kind, tip) {
+    var led = q("#gsLed"), btn = q("#gsLedBtn");
+    if (!led || !btn) return;
+    led.className = "led " + (kind || "off");
+    var map = {
+      ok: "🟢 المزامنة شغالة مع Google Sheets",
+      busy: "🟡 جاري المزامنة…",
+      err: "🔴 المزامنة واقفة على خطأ",
+      off: "⚪ غير مربوط بـ Google Sheets بعد"
+    };
+    var text = map[kind] || map.off;
+    btn.title = tip ? text + " — " + tip : text;
+    btn.setAttribute("aria-label", btn.title);
+    ledKind = kind;
+  }
+
   function gsStatus(kind, msg) {
     var box = q("#gsStatus"), txt = q("#gsStatusText");
-    box.className = "gs-status" + (kind ? " " + kind : "");
-    txt.textContent = msg;
-    q("#gsBadge").textContent = kind === "ok" ? "✅ متصل" : kind === "busy" ? "⏳ جاري…" : kind === "err" ? "⚠️ خطأ" : (cfg.url ? "غير مفعّل" : "غير مربوط");
+    if (box) box.className = "gs-status" + (kind ? " " + kind : "");
+    if (txt) txt.textContent = msg;
+    var badge = q("#gsBadge");
+    if (badge) badge.textContent = kind === "ok" ? "✅ متصل" : kind === "busy" ? "⏳ جاري…" : kind === "err" ? "⚠️ خطأ" : (cfg.url ? "جاهز" : "غير مربوط");
+    setLed(kind, msg);
   }
 
   function gsReady() {
-    if (!cfg.url) { gsStatus("err", "❌ ضع رابط الـ Web App أولًا (Deploy → Web app)."); return false; }
+    if (!cfg.url) { setLed("off", "ضع رابط الـ Web App من ⚙️ الإعدادات"); return false; }
     return true;
   }
 
@@ -1177,21 +1230,79 @@
       });
   }
 
-  function gsSyncAll() {
-    if (!gsReady()) return;
-    gsStatus("busy", "⏳ جاري المزامنة…");
-    return gsPush(true)
-      .then(function (ok) { return ok ? gsPull(true) : false; })
-      .then(function (ok) {
-        if (ok) toast("تمت المزامنة مع Google Sheets ✓");
-        else gsStatus("err", "⚠️ المزامنة فشلت. تأكد من إعدادات النشر (Anyone) ومن رابط Web App.");
+  /**
+   * فحص صحة الاتصال بدون كتابة: action=info بيقرأ بيانات الملف،
+   * فلمعة خضرا معناها إن الـ deployment شغال والـ Sheet موجود فعلًا.
+   */
+  function gsProbe() {
+    if (!cfg.url) { setLed("off", "ضع رابط الـ Web App من ⚙️ الإعدادات"); return Promise.resolve(false); }
+    return gsRead("info")
+      .then(function (res) {
+        if (!res || res.ok !== true) throw new Error((res && res.error) || "الخادم رجّع خطأ.");
+        cfg.lastOk = new Date().toISOString();
+        saveCfg();
+        return true;
       });
   }
 
+  /** مزامنة كاملة أوتوماتيك: فحص + جلب + رفع، وبلا أي زر. */
+  function gsAutoSync() {
+    if (!cfg.url) { setLed("off"); return Promise.resolve(false); }
+    gsStatus("busy", "⏳ بنوصّل بـ Google Sheets…");
+    return gsProbe()
+      .then(function () { return gsPull(true); })
+      .then(function (ok) { if (!ok) return false; return gsPush(true); })
+      .then(function (ok) {
+        clearTimeout(gsAutoSync._retry);
+        if (!ok) gsRetry(1);
+        return ok;
+      })
+      .catch(function (err) {
+        var m = err && err.message ? err.message : String(err);
+        var friendly = /Failed to fetch|NetworkError|Load failed|ERR_/i.test(m)
+          ? "مش قادرين نوصل للرابط — تأكد إن رابط الـ Web App صحيح وإن النت شغال"
+          : m;
+        gsStatus("err", "⚠️ " + friendly + " — بنعيد المحاولة أوتوماتيك.");
+        gsRetry(1);
+        return false;
+      });
+  }
+
+  /** إعادة محاولة تلقائية بتباعد متزايد لو المزامنة فشلت. */
+  var gsBackoff = [4000, 12000, 30000, 60000];
+  function gsRetry(n) {
+    clearTimeout(gsAutoSync._retry);
+    var wait = gsBackoff[Math.min(n, gsBackoff.length - 1)];
+    gsAutoSync._retry = setTimeout(function () { gsAutoSync(); }, wait);
+  }
+
+  /** نبضة دورية: ولو الـ LED بقى أحمر من غير سبب بنصلّحه لوحده. */
+  function gsHeartbeat() {
+    clearInterval(gsHeartbeat._i);
+    gsHeartbeat._i = setInterval(function () {
+      if (!cfg.url) return;
+      if (document.hidden) return;
+      gsRead("info")
+      .then(function (res) {
+        if (res && res.ok === true) {
+          cfg.lastOk = new Date().toISOString();
+          saveCfg();
+          if (ledKind === "err") gsStatus("ok", "✅ الاتصال رجع شغال — المزامنة كاملة.");
+        }
+      })
+
+        .catch(function () {
+          if (ledKind !== "err") gsStatus("err", "⚠️ فقدنا الاتصال بـ Google Sheets — بنعيد المحاولة.");
+          gsRetry(1);
+        });
+    }, 120000);
+  }
+
+  /** حفظ + رفع بعد أي تغيير في البيانات (أوتوماتيك بدون زر). */
   function gsAutoPush() {
-    if (!cfg.auto || !cfg.url) return;
+    if (!cfg.url) return;
     clearTimeout(gsAutoPush._t);
-    gsAutoPush._t = setTimeout(function () { gsPush(true); }, 1500);
+    gsAutoPush._t = setTimeout(function () { gsPush(true); }, 1200);
   }
 
   /* ======================================================================
@@ -1352,26 +1463,54 @@
     }
   }
 
+    /* ======================================================================
+       إعدادات الربط: مخفية ورا أيقونة ⚙️ + لمبة الحالة، والمزامنة أوتوماتيك
+       ====================================================================== */
+
+
+  function gsPanelOpen(open) {
+    var p = q("#gsPanel"), b = q("#gsToggle");
+    if (!p) return;
+    p.hidden = !open;
+    if (b) b.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
   function initGsUi() {
     loadCfg();
     q("#gsUrl").value = cfg.url;
     q("#gsSheetId").value = cfg.sheetId;
-    q("#gsAuto").checked = cfg.auto;
-    q("#gsAutoImport").checked = cfg.autoImport;
-    if (cfg.url) gsStatus("", "محفوظ: جاهز للمزامنة. آخر مزامنة: " + (cfg.lastSync ? cfg.lastSync.slice(0, 16).replace("T", " ") : "لا يوجد"));
 
-    q("#gsSave").addEventListener("click", function () {
-      cfg.url = q("#gsUrl").value.trim();
-      cfg.sheetId = q("#gsSheetId").value.trim();
-      cfg.auto = q("#gsAuto").checked;
-      cfg.autoImport = q("#gsAutoImport").checked;
-      saveCfg();
-      if (cfg.url) { gsStatus("", "تم الحفظ ✓ اضغط «🔄 مزامنة» للربط."); toast("تم حفظ إعدادات Google Sheets"); }
-      else gsStatus("err", "❌ ضع رابط الـ Web App أولًا.");
+    /* زر الإعدادات واللمبة */
+    q("#gsToggle").addEventListener("click", function () { gsPanelOpen(q("#gsPanel").hidden); });
+    q("#gsLedBtn").addEventListener("click", function () {
+      gsPanelOpen(true);
+      if (ledKind === "err" || ledKind === "off") gsStatus(ledKind, ledKind === "err" ? "⚠️ فيه خطأ — شوف التفاصيل تحت." : "❌ ضع رابط الـ Web App عشان المزامنة تشتغل أوتوماتيك.");
     });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && q("#gsPanel") && !q("#gsPanel").hidden) gsPanelOpen(false);
+    });
+
+    /* حفظ أوتوماتيك لكل ما يتكتب في الحقول */
+    var saveT = null;
+    function autoSaveCfg() {
+      clearTimeout(saveT);
+      saveT = setTimeout(function () {
+        cfg.url = q("#gsUrl").value.trim();
+        cfg.sheetId = q("#gsSheetId").value.trim();
+        saveCfg();
+        var s = q("#gsSaved");
+        if (s) s.textContent = "💾 اتحفظ ✓ " + new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
+        if (cfg.url) gsAutoSync();
+        else { setLed("off", "ضع رابط الـ Web App"); gsStatus("off", "لم يتم ربط Google Sheets بعد."); }
+      }, 700);
+    }
+    q("#gsUrl").addEventListener("input", autoSaveCfg);
+    q("#gsSheetId").addEventListener("input", autoSaveCfg);
+    q("#gsUrl").addEventListener("change", autoSaveCfg);
+
+    /* أزرار يدوية اختيارية — المزامنة الآلية شغالة طول الوقت */
     q("#gsPush").addEventListener("click", function () { gsPush(); });
     q("#gsPull").addEventListener("click", function () { gsPull(); });
-    q("#gsSync").addEventListener("click", function () { gsSyncAll(); });
     q("#gsExcelGo").addEventListener("click", function () {
       var txt = q("#gsExcel").value;
       if (!txt.trim()) { toast("الصق البيانات أولاً 📋"); return; }
@@ -1382,6 +1521,29 @@
       if (r.skipped) msg += "، " + r.skipped + " سطر متجاهَل";
       toast(msg);
       gsStatus("ok", msg);
+      gsAutoPush();
+    });
+
+    /* حالة أولية + مزامنة أوتوماتيك */
+    gsHeartbeat();
+    if (cfg.url) {
+      gsPanelOpen(false);
+      gsStatus("busy", "⏳ بنوصّل بـ Google Sheets…");
+      gsAutoSync();
+    } else {
+      gsPanelOpen(true);   // أول مرة: افتحي الإعدادات عشان تلصقي الرابط
+      setLed("off", "غير مربوط — افتحي الإعدادات");
+      gsStatus("off", "لم يتم ربط Google Sheets بعد — الصقي رابط الـ Web App في «رابط السكربت».");
+    }
+
+    /* رجع النت: جرّب فورًا */
+    window.addEventListener("online", function () { if (cfg.url) gsAutoSync(); });
+    window.addEventListener("offline", function () { if (cfg.url) gsStatus("err", "⚠️ مفيش اتصال بالإنترنت — المزامنة هتتشتغل أوتوماتيك أول ما يرجع."); });
+    /* رجع التبويب: تأكد إن اللمبة صح */
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden || !cfg.url) return;
+      var age = Date.now() - (Date.parse(cfg.lastOk || 0) || 0);
+      if (age > 60000) gsProbe().then(function (ok) { if (ok && ledKind === "err") gsStatus("ok", "✅ الاتصال شغال."); });
     });
   }
 
@@ -1433,9 +1595,7 @@
   applyHash(false);          // #den | #den-09 | #den-year
   renderTabs();
   updateView();
-
-  // استيراد تلقائي من الـ Sheet عند الفتح (الـ Sheet هو المصدر الحقيقي)
-  if (cfg.url && cfg.autoImport) gsPull(true);
+  // ملاحظة: المزامنة مع الـ Sheet بتشتغل أوتوماتيك من initGsUi() (فحص + جلب + رفع)
 
   // اختصارات الرابط: #den-07 يفتح يوليو، #den-year يفتح ملخص السنة
   window.addEventListener("hashchange", function () {
