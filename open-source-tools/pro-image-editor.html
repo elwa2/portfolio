@@ -34,7 +34,7 @@
       --pf-mono:'JetBrains Mono',monospace;
       --pf-menu-bg:rgba(30,35,48,0.97);
       --pf-canvas-bg:#1a1a2e;
-      --pf-panel-w:280px;--pf-toolbar-w:48px;--pf-menubar-h:28px;
+      --pf-panel-w:280px;--pf-toolbar-w:42px;--pf-menubar-h:28px;
       --pf-options-h:34px;--pf-statusbar-h:24px;
     }
     html,body{height:100%;overflow:hidden;font-family:var(--pf-font);font-size:12px;
@@ -196,19 +196,23 @@
 
     /* === LEFT TOOLBAR === */
     .toolbar{width:var(--pf-toolbar-w);background:var(--pf-bg-2);border-right:1px solid var(--pf-border);
-      display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0;overflow-y:auto;scrollbar-width:none;}
-    .toolbar::-webkit-scrollbar{width:0;}
-    .tool-btn{width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
-      border-radius:10px;cursor:pointer;position:relative;border:1px solid transparent;
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 0;gap:2px;
+      flex-shrink:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--pf-border) transparent;}
+    .toolbar::-webkit-scrollbar{width:4px;}
+    .toolbar::-webkit-scrollbar-track{background:transparent;}
+    .toolbar::-webkit-scrollbar-thumb{background:var(--pf-border);border-radius:2px;}
+    .toolbar::-webkit-scrollbar-thumb:hover{background:var(--pf-accent);}
+    .tool-btn{width:32px;height:32px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+      border-radius:8px;cursor:pointer;position:relative;border:1px solid transparent;
       transition:background var(--pf-transition),color var(--pf-transition),box-shadow var(--pf-transition);
       color:var(--pf-text-dim);outline:none;-webkit-tap-highlight-color:transparent;
       user-select:none;-webkit-user-select:none;touch-action:manipulation;}
     .tool-btn:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
     .tool-btn:focus-visible{outline:2px solid var(--pf-accent);outline-offset:1px;}
-    .tool-btn:active{transform:translateY(0.5px);}
+    .tool-btn:active{box-shadow:inset 0 1px 3px rgba(0,0,0,0.4);}
     .tool-btn.active{background:var(--pf-accent);color:#fff;
       box-shadow:0 0 0 1px rgba(79,172,254,0.35),0 0 14px var(--pf-accent-glow);}
-    .tool-btn[data-group]::after{content:"";position:absolute;right:2px;bottom:3px;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid currentColor;opacity:.55;pointer-events:none;}
+    .tool-btn[data-group]::after{content:"";position:absolute;right:1px;bottom:2px;border-left:2.5px solid transparent;border-right:2.5px solid transparent;border-top:3.5px solid currentColor;opacity:.55;pointer-events:none;}
     .tool-btn.active[data-group]::after{border-top-color:#fff;opacity:.9;}
     .tool-btn[data-group][data-group-open]::after{transform:rotate(180deg);}
     .tool-flyout{position:fixed;z-index:4000;min-width:164px;background:#1b1d2a;border:1px solid rgba(255,255,255,.12);
@@ -220,9 +224,9 @@
     .tool-flyout .fitem:hover .fk{color:rgba(255,255,255,.85);}
     .tool-flyout .fitem.sel{background:rgba(79,172,254,.2);color:var(--pf-accent);}
     .tool-flyout .fitem.sel .fk{color:var(--pf-accent);}
-    .tool-btn svg{width:24px;height:24px;flex-shrink:0;stroke:currentColor;fill:none;
+    .tool-btn svg{width:20px;height:20px;flex-shrink:0;stroke:currentColor;fill:none;
       stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
-    .tool-btn .tool-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);
+    .tool-btn .tool-tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
       background:#1b1d2a;color:#fff;padding:6px 10px;border-radius:8px;min-width:150px;
       font-size:11px;line-height:1.35;text-align:left;pointer-events:none;white-space:nowrap;
       opacity:0;visibility:hidden;z-index:300;
@@ -239,9 +243,9 @@
     .tool-btn .tool-tip.show{opacity:1;visibility:visible;
       transition:opacity 0.12s ease 0.25s,visibility 0s 0.25s;}
     body.dragging .tool-tip{opacity:0!important;visibility:hidden!important;transition:none!important;}
-    .tool-sep{width:26px;height:1px;background:var(--pf-border);margin:3px 0;flex:0 0 auto;}
-    .tool-btn .swatch-pair{position:relative;width:22px;height:22px;flex-shrink:0;cursor:pointer;}
-    .tool-btn .swatch-pair .swatch{position:absolute;width:17px;height:17px;border-radius:3.5px;
+    .tool-sep{width:20px;height:1px;background:var(--pf-border);margin:0;flex:0 1 auto;min-height:0;}
+    .tool-btn .swatch-pair{position:relative;width:19px;height:19px;flex-shrink:0;cursor:pointer;}
+    .tool-btn .swatch-pair .swatch{position:absolute;width:14px;height:14px;border-radius:3px;
       box-shadow:0 0 0 1px var(--pf-bg-2),0 0 0 2px rgba(255,255,255,0.35);cursor:pointer;}
     .tool-btn .swatch-pair .swatch.fg{top:0;right:0;z-index:2;}
     .tool-btn .swatch-pair .swatch.bg{bottom:0;left:0;z-index:1;}
@@ -604,9 +608,9 @@
     .type-editor::-webkit-scrollbar{height:4px;width:4px;}
     .type-editor::-webkit-scrollbar-thumb{background:var(--pf-bg-5);border-radius:2px;}
 
-    @media(max-width:1100px){.right-panel{width:250px;}.toolbar{width:44px;}}
+    @media(max-width:1100px){.right-panel{width:250px;}.toolbar{width:38px;}}
     @media(max-width:900px){.right-panel{width:220px;}}
-    @media(max-width:700px){.right-panel{display:none;}.toolbar{width:40px;}.tp-panel{left:4px;width:min(96vw,348px);}.menubar .mb-brand span{display:none;}.mb-account{display:none;}}
+    @media(max-width:700px){.right-panel{display:none;}.toolbar{width:34px;}.tp-panel{left:4px;width:min(96vw,348px);}.menubar .mb-brand span{display:none;}.mb-account{display:none;}}
 
     /* ===== ENHANCED DESIGN SYSTEM ===== */
     :root{
@@ -681,9 +685,8 @@
     .canvas-wrapper{box-shadow:0 0 0 1px rgba(255,255,255,0.09),0 24px 60px rgba(0,0,0,0.55),0 0 46px rgba(79,172,254,0.07);border-radius:2px;}
     .toolbar{background:linear-gradient(180deg,#171c2b,var(--pf-bg-2));}
     .tool-btn{box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02);}
-    .tool-btn:hover{transform:translateY(-1px);background:var(--pf-surface-hover);box-shadow:0 2px 10px rgba(0,0,0,0.35);}
+    .tool-btn:hover{background:var(--pf-surface-hover);box-shadow:0 2px 10px rgba(0,0,0,0.35);}
     .tool-btn.active{background:var(--pf-grad-trans);box-shadow:var(--pf-glow-btn);}
-    .tool-btn:active{transform:translateY(0.5px);}
     .panel-tab.active{background:var(--pf-grad-trans);box-shadow:var(--pf-glow-btn);}
     .panel-tab:hover{color:var(--pf-accent);}
     .panel-savebar{background:linear-gradient(180deg,rgba(20,24,36,0.98),var(--pf-bg-1));}
@@ -1365,27 +1368,27 @@
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="marquee" data-group="marquee" tabindex="0" role="button" aria-label="Rectangular Marquee — rectangular/elliptical selection (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="4 3"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Rectangular Marquee <span class="kbd">M</span></span><span class="tt-desc">Rectangular / Elliptical · long-press or arrow for variants</span></span></div>
       <div class="tool-btn" data-tool="lasso" data-group="lasso" tabindex="0" role="button" aria-label="Lasso Tool — freehand selection (L)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 22a5 5 0 0 1-2-4"/><path d="M3.3 14A6.8 6.8 0 0 1 2 10c0-4.4 4.5-8 10-8s10 3.6 10 8-4.5 8-10 8a12 12 0 0 1-5-1"/><path d="M5 13a5 5 0 0 1 2-4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Lasso Tool <span class="kbd">L</span></span><span class="tt-desc">Freehand / Polygonal / Magnetic</span></span></div>
-      <div class="tool-btn" data-tool="wand" data-group="wand" tabindex="0" role="button" aria-label="Magic Wand — auto-select by color (W)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17 17 5l2 2L7 19z"/><path d="M14 6l1-2M10 10l-2-1M18 10l2-1M12 18l1-2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Magic Wand <span class="kbd">W</span></span><span class="tt-desc">Magic Wand / Quick Selection</span></span></div>
+      <div class="tool-btn" data-tool="wand" data-group="wand" tabindex="0" role="button" aria-label="Magic Wand — auto-select by color (W)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 21 8.5-8.5"/><path d="M12.6 6.9a2.6 2.6 0 0 0 1.2-1.2l1.4-1.4a1.8 1.8 0 0 1 2.6 2.6l-1.4 1.4a2.6 2.6 0 0 0-1.2 1.2z"/><path d="M15 2v3M2 15h3M2.6 7.6l1.8 1.8M9.6 2.6 7.8 4.4M7.6 16.4l1.8 1.8M16.4 21.4l1.8-1.8M21.4 16.4l-1.8 1.8"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Magic Wand <span class="kbd">W</span></span><span class="tt-desc">Magic Wand / Quick Selection</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="crop" data-group="crop" tabindex="0" role="button" aria-label="Crop Tool (C)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Crop Tool <span class="kbd">C</span></span><span class="tt-desc">Crop / Perspective Crop / Slice</span></span></div>
       <div class="tool-btn" data-tool="eyedropper" data-group="eyedropper" tabindex="0" role="button" aria-label="Eyedropper Tool — pick a color (I)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Eyedropper Tool <span class="kbd">I</span></span><span class="tt-desc">Eyedropper / Color Sampler / Ruler</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="heal" data-group="heal" tabindex="0" role="button" aria-label="Spot Healing Brush (J)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 9v6M9 12h6"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Spot Healing Brush <span class="kbd">J</span></span><span class="tt-desc">Spot Healing / Healing Brush / Patch</span></span></div>
+      <div class="tool-btn" data-tool="heal" data-group="heal" tabindex="0" role="button" aria-label="Spot Healing Brush (J)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 20.5 3.9 13.9a4.6 4.6 0 0 1 6.5-6.5l6.2 6.2a4.6 4.6 0 0 1-6.5 6.5z"/><path d="M6.4 6.4 17.6 17.6"/><path d="m9.5 9.5 1.8-1.8M12.5 12.5l1.8-1.8M15.5 15.5l1.8-1.8"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Spot Healing Brush <span class="kbd">J</span></span><span class="tt-desc">Spot Healing / Healing Brush / Patch</span></span></div>
       <div class="tool-btn" data-tool="brush" tabindex="0" role="button" aria-label="Brush Tool — paint with brush (B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Brush Tool <span class="kbd">B</span></span><span class="tt-desc">Paint with soft strokes</span></span></div>
-      <div class="tool-btn" data-tool="clone" data-group="clone" tabindex="0" role="button" aria-label="Clone Stamp (S)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Clone Stamp <span class="kbd">S</span></span><span class="tt-desc">Clone Stamp / Pattern Stamp</span></span></div>
+      <div class="tool-btn" data-tool="clone" data-group="clone" tabindex="0" role="button" aria-label="Clone Stamp (S)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"/><path d="M19.3 13.7A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.7-.3-1.3-.7-1.8z"/><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-6 0c0 2 1 2 1 3.5V13"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Clone Stamp <span class="kbd">S</span></span><span class="tt-desc">Clone Stamp / Pattern Stamp</span></span></div>
       <div class="tool-btn" data-tool="eraser" data-group="eraser" tabindex="0" role="button" aria-label="Eraser Tool (E)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Eraser Tool <span class="kbd">E</span></span><span class="tt-desc">Eraser / Background Eraser / Magic Eraser</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="copyLayer" data-action="duplicate" tabindex="0" role="button" aria-label="Duplicate active layer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Duplicate Layer</span><span class="tt-desc">Copy the active layer</span></span></div>
       <div class="tool-btn" data-tool="addLayer" data-action="newlayer" tabindex="0" role="button" aria-label="Add a new layer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 4.5-9 4.5-9-4.5 9-4.5Z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 17 9 4.5 9-4.5"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">New Layer</span><span class="tt-desc">Add an empty layer</span></span></div>
       <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="gradient" data-group="gradient" tabindex="0" role="button" aria-label="Gradient Tool (G)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2.5"/><path d="M6 17 18 7"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Gradient Tool <span class="kbd">G</span></span><span class="tt-desc">Gradient / Paint Bucket</span></span></div>
-      <div class="tool-btn" data-tool="blur" data-group="blur" tabindex="0" role="button" aria-label="Blur Tool (R)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19c4 0 7-11 12-11 2.5 0 4.5 1.5 6 3"/><path d="M3 15c3.5-.6 5-2.5 6.5-4.5"/><path d="M6 21c3-1.6 4-3.5 5-5.5"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Blur Tool <span class="kbd">R</span></span><span class="tt-desc">Blur / Sharpen / Smudge</span></span></div>
+      <div class="tool-btn" data-tool="gradient" data-group="gradient" tabindex="0" role="button" aria-label="Gradient Tool (G)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 20.5 20.5 3.5"/><path d="M9 20.5 20.5 9"/><path d="M14.5 20.5 20.5 14.5"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Gradient Tool <span class="kbd">G</span></span><span class="tt-desc">Gradient / Paint Bucket</span></span></div>
+      <div class="tool-btn" data-tool="blur" data-group="blur" tabindex="0" role="button" aria-label="Blur Tool (R)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7 6.3 8.4a8 8 0 1 0 11.4 0z"/><path d="M12 18a4 4 0 0 0 4-4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Blur Tool <span class="kbd">R</span></span><span class="tt-desc">Blur / Sharpen / Smudge</span></span></div>
       <div class="tool-btn" data-tool="dodge" data-group="dodge" tabindex="0" role="button" aria-label="Dodge Tool (O)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Dodge Tool <span class="kbd">O</span></span><span class="tt-desc">Dodge / Burn / Sponge</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="pen" data-group="pen" tabindex="0" role="button" aria-label="Pen Tool (P)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.19 1.19l3.322 12.644a1 1 0 0 0 .776.746L13 18"/><circle cx="13" cy="13" r="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Pen Tool <span class="kbd">P</span></span><span class="tt-desc">Pen / Freeform Pen</span></span></div>
       <div class="tool-btn" data-tool="text" tabindex="0" role="button" aria-label="Type Tool — add editable text (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Type Tool <span class="kbd">T</span></span><span class="tt-desc">Add editable text</span></span></div>
       <div class="tool-btn" data-tool="shape" data-group="shape" tabindex="0" role="button" aria-label="Shape Tool (U)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Shape Tool <span class="kbd">U</span></span><span class="tt-desc">Rectangle / Ellipse / Polygon / Line / Custom</span></span></div>
-      <div class="tool-btn" data-tool="artboard" tabindex="0" role="button" aria-label="Artboard Tool — create / move / resize artboards, export only the artboard content"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="12" rx="1.5"/><path d="M4 9h16"/><path d="M9 16v4M15 16v4M7 20h10"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Artboard Tool <span class="kbd">A</span></span><span class="tt-desc">Draw to add an artboard · drag to move · corners to resize · only the artboard is exported</span></span></div>
+      <div class="tool-btn" data-tool="artboard" tabindex="0" role="button" aria-label="Artboard Tool — create / move / resize artboards, export only the artboard content"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 7h4M3 17h4M17 7h4M17 17h4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Artboard Tool <span class="kbd">A</span></span><span class="tt-desc">Draw to add an artboard · drag to move · corners to resize · only the artboard is exported</span></span></div>
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="hand" tabindex="0" role="button" aria-label="Hand Tool — pan the canvas (H)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0v1"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 0 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.8-2.4L3.2 14a1.5 1.5 0 0 1 2.1-2.1L8 14"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Hand Tool <span class="kbd">H</span></span><span class="tt-desc">Pan around the canvas</span></span></div>
       <div class="tool-btn" data-tool="zoom" tabindex="0" role="button" aria-label="Zoom Tool — zoom in and out (Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Zoom Tool <span class="kbd">Z</span></span><span class="tt-desc">Zoom in and out</span></span></div>
@@ -1872,8 +1875,8 @@
         <div class="shortcut-row"><span>Next / previous tab</span><span class="kbd">Ctrl+Tab / Ctrl+Shift+Tab</span></div>
         <div class="shortcut-row"><span>Select all</span><span class="kbd">Ctrl+A</span></div>
         <div class="shortcut-row"><span>Copy selection / canvas</span><span class="kbd">Ctrl+C</span></div>
-        <div class="shortcut-row"><span>Paste as layer into current canvas</span><span class="kbd">Ctrl+V</span></div>
-        <div class="shortcut-row"><span>Paste from clipboard</span><span class="kbd">Ctrl+V</span></div>
+        <div class="shortcut-row"><span>Paste copied pixels as a new layer</span><span class="kbd">Ctrl+V</span></div>
+        <div class="shortcut-row"><span>Paste a clipboard image into a new tab</span><span class="kbd">Paste&nbsp;image&nbsp;button</span></div>
         <div class="shortcut-row"><span>New empty tab</span><span class="kbd">Ctrl+Shift+T</span></div>
         <div class="shortcut-row"><span>Place image as layer</span><span class="kbd">File → Place…</span></div>
         <div class="shortcut-row"><span>Undo / Redo</span><span class="kbd">Ctrl+Z / Ctrl+Y</span></div>
@@ -2254,6 +2257,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   }
   function renderTabBar(){
     const bar=$("tabBar");if(!bar)return;
+    const ae=document.activeElement;
+    const refocusX=!!(ae&&ae.closest&&ae.closest("#tabBar .tab-x"));
+    const refocusId=refocusX&&ae.closest("#tabBar .tab")?ae.closest("#tabBar .tab").dataset.id:"";
     bar.innerHTML="";
     for(const t of tabs){
       const el=document.createElement("div");
@@ -2272,6 +2278,10 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     }
     updateTabOverflow();
     updateQe();
+    if(refocusX&&refocusId!==""){
+      const nx=bar.querySelector('.tab[data-id="'+refocusId+'"] .tab-x');
+      if(nx)nx.focus();
+    }
   }
   function updateTabOverflow(){
     const bar=$("tabBar"),btn=$("tabMoreBtn");
@@ -2281,6 +2291,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   let pendingCloseId=null;
   function closeTab(id){
     const t=tabs.find(x=>x.id===id);if(!t)return;
+    if(tabs.length===1&&!t.dirty&&!t.loading&&!tabHasImage(t)){
+      toast("No open document — this is the empty tab.","info",2200);return;
+    }
     if(t.id===activeTabId)captureActiveTab();
     if(t.dirty){
       pendingCloseId=id;
@@ -2288,7 +2301,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       $("unsavedModal").classList.add("open");
       return;
     }
+    const onlyOne=tabs.length===1;
     removeTab(id);
+    if(onlyOne)toast("All documents closed.","info",1800);
   }
   function removeTab(id){
     const idx=tabs.findIndex(t=>t.id===id);if(idx<0)return;
@@ -6663,8 +6678,11 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
         const star=document.createElement("span");star.className="dot-star";star.textContent=t.dirty?"*":"";
         const nm=document.createElement("span");nm.className="tm-name";nm.textContent=t.name;
         const zo=document.createElement("span");zo.style.cssText="font-size:10px;color:var(--pf-text-muted);";zo.textContent=Math.round(((t.id===activeTabId)?state.zoom:tabZoom(t))*100)+"%";
-        const x=document.createElement("span");x.className="tm-x";x.textContent="×";x.title="Close tab";x.setAttribute("aria-label","Close "+t.name);
-        x.addEventListener("click",ev=>{ev.stopPropagation();moreMenu.classList.remove("visible");closeTab(t.id);});
+        const x=document.createElement("span");x.className="tm-x";x.textContent="×";x.title="Close tab";
+        x.setAttribute("role","button");x.setAttribute("tabindex","0");x.setAttribute("aria-label","Close "+t.name);
+        const closeIt=ev=>{if(ev)ev.stopPropagation();moreMenu.classList.remove("visible");closeTab(t.id);};
+        x.addEventListener("click",closeIt);
+        x.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "||ev.key==="Spacebar"){ev.preventDefault();closeIt(ev);}});
         b.appendChild(star);b.appendChild(nm);b.appendChild(zo);b.appendChild(x);
         b.addEventListener("click",()=>{moreMenu.classList.remove("visible");focusTab(t.id);});
         moreMenu.appendChild(b);
