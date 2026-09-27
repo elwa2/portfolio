@@ -1096,13 +1096,30 @@
   .ed-csw.hidden { display: none; }
 
   /* ===== EDITOR FIND & REPLACE ===== */
+  .ed-find-layer {
+    position: absolute; inset: 0; margin: 0; padding: 12px 14px; overflow: hidden;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    white-space: pre; color: transparent; pointer-events: none; z-index: 0;
+  }
+  .ed-find-layer mark {
+    background: rgba(250, 204, 21, 0.28); color: transparent;
+    border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.45);
+  }
+  .ed-find-layer mark.cur {
+    background: rgba(56, 189, 248, 0.38); color: transparent;
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.95);
+  }
+  body.editor-active .ed-find-layer { font-size: 13px; line-height: 1.65; }
+
   .ed-find-box {
-    position: absolute; top: 0; right: 0; z-index: 50;
+    position: absolute; top: 8px; right: 8px; z-index: 50;
     background: var(--bg-overlay); border: 1px solid var(--border-def);
     border-radius: var(--radius-sm); padding: 10px;
     width: 100%; max-width: 380px; box-shadow: var(--shadow-md);
-    direction: ltr;
+    direction: ltr; max-height: calc(100% - 16px); overflow-y: auto;
   }
+  .ed-find-box::-webkit-scrollbar { width: 8px; }
+  .ed-find-box::-webkit-scrollbar-thumb { background: var(--border-str); border-radius: 4px; }
   .ed-find-header {
     display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
     font-size: 12px; color: var(--text-2); font-weight: 600;
@@ -4662,6 +4679,266 @@ function getFiltered(){
     if (count) count.textContent = input.value.length + ' حرف';
   }
 
+  /* ===== EDITOR — FIND & REPLACE (Ctrl+F) ===== */
+  let edFindMatches = [];
+  let edFindIndex = -1;
+  let edFindQuery = '';
+  let edFindBound = false;
+
+  function edInitFindBox(){
+    const box = document.getElementById('edFindBox');
+    if (!box || edFindBound) return;
+    edFindBound = true;
+    const fi = document.getElementById('edFindInput');
+    const ri = document.getElementById('edReplaceInput');
+    if (fi){
+      fi.addEventListener('input', () => edPerformFind());
+      fi.addEventListener('keydown', e => {
+        if (e.key === 'Enter'){ e.preventDefault(); e.shiftKey ? edFindPrevious() : edFindNext(); }
+        else if (e.key === 'Escape'){ e.preventDefault(); edCloseFindBox(); }
+      });
+    }
+    if (ri){
+      ri.addEventListener('input', edUpdateReplaceBtns);
+      ri.addEventListener('keydown', e => {
+        if (e.key === 'Enter'){ e.preventDefault(); e.ctrlKey || e.altKey ? edReplaceAll() : edReplaceSingle(); }
+        else if (e.key === 'Escape'){ e.preventDefault(); edCloseFindBox(); }
+      });
+    }
+  }
+
+  function edSyncFindToggles(){
+    document.querySelectorAll('.ed-find-box .ed-find-toggle').forEach(l => {
+      const cb = l.querySelector('input');
+      if (cb) l.classList.toggle('active', !!cb.checked);
+    });
+  }
+
+  function edFindRegex(){
+    const fi = document.getElementById('edFindInput');
+    if (!fi) return { re: null, bad: false, q: '' };
+    const q = fi.value;
+    if (!q) return { re: null, bad: false, q: q };
+    const opt = id => { const el = document.getElementById(id); return !!(el && el.checked); };
+    let src = opt('edFindRegex') ? q : q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (opt('edFindWord')) src = '(?<![\\p{L}\\p{N}_])(?:' + src + ')(?![\\p{L}\\p{N}_])';
+    try { return { re: new RegExp(src, opt('edFindCase') ? 'gu' : 'giu'), bad: false, q: q }; }
+    catch (e) { return { re: null, bad: true, q: q }; }
+  }
+
+  function edCollectMatches(re){
+    const input = document.getElementById('edInput');
+    const out = [];
+    if (!input || !re) return out;
+    const text = input.value;
+    let m, guard = 0;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null){
+      if (m[0].length === 0){ re.lastIndex++; continue; }
+      out.push({ start: m.index, end: m.index + m[0].length });
+      if (++guard >= 20000) break;
+    }
+    return out;
+  }
+
+  function edSetFindBtns(on){
+    ['edFindPrev','edFindNext','edReplaceSingle','edReplaceAll'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) b.disabled = !on;
+    });
+  }
+  function edUpdateReplaceBtns(){
+    const b = document.getElementById('edReplaceAll');
+    if (b) b.disabled = !edFindMatches.length;
+  }
+
+  function edRenderFindLayer(){
+    const input = document.getElementById('edInput');
+    const layer = document.getElementById('edFindLayer');
+    if (!input || !layer) return;
+    if (!edFindMatches.length){ if (layer.innerHTML) layer.innerHTML = ''; return; }
+    const v = input.value;
+    const LIMIT = 3000;
+    const n = Math.min(edFindMatches.length, LIMIT);
+    let html = '', last = 0;
+    for (let i = 0; i < n; i++){
+      const m = edFindMatches[i];
+      if (m.start < last) continue;
+      html += escHtml(v.slice(last, m.start));
+      html += '<mark' + (i === edFindIndex ? ' class="cur"' : '') + '>' + escHtml(v.slice(m.start, m.end)) + '</mark>';
+      last = m.end;
+    }
+    html += escHtml(v.slice(last)) + '\n';
+    layer.innerHTML = html;
+    layer.scrollTop = input.scrollTop;
+    layer.scrollLeft = input.scrollLeft;
+  }
+
+  function edScrollToIndex(idx){
+    const input = document.getElementById('edInput');
+    if (!input) return;
+    const pre  = document.getElementById('edHigh');
+    const gut  = document.getElementById('edGutter');
+    const fl   = document.getElementById('edFindLayer');
+    const cs   = getComputedStyle(input);
+    const lh   = parseFloat(cs.lineHeight) || 20;
+    const padT = parseFloat(cs.paddingTop) || 0;
+    const target = padT + (input.value.slice(0, idx).match(/\n/g) || []).length * lh;
+    const view = input.clientHeight || 400;
+    if (target < input.scrollTop + lh || target > input.scrollTop + view - lh * 2){
+      input.scrollTop = Math.max(0, target - view / 3);
+    }
+    if (pre) pre.scrollTop = input.scrollTop;
+    if (gut) gut.scrollTop = input.scrollTop;
+    if (fl){ fl.scrollTop = input.scrollTop; fl.scrollLeft = input.scrollLeft; }
+    if (typeof edPlaceColors === 'function') edPlaceColors();
+  }
+
+  function edSelectFind(i){
+    const input = document.getElementById('edInput');
+    const m = edFindMatches[i];
+    if (!input || !m) return;
+    edFindIndex = i;
+    try { input.setSelectionRange(m.start, m.end); } catch (e) {}
+    edRenderFindLayer();
+    edScrollToIndex(m.start);
+    edStatus();
+    const stats = document.getElementById('edFindStats');
+    if (stats) stats.textContent = (i + 1) + ' / ' + edFindMatches.length;
+  }
+
+  function edPerformFind(preferAt){
+    const input = document.getElementById('edInput');
+    const stats = document.getElementById('edFindStats');
+    if (!input) return;
+    edSyncFindToggles();
+    const r = edFindRegex();
+    edFindQuery = r.q;
+    if (r.bad){
+      edFindMatches = []; edFindIndex = -1;
+      if (stats) stats.textContent = 'تعبير نمطي غير صالح';
+      edSetFindBtns(false);
+      edRenderFindLayer();
+      return;
+    }
+    if (!r.re){
+      edFindMatches = []; edFindIndex = -1;
+      if (stats) stats.textContent = 'اكتب نص للبحث';
+      edSetFindBtns(false);
+      edRenderFindLayer();
+      return;
+    }
+    edFindMatches = edCollectMatches(r.re);
+    if (!edFindMatches.length){
+      edFindIndex = -1;
+      if (stats) stats.textContent = 'لا نتائج';
+      edSetFindBtns(false);
+      edRenderFindLayer();
+      return;
+    }
+    const from = (typeof preferAt === 'number') ? preferAt : (input.selectionEnd || 0);
+    let idx = edFindMatches.findIndex(m => m.start >= from);
+    if (idx < 0) idx = 0;
+    edSetFindBtns(true);
+    edSelectFind(idx);
+  }
+
+  function edFindNext(){
+    if (!edFindMatches.length){ edPerformFind(); return; }
+    edSelectFind((edFindIndex + 1) % edFindMatches.length);
+  }
+  function edFindPrevious(){
+    if (!edFindMatches.length){ edPerformFind(); return; }
+    edSelectFind((edFindIndex - 1 + edFindMatches.length) % edFindMatches.length);
+  }
+
+  function edSetEditorValue(text){
+    const input = document.getElementById('edInput');
+    if (!input) return;
+    input.value = text;
+    const sn = activeVdSnippet();
+    sn.draft = text;
+    saveVd();
+    edSync();
+    edStatus();
+  }
+
+  function edReplaceSingle(){
+    const input = document.getElementById('edInput');
+    const ri = document.getElementById('edReplaceInput');
+    if (!input || !ri) return;
+    if (!edFindMatches.length){ edPerformFind(); return; }
+    const m = edFindMatches[edFindIndex];
+    if (!m) return;
+    const rep = ri.value;
+    const at = m.start;
+    edSetEditorValue(input.value.slice(0, at) + rep + input.value.slice(m.end));
+    edPerformFind(at + rep.length);
+    const total = edFindMatches.length;
+    showToast(total ? 'تم استبدال واحد · باقي ' + total : 'تم استبدال واحد · لا نتائج أخرى');
+  }
+
+  function edReplaceAll(){
+    const input = document.getElementById('edInput');
+    const ri = document.getElementById('edReplaceInput');
+    if (!input || !ri) return;
+    const r = edFindRegex();
+    if (r.bad){ showToast('تعبير نمطي غير صالح'); return; }
+    if (!r.re){ showToast('اكتب نص للبحث أولاً'); return; }
+    if (!edFindMatches.length){ edPerformFind(); return; }
+    const count = edFindMatches.length;
+    const rep = ri.value;
+    edSetEditorValue(input.value.replace(r.re, () => rep));
+    edPerformFind();
+    showToast('تم استبدال ' + count + ' نتيجة');
+  }
+
+  function edOpenFindBox(){
+    const input = document.getElementById('edInput');
+    const box = document.getElementById('edFindBox');
+    if (!input || !box) return;
+    edInitFindBox();
+    const fi = document.getElementById('edFindInput');
+    const sel = input.value.slice(input.selectionStart, input.selectionEnd);
+    if (sel && sel.length < 200 && sel.indexOf('\n') === -1) fi.value = sel;
+    else if (edFindQuery) fi.value = edFindQuery;
+    box.style.display = 'block';
+    const fb = document.getElementById('edFindBtn');
+    if (fb) fb.classList.add('active');
+    edSyncFindToggles();
+    edPerformFind();
+    fi.focus();
+    if (fi.value) fi.select();
+  }
+
+  function edCloseFindBox(){
+    const box = document.getElementById('edFindBox');
+    if (box) box.style.display = 'none';
+    const fb = document.getElementById('edFindBtn');
+    if (fb) fb.classList.remove('active');
+    edFindMatches = []; edFindIndex = -1;
+    edRenderFindLayer();
+    const input = document.getElementById('edInput');
+    if (input) input.focus();
+  }
+
+  document.addEventListener('keydown', e => {
+    const mod = e.ctrlKey || e.metaKey;
+    const k = (e.key || '').toLowerCase();
+    if (mod && k === 'f' && !e.altKey){
+      const box = document.getElementById('edFindBox');
+      if (!document.getElementById('edInput') || !document.body.classList.contains('editor-active')) return;
+      e.preventDefault();
+      if (box && box.style.display !== 'none') edCloseFindBox();
+      else edOpenFindBox();
+      return;
+    }
+    if (e.key === 'Escape'){
+      const box = document.getElementById('edFindBox');
+      if (box && box.style.display !== 'none') edCloseFindBox();
+    }
+  });
+
   function edSaveVersion(opts){
     const silent = !!(opts && opts.silent);
     const sn = activeVdSnippet();
@@ -4724,6 +5001,7 @@ function getFiltered(){
     const input = document.getElementById('edInput');
     const pre   = document.getElementById('edHigh');
     const gut   = document.getElementById('edGutter');
+    const flay  = document.getElementById('edFindLayer');
     if (input){
       input.style.textAlign = edView.align;
       input.style.direction = edView.dir;
@@ -4732,6 +5010,11 @@ function getFiltered(){
         pre.style.textAlign = edView.align;
         pre.style.direction = edView.dir;
         pre.style.fontSize  = edView.size + 'px';
+      }
+      if (flay){
+        flay.style.textAlign = edView.align;
+        flay.style.direction = edView.dir;
+        flay.style.fontSize  = edView.size + 'px';
       }
       if (gut) gut.style.fontSize = edView.size + 'px';
     }
@@ -5118,6 +5401,8 @@ function getFiltered(){
             <button class="ed-ibtn" onclick="edFontSize(-1)" title="تصغير الخط" aria-label="تصغير الخط">${svgIcon('fontMinus')}</button>
             <button class="ed-ibtn" onclick="edFontReset()" title="إعادة ضبط حجم الخط" aria-label="إعادة ضبط حجم الخط">${svgIcon('restore')}</button>
             <span class="ed-font-val" id="edFontVal"></span>
+            <span class="ed-tools-sep"></span>
+            <button class="ed-ibtn" id="edFindBtn" onclick="edOpenFindBox()" title="بحث واستبدال (Ctrl+F)" aria-label="بحث واستبدال">${svgIcon('find')}</button>
           </div>
           <div class="ed-toolbar-actions">
             <button class="ed-ibtn primary" onclick="edSaveVersion()" title="حفظ نسخة (Ctrl+S)" aria-label="حفظ نسخة">${svgIcon('save')}</button>
@@ -5131,6 +5416,7 @@ function getFiltered(){
         <div class="ed-wrap" id="edWrap">
           <div class="ed-gutter" id="edGutter"></div>
           <div class="ed-body">
+            <pre class="ed-find-layer" id="edFindLayer" aria-hidden="true"></pre>
             <pre class="ed-highlight" id="edHigh"></pre>
             <textarea class="ed-input" id="edInput" spellcheck="false" wrap="off" placeholder="/* الصق أو اكتب الكود هنا... */"></textarea>
             <div class="ed-col-layer" id="edColLayer"></div>
@@ -5194,12 +5480,16 @@ function getFiltered(){
         saveVd();
         edSync();
         edStatus();
+        const _fb = document.getElementById('edFindBox');
+        if (_fb && _fb.style.display !== 'none' && edFindQuery) edPerformFind();
       });
       input.addEventListener('scroll', () => {
         const pre = document.getElementById('edHigh');
         const gut = document.getElementById('edGutter');
+        const fl  = document.getElementById('edFindLayer');
         if (pre) { pre.scrollTop = input.scrollTop; pre.scrollLeft = input.scrollLeft; }
         if (gut) gut.scrollTop = input.scrollTop;
+        if (fl) { fl.scrollTop = input.scrollTop; fl.scrollLeft = input.scrollLeft; }
         edPlaceColors();
       });
       input.addEventListener('keydown', e => {
@@ -5219,6 +5509,10 @@ function getFiltered(){
       input.addEventListener('click', edStatus);
       input.focus();
     }
+    edFindBound = false;
+    edFindMatches = [];
+    edFindIndex = -1;
+    edInitFindBox();
     document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
   }
 
