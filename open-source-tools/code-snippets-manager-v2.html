@@ -1236,6 +1236,29 @@
     color: #38bdf8; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3);
     border-radius: 999px; padding: 2px 8px; font-variant-numeric: tabular-nums;
   }
+  /* ── جدول المنبهات ── */
+  .al-sched { display: grid; gap: 8px; }
+  .al-sitem {
+    padding: 9px 11px; background: var(--bg-overlay);
+    border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+  }
+  .al-sitem.off { opacity: .55; }
+  .al-shead { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .al-sel.sm { padding: 4px 7px; font-size: 12.5px; min-width: 56px; }
+  .al-tp-c.sm { font-size: 15px; }
+  .al-sdays { display: inline-flex; gap: 3px; flex-wrap: wrap; }
+  .al-dchip {
+    width: 25px; height: 25px; border-radius: 50%; padding: 0;
+    font-size: 11px; font-weight: 700; line-height: 1;
+    background: var(--bg-overlay); border: 1px solid var(--border-def);
+    color: var(--text-3); cursor: pointer; transition: .12s;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .al-dchip:hover { color: var(--text-1); border-color: var(--text-3); }
+  .al-dchip.on { background: #38bdf8; border-color: #38bdf8; color: #0e0e10; }
+  .al-dchip:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+  .al-sfoot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .al-sfoot .al-val { font-size: 11px; }
   .al-prow-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
   .al-pn { font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; }
   .al-pn i { color: #fbbf24; font-size: 15px; }
@@ -5321,6 +5344,14 @@ function getFiltered(){
     { m:45, label:'قبلها 45 د' }, { m:60, label:'قبلها ساعة' },
     { m:90, label:'قبلها ساعة ونص' }, { m:120, label:'قبلها ساعتين' }
   ];
+  /* جدول المنبهات: ترتيب العرض المعتاد (السبت أولًا)، i = Date.getDay() */
+  const AL_WDAYS = [
+    { i:6, s:'س' }, { i:0, s:'ح' }, { i:1, s:'ن' }, { i:2, s:'ث' },
+    { i:3, s:'ر' }, { i:4, s:'خ' }, { i:5, s:'ج' }
+  ];
+  const AL_DAY_ALL = [0,1,2,3,4,5,6];
+  const AL_DAY_WKD = [6,0,1,2,3];        /* السبت → الخميس */
+  const AL_MAX_SCHED = 12;
 
   /* ── المواقيت: حساب شمسي محلي (مفيش إنترنت) ── */
   const AL_PRAYERS = [
@@ -5364,12 +5395,13 @@ function getFiltered(){
   let alFileInput = null;
   let showAlDash = false;
   let alStore = loadAl();
+  let alNoToast = false;
 
   function defaultAl(){
     return { armed:false, ringing:false, dueAt:0, dur:5*AL_MIN, mode:'dur',
              sound:AL_MIX_ID, vol:0.7, repeat:true, label:'', h:0, m:5, s:0, hms:'0:5:0',
              ringFor:5*AL_MIN, restFor:1*AL_MIN, phase:'ring', phaseEndsAt:0,
-             th:5, tm:0, tap:'ص', daily:false, prayer:'', lead:0,
+             th:5, tm:0, tap:'ص', daily:false, prayer:'', lead:0, sched:[],
              city:'القاهرة', lat:30.0444, lng:31.2357, tz:-new Date().getTimezoneOffset() / 60, allAdj:0,
              fajrAng:19.5, ishaAng:18, ishaMin:0, asr:1, asrAdj:0,
              custom:null };
@@ -5402,7 +5434,8 @@ function getFiltered(){
         a.asrAdj = alNum(a.asrAdj, 0, -90, 90);
         a.lead = Math.round(alNum(a.lead, 0, 0, 24*60));
         a.asr = a.asr === 2 ? 2 : 1;
-        a.mode = (a.mode === 'time' || a.mode === 'prayer') ? a.mode : 'dur';
+        a.sched = alSchedNorm(a.sched);
+        a.mode = (a.mode === 'time' || a.mode === 'prayer' || a.mode === 'sched') ? a.mode : 'dur';
         a.phase = a.phase === 'rest' ? 'rest' : 'ring';
         a.daily = !!a.daily;
         if (a.sound === AL_CUSTOM_ID && (!a.custom || !a.custom.data)) a.sound = AL_MIX_ID;
@@ -5706,11 +5739,13 @@ function getFiltered(){
     alAudioCtx();
     alEnsureTick();
     alPaint();
-    showToast('المنبه اتفعّل — ' + label + ' بعد ' + alFmtDur(d));
+    if (!alNoToast) showToast('المنبه اتفعّل — ' + label + ' بعد ' + alFmtDur(d));
   }
   function alArm(ms, label){ alArmAt(Date.now() + Math.max(1000, ms || 0), label); }
-  function alDisarm(silent){
-    const wasDaily = alStore.daily && (alStore.mode === 'time' || alStore.mode === 'prayer');
+  function alDisarm(silent, rerun){
+    const wasRinging = alStore.ringing;
+    const isSched = alStore.mode === 'sched';
+    const wasDaily = isSched || (alStore.daily && (alStore.mode === 'time' || alStore.mode === 'prayer'));
     const keep = { mode:alStore.mode, prayer:alStore.prayer, th:alStore.th, tm:alStore.tm, tap:alStore.tap };
     alRingStop();
     alStore.armed = false;
@@ -5720,11 +5755,13 @@ function getFiltered(){
     alStore.label = '';
     saveAl();
     alTitleOff();
-    if (wasDaily && !silent){
+    /* إعادة الضبط التلقائي بتحصل بس بعد ما المنبه يرن فعلاً — زر إيقاف يوقف فعلاً */
+    if (wasDaily && !silent && (wasRinging || rerun)){
       alStore.daily = true;
-      if (keep.mode === 'prayer' && keep.prayer) alArmPrayer(keep.prayer, true);
+      if (isSched) alSchedArm(true);
+      else if (keep.mode === 'prayer' && keep.prayer) alArmPrayer(keep.prayer, true);
       else alArmClock(true);
-      showToast('اتعاد لليوم التاني — ' + alStore.label);
+      showToast('اتعاد لليوم اللي بعده — ' + alStore.label);
       return;
     }
     alPaint();
@@ -5763,7 +5800,7 @@ function getFiltered(){
   }
   function alDismiss(){
     if (!alStore.ringing && !alStore.armed) return;
-    alDisarm();
+    alDisarm(false, true);
   }
   function alSnooze(min){
     if (!alStore.ringing) return;
@@ -5818,7 +5855,7 @@ function getFiltered(){
     set('alTh', alStore.th); set('alTm', alStore.tm);
   }
   function alSetMode(m){
-    alStore.mode = (m === 'time' || m === 'prayer') ? m : 'dur';
+    alStore.mode = (m === 'time' || m === 'prayer' || m === 'sched') ? m : 'dur';
     saveAl();
     renderAlDash();
   }
@@ -5886,6 +5923,129 @@ function getFiltered(){
     alStore.daily = !!on;
     saveAl();
     renderAlDash();
+  }
+  /* ── جدول المنبهات: أكتر من منبه، كل واحد وقت + أيام مختارة ── */
+  function alNewId(){ return 's' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36); }
+  function alSchedNorm(list){
+    if (!Array.isArray(list)) return [];
+    const out = [];
+    for (let i = 0; i < list.length && out.length < AL_MAX_SCHED; i++){
+      const a = list[i];
+      if (!a || typeof a !== 'object') continue;
+      let days = AL_DAY_ALL.slice();
+      if (Array.isArray(a.days)){
+        days = a.days.map(n => parseInt(n, 10)).filter(n => n >= 0 && n <= 6)
+                     .filter((n, ix, arr) => arr.indexOf(n) === ix);
+      }
+      if (!days.length) days = [0];
+      days.sort((x, y) => ((x + 1) % 7) - ((y + 1) % 7));
+      out.push({
+        id: (typeof a.id === 'string' && a.id) ? a.id : alNewId(),
+        th: Math.round(alNum(a.th, 5, 1, 12)),
+        tm: Math.round(alNum(a.tm, 0, 0, 59)),
+        tap: a.tap === 'م' ? 'م' : 'ص',
+        days: days,
+        on: a.on !== false,
+        name: String(a.name == null ? '' : a.name).slice(0, 40)
+      });
+    }
+    return out;
+  }
+  function alDayName(ms){ return AL_DAYS[new Date(ms).getDay()]; }
+  /* موعد منبه واحد بعد اللحظة المطلوبة (null = مفيش) */
+  function alAlarmNext(a, from){
+    if (!a || a.on === false || !a.days || !a.days.length) return null;
+    const v = alTo24(a.th, a.tm, a.tap);
+    const base = new Date(from);
+    base.setHours(0, 0, 0, 0);
+    for (let d = 0; d <= 7; d++){
+      const day = new Date(base.getTime() + d * 864e5);
+      if (a.days.indexOf(day.getDay()) < 0) continue;
+      const t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), v.h, v.m, 0, 0).getTime();
+      if (t > from) return t;
+    }
+    return null;
+  }
+  /* أقرب موعد في الجدول كله */
+  function alSchedNext(from){
+    let best = null, bestAl = null;
+    for (let i = 0; i < alStore.sched.length; i++){
+      const t = alAlarmNext(alStore.sched[i], from);
+      if (t != null && (best == null || t < best)){ best = t; bestAl = alStore.sched[i]; }
+    }
+    return best == null ? null : { at:best, al:bestAl };
+  }
+  function alDaysTxt(a){
+    if (!a || !a.days.length) return 'مفيش يوم';
+    if (a.days.length === 7) return 'كل يوم';
+    return AL_WDAYS.filter(d => a.days.indexOf(d.i) >= 0).map(d => AL_DAYS[d.i]).join('، ');
+  }
+  function alSchedLabel(a, at){
+    const when = (a.name ? a.name : ('منبه ' + alH12(a.th) + ':' + alTwo(a.tm) + ' ' + a.tap));
+    const dn = alDayName(at);
+    const today = new Date().toDateString() === new Date(at).toDateString();
+    return dn && !today ? (when + ' (' + dn + ')') : when;
+  }
+  /* بعد أي تعديل على الجدول: لو شغّال بنحسب الموعد الجديد فورًا */
+  function alSchedChanged(){
+    saveAl();
+    if (alStore.mode === 'sched' && (alStore.armed || alStore.ringing)) alSchedArm(true);
+    else renderAlDash();
+  }
+  function alSchedAdd(){
+    if (alStore.sched.length >= AL_MAX_SCHED){ showToast('الحد الأقصى ' + AL_MAX_SCHED + ' منبه'); return; }
+    alStore.sched.push({ id:alNewId(), th:alStore.th, tm:alStore.tm, tap:alStore.tap, days:AL_DAY_ALL.slice(), on:true, name:'' });
+    alSetMode('sched');
+    alSchedChanged();
+  }
+  function alSchedDel(i){
+    if (!alStore.sched[i]) return;
+    alStore.sched.splice(i, 1);
+    alSchedChanged();
+  }
+  function alSchedOn(i){
+    const a = alStore.sched[i];
+    if (!a) return;
+    a.on = !a.on;
+    alSchedChanged();
+  }
+  function alSchedTime(i, field, val){
+    const a = alStore.sched[i];
+    if (!a) return;
+    if (field === 'th') a.th = Math.round(alNum(val, a.th, 1, 12));
+    else if (field === 'tm') a.tm = Math.round(alNum(val, a.tm, 0, 59));
+    else if (field === 'tap') a.tap = (val === 'م') ? 'م' : 'ص';
+    alSchedChanged();
+  }
+  function alSchedDay(i, day){
+    const a = alStore.sched[i];
+    if (!a) return;
+    const k = parseInt(day, 10);
+    if (isNaN(k) || k < 0 || k > 6) return;
+    const ix = a.days.indexOf(k);
+    if (ix >= 0) a.days.splice(ix, 1);
+    else a.days.push(k);
+    if (!a.days.length) a.days.push(k);       /* مينفعش يبقى منبه بلا أيام */
+    a.days.sort((x, y) => ((x + 1) % 7) - ((y + 1) % 7));
+    alSchedChanged();
+  }
+  function alSchedDays(i, preset){
+    const a = alStore.sched[i];
+    if (!a) return;
+    a.days = (preset === 'wkd' ? AL_DAY_WKD : AL_DAY_ALL).slice();
+    alSchedChanged();
+  }
+  function alSchedArm(silent){
+    const n = alSchedNext(Date.now() + 1000);
+    if (!n){
+      if (alStore.armed || alStore.ringing) alDisarm(true);   // مفيش حاجة تبقى متسلّحة
+      if (!silent) showToast('مفيش أي منبه مفعّل — اختار يوم أو شغّل منبه');
+      return;
+    }
+    alStore.mode = 'sched';
+    const prev = alNoToast; alNoToast = !!silent;
+    alArmAt(n.at, alSchedLabel(n.al, n.at));
+    alNoToast = prev;
   }
   /* ── مواقيت الصلاة ── */
   function alArmPrayer(id, silent){
@@ -6048,7 +6208,7 @@ function getFiltered(){
       left = Math.max(0, alStore.phaseEndsAt - Date.now());
       p = ring ? (left / Math.max(1000, alStore.ringFor)) : (left / Math.max(1000, alStore.restFor));
       lbl = ring ? 'يرن الآن' : 'استراحة — هيرن تاني';
-      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer') && !!alStore.dueAt;
+      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer' || alStore.mode === 'sched') && !!alStore.dueAt;
       numTxt = atClock ? alFmtDate12(new Date(alStore.dueAt)) : alFmtClock(left);
       if (!atClock) capTxt = capFor(left);
     }
@@ -6056,7 +6216,7 @@ function getFiltered(){
       left = Math.max(0, alStore.dueAt - Date.now());
       p = left / total;
       // وضع الوقت/الصلاة: الرقم الكبير = وقت رنين المنبه، والعد التنازلي تحته بوحدات صريحة
-      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer') && !!alStore.dueAt;
+      atClock = (alStore.mode === 'time' || alStore.mode === 'prayer' || alStore.mode === 'sched') && !!alStore.dueAt;
       if (atClock){
         numTxt = alFmtDate12(new Date(alStore.dueAt));
         lbl = 'المتبقي ' + alFmtDur(left);
@@ -6068,8 +6228,11 @@ function getFiltered(){
     }
     else {
       left = total; p = 1;
-      const idle = alStore.mode === 'prayer' ? 'وقت الصلاة' : (alStore.mode === 'time' ? 'الوقت المضبوط' : 'مدة المنبه');
-      if (alStore.mode === 'prayer' || alStore.mode === 'time'){ numTxt = idle; lbl = 'ابدأ المنبه'; }
+      const onCount = alStore.sched.filter(a => a.on && a.days.length).length;
+      const idle = alStore.mode === 'sched' ? (onCount ? (onCount + ' منبه في الجدول') : 'الجدول فاضي')
+                 : alStore.mode === 'prayer' ? 'وقت الصلاة'
+                 : alStore.mode === 'time' ? 'الوقت المضبوط' : 'مدة المنبه';
+      if (alStore.mode === 'prayer' || alStore.mode === 'time' || alStore.mode === 'sched'){ numTxt = idle; lbl = 'ابدأ المنبه'; }
       else { numTxt = alFmtClock(total); lbl = idle; capTxt = capFor(total); }
     }
     const num = document.getElementById('alRingNum');
@@ -6160,12 +6323,44 @@ function getFiltered(){
     for (let i = from; i <= to; i += st) s += '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + (pad ? alTwo(i) : i) + '</option>';
     return s;
   }
+  function alSchedHtml(){
+    const rows = alStore.sched.map((a, i) => {
+      const days = AL_WDAYS.map(d => {
+        const on = a.days.indexOf(d.i) >= 0;
+        return `<button class="al-dchip${on ? ' on' : ''}" onclick="alSchedDay(${i},${d.i})" aria-pressed="${on}" title="${AL_DAYS[d.i]}" aria-label="${AL_DAYS[d.i]}">${d.s}</button>`;
+      }).join('');
+      const nxt = alAlarmNext(a, Date.now() + 1000);
+      return `<div class="al-sitem${a.on ? '' : ' off'}" data-sched="${i}">
+        <div class="al-shead">
+          <select class="al-sel sm" onchange="alSchedTime(${i},'th',this.value)" aria-label="ساعة المنبه ${i + 1}">${alOpts(1, 12, 1, false, a.th)}</select>
+          <span class="al-tp-c sm">:</span>
+          <select class="al-sel sm" onchange="alSchedTime(${i},'tm',this.value)" aria-label="دقيقة المنبه ${i + 1}">${alOpts(0, 59, 1, true, a.tm)}</select>
+          <button class="al-ampm${a.tap === 'م' ? ' pm' : ''}" onclick="alSchedTime(${i},'tap','${a.tap === 'م' ? 'ص' : 'م'}')" aria-label="صباح أم مساء">${a.tap}</button>
+          <span class="al-sdays" role="group" aria-label="أيام التكرار">${days}</span>
+          <span class="al-sw${a.on ? ' on' : ''}" onclick="alSchedOn(${i})" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();alSchedOn(${i})}" role="switch" aria-checked="${a.on}" tabindex="0" aria-label="تشغيل المنبه ${i + 1}"></span>
+          <button class="al-x" onclick="alSchedDel(${i})" title="حذف المنبه" aria-label="حذف المنبه ${i + 1}"><i class="ti ti-x" aria-hidden="true"></i></button>
+        </div>
+        <div class="al-sfoot">
+          <span class="al-val" title="أيام التكرار">${alDaysTxt(a)}</span>
+          <span class="al-val">${nxt ? ('الجاي ' + alFmtDate12(new Date(nxt)) + ' — ' + alDayName(nxt)) : 'مش مفعّل'}</span>
+          <button class="al-chip sm" onclick="alSchedDays(${i},'all')">كل يوم</button>
+          <button class="al-chip sm" onclick="alSchedDays(${i},'wkd')">أيام العمل</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="al-sched" id="alSchedList">${rows || '<div class="al-note" style="margin:0">مفيش منبهات في الجدول — اضغط «إضافة منبه».</div>'}</div>
+      <div class="al-row" style="margin-top:12px">
+        <button class="al-btn go" onclick="alSchedAdd()"><i class="ti ti-plus" aria-hidden="true"></i> إضافة منبه</button>
+        <span class="al-note" style="margin:0">اختار لكل منبه وقته والأيام اللي يتكرر فيها — وكل المنبهات المفعّلة تشتغل مع بعض.</span>
+      </div>`;
+  }
   function alSegHtml(modes){
     return `<div class="al-seg" role="tablist" aria-label="نوع المنبه">` + modes.map(x =>
       `<button class="al-segi${alStore.mode === x[0] ? ' on' : ''}" onclick="alSetMode('${x[0]}')" role="tab" aria-selected="${alStore.mode === x[0]}">
         <i class="ti ${x[2]}" aria-hidden="true"></i> ${x[1]}</button>`).join('') + `</div>`;
   }
   function alModeHtml(){
+    if (alStore.mode === 'sched') return alSchedHtml();
     if (alStore.mode === 'time'){
       const t = alClockTarget();
       return `<div class="al-tp">
@@ -6340,7 +6535,7 @@ function getFiltered(){
       <div class="al-col">
         <div class="al-card">
           <div class="al-card-title"><i class="ti ti-target" aria-hidden="true"></i> اضبط المنبه</div>
-          ${alSegHtml([['dur','مدة من دلوقتي','ti-timer'], ['time','وقت محدد','ti-clock'], ['prayer','صلاة','ti-moon']])}
+          ${alSegHtml([['dur','مدة من دلوقتي','ti-timer'], ['time','وقت محدد','ti-clock'], ['sched','جدول','ti-list'], ['prayer','صلاة','ti-moon']])}
           ${alModeHtml()}
         </div>
 
@@ -6390,6 +6585,11 @@ function getFiltered(){
   }
 
   function alGoClick(){
+    if (alStore.mode === 'sched'){
+      if (alStore.armed || alStore.ringing) alDisarm(true);
+      alSchedArm();
+      return;
+    }
     if (alStore.mode === 'prayer'){
       if (alStore.armed || alStore.ringing) alDisarm(true);
       if (alStore.prayer) alArmPrayer(alStore.prayer); else { alSetMode('prayer'); showToast('اختار الصلاة اللي عايزها'); }
