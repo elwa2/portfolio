@@ -1095,6 +1095,65 @@
   .ed-csw:hover { transform: scale(1.14); box-shadow: 0 0 0 1px #38bdf8, 0 0 0 3px rgba(56,189,248,0.35); }
   .ed-csw.hidden { display: none; }
 
+  /* ===== EDITOR FIND & REPLACE ===== */
+  .ed-find-box {
+    position: absolute; top: 0; right: 0; z-index: 50;
+    background: var(--bg-overlay); border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm); padding: 10px;
+    width: 100%; max-width: 380px; box-shadow: var(--shadow-md);
+    direction: ltr;
+  }
+  .ed-find-header {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+    font-size: 12px; color: var(--text-2); font-weight: 600;
+  }
+  .ed-find-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border: none; background: transparent;
+    color: var(--text-3); cursor: pointer; border-radius: 6px;
+    transition: all 0.15s; margin-inline-start: auto; flex-shrink: 0;
+  }
+  .ed-find-close:hover { background: var(--glass-str); color: var(--text-1); }
+  .ed-find-input {
+    width: 100%; padding: 6px 10px; border: 1px solid var(--border-sub);
+    border-radius: 6px; background: var(--bg-elevated); color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none;
+    margin-bottom: 8px; direction: ltr;
+  }
+  .ed-find-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.18); }
+  .ed-find-input::placeholder { color: var(--text-4); }
+  .ed-find-row {
+    display: flex; gap: 6px; align-items: center; margin-bottom: 8px;
+  }
+  .ed-find-stats {
+    font-size: 11px; color: var(--text-3); padding: 0 6px;
+    font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+  }
+  .ed-find-nav {
+    display: flex; gap: 4px; margin-inline-start: auto; flex-shrink: 0;
+  }
+  .ed-find-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border: 1px solid var(--border-sub);
+    border-radius: 6px; background: var(--bg-elevated); color: var(--text-2);
+    cursor: pointer; transition: all 0.15s; padding: 0;
+  }
+  .ed-find-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+  .ed-find-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ed-find-toggles {
+    display: flex; gap: 6px; margin-bottom: 8px;
+  }
+  .ed-find-toggle {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 8px; border-radius: 6px; background: transparent;
+    border: 1px solid var(--border-sub); color: var(--text-3);
+    font-size: 11px; cursor: pointer; transition: all 0.15s;
+    font-family: 'Cairo', sans-serif; flex-shrink: 0;
+  }
+  .ed-find-toggle:hover { border-color: var(--border-def); color: var(--text-2); }
+  .ed-find-toggle.active { background: #38bdf8; border-color: #38bdf8; color: #0e0e10; }
+  .ed-find-toggle input { display: none; }
+
   .ed-color-pop {
     position: fixed; z-index: 400; width: 240px;
     background: var(--bg-elevated); border: 1px solid var(--border-def);
@@ -5009,7 +5068,13 @@ function getFiltered(){
     alignCenter: '<line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/>',
     alignLeft: '<line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/>',
     fontPlus: '<path d="M4 7h10M4 12h7M4 17h9"/><path d="M17 8v6M14 11h6"/>',
-    fontMinus: '<path d="M4 7h10M4 12h7M4 17h9"/><path d="M14 11h6"/>'
+    fontMinus: '<path d="M4 7h10M4 12h7M4 17h9"/><path d="M14 11h6"/>',
+    find: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+    close: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    prev: '<path d="M15 19l-7-7 7-7"/>',
+    next: '<path d="M9 5l7 7-7 7"/>',
+    replace: '<path d="M3 12l4-4v3h10V8l4 4-4 4v-3H7v3l-4-4z" transform="translate(0 1)"/><path d="M21 12l-4 4v-3H7v3l-4-4 4-4v3h10V8l4 4z" transform="translate(0 -1)"/>',
+    replaceAll: '<path d="M3 8l4-4v3h8V4l4 4-4 4v-3H7v3l-4-4z"/><path d="M21 16l-4-4v3H9v-3l-4 4 4 4v-3h8v3l4-4z"/>'
   };
   function svgIcon(name, size){
     const s = size || 17;
@@ -5069,6 +5134,42 @@ function getFiltered(){
             <pre class="ed-highlight" id="edHigh"></pre>
             <textarea class="ed-input" id="edInput" spellcheck="false" wrap="off" placeholder="/* الصق أو اكتب الكود هنا... */"></textarea>
             <div class="ed-col-layer" id="edColLayer"></div>
+            <!-- EDITOR FIND & REPLACE BOX -->
+            <div class="ed-find-box" id="edFindBox" style="display:none;">
+              <div class="ed-find-header">
+                <span style="display:inline-flex">${svgIcon('find', 15)}</span>
+                <span>البحث والاستبدال</span>
+                <button class="ed-find-close" onclick="edCloseFindBox()" title="إغلاق البحث (Esc)" aria-label="إغلاق">${svgIcon('close', 14)}</button>
+              </div>
+              <input class="ed-find-input" id="edFindInput" type="text" placeholder="البحث..." spellcheck="false">
+              <div class="ed-find-row">
+                <span class="ed-find-stats" id="edFindStats"></span>
+                <div class="ed-find-nav">
+                  <button class="ed-find-btn" id="edFindPrev" onclick="edFindPrevious()" title="السابق (Shift+Enter)" aria-label="السابق">${svgIcon('prev', 16)}</button>
+                  <button class="ed-find-btn" id="edFindNext" onclick="edFindNext()" title="التالي (Enter)" aria-label="التالي">${svgIcon('next', 16)}</button>
+                </div>
+              </div>
+              <div class="ed-find-toggles">
+                <label class="ed-find-toggle" title="حساس لحالة الأحرف">
+                  <input type="checkbox" id="edFindCase" onchange="edPerformFind()">
+                  <span>Aa</span>
+                </label>
+                <label class="ed-find-toggle" title="كلمة كاملة فقط">
+                  <input type="checkbox" id="edFindWord" onchange="edPerformFind()">
+                  <span>كلمة</span>
+                </label>
+                <label class="ed-find-toggle" title="تعبير نمطي">
+                  <input type="checkbox" id="edFindRegex" onchange="edPerformFind()">
+                  <span>.*</span>
+                </label>
+              </div>
+              <input class="ed-find-input" id="edReplaceInput" type="text" placeholder="استبدل ب..." spellcheck="false">
+              <div class="ed-find-row">
+                <button class="ed-find-btn" id="edReplaceSingle" onclick="edReplaceSingle()" title="استبدال الحالي" aria-label="استبدال">${svgIcon('replace', 16)}</button>
+                <button class="ed-find-btn" id="edReplaceAll" onclick="edReplaceAll()" title="استبدال الكل" aria-label="استبدال الكل" style="background:#38bdf8;color:#0e0e10;border-color:#38bdf8">${svgIcon('replaceAll', 16)}</button>
+              </div>
+            </div>
+          </div>
           </div>
         </div>
 
