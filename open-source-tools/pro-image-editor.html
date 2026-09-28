@@ -12,7 +12,8 @@
     window.__pfCDN = {
       pdfMin: ["vendor/pdfjs/pdf.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"],
       pdfWorker: ["vendor/pdfjs/pdf.worker.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"],
-      jspdf: ["vendor/jspdf/jspdf.umd.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"]
+      jspdf: ["vendor/jspdf/jspdf.umd.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"],
+      jszip: ["vendor/jszip/jszip.min.js", "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"]
     };
   </script>
   <style>
@@ -827,6 +828,149 @@
     .cp-actions .cp-ok{background:linear-gradient(135deg,rgba(79,172,254,.9),rgba(139,92,246,.85));border-color:transparent;color:#fff;}
     .cp-actions .cp-ok:hover{filter:brightness(1.12);}
     .cp-note{font-size:8.5px;color:var(--pf-text-muted);margin-top:8px;text-align:center;line-height:1.5;}
+
+    /* ===== SPLIT (MegaSplit) PANEL ===== */
+    .ms-wrap{padding:0;}
+    .ms-row{display:flex;gap:6px;align-items:center;}
+    .ms-row+.ms-row{margin-top:6px;}
+    .ms-row>.ib{flex:1;width:auto;height:28px;gap:5px;font-size:10.5px;font-weight:600;font-family:var(--pf-font);padding:0 6px;}
+    .ms-row>.ib svg{width:13px;height:13px;}
+    .ms-btn-primary{background:linear-gradient(135deg,var(--pf-accent),#8b5cf6);border-color:transparent;color:#fff;}
+    .ms-btn-primary:hover{background:linear-gradient(135deg,#3a9af0,#7c3aed);border-color:transparent;color:#fff;}
+    .ms-btn-ok{background:linear-gradient(135deg,rgba(72,187,120,.9),rgba(56,161,105,.9));border-color:transparent;color:#fff;}
+    .ms-btn-ok:hover{background:linear-gradient(135deg,#48bb78,#38a169);border-color:transparent;color:#fff;}
+    .ms-btn-go{background:linear-gradient(135deg,var(--pf-accent),#8b5cf6);border-color:transparent;color:#fff;height:32px!important;font-size:11px!important;font-weight:700;box-shadow:0 0 12px var(--pf-accent-glow);}
+    .ms-btn-go:hover{filter:brightness(1.12);}
+    .ms-btn-go:disabled,.ms-row>.ib:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+
+    /* drop zone */
+    .ms-drop{border:1.5px dashed var(--pf-border-focus);border-radius:8px;background:var(--pf-bg-3);
+      padding:12px 8px;text-align:center;cursor:pointer;transition:all var(--pf-transition);color:var(--pf-text-dim);}
+    .ms-drop:hover{background:var(--pf-surface-hover);border-color:var(--pf-accent);color:var(--pf-text);}
+    .ms-drop.drag-over{border-color:var(--pf-accent);background:rgba(79,172,254,.14);color:var(--pf-text);
+      box-shadow:0 0 0 1px var(--pf-accent) inset,0 0 16px var(--pf-accent-glow);}
+    .ms-drop svg{width:20px;height:20px;stroke:var(--pf-accent);fill:none;stroke-width:1.75;margin-bottom:4px;}
+    .ms-drop .ms-dz-t{font-size:10.5px;font-weight:600;color:var(--pf-text);margin-bottom:2px;}
+    .ms-drop .ms-dz-s{font-size:9px;color:var(--pf-text-muted);line-height:1.5;}
+    .ms-badges{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:6px;}
+    .ms-badge{font-size:8px;font-family:var(--pf-mono);padding:1px 5px;border-radius:4px;
+      background:var(--pf-bg-4);color:var(--pf-text-muted);border:1px solid var(--pf-border);}
+
+    /* pdf pager */
+    .ms-pager{display:none;align-items:center;gap:6px;margin-top:6px;background:var(--pf-bg-3);
+      border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);padding:4px 6px;}
+    .ms-pager.on{display:flex;}
+    .ms-pager .ms-pg-txt{flex:1;font-size:10px;color:var(--pf-text-dim);text-align:center;direction:ltr;}
+    .ms-pager .ms-pg-txt b{color:var(--pf-accent);font-family:var(--pf-mono);}
+    .ms-pager .ib{width:24px;height:22px;}
+    .ms-pager .ib svg{width:12px;height:12px;}
+
+    /* preview + cut lines */
+    .ms-prev{position:relative;width:100%;height:180px;border:1px solid var(--pf-border);border-radius:8px;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      background:
+        linear-gradient(45deg,#1a1a2e 25%,transparent 25%,transparent 75%,#1a1a2e 75%),
+        linear-gradient(45deg,#1a1a2e 25%,#14142a 25%,#14142a 75%,#1a1a2e 75%);
+      background-size:14px 14px;background-position:0 0,7px 7px;cursor:crosshair;user-select:none;touch-action:none;}
+    .ms-prev.empty{background:var(--pf-bg-3);border-style:dashed;cursor:default;}
+    .ms-prev.empty .ms-prev-ph{font-size:9.5px;color:var(--pf-text-muted);text-align:center;line-height:1.6;padding:10px;}
+    .ms-prev canvas{display:block;max-width:100%;max-height:100%;width:auto;height:auto;}
+    .ms-lines{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;}
+    .ms-line{position:absolute;pointer-events:auto;background:var(--pf-ms-line,#4facfe);
+      box-shadow:0 0 0 1px rgba(0,0,0,.55),0 0 10px color-mix(in srgb,var(--pf-ms-line,#4facfe) 55%,transparent);cursor:grab;}
+    .ms-line.vertical{width:2px;top:0;bottom:0;}
+    .ms-line.horizontal{height:2px;left:0;right:0;}
+    .ms-line.dragging{cursor:grabbing;background:#fff;}
+    .ms-line .ms-lb{position:absolute;font-size:8px;font-family:var(--pf-mono);font-weight:700;color:#04121f;
+      background:var(--pf-ms-line,#4facfe);border-radius:3px;padding:0 3px;line-height:11px;white-space:nowrap;
+      box-shadow:0 1px 3px rgba(0,0,0,.5);}
+    .ms-line.horizontal .ms-lb{left:3px;top:-5px;}
+    .ms-line.vertical .ms-lb{left:3px;top:2px;}
+    .ms-line.flip.horizontal .ms-lb{left:auto;right:3px;}
+    .ms-line.flip.vertical .ms-lb{left:auto;right:3px;}
+    .ms-line .ms-lx{position:absolute;width:13px;height:13px;border-radius:50%;background:#fc5c7d;color:#fff;
+      font-size:10px;line-height:12px;text-align:center;cursor:pointer;font-family:var(--pf-font);
+      box-shadow:0 1px 4px rgba(0,0,0,.6);}
+    .ms-line.horizontal .ms-lx{right:3px;top:-5px;}
+    .ms-line.vertical .ms-lx{right:3px;top:2px;}
+    .ms-line.flip.horizontal .ms-lx{right:auto;left:3px;}
+    .ms-line.flip.vertical .ms-lx{right:auto;left:3px;}
+    .ms-line .ms-lx:hover{background:#e03e60;}
+
+    /* direction toggle */
+    .ms-dir{display:flex;gap:4px;background:var(--pf-bg-3);border:1px solid var(--pf-border);
+      border-radius:var(--pf-radius-sm);padding:3px;}
+    .ms-dir button{flex:1;height:26px;border:0;border-radius:var(--pf-radius-sm);background:transparent;
+      color:var(--pf-text-dim);font-size:10px;font-weight:600;font-family:var(--pf-font);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:4px;transition:all var(--pf-transition);}
+    .ms-dir button svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+    .ms-dir button:hover{background:var(--pf-surface-hover);color:var(--pf-text);}
+    .ms-dir button.active{background:linear-gradient(135deg,var(--pf-accent),#8b5cf6);color:#fff;
+      box-shadow:0 0 8px var(--pf-accent-glow);}
+    .ms-hint{font-size:9px;line-height:1.6;color:var(--pf-text-muted);margin-top:6px;
+      border-right:2px solid var(--pf-accent);padding-right:6px;}
+
+    /* numeric fields */
+    .ms-f{display:flex;align-items:center;gap:5px;margin-bottom:7px;}
+    .ms-f:last-child{margin-bottom:0;}
+    .ms-f label{font-size:10px;color:var(--pf-text-label);flex:1;min-width:0;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .ms-f input[type="number"],.ms-f select{width:72px;flex:0 0 auto;background:var(--pf-bg-3);
+      border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);color:var(--pf-text);
+      padding:4px 5px;font-size:10.5px;font-family:var(--pf-mono);}
+    .ms-f select{width:100%;font-family:var(--pf-font);}
+    .ms-f input[type="number"]:focus,.ms-f select:focus{outline:none;border-color:var(--pf-border-focus);}
+
+    /* cut line list */
+    .ms-lines-list{border:1px solid var(--pf-border);border-radius:var(--pf-radius-sm);
+      max-height:132px;overflow-y:auto;margin-bottom:6px;}
+    .ms-lines-list::-webkit-scrollbar{width:4px;}
+    .ms-lines-list::-webkit-scrollbar-thumb{background:var(--pf-bg-5);border-radius:2px;}
+    .ms-li{display:flex;align-items:center;gap:5px;padding:3px 6px;border-bottom:1px solid var(--pf-border);}
+    .ms-li:last-child{border-bottom:0;}
+    .ms-li .ms-li-sw{width:8px;height:8px;border-radius:2px;background:var(--pf-ms-line,#4facfe);flex:0 0 auto;}
+    .ms-li .ms-li-n{font-size:9.5px;color:var(--pf-text-dim);flex:1;min-width:0;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .ms-li .ms-li-n b{color:var(--pf-text);font-family:var(--pf-mono);}
+    .ms-li input{width:62px;flex:0 0 auto;background:var(--pf-bg-4);border:1px solid var(--pf-border);
+      border-radius:4px;color:var(--pf-text);padding:2px 4px;font-size:9.5px;font-family:var(--pf-mono);text-align:right;}
+    .ms-li input:focus{outline:none;border-color:var(--pf-border-focus);}
+    .ms-li .ib{width:19px;height:19px;border-radius:4px;}
+    .ms-li .ib svg{width:10px;height:10px;}
+    .ms-li-empty{padding:8px;text-align:center;font-size:9.5px;color:var(--pf-text-muted);line-height:1.6;}
+
+    /* progress */
+    .ms-prog{display:none;margin-top:8px;}
+    .ms-prog.on{display:block;}
+    .ms-prog-bar{height:5px;border-radius:3px;background:var(--pf-bg-4);overflow:hidden;}
+    .ms-prog-fill{height:100%;width:0%;border-radius:3px;
+      background:linear-gradient(90deg,var(--pf-accent),#8b5cf6);transition:width .2s ease;}
+    .ms-prog-txt{font-size:9px;color:var(--pf-text-muted);margin-top:4px;text-align:center;}
+
+    /* results */
+    .ms-sum{display:none;align-items:center;gap:6px;background:rgba(72,187,120,.1);
+      border:1px solid rgba(72,187,120,.3);border-radius:var(--pf-radius-sm);padding:5px 7px;margin-bottom:7px;}
+    .ms-sum.on{display:flex;}
+    .ms-sum svg{width:13px;height:13px;stroke:var(--pf-success);fill:none;stroke-width:2.5;flex:0 0 auto;}
+    .ms-sum span{font-size:9.5px;color:var(--pf-text-dim);line-height:1.5;}
+    .ms-sum b{color:var(--pf-success);font-family:var(--pf-mono);}
+    .ms-seg-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:260px;overflow-y:auto;
+      padding-right:2px;margin-bottom:7px;}
+    .ms-seg-grid::-webkit-scrollbar{width:4px;}
+    .ms-seg-grid::-webkit-scrollbar-thumb{background:var(--pf-bg-5);border-radius:2px;}
+    .ms-seg{border:1px solid var(--pf-border);border-radius:6px;background:var(--pf-bg-3);overflow:hidden;
+      cursor:pointer;transition:all var(--pf-transition);position:relative;}
+    .ms-seg:hover{border-color:var(--pf-accent);box-shadow:0 0 10px var(--pf-accent-glow);}
+    .ms-seg-img{width:100%;height:52px;object-fit:cover;display:block;background:var(--pf-bg-1);}
+    .ms-seg-meta{padding:3px 4px;}
+    .ms-seg-nm{font-size:8.5px;font-family:var(--pf-mono);color:var(--pf-text);
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
+    .ms-seg-dim{font-size:8px;color:var(--pf-text-muted);font-family:var(--pf-mono);direction:ltr;}
+    .ms-seg-dl{position:absolute;top:3px;inset-inline-end:3px;width:19px;height:19px;border-radius:5px;
+      background:rgba(12,14,20,.82);color:#fff;display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity var(--pf-transition);}
+    .ms-seg:hover .ms-seg-dl{opacity:1;}
+    .ms-seg-dl svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
   </style>
 </head>
 <body>
@@ -1507,6 +1651,16 @@
           </svg>
           <span class="rail-tip" role="tooltip">Artboards</span>
         </div>
+        <div class="panel-tab" data-panel="split" role="button" tabindex="0" aria-label="Split image into segments">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="3"/>
+            <circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Split &middot; تقطيع</span>
+        </div>
         <div class="rail-spacer"></div>
 <button type="button" class="panel-tab rail-save" id="railSaveBtn" aria-label="Save as PNG (Alt/Ctrl/right-click for more formats)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1731,6 +1885,162 @@
               <div class="ab-list" id="abList"></div>
             </div>
             <p class="ab-tip"><b>How it works:</b> the document is the <b>board</b> — it is bigger than the artboard, so you can add several images as layers and freely move them <b>outside</b> the artboard. When you <b>Export</b>, only the pixels <b>inside</b> the selected artboard are saved. Use the <b>Artboard Tool (A)</b> on the left toolbar — drag to create a new artboard, drag an artboard to move it, drag its corners to resize it.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPLIT (MegaSplit) PANEL -->
+      <div class="panel-content" data-panel="split">
+        <div class="panel-savebar">
+          <button class="ib save-export-btn ms-btn-go" id="msRunBtn" title="Cut the image into segments" disabled>
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+            Cut &amp; Export Segments
+          </button>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-header"><h4><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Source</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+          <div class="panel-body">
+            <div class="ms-wrap">
+              <div class="ms-drop" id="msDrop" role="button" tabindex="0" aria-label="Drop an image or PDF here, or click to browse">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="ms-dz-t">Drop an image / PDF</div>
+                <div class="ms-dz-s">or click to browse &middot; max 20MB</div>
+                <div class="ms-badges">
+                  <span class="ms-badge">JPG</span><span class="ms-badge">PNG</span><span class="ms-badge">WebP</span><span class="ms-badge">GIF</span><span class="ms-badge">PDF</span>
+                </div>
+                <input type="file" id="msFile" accept="image/*,.pdf" hidden />
+              </div>
+
+              <div class="ms-pager" id="msPager">
+                <button class="ib" id="msPrevPage" title="Previous page"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+                <span class="ms-pg-txt">Page <b id="msPageNo">1</b> / <b id="msPageCount">1</b></span>
+                <button class="ib" id="msNextPage" title="Next page"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+              </div>
+
+              <div class="ms-row" style="margin-top:7px;">
+                <button class="ib" id="msUseCurrent" title="Load the image currently open in the editor">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  Use Current Image
+                </button>
+              </div>
+              <div class="ms-row">
+                <button class="ib" id="msReplaceBtn" title="Swap the source image and keep the cut ratios" disabled>
+                  <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                  Replace
+                </button>
+                <input type="file" id="msReplaceFile" accept="image/*" hidden />
+                <button class="ib" id="msResetBtn" title="Clear the source and all cut lines" disabled>
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                  Reset
+                </button>
+              </div>
+              <p class="ms-hint" id="msSrcHint">Use <b>Use Current Image</b> to split the picture you are editing, or drop your own file above.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-header"><h4><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>Cut Lines</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+          <div class="panel-body">
+            <div class="ms-wrap">
+              <div class="ms-prev empty" id="msPrev">
+                <canvas id="msPrevCanvas" hidden></canvas>
+                <div class="ms-lines" id="msLines"></div>
+                <div class="ms-prev-ph" id="msPrevPh">No source image yet.<br>Load one to start cutting.</div>
+              </div>
+
+              <div class="ms-dir" style="margin-top:8px;">
+                <button id="msDirH" class="active" title="Horizontal cuts (split into rows)"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="7 8 3 12 7 16"/><polyline points="17 8 21 12 17 16"/></svg>Horizontal</button>
+                <button id="msDirV" title="Vertical cuts (split into columns)"><svg viewBox="0 0 24 24"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8 7 12 3 16 7"/><polyline points="8 17 12 21 16 17"/></svg>Vertical</button>
+              </div>
+
+              <p class="ms-hint" id="msDirHint">Click on the preview to add a horizontal cut. Drag a line to move it, or press &times; to remove it.</p>
+
+              <div class="ms-f" style="margin-top:8px;">
+                <label for="msSegCount">Equal segments (2&ndash;20)</label>
+                <input type="number" id="msSegCount" min="2" max="20" value="2" />
+                <button class="ib" id="msEqualBtn" title="Distribute equal segments" style="width:28px;height:26px;">
+                  <svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+                </button>
+              </div>
+
+              <div class="ms-lines-list" id="msLinesList">
+                <div class="ms-li-empty">No cut lines yet &mdash; click the preview to add one.</div>
+              </div>
+              <div class="ms-row">
+                <button class="ib" id="msClearBtn" title="Remove every cut line" disabled>
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                  Clear All Lines
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section collapsed">
+          <div class="panel-header"><h4><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>Output</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+          <div class="panel-body">
+            <div class="ms-wrap">
+              <div class="ms-f">
+                <label for="msFormat">Format</label>
+                <select id="msFormat">
+                  <option value="image/png">PNG</option>
+                  <option value="image/jpeg" selected>JPEG</option>
+                  <option value="image/webp">WebP</option>
+                </select>
+              </div>
+              <div class="ms-f">
+                <label for="msQuality">Quality (1&ndash;100)</label>
+                <input type="number" id="msQuality" min="1" max="100" value="95" />
+              </div>
+              <div class="ms-f">
+                <label for="msMaxKb">Max size per part</label>
+                <select id="msMaxKb">
+                  <option value="512">512 KB</option>
+                  <option value="1024" selected>1 MB</option>
+                  <option value="2048">2 MB</option>
+                  <option value="5120">5 MB</option>
+                </select>
+              </div>
+              <p class="ms-hint">Each part is auto-compressed under the size limit (quality is binary&ndash;searched, then the format is downgraded if needed).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Result</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+          <div class="panel-body">
+            <div class="ms-wrap">
+              <div class="ms-prog" id="msProg">
+                <div class="ms-prog-bar"><div class="ms-prog-fill" id="msProgFill"></div></div>
+                <div class="ms-prog-txt" id="msProgTxt">Cutting&hellip;</div>
+              </div>
+
+              <div class="ms-sum" id="msSum">
+                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span><b id="msSumCount">0</b> parts are ready &mdash; click a part to download it, or grab everything as a ZIP.</span>
+              </div>
+
+              <div class="ms-seg-grid" id="msSegGrid"></div>
+
+              <div class="ms-row">
+                <button class="ib ms-btn-ok" id="msZipBtn" style="display:none;">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download All (ZIP)
+                </button>
+              </div>
+              <div class="ms-row">
+                <button class="ib" id="msBackBtn" style="display:none;">
+                  <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                  Back to Editing
+                </button>
+                <button class="ib" id="msStartOverBtn" style="display:none;">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>
+                  Start Over
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -8332,6 +8642,687 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       toast(state.artboardExportOnly?"Exports will be cropped to the active artboard.":"Exports will use the full board.","info",1800);
     });
     renderArtboardPanel();
+  })();
+
+  /* ===================== SPLIT / MEGASPLIT PANEL ===================== */
+  (function initSplitPanel(){
+    const el={
+      drop:$("msDrop"),file:$("msFile"),replaceFile:$("msReplaceFile"),
+      useCurrent:$("msUseCurrent"),replaceBtn:$("msReplaceBtn"),resetBtn:$("msResetBtn"),srcHint:$("msSrcHint"),
+      pager:$("msPager"),prevPage:$("msPrevPage"),nextPage:$("msNextPage"),pageNo:$("msPageNo"),pageCount:$("msPageCount"),
+      prev:$("msPrev"),prevCanvas:$("msPrevCanvas"),prevPh:$("msPrevPh"),lines:$("msLines"),
+      dirH:$("msDirH"),dirV:$("msDirV"),dirHint:$("msDirHint"),
+      segCount:$("msSegCount"),equalBtn:$("msEqualBtn"),
+      linesList:$("msLinesList"),clearBtn:$("msClearBtn"),
+      format:$("msFormat"),quality:$("msQuality"),maxKb:$("msMaxKb"),
+      runBtn:$("msRunBtn"),prog:$("msProg"),progFill:$("msProgFill"),progTxt:$("msProgTxt"),
+      sum:$("msSum"),sumCount:$("msSumCount"),segGrid:$("msSegGrid"),
+      zipBtn:$("msZipBtn"),backBtn:$("msBackBtn"),startOverBtn:$("msStartOverBtn")
+    };
+    if(!el.drop||!el.prev||!el.prevCanvas)return;
+
+    const MS_STORE="photoforge.splitCuts.v1";
+    const MS_MAX_PRESETS=50;
+    const MS_MAX_FILE=20*1024*1024;
+    const MS_MIN_GAP=10; /* px from the edges, matches original MegaSplit */
+
+    let msSource=null;            /* HTMLImageElement | HTMLCanvasElement */
+    let msSourceName="";
+    let msW=0,msH=0;
+    let msLines=[];               /* {id,pos} sorted ascending */
+    let msLineSeq=0;
+    let msDir="horizontal";
+    let msSegments=[];
+    let msPdfPages=[],msPdfPage=0;
+    let msSignature=null;
+    let msView="edit";            /* "edit" | "result" */
+    let msDragId=null;
+    const msCtx=el.prevCanvas.getContext("2d");
+
+    /* ---------- helpers ---------- */
+    const msTotal=()=>msDir==="horizontal"?msH:msW;
+    const msIsH=()=>msDir==="horizontal";
+    const msLineColor=()=>msDir==="horizontal"?"#4facfe":"#8b5cf6";
+    const msFmtBytes=(bytes,dm=1)=>{
+      if(!bytes)return "0 B";
+      const units=["B","KB","MB","GB"],i=Math.min(Math.floor(Math.log(bytes)/Math.log(1024)),units.length-1);
+      return (bytes/Math.pow(1024,i)).toFixed(i?dm:0)+" "+units[i];
+    };
+    const msExt=(f)=>({"image/png":"png","image/jpeg":"jpg","image/webp":"webp"})[f]||"png";
+    const msBaseName=()=>{
+      const n=(msSourceName||"image").replace(/\.[a-z0-9]+$/i,"").replace(/[\\/:*?"<>|]+/g,"_").trim()||"image";
+      return n;
+    };
+    const msSetVar=()=>{el.prev.style.setProperty("--pf-ms-line",msLineColor());};
+
+    /* ---------- localStorage presets ---------- */
+    const msReadPresets=()=>{
+      try{const raw=localStorage.getItem(MS_STORE);if(!raw)return {};const p=JSON.parse(raw);
+        return p&&typeof p==="object"?p:{};}catch(e){return {};}
+    };
+    const msWritePresets=p=>{try{localStorage.setItem(MS_STORE,JSON.stringify(p));}catch(e){}};
+    function msSaveLines(){
+      if(!msSignature||!msW||!msH)return;
+      const t=msTotal();
+      const all=msReadPresets();
+      all[msSignature]={
+        w:msW,h:msH,dir:msDir,updatedAt:Date.now(),
+        ratios:msLines.map(l=>Number((l.pos/t).toFixed(6))).filter(r=>r>0&&r<1)
+      };
+      const kept=Object.entries(all).sort((a,b)=>(b[1].updatedAt||0)-(a[1].updatedAt||0)).slice(0,MS_MAX_PRESETS);
+      const out={};kept.forEach(([k,v])=>{out[k]=v;});
+      msWritePresets(out);
+    }
+    function msRestoreLines(){
+      if(!msSignature||!msW||!msH)return false;
+      const p=msReadPresets()[msSignature];
+      if(!p||!Array.isArray(p.ratios)||p.w!==msW||p.h!==msH)return false;
+      if(p.dir&&p.dir!==msDir)msSetDir(p.dir,false);
+      const t=msTotal();
+      msLines=p.ratios.map(Number)
+        .filter(r=>Number.isFinite(r)&&r>0&&r<1)
+        .map(r=>({id:++msLineSeq,pos:Math.round(r*t)}))
+        .filter(l=>l.pos>=MS_MIN_GAP&&l.pos<=t-MS_MIN_GAP)
+        .sort((a,b)=>a.pos-b.pos);
+      return msLines.length>0;
+    }
+
+    /* ---------- encoding / compression ---------- */
+    function msCanvasToBlob(src,format,quality){
+      return new Promise((res,rej)=>{
+        let out=src;
+        if(format==="image/jpeg"){
+          out=mkCanvas(src.width,src.height);
+          const c=out.getContext("2d");
+          c.fillStyle="#FFFFFF";c.fillRect(0,0,out.width,out.height);
+          c.drawImage(src,0,0);
+        }
+        out.toBlob(b=>b?res(b):rej(new Error("Image encoding failed.")),format,format==="image/png"?undefined:quality);
+      });
+    }
+    function msFormatOrder(pref){
+      if(pref==="image/jpeg")return["image/jpeg","image/webp"];
+      if(pref==="image/webp")return["image/webp","image/jpeg"];
+      return["image/png","image/webp","image/jpeg"];
+    }
+    async function msEncodeUnderLimit(src,format,quality,maxBytes){
+      if(format==="image/png"){
+        const b=await msCanvasToBlob(src,format);
+        return b.size<=maxBytes?{blob:b,format}:null;
+      }
+      let lo=0.05,hi=clamp(quality,0.05,1),best=null;
+      const first=await msCanvasToBlob(src,format,hi);
+      if(first.size<=maxBytes){best=first;lo=hi;}
+      else{
+        for(let i=0;i<8;i++){
+          const mid=(lo+hi)/2;
+          const b=await msCanvasToBlob(src,format,mid);
+          if(b.size<=maxBytes){best=b;lo=mid;}else{hi=mid;}
+        }
+      }
+      if(best&&best.size<=maxBytes)return{blob:best,format};
+      const min=await msCanvasToBlob(src,format,0.05);
+      return min.size<=maxBytes?{blob:min,format}:null;
+    }
+    async function msCompressToLimit(src,pref,quality,maxBytes){
+      for(const f of msFormatOrder(pref)){
+        const r=await msEncodeUnderLimit(src,f,quality,maxBytes);
+        if(r)return{blob:r.blob,format:r.format,width:src.width,height:src.height};
+      }
+      throw new Error("Could not compress a part under "+msFmtBytes(maxBytes,0)+". Try more parts.");
+    }
+
+    /* ---------- progress ---------- */
+    let msProgToken=0;
+    function msProgress(on,ratio,text){
+      el.prog.classList.toggle("on",!!on);
+      el.progFill.style.width=Math.round(clamp(ratio||0,0,1)*100)+"%";
+      el.progTxt.textContent=text||"";
+    }
+
+    /* ---------- preview rendering ---------- */
+    function msDrawPreview(){
+      if(!msSource||!msW||!msH)return;
+      el.prevCanvas.hidden=false;
+      el.prev.classList.remove("empty");
+      el.prevPh.hidden=true;
+      el.prevCanvas.width=msW;
+      el.prevCanvas.height=msH;
+      msCtx.clearRect(0,0,msW,msH);
+      msCtx.drawImage(msSource,0,0,msW,msH);
+      msRenderLines();
+    }
+    function msRenderLines(){
+      el.lines.innerHTML="";
+      if(!msW||!msH)return;
+      /* align the overlay exactly on top of the letterboxed canvas */
+      const box=el.prev.getBoundingClientRect();
+      const cv=el.prevCanvas.getBoundingClientRect();
+      if(!cv.width||!cv.height||!box.width||!box.height)return;
+      el.lines.style.left=(cv.left-box.left)+"px";
+      el.lines.style.top=(cv.top-box.top)+"px";
+      el.lines.style.width=cv.width+"px";
+      el.lines.style.height=cv.height+"px";
+      const scale=msIsH()?(cv.height/msH):(cv.width/msW);
+      const t=msTotal();
+      msLines.forEach((l,i)=>{
+        const d=document.createElement("div");
+        d.className="ms-line "+(msIsH()?"horizontal":"vertical")+((l.pos/t>0.72)?" flip":"");
+        d.dataset.lineId=l.id;
+        const off=Math.round(l.pos*scale);
+        if(msIsH())d.style.top=off+"px";else d.style.left=off+"px";
+        const lb=document.createElement("span");lb.className="ms-lb";lb.textContent=String(i+1);
+        d.appendChild(lb);
+        const x=document.createElement("span");x.className="ms-lx";x.textContent="\u00d7";
+        x.title="Remove this cut";x.dataset.remove=String(l.id);
+        d.appendChild(x);
+        d.addEventListener("pointerdown",ev=>msStartDrag(ev,l.id));
+        el.lines.appendChild(d);
+      });
+    }
+    function msRenderLineList(){
+      const t=msTotal();
+      if(!msLines.length){
+        el.linesList.innerHTML=msW
+          ? '<div class="ms-li-empty">No cut lines yet &mdash; click the preview to add one.</div>'
+          : '<div class="ms-li-empty">No source image yet.</div>';
+        return;
+      }
+      let html="";
+      msLines.forEach((l,i)=>{
+        html+='<div class="ms-li" data-line-id="'+l.id+'">'
+          +'<span class="ms-li-sw" style="background:'+msLineColor()+'"></span>'
+          +'<span class="ms-li-n">Line <b>'+(i+1)+'</b></span>'
+          +'<input type="number" data-pos-input="'+l.id+'" value="'+l.pos+'" min="'+MS_MIN_GAP+'" max="'+Math.max(MS_MIN_GAP,Math.round(t)-MS_MIN_GAP)+'" title="Position in pixels" />'
+          +'<button class="ib" data-del="'+l.id+'" title="Remove"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
+          +'</div>';
+      });
+      el.linesList.innerHTML=html;
+    }
+    function msSyncUi(){
+      const has=!!msSource;
+      msSetVar();
+      el.pager.classList.toggle("on",msPdfPages.length>1);
+      el.pageNo.textContent=String(msPdfPage+1);
+      el.pageCount.textContent=String(Math.max(1,msPdfPages.length));
+      el.prevPage.disabled=msPdfPage<=0;
+      el.nextPage.disabled=msPdfPage>=msPdfPages.length-1;
+      el.runBtn.disabled=!has||msView==="result";
+      el.replaceBtn.disabled=!has;
+      el.resetBtn.disabled=!has;
+      el.clearBtn.disabled=!msLines.length;
+      el.segCount.disabled=!has;
+      el.equalBtn.disabled=!has;
+      el.dirH.classList.toggle("active",msDir==="horizontal");
+      el.dirV.classList.toggle("active",msDir==="vertical");
+      el.dirHint.innerHTML=!has
+        ? "Load a source image to start cutting."
+        : (msDir==="horizontal"
+          ? "Click on the preview to add a <b>horizontal</b> cut. Drag a line to move it, or press &times; to remove it."
+          : "Click on the preview to add a <b>vertical</b> cut. Drag a line to move it, or press &times; to remove it.");
+      el.srcHint.innerHTML=has
+        ? "Source: <b>"+msBaseName()+"</b> &middot; "+msW+"&times;"+msH+(msPdfPages.length>1?" &middot; PDF page "+(msPdfPage+1):"")
+        : "Use <b>Use Current Image</b> to split the picture you are editing, or drop your own file above.";
+      el.sum.classList.toggle("on",msView==="result"&&msSegments.length>0);
+      el.sumCount.textContent=String(msSegments.length);
+      el.zipBtn.style.display=msView==="result"&&msSegments.length>1?"":"none";
+      el.backBtn.style.display=msView==="result"?"":"none";
+      el.startOverBtn.style.display=msView==="result"?"":"none";
+      if(msView!=="result"){el.segGrid.innerHTML="";el.sum.classList.remove("on");}
+    }
+
+    /* ---------- cut line ops ---------- */
+    function msSetDir(dir,keepLines){
+      if(dir===msDir)return;
+      const t=msTotal();
+      const ratios=keepLines?msLines.map(l=>l.pos/t):[];
+      msDir=dir;
+      const nt=msTotal();
+      msLines=ratios
+        .map((r,i)=>({id:i+1,pos:Math.round(r*nt)}))
+        .filter(l=>l.pos>=MS_MIN_GAP&&l.pos<=nt-MS_MIN_GAP)
+        .sort((a,b)=>a.pos-b.pos);
+      msLineSeq=msLines.length;
+      msSetVar();
+      msRenderLines();msRenderLineList();msSyncUi();
+      if(msSignature)msSaveLines();
+    }
+    function msAddLine(pos){
+      if(!msW||!msH)return;
+      const t=msTotal();
+      pos=Math.round(pos);
+      if(pos<MS_MIN_GAP||pos>t-MS_MIN_GAP)return;
+      if(msLines.some(l=>Math.abs(l.pos-pos)<4))return;
+      msLines.push({id:++msLineSeq,pos});
+      msLines.sort((a,b)=>a.pos-b.pos);
+      msAfterLineChange();
+    }
+    function msRemoveLine(id){
+      msLines=msLines.filter(l=>l.id!==id);
+      msAfterLineChange();
+    }
+    function msAfterLineChange(){
+      msRenderLines();msRenderLineList();msSyncUi();
+      msSaveLines();
+    }
+    function msEqualSegments(){
+      if(!msW||!msH)return;
+      const n=clamp(Math.round(Number(el.segCount.value)||0),2,20);
+      el.segCount.value=String(n);
+      const t=msTotal(),step=t/n;
+      msLines=[];
+      for(let i=1;i<n;i++)msLines.push({id:++msLineSeq,pos:Math.round(step*i)});
+      msLines=msLines.filter(l=>l.pos>=MS_MIN_GAP&&l.pos<=t-MS_MIN_GAP).sort((a,b)=>a.pos-b.pos);
+      msAfterLineChange();
+      toast(n+" equal "+msDir+" parts.","success",1600);
+    }
+    function msClearLines(){
+      if(!msLines.length)return;
+      msLines=[];
+      msAfterLineChange();
+    }
+
+    /* ---------- preview interaction ---------- */
+    let msSuppressClick=false;
+    el.prev.addEventListener("click",ev=>{
+      if(msSuppressClick){msSuppressClick=false;return;}
+      if(msView==="result"||!msSource)return;
+      if(ev.target.closest("[data-remove]"))return;
+      const r=el.prevCanvas.getBoundingClientRect();
+      if(!r.width||!r.height)return;
+      const v=msIsH()
+        ?(ev.clientY-r.top)/r.height*msH
+        :(ev.clientX-r.left)/r.width*msW;
+      msAddLine(v);
+    });
+    function msStartDrag(ev,id){
+      if(msView==="result")return;
+      if(ev.target.closest("[data-remove]"))return;
+      ev.preventDefault();ev.stopPropagation();
+      msDragId=id;
+      const node=el.lines.querySelector('[data-line-id="'+id+'"]');
+      if(node)node.classList.add("dragging");
+      window.addEventListener("pointermove",msOnDrag);
+      window.addEventListener("pointerup",msEndDrag,{once:true});
+    }
+    function msOnDrag(ev){
+      if(msDragId==null)return;
+      const r=el.prevCanvas.getBoundingClientRect();
+      const line=msLines.find(l=>l.id===msDragId);
+      if(!line||!r.width||!r.height)return;
+      const t=msTotal();
+      let v=msIsH()?(ev.clientY-r.top)/r.height*msH:(ev.clientX-r.left)/r.width*msW;
+      v=Math.round(clamp(v,MS_MIN_GAP,t-MS_MIN_GAP));
+      if(v===line.pos)return;
+      line.pos=v;
+      msLines.sort((a,b)=>a.pos-b.pos);
+      msRenderLines();msRenderLineList();
+    }
+    function msEndDrag(){
+      if(msDragId!=null){
+        const node=el.lines.querySelector('[data-line-id="'+msDragId+'"]');
+        if(node)node.classList.remove("dragging");
+        msDragId=null;
+        msSuppressClick=true;
+        setTimeout(()=>{msSuppressClick=false;},60);
+        msSaveLines();
+      }
+      window.removeEventListener("pointermove",msOnDrag);
+    }
+    el.lines.addEventListener("click",ev=>{
+      const btn=ev.target.closest("[data-remove]");
+      if(btn){ev.stopPropagation();msRemoveLine(Number(btn.dataset.remove));}
+    });
+    el.linesList.addEventListener("click",ev=>{
+      const b=ev.target.closest("[data-del]");
+      if(b){msRemoveLine(Number(b.dataset.del));return;}
+    });
+    el.linesList.addEventListener("change",ev=>{
+      const inp=ev.target.closest("[data-pos-input]");
+      if(!inp)return;
+      const id=Number(inp.dataset.posInput);
+      const t=msTotal();
+      const v=Math.round(clamp(Number(inp.value)||0,MS_MIN_GAP,Math.max(MS_MIN_GAP,t-MS_MIN_GAP)));
+      const line=msLines.find(l=>l.id===id);
+      if(!line)return;
+      line.pos=v;
+      msLines.sort((a,b)=>a.pos-b.pos);
+      msAfterLineChange();
+    });
+
+    /* ---------- source loading ---------- */
+    function msReleaseSegments(){
+      msSegments.forEach(s=>{if(s.url)URL.revokeObjectURL(s.url);});
+      msSegments=[];
+    }
+    function msSetSource(src,name,w,h){
+      msReleaseSegments();
+      msSource=src;msSourceName=name||"image";
+      msW=Math.max(1,Math.round(w||src.width));
+      msH=Math.max(1,Math.round(h||src.height));
+      msSignature=msBaseName().toLowerCase()+"_"+msW+"x"+msH;
+      msLines=[];msLineSeq=0;
+      msView="edit";
+      if(!msRestoreLines()){msLines=[];msLineSeq=0;}
+      msDrawPreview();msRenderLineList();msSyncUi();
+    }
+    function msLoadImageFile(file){
+      if(file.size>MS_MAX_FILE){toast("File is too large - 20MB max.","error");return;}
+      if(!/^image\//.test(file.type)){toast("Unsupported file type.","error");return;}
+      const reader=new FileReader();
+      reader.onload=e=>{
+        const img=new Image();
+        img.onload=()=>{msPdfPages=[];msPdfPage=0;msSetSource(img,file.name,img.naturalWidth,img.naturalHeight);};
+        img.onerror=()=>toast("Could not load that image.","error");
+        img.src=e.target.result;
+      };
+      reader.onerror=()=>toast("Could not read that file.","error");
+      reader.readAsDataURL(file);
+    }
+    async function msLoadPdfFile(file){
+      if(file.size>MS_MAX_FILE){toast("File is too large - 20MB max.","error");return;}
+      const token=++msProgToken;
+      msProgress(true,0,"Loading PDF\u2026");
+      try{
+        await ensurePdfJs();
+        if(!window.pdfjsLib)throw new Error("PDF engine unavailable");
+        const data=await file.arrayBuffer();
+        const doc=await pdfjsLib.getDocument({data}).promise;
+        const pages=[];
+        for(let p=1;p<=doc.numPages;p++){
+          if(token!==msProgToken)return;
+          msProgress(true,p/doc.numPages,"Rendering page "+p+" / "+doc.numPages+"\u2026");
+          const page=await doc.getPage(p);
+          const vp=page.getViewport({scale:2});
+          const c=mkCanvas(Math.round(vp.width),Math.round(vp.height));
+          const cctx=c.getContext("2d");
+          cctx.fillStyle="#ffffff";cctx.fillRect(0,0,c.width,c.height);
+          await page.render({canvasContext:cctx,viewport:vp}).promise;
+          pages.push(c);
+          await new Promise(r=>setTimeout(r,0));
+        }
+        msPdfPages=pages;msPdfPage=0;
+        msProgress(false);
+        msUsePdfPage(0,file.name);
+      }catch(e){
+        msProgress(false);
+        console.error(e);
+        toast("Could not process that PDF.","error");
+      }
+    }
+    function msUsePdfPage(idx,pdfName){
+      if(idx<0||idx>=msPdfPages.length)return;
+      msPdfPage=idx;
+      const c=msPdfPages[idx];
+      const name=(pdfName||"pdf").replace(/\.pdf$/i,"")+"_p"+(idx+1);
+      msSetSource(c,name,c.width,c.height);
+    }
+    function msHandleFile(file){
+      if(!file)return;
+      if(file.type==="application/pdf"||/\.pdf$/i.test(file.name||""))msLoadPdfFile(file);
+      else msLoadImageFile(file);
+    }
+    function msUseCurrentImage(){
+      if(!originalImage){toast("Open an image in the editor first.","warning");return;}
+      try{
+        const c=currentExportCanvas();
+        if(!c||!c.width||!c.height){toast("No image to split yet.","warning");return;}
+        const copy=mkCanvas(c.width,c.height);
+        copy.getContext("2d").drawImage(c,0,0);
+        msPdfPages=[];msPdfPage=0;
+        msSetSource(copy,(currentFileNameBase||"current")+" (editor)",copy.width,copy.height);
+        toast("Loaded the current editor image.","success",1800);
+      }catch(e){toast("Could not read the current image.","error");}
+    }
+    function msReplaceImageFile(file){
+      if(!file)return;
+      if(file.size>MS_MAX_FILE){toast("File is too large - 20MB max.","error");return;}
+      if(!/^image\//.test(file.type)){toast("Please pick an image file.","error");return;}
+      const oldTotal=msTotal();
+      const ratios=msLines.map(l=>l.pos/oldTotal);
+      const reader=new FileReader();
+      reader.onload=e=>{
+        const img=new Image();
+        img.onload=()=>{
+          msPdfPages=[];msPdfPage=0;
+          msReleaseSegments();
+          msSource=img;msSourceName=file.name;
+          msW=img.naturalWidth;msH=img.naturalHeight;
+          msView="edit";
+          const presetExists=!!(msReadPresets()[msBaseName().toLowerCase()+"_"+msW+"x"+msH]);
+          msSignature=msBaseName().toLowerCase()+"_"+msW+"x"+msH;
+          if(!presetExists){
+            const nt=msTotal();
+            msLines=ratios.map((r,i)=>({id:i+1,pos:Math.round(r*nt)}))
+              .filter(l=>l.pos>=MS_MIN_GAP&&l.pos<=nt-MS_MIN_GAP)
+              .sort((a,b)=>a.pos-b.pos);
+            msLineSeq=msLines.length;
+            msDrawPreview();msRenderLineList();msSyncUi();
+            msSaveLines();
+          }else{
+            msLines=[];msLineSeq=0;
+            if(!msRestoreLines()){msLines=[];msLineSeq=0;}
+            msDrawPreview();msRenderLineList();msSyncUi();
+          }
+        };
+        img.onerror=()=>toast("Could not load that image.","error");
+        img.src=e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    function msReset(){
+      msProgToken++;
+      msProgress(false);
+      msReleaseSegments();
+      msSource=null;msSourceName="";msW=0;msH=0;
+      msLines=[];msLineSeq=0;
+      msPdfPages=[];msPdfPage=0;
+      msSignature=null;msView="edit";msDragId=null;
+      el.prevCanvas.hidden=true;
+      el.prevCanvas.width=1;el.prevCanvas.height=1;
+      el.prev.classList.add("empty");
+      el.prevPh.hidden=false;
+      el.lines.innerHTML="";
+      el.segGrid.innerHTML="";
+      el.sum.classList.remove("on");
+      el.file.value="";
+      el.replaceFile.value="";
+      msRenderLineList();msSyncUi();
+    }
+
+    /* ---------- cutting ---------- */
+    async function msRun(){
+      if(!msSource||!msW||!msH)return;
+      const token=++msProgToken;
+      const format=el.format.value;
+      const quality=clamp(Math.round(Number(el.quality.value)||95),1,100)/100;
+      const maxBytes=Math.max(64,Number(el.maxKb.value)||1024)*1024;
+      const horizontal=msIsH();
+      const total=msTotal();
+      const positions=msLines.length?[0,...msLines.map(l=>l.pos),total]:[0,total];
+
+      msReleaseSegments();
+      msProgress(true,0,"Cutting\u2026");
+      el.runBtn.disabled=true;
+      const out=[];
+      try{
+        for(let i=0;i<positions.length-1;i++){
+          if(token!==msProgToken)return;
+          const start=positions[i],size=positions[i+1]-start;
+          if(size<1)continue;
+          msProgress(true,i/(positions.length-1),"Part "+(i+1)+" of "+(positions.length-1)+"\u2026");
+          const seg=horizontal?mkCanvas(msW,Math.round(size)):mkCanvas(Math.round(size),msH);
+          const sctx=seg.getContext("2d");
+          if(horizontal)sctx.drawImage(msSource,0,start,msW,size,0,0,msW,Math.round(size));
+          else sctx.drawImage(msSource,start,0,size,msH,0,0,Math.round(size),msH);
+          const packed=await msCompressToLimit(seg,format,quality,maxBytes);
+          out.push({
+            id:out.length+1,
+            blob:packed.blob,
+            url:URL.createObjectURL(packed.blob),
+            width:packed.width,height:packed.height,
+            name:msBaseName()+"_part_"+String(out.length+1).padStart(2,"0")+"."+msExt(packed.format)
+          });
+          await new Promise(r=>setTimeout(r,0));
+        }
+        if(token!==msProgToken)return;
+        if(!out.length)throw new Error("Nothing to cut.");
+        msSegments=out;
+        msView="result";
+        msProgress(false);
+        msRenderSegments();
+        toast(out.length+" parts are ready.","success");
+      }catch(e){
+        console.error(e);
+        msProgress(false);
+        msReleaseSegments();
+        toast(e.message||"Split failed.","error");
+      }finally{
+        if(token===msProgToken)msSyncUi();
+      }
+    }
+    function msRenderSegments(){
+      el.segGrid.innerHTML="";
+      msSegments.forEach(s=>{
+        const card=document.createElement("div");
+        card.className="ms-seg";
+        card.title=s.name+" - "+s.width+"x"+s.height+" ("+msFmtBytes(s.blob.size)+") - click to download";
+        const img=document.createElement("img");
+        img.className="ms-seg-img";img.src=s.url;img.alt=s.name;img.loading="lazy";
+        const meta=document.createElement("div");
+        meta.className="ms-seg-meta";
+        meta.innerHTML='<div class="ms-seg-nm">'+esc(s.name)+'</div><div class="ms-seg-dim">'+s.width+"&times;"+s.height+" &middot; "+msFmtBytes(s.blob.size)+"</div>";
+        const dl=document.createElement("span");
+        dl.className="ms-seg-dl";
+        dl.innerHTML='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+        card.appendChild(img);card.appendChild(meta);card.appendChild(dl);
+        card.addEventListener("click",()=>msDownloadSegment(s.id));
+        el.segGrid.appendChild(card);
+      });
+    }
+    function msDownloadSegment(id){
+      const s=msSegments.find(x=>x.id===id);
+      if(!s)return;
+      const a=document.createElement("a");
+      a.href=s.url;a.download=s.name;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    }
+    async function msDownloadAll(){
+      if(!msSegments.length)return;
+      const token=++msProgToken;
+      msProgress(true,0,"Building ZIP\u2026");
+      try{
+        if(!window.JSZip){
+          const cdn=(window.__pfCDN||{});
+          if(!cdn.jszip)throw new Error("ZIP library config missing");
+          await loadScriptCandidates(cdn.jszip);
+        }
+        if(!window.JSZip)throw new Error("ZIP library unavailable");
+        if(token!==msProgToken)return;
+        const zip=new window.JSZip();
+        const folder=zip.folder(msBaseName()||"segments");
+        msSegments.forEach(s=>folder.file(s.name,s.blob));
+        const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE"},
+          (m)=>{if(token===msProgToken)msProgress(true,Math.max(0,Math.min(1,(m&&m.percent?m.percent:0)/100)),"Zipping\u2026 "+Math.round(m&&m.percent?m.percent:0)+"%");});
+        if(token!==msProgToken)return;
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url;
+        a.download=msBaseName()+"_parts_"+new Date().toISOString().slice(0,10)+".zip";
+        document.body.appendChild(a);a.click();document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(url),4000);
+        msProgress(false);
+        toast("ZIP downloaded.","success");
+      }catch(e){
+        console.error(e);
+        msProgress(false);
+        toast("Could not create the ZIP: "+(e.message||""),"error");
+      }
+    }
+    function msBackToEdit(){
+      msView="edit";
+      msProgress(false);
+      msSyncUi();
+    }
+
+    /* ---------- confirm dialog (matches the app modal style) ---------- */
+    function msConfirm(message){
+      return new Promise(resolve=>{
+        const ov=document.createElement("div");
+        ov.className="modal-overlay open";
+        ov.innerHTML='<div class="modal" style="width:320px">'
+          +'<div class="modal-header"><h3>Are you sure?</h3></div>'
+          +'<div class="modal-body" style="font-size:12px;line-height:1.7;color:var(--pf-text-dim);">'+esc(message)+'</div>'
+          +'<div class="modal-footer">'
+          +'<button class="btn btn-secondary" data-no>Cancel</button>'
+          +'<button class="btn btn-primary" data-yes>Yes, continue</button>'
+          +'</div></div>';
+        const done=(ok)=>{
+          if(ov.parentNode)ov.parentNode.removeChild(ov);
+          document.removeEventListener("keydown",onKey);
+          resolve(ok);
+        };
+        const onKey=e=>{
+          if(e.key==="Escape"){e.stopPropagation();done(false);}
+          else if(e.key==="Enter"){e.stopPropagation();done(true);}
+        };
+        ov.addEventListener("click",e=>{
+          if(e.target===ov)done(false);
+          else if(e.target.closest("[data-no]"))done(false);
+          else if(e.target.closest("[data-yes]"))done(true);
+        });
+        document.addEventListener("keydown",onKey);
+        document.body.appendChild(ov);
+        const yes=ov.querySelector("[data-yes]");
+        if(yes)yes.focus();
+      });
+    }
+
+    /* ---------- wiring ---------- */
+    el.drop.addEventListener("click",()=>el.file.click());
+    el.drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();el.file.click();}});
+    el.file.addEventListener("change",e=>{msHandleFile(e.target.files&&e.target.files[0]);e.target.value="";});
+    ["dragenter","dragover"].forEach(t=>el.drop.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();el.drop.classList.add("drag-over");}));
+    ["dragleave","drop"].forEach(t=>el.drop.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();el.drop.classList.remove("drag-over");}));
+    el.drop.addEventListener("drop",e=>{
+      const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+      if(!f){toast("Please drop an image or PDF file.","warning");return;}
+      if(!(/^image\//.test(f.type)||f.type==="application/pdf"||/\.pdf$/i.test(f.name||""))){
+        toast("Please drop an image or PDF file.","warning");return;
+      }
+      msHandleFile(f);
+    });
+    el.useCurrent.addEventListener("click",msUseCurrentImage);
+    el.replaceBtn.addEventListener("click",()=>el.replaceFile.click());
+    el.replaceFile.addEventListener("change",e=>{msReplaceImageFile(e.target.files&&e.target.files[0]);e.target.value="";});
+    el.resetBtn.addEventListener("click",async()=>{
+      if(!msSource)return;
+      if(await msConfirm("Clear the source image and all cut lines?"))msReset();
+    });
+    el.prevPage.addEventListener("click",()=>{if(msPdfPage>0)msUsePdfPage(msPdfPage-1,msSourceName.replace(/_p\d+$/,""));});
+    el.nextPage.addEventListener("click",()=>{if(msPdfPage<msPdfPages.length-1)msUsePdfPage(msPdfPage+1,msSourceName.replace(/_p\d+$/,""));});
+    el.dirH.addEventListener("click",()=>msSetDir("horizontal",true));
+    el.dirV.addEventListener("click",()=>msSetDir("vertical",true));
+    el.equalBtn.addEventListener("click",msEqualSegments);
+    el.segCount.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();msEqualSegments();}});
+    el.clearBtn.addEventListener("click",msClearLines);
+    el.runBtn.addEventListener("click",msRun);
+    el.zipBtn.addEventListener("click",msDownloadAll);
+    el.backBtn.addEventListener("click",msBackToEdit);
+    el.startOverBtn.addEventListener("click",async()=>{
+      if(await msConfirm("Start over? The current parts and cut lines will be cleared."))msReset();
+    });
+
+    let msResizeRaf=0;
+    window.addEventListener("resize",()=>{
+      if(msResizeRaf)return;
+      msResizeRaf=requestAnimationFrame(()=>{msResizeRaf=0;if(msW&&msH)msRenderLines();});
+    });
+    const msPanel=document.querySelector('.panel-content[data-panel="split"]');
+    if(msPanel)msPanel.addEventListener("scroll",()=>{if(msW&&msH)msRenderLines();},{passive:true});
+
+    msRenderLineList();
+    msSyncUi();
   })();
 
   applyToolUi(getToolMode());
