@@ -1004,6 +1004,19 @@
       box-shadow:0 0 0 1px rgba(255,255,255,.07),0 24px 60px rgba(0,0,0,.55);}
     .ms-prev-stage.empty{box-shadow:none;}
     .ms-prev-stage canvas{max-width:100%;max-height:100%;}
+    /* ── preview zoom / pan (wheel zooms, middle-drag or Space+drag pans) ── */
+    .ms-prev-stage canvas.ms-zoomed{max-width:none;max-height:none;will-change:transform;}
+    .ms-prev-stage.can-pan{cursor:grab;}
+    .ms-prev-stage.panning{cursor:grabbing;}
+    .ms-zoom{display:flex;align-items:center;gap:3px;flex:0 0 auto;}
+    .ms-zoom .ib{width:26px;height:26px;padding:0;}
+    .ms-zoom .ib svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+    .ms-zoom .ms-zoom-val{width:auto;min-width:52px;padding:0 8px;font-family:var(--pf-mono);
+      font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums;}
+    .ms-zoom .ib[disabled]{opacity:.35;cursor:not-allowed;}
+    .ms-zoom-hint{margin:0 0 8px;font-size:10px;line-height:1.55;color:var(--pf-text-muted);}
+    .ms-zoom-hint kbd{font-family:var(--pf-mono);font-size:9.5px;background:var(--pf-bg-4);
+      border:1px solid var(--pf-border);border-radius:4px;padding:0 4px;color:var(--pf-text-dim);}
     .ms-prev-stage .ms-prev-ph{font-size:12.5px;padding:24px;}
 
     /* the stage replaces the canvas, so the panel slot just points at it */
@@ -2521,6 +2534,17 @@
               Split &middot; <span>تقطيع</span>
             </div>
             <div class="ss-meta" id="ssMeta">No source image</div>
+            <div class="ms-zoom" id="msZoomBar" role="group" aria-label="Preview zoom">
+              <button type="button" class="ib ss-btn" id="msZoomOut" title="Zoom out (−)">
+                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="ib ss-btn ms-zoom-val" id="msZoomVal" title="Reset to fit the whole image (0)">100%</button>
+              <button type="button" class="ib ss-btn" id="msZoomIn" title="Zoom in (+)">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="ib ss-btn" id="msZoomOne" title="Actual pixels — 1 image pixel to 1 screen pixel (1)">1:1</button>
+              <button type="button" class="ib ss-btn" id="msZoomFit" title="Fit the whole image (0)">Fit</button>
+            </div>
             <div class="ss-actions">
               <button type="button" class="ib ss-btn" id="ssUseCurrent" title="Load the image currently open in the editor">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -10617,6 +10641,8 @@ const dataUrl=src.toDataURL("image/png");
       dirH:$("msDirH"),dirV:$("msDirV"),dirHint:$("msDirHint"),
       segCount:$("msSegCount"),equalBtn:$("msEqualBtn"),
       linesList:$("msLinesList"),clearBtn:$("msClearBtn"),
+      zoomBar:$("msZoomBar"),zoomIn:$("msZoomIn"),zoomOut:$("msZoomOut"),zoomVal:$("msZoomVal"),
+      zoomFit:$("msZoomFit"),zoomOne:$("msZoomOne"),
       format:$("msFormat"),quality:$("msQuality"),maxKb:$("msMaxKb"),
       runBtn:$("msRunBtn"),prog:$("msProg"),progFill:$("msProgFill"),progTxt:$("msProgTxt"),
       sum:$("msSum"),sumCount:$("msSumCount"),segGrid:$("msSegGrid"),
@@ -10640,6 +10666,13 @@ const dataUrl=src.toDataURL("image/png");
     let msSignature=null;
     let msView="edit";            /* "edit" | "result" */
     let msDragId=null;
+    let msZoom=1;                 /* multiplier of the "fit" scale */
+    let msPanX=0,msPanY=0;        /* px offset of the zoomed preview inside the stage */
+    let msPanDrag=null;           /* {x,y,px,py} while panning */
+    let msSpaceDown=false;
+    const MS_ZOOM_MIN=1;          /* 1 === fit the whole image */
+    const MS_ZOOM_MAX=24;         /* up to 24x the fit scale (≈1:1 for tall strips) */
+    const MS_ZOOM_STEP=1.25;
     const msCtx=el.prevCanvas.getContext("2d");
 
     /* ---------- helpers ---------- */
@@ -10743,6 +10776,82 @@ const dataUrl=src.toDataURL("image/png");
       el.progTxt.textContent=text||"";
     }
 
+    /* ---------- preview zoom / pan ----------
+       The canvas always holds the source at native resolution; zoom only changes its
+       CSS box, so every getBoundingClientRect() based hit-test (click to cut, drag a
+       cut) keeps working at any magnification. */
+    function msFitSize(box){
+      const pad=10;
+      const availW=Math.max(1,(box?box.width:el.prev.clientWidth)-pad*2);
+      const availH=Math.max(1,(box?box.height:el.prev.clientHeight)-pad*2);
+      const ratio=msW/msH;
+      let w=availW,h=availW/ratio;
+      if(h>availH){h=availH;w=availH*ratio;}
+      return {w:Math.max(1,w),h:Math.max(1,h)};
+    }
+    function msClampPan(){
+      const box=el.prev.getBoundingClientRect();
+      const f=msFitSize(box);
+      const w=f.w*msZoom,h=f.h*msZoom;
+      const slackX=Math.max(0,(w-box.width)/2)+48, slackY=Math.max(0,(h-box.height)/2)+48;
+      msPanX=clamp(msPanX,-slackX,slackX);
+      msPanY=clamp(msPanY,-slackY,slackY);
+    }
+    function msApplyView(){
+      const cv=el.prevCanvas;
+      if(!msSource||!msW||!msH){
+        cv.classList.remove("ms-zoomed");
+        cv.style.transform="";cv.style.width="";cv.style.height="";
+        if(el.zoomVal)el.zoomVal.textContent="100%";
+        if(el.zoomIn)el.zoomIn.disabled=!msSource;
+        if(el.zoomOut)el.zoomOut.disabled=!msSource;
+        if(el.zoomOne)el.zoomOne.disabled=!msSource;
+        if(el.zoomFit)el.zoomFit.disabled=!msSource;
+        return;
+      }
+      const box=el.prev.getBoundingClientRect();
+      const f=msFitSize(box);
+      const w=f.w*msZoom,h=f.h*msZoom;
+      if(msZoom<=MS_ZOOM_MIN+1e-6&&Math.abs(msPanX)<0.5&&Math.abs(msPanY)<0.5){
+        cv.classList.remove("ms-zoomed");
+        cv.style.transform="";cv.style.width="";cv.style.height="";
+      }else{
+        cv.classList.add("ms-zoomed");
+        cv.style.width=w+"px";cv.style.height=h+"px";
+        cv.style.transform="translate("+msPanX.toFixed(1)+"px,"+msPanY.toFixed(1)+"px)";
+      }
+      /* the label is the true display scale: 100% === 1 image pixel = 1 CSS pixel */
+      const pct=Math.max(1,Math.round(w/msW*100));
+      if(el.zoomVal)el.zoomVal.textContent=pct>=100?(pct+"%"):(pct+"%");
+      if(el.zoomIn)el.zoomIn.disabled=msZoom>=MS_ZOOM_MAX-1e-6;
+      if(el.zoomOut)el.zoomOut.disabled=msZoom<=MS_ZOOM_MIN+1e-6;
+      if(el.zoomFit)el.zoomFit.disabled=msZoom<=MS_ZOOM_MIN+1e-6;
+      if(el.zoomOne)el.zoomOne.disabled=Math.abs(w-msW)<0.5&&Math.abs(h-msH)<0.5;
+      msRenderLines();
+    }
+    function msZoomAt(cx,cy,zNew){
+      if(!msSource||msView==="result")return;
+      const box=el.prev.getBoundingClientRect();
+      const f=msFitSize(box);
+      const w=f.w*msZoom,h=f.h*msZoom;
+      const offX=(box.width-w)/2+msPanX, offY=(box.height-h)/2+msPanY;
+      /* image fraction under the cursor, kept identical across the zoom change */
+      const fx=(cx-box.left-offX)/w, fy=(cy-box.top-offY)/h;
+      msZoom=clamp(zNew,MS_ZOOM_MIN,MS_ZOOM_MAX);
+      const w2=f.w*msZoom,h2=f.h*msZoom;
+      msPanX=(cx-box.left-fx*w2)-(box.width-w2)/2;
+      msPanY=(cy-box.top-fy*h2)-(box.height-h2)/2;
+      msClampPan();
+      msApplyView();
+    }
+    function msZoomCentre(zNew){msZoomAt(el.prev.getBoundingClientRect().left+el.prev.clientWidth/2,el.prev.getBoundingClientRect().top+el.prev.clientHeight/2,zNew);}
+    function msResetView(){msZoom=1;msPanX=0;msPanY=0;msApplyView();}
+    function msOneToOne(){
+      if(!msSource)return;
+      const f=msFitSize(el.prev.getBoundingClientRect());
+      msZoomAt(el.prev.getBoundingClientRect().left+el.prev.clientWidth/2,el.prev.getBoundingClientRect().top+el.prev.clientHeight/2,Math.min(msW/f.w,msH/f.h));
+    }
+
     /* ---------- preview rendering ---------- */
     function msDrawPreview(){
       if(!msSource||!msW||!msH)return;
@@ -10753,7 +10862,7 @@ const dataUrl=src.toDataURL("image/png");
       el.prevCanvas.height=msH;
       msCtx.clearRect(0,0,msW,msH);
       msCtx.drawImage(msSource,0,0,msW,msH);
-      msRenderLines();
+      msResetView();
     }
     function msRenderLines(){
       el.lines.innerHTML="";
@@ -10888,6 +10997,40 @@ const dataUrl=src.toDataURL("image/png");
 
     /* ---------- preview interaction ---------- */
     let msSuppressClick=false;
+    /* mouse wheel zooms into the picture so you can place cuts on exact pixels */
+    el.prev.addEventListener("wheel",ev=>{
+      if(!msSource||msView==="result")return;
+      ev.preventDefault();
+      const unit=ev.deltaMode===1?16:(ev.deltaMode===2?400:1);
+      const delta=clamp(ev.deltaY*unit,-320,320);
+      if(!delta)return;
+      msZoomAt(ev.clientX,ev.clientY,msZoom*Math.exp(-delta*0.0018));
+    },{passive:false});
+    /* pan with the middle mouse button, or Space + drag */
+    el.prev.addEventListener("pointerdown",ev=>{
+      if(!msSource||msView==="result")return;
+      if(!(ev.button===1||(ev.button===0&&msSpaceDown)))return;
+      ev.preventDefault();ev.stopPropagation();
+      msPanDrag={x:ev.clientX,y:ev.clientY,px:msPanX,py:msPanY};
+      el.prev.classList.add("panning");
+      window.addEventListener("pointermove",msOnPan);
+      window.addEventListener("pointerup",msEndPan,{once:true});
+    });
+    function msOnPan(ev){
+      if(!msPanDrag)return;
+      msPanX=msPanDrag.px+(ev.clientX-msPanDrag.x);
+      msPanY=msPanDrag.py+(ev.clientY-msPanDrag.y);
+      msClampPan();
+      msApplyView();
+    }
+    function msEndPan(){
+      if(!msPanDrag)return;
+      msPanDrag=null;
+      el.prev.classList.remove("panning");
+      msSuppressClick=true;
+      setTimeout(()=>{msSuppressClick=false;},60);
+      window.removeEventListener("pointermove",msOnPan);
+    }
     el.prev.addEventListener("click",ev=>{
       if(msSuppressClick){msSuppressClick=false;return;}
       if(msView==="result"||!msSource)return;
@@ -11082,6 +11225,16 @@ const dataUrl=src.toDataURL("image/png");
       msLines=[];msLineSeq=0;
       msPdfPages=[];msPdfPage=0;
       msSignature=null;msView="edit";msDragId=null;
+      msPanDrag=null;msSpaceDown=false;
+      el.prev.classList.remove("can-pan","panning");
+      msZoom=1;msPanX=0;msPanY=0;
+      el.prevCanvas.classList.remove("ms-zoomed");
+      el.prevCanvas.style.transform="";el.prevCanvas.style.width="";el.prevCanvas.style.height="";
+      if(el.zoomVal)el.zoomVal.textContent="100%";
+      if(el.zoomIn)el.zoomIn.disabled=true;
+      if(el.zoomOut)el.zoomOut.disabled=true;
+      if(el.zoomOne)el.zoomOne.disabled=true;
+      if(el.zoomFit)el.zoomFit.disabled=true;
       el.prevCanvas.hidden=true;
       el.prevCanvas.width=1;el.prevCanvas.height=1;
       el.prev.classList.add("empty");
@@ -11273,6 +11426,27 @@ const dataUrl=src.toDataURL("image/png");
     el.runBtn.addEventListener("click",msRun);
     el.zipBtn.addEventListener("click",msDownloadAll);
     el.backBtn.addEventListener("click",msBackToEdit);
+    /* ---------- zoom controls ---------- */
+    if(el.zoomIn)el.zoomIn.addEventListener("click",()=>msZoomCentre(msZoom*MS_ZOOM_STEP));
+    if(el.zoomOut)el.zoomOut.addEventListener("click",()=>msZoomCentre(msZoom/MS_ZOOM_STEP));
+    if(el.zoomVal)el.zoomVal.addEventListener("click",msResetView);
+    if(el.zoomFit)el.zoomFit.addEventListener("click",msResetView);
+    if(el.zoomOne)el.zoomOne.addEventListener("click",msOneToOne);
+    /* Space held = grab hand; released on blur so the cursor never gets stuck */
+    window.addEventListener("keydown",e=>{
+      const tag=(e.target&&e.target.tagName||"").toLowerCase();
+      if(tag==="input"||tag==="textarea")return;
+      if(e.code==="Space"&&!msSpaceDown){
+        const t=e.target;
+        if(t&&t.closest&&(t.closest("button,a,input,select,textarea,[contenteditable]")))return;
+        msSpaceDown=true;
+        el.prev.classList.add("can-pan");
+      }
+    });
+    window.addEventListener("keyup",e=>{
+      if(e.code==="Space"&&msSpaceDown){msSpaceDown=false;el.prev.classList.remove("can-pan");}
+    });
+    window.addEventListener("blur",()=>{msSpaceDown=false;el.prev.classList.remove("can-pan");});
     el.startOverBtn.addEventListener("click",async()=>{
       if(await msConfirm("Start over? The current parts and cut lines will be cleared."))msReset();
     });
@@ -11280,14 +11454,14 @@ const dataUrl=src.toDataURL("image/png");
     let msResizeRaf=0;
     window.addEventListener("resize",()=>{
       if(msResizeRaf)return;
-      msResizeRaf=requestAnimationFrame(()=>{msResizeRaf=0;if(msW&&msH)msRenderLines();});
+      msResizeRaf=requestAnimationFrame(()=>{msResizeRaf=0;if(msW&&msH)msApplyView();});
     });
     const msPanel=document.querySelector('.panel-content[data-panel="split"]');
     if(msPanel)msPanel.addEventListener("scroll",()=>{if(msW&&msH)msRenderLines();},{passive:true});
 
     /* ---------- Split workspace stage (the big preview lives in the canvas area) ---------- */
     const msStage=$("splitStage"),msStageBody=$("splitStageBody");
-    const msRelayout=()=>{if(msW&&msH)msRenderLines();};
+    const msRelayout=()=>{if(msW&&msH)msApplyView();};
     if(window.ResizeObserver&&msStageBody)new ResizeObserver(msRelayout).observe(msStageBody);
     if(msStageBody){
       ["dragenter","dragover"].forEach(t=>msStageBody.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();msStageBody.classList.add("drop-over");}));
