@@ -13,7 +13,8 @@
       pdfMin: ["vendor/pdfjs/pdf.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"],
       pdfWorker: ["vendor/pdfjs/pdf.worker.min.js", "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"],
       jspdf: ["vendor/jspdf/jspdf.umd.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"],
-      jszip: ["vendor/jszip/jszip.min.js", "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"]
+      jszip: ["vendor/jszip/jszip.min.js", "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"],
+      pdfLib: ["vendor/pdflib/pdf-lib.min.js", "https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"]
     };
   </script>
   <style>
@@ -1017,6 +1018,877 @@
     body.split-mode .toolbar{opacity:.32;pointer-events:none;}
     body.split-mode .canvas-viewport{cursor:default;}
     body.split-mode .split-stage .ms-prev{cursor:crosshair;}
+
+    /* ═══ Crop & Merge workspace shell ═══ */
+    .tab-merge .tab-name{font-weight:700;color:#a78bfa;}
+    .tab-merge.active{box-shadow:inset 0 2px 0 #a78bfa,inset 3px 0 0 #f59e0b;}
+    .cm-stage{position:absolute;inset:0;display:none;flex-direction:column;z-index:3;}
+    .cm-stage.on{display:flex;}
+    .cm-stage-bar{display:flex;align-items:center;gap:10px;height:42px;flex:0 0 auto;padding:0 10px 0 12px;
+      background:var(--pf-bg-2);border-bottom:1px solid var(--pf-border);}
+    .cm-stage-title{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--pf-text);}
+    .cm-stage-title svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:#a78bfa;}
+    .cm-stage-meta{font-size:10.5px;color:var(--pf-text-dim);font-family:var(--pf-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+    .cm-stage-acts,.cm-stage-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+    .cm-stage-body{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+      background:var(--pf-bg-0);}
+    .cm-stage-body>*{flex:1;min-height:0;}
+    /* the stage's own buttons (cm-sbtn) live in the ported markup, so they get
+       the same treatment the Split stage bar buttons already have */
+    .cm-sbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:27px;padding:0 10px;
+      border-radius:7px;border:1px solid var(--pf-border);background:var(--pf-bg-4);color:var(--pf-text);
+      font-family:var(--pf-font);font-size:10.5px;font-weight:600;white-space:nowrap;cursor:pointer;
+      transition:background .15s,filter .15s,opacity .15s;}
+    .cm-sbtn i{font-size:10.5px;line-height:1;opacity:.9;}
+    .cm-sbtn:hover{background:var(--pf-surface-hover);border-color:rgba(167,139,250,.5);}
+    .cm-sbtn:active{filter:brightness(.94);}
+    .cm-sbtn:disabled{opacity:.4;cursor:not-allowed;}
+    .cm-sbtn.cmc-primary{background:linear-gradient(135deg,#a78bfa,#f59e0b);border-color:transparent;color:#1a1024;
+      font-weight:700;box-shadow:0 0 12px rgba(167,139,250,.3);}
+    .cm-sbtn.cmc-primary:hover{filter:brightness(1.08);}
+    .cm-sbtn.cmc-primary:disabled{box-shadow:none;filter:none;}
+    /* merge-mode shell: the document canvas is hidden, so dim the tools that act on it */
+    body.merge-mode .toolbar{opacity:.32;pointer-events:none;}
+    body.merge-mode .canvas-viewport{cursor:default;}
+    body.merge-mode .tabBar .tab:not(.tab-merge):not(.active){opacity:.7;}
+  </style>
+
+  <!-- Crop & Merge workspace (ported from image-crop-merge.html) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style id="cmToolStyles">
+
+  /* ---- Crop & Merge workspace: theme bridge to PhotoForge ---- */
+  #cmWorkspace{
+    --primary-color:#4facfe;
+    --primary-rgb:79,172,254;
+    --secondary-purple:#a78bfa;
+    --card-bg:#181c28;
+    --text-color:#e8ecf4;
+    --text-color-light:rgba(232,236,244,0.6);
+    --surface:#1a1f2e;
+    --surface-2:#1e2330;
+    --line:rgba(255,255,255,0.08);
+    --radius:10px;
+    font-family:var(--pf-font,'Inter',system-ui,sans-serif);
+    color:var(--text-color);
+    background:var(--card-bg);
+  }
+  #cmWorkspace ::-webkit-scrollbar{width:9px;height:9px}
+  #cmWorkspace ::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
+  #cmWorkspace ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:9px}
+  #cmWorkspace ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
+  #cmWorkspace .tool-page-wrapper{
+          padding: 50px 0 80px;
+          min-height: 80vh;
+          position: relative;
+          z-index: 2;
+        }#cmWorkspace .tool-header{
+          text-align: center;
+          margin-bottom: 45px;
+        }#cmWorkspace .tool-header h1{
+          font-size: 2.6rem;
+          color: var(--primary-color);
+          margin-bottom: 15px;
+          font-weight: 800;
+        }#cmWorkspace .tool-header h1 i{
+          margin-left: 12px;
+          opacity: 0.85;
+        }#cmWorkspace .tool-header p{
+          color: var(--text-color-light);
+          max-width: 750px;
+          margin: 0 auto;
+          line-height: 1.8;
+          font-size: 1rem;
+        }#cmWorkspace .tool-main-container{
+          max-width: 1240px;
+          margin: 0 auto;
+        }#cmWorkspace .single-mode-bar{
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 25px;
+          background: var(--card-bg);
+          border-radius: 14px;
+          padding: 14px 20px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }#cmWorkspace .single-mode-bar label{
+          font-size: 0.92rem;
+          color: var(--text-color);
+          cursor: pointer;
+          font-weight: 600;
+        }#cmWorkspace .single-mode-bar .hint{
+          font-size: 0.82rem;
+          color: var(--text-color-light);
+          margin-right: auto;
+        }#cmWorkspace .images-section{
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 22px;
+          margin-bottom: 25px;
+        }@media (max-width: 860px){#cmWorkspace .images-section{ grid-template-columns: 1fr; }
+        }#cmWorkspace .image-panel{
+          background: var(--card-bg);
+          border-radius: 22px;
+          padding: 26px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+          transition: opacity 0.3s, pointer-events 0.3s;
+        }#cmWorkspace .image-panel.disabled{
+          opacity: 0.42;
+          pointer-events: none;
+          user-select: none;
+        }#cmWorkspace .panel-title{
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: var(--text-color);
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }#cmWorkspace .paste-target-btn{
+          margin-right: auto;
+          background: rgba(var(--primary-rgb), 0.06);
+          border: 1.5px dashed rgba(var(--primary-rgb), 0.28);
+          border-radius: 8px;
+          color: var(--text-color-light);
+          cursor: pointer;
+          padding: 4px 11px;
+          font-size: 0.74rem;
+          font-weight: 600;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          white-space: nowrap;
+        }#cmWorkspace .paste-target-btn:hover{
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+          background: rgba(var(--primary-rgb), 0.13);
+        }#cmWorkspace .paste-target-btn.active{
+          border-style: solid;
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+          background: rgba(var(--primary-rgb), 0.16);
+          box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.18);
+        }#cmWorkspace .paste-target-btn.active i{ animation: pulse-dot 1.5s infinite; }#cmWorkspace .panel-num{
+          width: 30px;
+          height: 30px;
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.88rem;
+          font-weight: 800;
+          flex-shrink: 0;
+        }#cmWorkspace .upload-zone{
+          border: 2px dashed rgba(var(--primary-rgb), 0.3);
+          border-radius: 14px;
+          padding: 22px 16px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: rgba(var(--primary-rgb), 0.02);
+          margin-bottom: 14px;
+        }#cmWorkspace .upload-zone:hover, #cmWorkspace .upload-zone.drag-over{
+          border-color: var(--primary-color);
+          background: rgba(var(--primary-rgb), 0.06);
+          transform: scale(1.01);
+        }#cmWorkspace .upload-zone i{
+          font-size: 1.8rem;
+          color: var(--primary-color);
+          margin-bottom: 8px;
+          display: block;
+        }#cmWorkspace .upload-zone p{
+          color: var(--text-color-light);
+          font-size: 0.875rem;
+          margin: 0;
+        }#cmWorkspace .upload-zone input[type="file"]{ display: none; }#cmWorkspace .canvas-wrapper{
+          position: relative;
+          border-radius: 13px;
+          overflow: hidden;
+          background: #111827;
+          height: 310px;
+          margin-bottom: 15px;
+          cursor: crosshair;
+        }#cmWorkspace .canvas-wrapper canvas{
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }#cmWorkspace .canvas-empty-msg{
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: #6b7280;
+          text-align: center;
+          font-size: 0.85rem;
+          line-height: 1.8;
+          pointer-events: none;
+        }#cmWorkspace .canvas-empty-msg i{ font-size: 2.2rem; opacity: 0.3; display: block; margin-bottom: 8px; }#cmWorkspace .canvas-hint{
+          position: absolute;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0,0,0,0.6);
+          color: #fff;
+          padding: 4px 14px;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          pointer-events: none;
+          white-space: nowrap;
+          display: none;
+        }#cmWorkspace .canvas-wrapper:hover .canvas-hint{ display: block; }#cmWorkspace .panel-controls{
+          display: flex;
+          flex-direction: column;
+          gap: 11px;
+        }#cmWorkspace .ctrl-row{
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }#cmWorkspace .ctrl-label{
+          font-size: 0.82rem;
+          color: var(--text-color);
+          font-weight: 700;
+          white-space: nowrap;
+          min-width: 75px;
+        }#cmWorkspace .range-wrap{
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 120px;
+        }#cmWorkspace .range-wrap input[type="range"]{
+          flex: 1;
+          -webkit-appearance: none;
+          height: 5px;
+          border-radius: 4px;
+          background: rgba(var(--primary-rgb), 0.18);
+          outline: none;
+          cursor: pointer;
+        }#cmWorkspace .range-wrap input[type="range"]::-webkit-slider-thumb{
+          -webkit-appearance: none;
+          width: 17px; height: 17px;
+          border-radius: 50%;
+          background: var(--primary-color);
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.4);
+        }#cmWorkspace .range-wrap input[type="range"]::-moz-range-thumb{
+          width: 17px; height: 17px;
+          border-radius: 50%;
+          background: var(--primary-color);
+          cursor: pointer;
+          border: none;
+        }#cmWorkspace .range-val{
+          font-size: 0.78rem;
+          color: var(--primary-color);
+          font-weight: 800;
+          min-width: 38px;
+          text-align: center;
+          background: rgba(var(--primary-rgb), 0.08);
+          border-radius: 6px;
+          padding: 2px 5px;
+        }#cmWorkspace .crop-row{
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }#cmWorkspace .crop-info-badge{
+          flex: 1;
+          font-size: 0.78rem;
+          color: var(--text-color-light);
+          padding: 5px 12px;
+          background: rgba(var(--primary-rgb), 0.05);
+          border-radius: 8px;
+          min-width: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }#cmWorkspace .crop-info-badge span{ color: var(--primary-color); font-weight: 800; }#cmWorkspace .toggle-btn-group{ display: flex; gap: 7px; flex-wrap: wrap; }#cmWorkspace .toggle-btn{
+          padding: 7px 13px;
+          border-radius: 9px;
+          border: 1px solid rgba(var(--primary-rgb), 0.22);
+          background: transparent;
+          color: var(--text-color);
+          cursor: pointer;
+          font-size: 0.78rem;
+          font-family: "Cairo", sans-serif;
+          font-weight: 700;
+          transition: all 0.22s ease;
+          white-space: nowrap;
+        }#cmWorkspace .toggle-btn.active{
+          background: var(--primary-color);
+          color: white;
+          border-color: var(--primary-color);
+          box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.3);
+        }#cmWorkspace .toggle-btn:hover:not(.active){
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }#cmWorkspace .btn-sm{
+          padding: 7px 14px;
+          border-radius: 9px;
+          border: none;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: 700;
+          font-family: "Cairo", sans-serif;
+          transition: all 0.25s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          white-space: nowrap;
+        }#cmWorkspace .btn-outline{
+          background: transparent;
+          border: 1px solid rgba(var(--primary-rgb), 0.28);
+          color: var(--text-color);
+        }#cmWorkspace .btn-outline:hover{ border-color: var(--primary-color); color: var(--primary-color); }#cmWorkspace .btn-primary{ background: var(--primary-color); color: white; }#cmWorkspace .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 5px 14px rgba(var(--primary-rgb), 0.35); }#cmWorkspace .btn-secondary{ background: var(--secondary-purple); color: white; }#cmWorkspace .btn-secondary:hover{ transform: translateY(-2px); box-shadow: 0 5px 14px rgba(138,43,226,0.35); }#cmWorkspace .btn-success{ background: #22c55e; color: white; }#cmWorkspace .btn-success:hover{ transform: translateY(-2px); box-shadow: 0 5px 14px rgba(34,197,94,0.35); }#cmWorkspace .btn-dark{ background: #1e293b; color: white; }#cmWorkspace .btn-dark:hover{ transform: translateY(-2px); }#cmWorkspace .btn-danger{ background: #ef4444; color: white; }#cmWorkspace .btn-danger:hover{ transform: translateY(-2px); }#cmWorkspace .toggle-switch{
+          position: relative;
+          width: 46px; height: 25px;
+          display: inline-flex;
+          flex-shrink: 0;
+        }#cmWorkspace .toggle-switch input{ opacity: 0; width: 0; height: 0; }#cmWorkspace .toggle-slider{
+          position: absolute;
+          cursor: pointer;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: #cbd5e1;
+          transition: 0.3s;
+          border-radius: 25px;
+        }#cmWorkspace .toggle-slider:before{
+          position: absolute;
+          content: "";
+          height: 19px; width: 19px;
+          right: 3px; bottom: 3px;
+          background: white;
+          border-radius: 50%;
+          transition: 0.3s;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        }#cmWorkspace .toggle-switch input:checked + .toggle-slider{ background: var(--primary-color); }#cmWorkspace .toggle-switch input:checked + .toggle-slider:before{ transform: translateX(-21px); }#cmWorkspace .merge-adj-section{
+          background: var(--card-bg);
+          border-radius: 22px;
+          padding: 32px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+          margin-bottom: 25px;
+        }#cmWorkspace .section-title{
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: var(--text-color);
+          margin-bottom: 28px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }#cmWorkspace .section-title i{ color: var(--primary-color); }#cmWorkspace .settings-grid{
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+        }@media (max-width: 700px){#cmWorkspace .settings-grid{ grid-template-columns: 1fr; }
+        }#cmWorkspace .settings-group h4{
+          font-size: 0.9rem;
+          font-weight: 800;
+          color: var(--text-color);
+          margin-bottom: 16px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }#cmWorkspace .settings-group h4 i{ color: var(--primary-color); }#cmWorkspace .setting-row{
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 14px;
+          flex-wrap: wrap;
+        }#cmWorkspace .setting-row label.s-label{
+          font-size: 0.83rem;
+          color: var(--text-color);
+          font-weight: 700;
+          min-width: 95px;
+          flex-shrink: 0;
+        }#cmWorkspace input[type="color"]{
+          width: 38px; height: 38px;
+          border: 2px solid rgba(var(--primary-rgb), 0.2);
+          border-radius: 9px;
+          cursor: pointer;
+          padding: 2px;
+          background: transparent;
+          flex-shrink: 0;
+        }#cmWorkspace .merge-action{
+          margin-top: 30px;
+          text-align: center;
+        }#cmWorkspace .btn-merge{
+          padding: 16px 55px;
+          border-radius: 16px;
+          border: none;
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+          color: white;
+          font-size: 1.12rem;
+          font-weight: 800;
+          font-family: "Cairo", sans-serif;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 22px rgba(var(--primary-rgb), 0.35);
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+        }#cmWorkspace .btn-merge:hover{
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(var(--primary-rgb), 0.45);
+        }#cmWorkspace .btn-merge:active{ transform: translateY(-1px); }#cmWorkspace .result-section{
+          background: var(--card-bg);
+          border-radius: 22px;
+          padding: 26px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+        }#cmWorkspace .result-section:not(.visible) .result-canvas-wrapper, #cmWorkspace .result-section:not(.visible) .result-info, #cmWorkspace .result-section:not(.visible) .export-grid{ display: none !important; }#cmWorkspace .result-section.visible .live-preview-placeholder{ display: none; }#cmWorkspace .result-section.visible .result-canvas-wrapper{ display: block; }#cmWorkspace .result-section.visible .result-info{ display: block; }#cmWorkspace .result-section.visible .export-grid{ display: flex; }#cmWorkspace .result-canvas-wrapper{
+          text-align: center;
+          background: repeating-conic-gradient(#e5e7eb 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px;
+          border-radius: 14px;
+          padding: 20px;
+          margin-bottom: 22px;
+          overflow: auto;
+        }#cmWorkspace [data-theme="dark"] .result-canvas-wrapper{
+          background: repeating-conic-gradient(#1e293b 0% 25%, #111827 0% 50%) 0 0 / 20px 20px;
+        }#cmWorkspace #resultCanvas{
+          max-width: 100%;
+          border-radius: 10px;
+          box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+          display: block;
+          margin: 0 auto;
+        }#cmWorkspace .result-info{
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 0.83rem;
+          color: var(--text-color-light);
+        }#cmWorkspace .result-info span{ color: var(--primary-color); font-weight: 800; }#cmWorkspace .export-grid{
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: center;
+        }#cmWorkspace .btn-export{
+          padding: 12px 26px;
+          border-radius: 13px;
+          border: none;
+          cursor: pointer;
+          font-size: 0.92rem;
+          font-weight: 800;
+          font-family: "Cairo", sans-serif;
+          transition: all 0.28s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }#cmWorkspace .btn-export:hover{ transform: translateY(-3px); }#cmWorkspace .toast{
+          position: fixed;
+          bottom: 90px;
+          left: 50%;
+          transform: translateX(-50%) translateY(15px);
+          background: var(--primary-color);
+          color: white;
+          padding: 11px 28px;
+          border-radius: 30px;
+          font-size: 0.88rem;
+          font-weight: 700;
+          opacity: 0;
+          transition: all 0.35s ease;
+          z-index: 9999;
+          pointer-events: none;
+          white-space: nowrap;
+          box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.4);
+        }#cmWorkspace .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }#cmWorkspace .toast.success{ background: #22c55e; }#cmWorkspace .toast.error{ background: #ef4444; }@media (max-width: 600px){#cmWorkspace .tool-header h1{ font-size: 1.9rem; }#cmWorkspace .merge-adj-section{ padding: 20px; }#cmWorkspace .btn-merge{ padding: 14px 32px; font-size: 1rem; }
+        }#cmWorkspace .extra-panel{
+          margin-top: 28px;
+          padding-top: 26px;
+          border-top: 1.5px dashed rgba(var(--primary-rgb), 0.15);
+        }#cmWorkspace .extra-panel-header{
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 0;
+        }#cmWorkspace .extra-panel-header .section-title{
+          margin-bottom: 0;
+          flex: 1;
+        }#cmWorkspace .extra-panel-body{
+          margin-top: 22px;
+          display: none;
+        }#cmWorkspace .extra-panel-body.open{ display: block; }#cmWorkspace .a4-thumb-wrap{
+          display: flex;
+          align-items: flex-start;
+          gap: 18px;
+          margin-top: 14px;
+          padding: 12px 16px;
+          background: rgba(var(--primary-rgb), 0.04);
+          border-radius: 12px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+        }#cmWorkspace .a4-thumb-wrap canvas{
+          border: 2px solid rgba(var(--primary-rgb), 0.25);
+          border-radius: 5px;
+          flex-shrink: 0;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }#cmWorkspace .a4-thumb-info{
+          font-size: 0.8rem;
+          color: var(--text-color-light);
+          line-height: 1.9;
+        }#cmWorkspace .a4-thumb-info strong{ color: var(--primary-color); font-weight: 800; }#cmWorkspace input[type="number"].num-input{
+          width: 72px;
+          padding: 8px 10px;
+          border-radius: 9px;
+          border: 1px solid rgba(var(--primary-rgb), 0.22);
+          background: var(--card-bg);
+          color: var(--text-color);
+          font-size: 0.88rem;
+          font-family: "Cairo", sans-serif;
+          font-weight: 700;
+          text-align: center;
+          outline: none;
+        }#cmWorkspace input[type="number"].num-input:focus{ border-color: var(--primary-color); }#cmWorkspace .bottom-layout{
+          display: flex;
+          gap: 22px;
+          align-items: flex-start;
+          margin-bottom: 25px;
+        }#cmWorkspace .settings-col{
+          flex: 1 1 0;
+          min-width: 0;
+        }#cmWorkspace .preview-col{
+          flex: 0 0 420px;
+          min-width: 300px;
+          position: sticky;
+          top: 85px;
+          max-height: calc(100vh - 100px);
+          overflow-y: auto;
+        }@media (max-width: 1000px){#cmWorkspace .bottom-layout{ flex-direction: column; }#cmWorkspace .preview-col{ position: static; flex: 1 1 0; min-width: 0; width: 100%; max-height: none; }
+        }#cmWorkspace .live-preview-placeholder{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 280px;
+          gap: 14px;
+          color: var(--text-color-light);
+          text-align: center;
+          padding: 20px;
+        }#cmWorkspace .live-preview-placeholder i{ font-size: 3rem; opacity: 0.2; }#cmWorkspace .live-preview-placeholder .ph-title{
+          font-size: 0.95rem; font-weight: 700;
+          color: var(--text-color); opacity: 0.55;
+        }#cmWorkspace .live-preview-placeholder small{ font-size: 0.78rem; opacity: 0.65; line-height: 1.7; }#cmWorkspace .merge-action-compact{
+          margin-top: 18px;
+          padding-top: 18px;
+          border-top: 1px dashed rgba(var(--primary-rgb), 0.12);
+          display: flex;
+          justify-content: flex-end;
+        }#cmWorkspace .straighten-hint{
+          display: none;
+          font-size: 0.72rem;
+          color: var(--primary-color);
+          font-weight: 700;
+          animation: strPulse 1.3s ease-in-out infinite;
+          white-space: nowrap;
+        }#cmWorkspace .btn-sm.btn-active{
+          background: var(--secondary-purple) !important;
+          color: white !important;
+          border-color: var(--secondary-purple) !important;
+        }#cmWorkspace .preview-zoom-bar{
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          justify-content: center;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+        }#cmWorkspace .result-section:not(.visible) .preview-zoom-bar{ display: none !important; }#cmWorkspace .pos-grid{
+          display: grid;
+          grid-template-columns: repeat(3, 30px);
+          gap: 4px;
+        }#cmWorkspace .pos-btn{
+          width: 30px; height: 30px;
+          border: 1.5px solid rgba(var(--primary-rgb, 99,102,241), 0.35);
+          background: transparent;
+          color: var(--text-color);
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          display: flex; align-items: center; justify-content: center;
+          transition: background 0.18s, border-color 0.18s, color 0.18s;
+          padding: 0;
+          line-height: 1;
+        }#cmWorkspace .pos-btn:hover{
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+          background: rgba(var(--primary-rgb, 99,102,241), 0.1);
+        }#cmWorkspace .pos-btn.pos-active{
+          background: var(--primary-color);
+          color: #fff;
+          border-color: var(--primary-color);
+        }#cmWorkspace .tool-tabs{
+          display: flex;
+          gap: 8px;
+          margin-bottom: 28px;
+          background: var(--card-bg);
+          border-radius: 16px;
+          padding: 8px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+          flex-wrap: wrap;
+        }#cmWorkspace .tool-tab{
+          flex: 1;
+          padding: 12px 20px;
+          border: none;
+          border-radius: 11px;
+          background: transparent;
+          color: var(--text-color-light);
+          font-family: "Cairo", sans-serif;
+          font-size: 0.92rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-width: 110px;
+        }#cmWorkspace .tool-tab:hover{ background: rgba(var(--primary-rgb), 0.08); color: var(--primary-color); }#cmWorkspace .tool-tab.active{
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+          color: white;
+          box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
+        }#cmWorkspace .pdf-sub-tabs{
+          display: flex;
+          gap: 8px;
+          margin-bottom: 22px;
+          flex-wrap: wrap;
+        }#cmWorkspace .pdf-sub-btn{
+          padding: 9px 22px;
+          border: 1.5px solid rgba(var(--primary-rgb), 0.25);
+          border-radius: 50px;
+          background: transparent;
+          color: var(--text-color-light);
+          font-family: "Cairo", sans-serif;
+          font-size: 0.88rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.22s ease;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }#cmWorkspace .pdf-sub-btn:hover{ border-color: var(--primary-color); color: var(--primary-color); background: rgba(var(--primary-rgb), 0.07); }#cmWorkspace .pdf-sub-btn.active{
+          background: rgba(var(--primary-rgb), 0.15);
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }#cmWorkspace .converter-mode-bar{
+          display: flex;
+          gap: 8px;
+          margin-bottom: 14px;
+        }#cmWorkspace .conv-mode-btn{
+          flex: 1;
+          padding: 8px 14px;
+          border: 1.5px solid rgba(var(--primary-rgb), 0.2);
+          border-radius: 8px;
+          background: transparent;
+          color: var(--text-color-light);
+          font-family: "Cairo", sans-serif;
+          font-size: 0.85rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }#cmWorkspace .conv-mode-btn:hover{ border-color: var(--primary-color); color: var(--primary-color); }#cmWorkspace .conv-mode-btn.active{
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-purple));
+          border-color: transparent;
+          color: #fff;
+          box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.3);
+        }#cmWorkspace .pdf-mode-bar{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: rgba(var(--primary-rgb), 0.1);
+          border: 1px solid rgba(var(--primary-rgb), 0.28);
+          border-radius: 11px;
+          padding: 9px 15px;
+          margin-bottom: 14px;
+          font-size: 0.84rem;
+          color: var(--primary-color);
+          font-weight: 600;
+          gap: 10px;
+        }#cmWorkspace .pdf-mode-bar i{ margin-left: 6px; }#cmWorkspace .pdf-mode-reset{
+          background: none;
+          border: 1px solid rgba(var(--primary-rgb), 0.25);
+          border-radius: 7px;
+          color: var(--text-color-light);
+          cursor: pointer;
+          padding: 4px 10px;
+          font-size: 0.78rem;
+          white-space: nowrap;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }#cmWorkspace .pdf-mode-reset:hover{
+          background: rgba(220, 50, 50, 0.12);
+          border-color: #e55;
+          color: #e55;
+        }#cmWorkspace .pdf-panel-wrap{
+          display: flex;
+          gap: 24px;
+          align-items: flex-start;
+        }#cmWorkspace .pdf-upload-section{ flex: 1 1 0; min-width: 0; }#cmWorkspace .pdf-settings-section{
+          flex: 0 0 300px;
+          min-width: 260px;
+          background: var(--card-bg);
+          border-radius: 18px;
+          padding: 22px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 6px 22px rgba(0,0,0,0.06);
+          position: sticky;
+          top: 85px;
+        }@media (max-width: 900px){#cmWorkspace .pdf-panel-wrap{ flex-direction: column; }#cmWorkspace .pdf-settings-section{ flex: 1 1 0; position: static; min-width: 0; width: 100%; }
+        }#cmWorkspace .pdf-dropzone{
+          border: 2.5px dashed rgba(var(--primary-rgb), 0.35);
+          border-radius: 16px;
+          padding: 40px 24px;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(var(--primary-rgb), 0.03);
+          transition: all 0.25s;
+          color: var(--text-color-light);
+          margin-bottom: 18px;
+        }#cmWorkspace .pdf-dropzone:hover, #cmWorkspace .pdf-dropzone.drag-over{
+          border-color: var(--primary-color);
+          background: rgba(var(--primary-rgb), 0.07);
+          color: var(--primary-color);
+        }#cmWorkspace .pdf-dropzone i{ font-size: 2.5rem; opacity: 0.45; margin-bottom: 10px; display: block; }#cmWorkspace .pdf-dropzone p{ font-size: 0.95rem; font-weight: 700; margin: 4px 0; }#cmWorkspace .pdf-dropzone small{ font-size: 0.78rem; opacity: 0.7; }#cmWorkspace .pdf-file-list{
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          max-height: 480px;
+          overflow-y: auto;
+        }#cmWorkspace .pdf-file-item{
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: var(--card-bg);
+          border-radius: 12px;
+          padding: 9px 13px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }#cmWorkspace .pdf-file-item .p-thumb{
+          width: 52px; height: 52px;
+          border-radius: 8px;
+          object-fit: cover;
+          flex-shrink: 0;
+          border: 1px solid rgba(var(--primary-rgb), 0.15);
+        }#cmWorkspace .pdf-file-item .p-icon{
+          width: 52px; height: 52px;
+          border-radius: 8px;
+          flex-shrink: 0;
+          background: rgba(239,68,68,0.12);
+          color: #ef4444;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.5rem;
+        }#cmWorkspace .pdf-file-item .p-name{ flex: 1; font-size: 0.82rem; font-weight: 700; color: var(--text-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }#cmWorkspace .pdf-file-item .p-meta{ font-size: 0.72rem; color: var(--text-color-light); margin-top: 2px; }#cmWorkspace .pdf-order-btns{ display: flex; flex-direction: column; gap: 3px; }#cmWorkspace .pdf-order-btns button{
+          width: 24px; height: 24px;
+          border: 1.5px solid rgba(var(--primary-rgb), 0.25);
+          background: transparent; border-radius: 5px; cursor: pointer;
+          font-size: 0.75rem; display: flex; align-items: center; justify-content: center;
+          color: var(--text-color-light); transition: all 0.18s; padding: 0;
+        }#cmWorkspace .pdf-order-btns button:hover{ border-color: var(--primary-color); color: var(--primary-color); background: rgba(var(--primary-rgb), 0.08); }#cmWorkspace .pdf-del-btn{
+          width: 28px; height: 28px;
+          border: 1.5px solid rgba(239,68,68,0.3); background: transparent;
+          border-radius: 7px; cursor: pointer; color: #ef4444;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.85rem; transition: all 0.18s; flex-shrink: 0; padding: 0;
+        }#cmWorkspace .pdf-del-btn:hover{ background: rgba(239,68,68,0.1); }#cmWorkspace .pdf-merge-info{ font-size: 0.83rem; color: var(--text-color-light); line-height: 1.9; }#cmWorkspace .pdf-merge-info p{ margin-bottom: 10px; font-weight: 700; color: var(--text-color); }#cmWorkspace .pdf-merge-info ul{ padding-right: 18px; }#cmWorkspace .pdf-merge-info ul li{ margin-bottom: 6px; }#cmWorkspace .pdf-page-card{
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          background: rgba(var(--primary-rgb), 0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 10px;
+          padding: 8px;
+          transition: border-color 0.2s;
+        }#cmWorkspace .pdf-page-card:hover{ border-color: rgba(var(--primary-rgb), 0.35); }#cmWorkspace .pdf-page-card canvas{ border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: block; }#cmWorkspace .pdf-page-label{ font-size: 0.7rem; color: var(--text-color-light); }#cmWorkspace .pdf-page-actions{ display: flex; gap: 5px; width: 100%; }#cmWorkspace .pdf-page-btn{
+          flex: 1;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 6px;
+          color: var(--text-color-light);
+          cursor: pointer;
+          padding: 4px 6px;
+          font-size: 0.72rem;
+          transition: all 0.18s;
+          white-space: nowrap;
+          display: flex; align-items: center; justify-content: center; gap: 3px;
+        }#cmWorkspace .pdf-page-btn:hover{
+          background: rgba(var(--primary-rgb), 0.15);
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }#cmWorkspace .pdf-page-btn-crop:hover{
+          background: rgba(90, 210, 140, 0.14);
+          border-color: #5dba8a;
+          color: #5dba8a;
+        }#cmWorkspace .pdf-page-card canvas{ cursor: zoom-in; }#cmWorkspace #pdfPreviewModal{
+          display: none;
+          position: fixed; inset: 0; z-index: 9999;
+          background: rgba(0,0,0,0.82);
+          align-items: center; justify-content: center;
+          backdrop-filter: blur(6px);
+        }#cmWorkspace #pdfPreviewModal.open{ display: flex; }#cmWorkspace .pdf-preview-box{
+          position: relative;
+          background: var(--card-bg);
+          border: 1.5px solid rgba(var(--primary-rgb),0.3);
+          border-radius: 14px;
+          padding: 12px;
+          max-width: 92vw;
+          max-height: 92vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+        }#cmWorkspace .pdf-preview-bar{
+          display: flex; align-items: center; justify-content: space-between;
+          width: 100%; gap: 10px;
+        }#cmWorkspace .pdf-preview-title{
+          font-size: 0.92rem; font-weight: 700;
+          color: var(--text-color);
+        }#cmWorkspace .pdf-preview-close{
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 8px;
+          color: var(--text-color-light);
+          cursor: pointer;
+          padding: 5px 10px;
+          font-size: 1rem;
+          line-height: 1;
+          transition: all 0.18s;
+        }#cmWorkspace .pdf-preview-close:hover{ background: rgba(220,50,50,0.25); border-color: #e05050; color: #e05050; }#cmWorkspace .pdf-preview-scroll{
+          overflow: auto;
+          max-width: calc(92vw - 24px);
+          max-height: calc(92vh - 90px);
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.08);
+        }#cmWorkspace #pdfPreviewCanvas{ display: block; border-radius: 8px; }#cmWorkspace .pdf-preview-actions{
+          display: flex; gap: 8px; width: 100%;
+        }#cmWorkspace .s-select{
+          background: var(--card-bg); color: var(--text-color);
+          border: 1.5px solid rgba(var(--primary-rgb), 0.22);
+          border-radius: 9px; padding: 8px 12px;
+          font-size: 0.88rem; font-family: "Cairo", sans-serif;
+          font-weight: 700; cursor: pointer; outline: none; flex: 1;
+        }#cmWorkspace .s-select:focus{ border-color: var(--primary-color); }
+  @keyframes pulse-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.45; }
+        }
+  @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+  @keyframes strPulse {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.35; }
+        }
   </style>
 </head>
 <body>
@@ -1677,6 +2549,732 @@
           </div>
           <input type="file" id="ssFile" accept="image/*,.pdf" hidden />
         </div>
+<!-- ══════════ CROP & MERGE WORKSPACE (ported from image-crop-merge.html) ══════════ -->
+  <div class="cm-stage" id="cmStage">
+    <div class="cm-stage-bar">
+      <span class="cm-stage-title"><i class="fas fa-object-group"></i> قص ودمج الصور</span>
+      <span class="cm-stage-meta" id="cmMeta"></span>
+      <div class="cm-stage-actions">
+        <button class="cm-sbtn" id="cmUseCurrent" title="Load the image you are editing into slot 1"><i class="fas fa-image"></i> الصورة الحالية</button>
+        <button class="cm-sbtn cmc-primary" id="cmSave" title="Save the merge result"><i class="fas fa-save"></i> حفظ</button>
+        <button class="cm-sbtn" id="cmClose" title="Back to your document"><i class="fas fa-arrow-left"></i> رجوع</button>
+      </div>
+    </div>
+    <div class="cm-stage-body" id="cmStageBody">
+      <div class="cm-workspace" id="cmWorkspace">
+                <div class="tool-main-container">
+        
+                  <!-- ═══ Tool Tabs ═══ -->
+                  <div class="tool-tabs">
+                    <button class="tool-tab active" id="tabBtn-cropmerge" onclick="switchTab('cropmerge')">
+                      <i class="fas fa-crop-alt"></i> قص ودمج
+                    </button>
+                    <button class="tool-tab" id="tabBtn-pdftools" onclick="switchTab('pdftools')">
+                      <i class="fas fa-file-pdf"></i> أدوات PDF
+                    </button>
+                  </div>
+        
+                  <div id="tab-cropmerge" class="tab-panel">
+        
+                  <!-- Single Image Mode Toggle -->
+                  <div class="single-mode-bar">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="singleImageMode" onchange="toggleSingleMode()">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="singleImageMode" style="cursor:pointer;">وضع الصورة الواحدة فقط</label>
+                    <span class="hint">عطّل الصورة الثانية إذا كنت تريد معالجة صورة واحدة فقط</span>
+                  </div>
+        
+                  <!-- Images Section -->
+                  <div class="images-section">
+        
+                    <!-- Panel 1 -->
+                    <div class="image-panel" id="panel-card-0">
+                      <div class="panel-title">
+                        <span class="panel-num">١</span>
+                        الصورة الأولى <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الأمامي)</small>
+                        <button class="paste-target-btn active" id="pasteTargetBtn0" onclick="setPasteTarget(0)" title="Ctrl+V يلصق هنا">
+                          <i class="fas fa-paste"></i> لصق هنا
+                        </button>
+                      </div>
+        
+                      <div class="upload-zone" id="uploadZone0">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                        <small style="font-size:0.73rem;color:var(--text-color-light);opacity:.7;">Ctrl+V للصق من الحافظة</small>
+                        <input type="file" id="fileInput0" accept="image/*" onchange="loadImageFromInput(0, this)">
+                      </div>
+        
+                      <div class="canvas-wrapper" id="canvasWrapper0">
+                        <canvas id="canvas0"></canvas>
+                        <div class="canvas-empty-msg" id="emptyMsg0">
+                          <i class="fas fa-image"></i>
+                          ارفع صورة أولاً<br>
+                          <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
+                        </div>
+                        <div class="canvas-hint">اسحب لتحديد • اسحب النقاط لضبط التحديد</div>
+                      </div>
+        
+                      <div class="panel-controls">
+                        <!-- Rotation -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label"><i class="fas fa-sync-alt"></i> التدوير</span>
+                          <div class="range-wrap">
+                            <input type="range" id="rotation0" min="0" max="360" value="0" oninput="updateRotation(0, this.value)">
+                            <span class="range-val" id="rotVal0">0°</span>
+                          </div>
+                        </div>
+                        <!-- Quick Rotation -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label">تدوير سريع</span>
+                          <div class="toggle-btn-group">
+                            <button class="btn-sm btn-outline" onclick="rotateBy(0,-90)" title="90° يساراً">⟲ ‑90°</button>
+                            <button class="btn-sm btn-outline" onclick="rotateBy(0,180)" title="قلب 180°">↕ 180°</button>
+                            <button class="btn-sm btn-outline" onclick="rotateBy(0,90)" title="90° يميناً">⟳ +90°</button>
+                          </div>
+                        </div>
+                        <!-- Straighten Mode -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label"><i class="fas fa-ruler"></i> تسوية</span>
+                          <button class="btn-sm btn-outline" id="straightenBtn0" onclick="toggleStraighten(0)">
+                            <i class="fas fa-crosshairs"></i> حدد خطاً مرجعياً
+                          </button>
+                          <span class="straighten-hint" id="straightenHint0">انقر نقطة ← ثم نقطة أخرى</span>
+                        </div>
+                        <!-- Shape -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label">التحديد</span>
+                          <div class="toggle-btn-group">
+                            <button class="toggle-btn active" id="shape0-free" onclick="setShape(0,'free')"><i class="fas fa-vector-square"></i> حر</button>
+                            <button class="toggle-btn" id="shape0-square" onclick="setShape(0,'square')"><i class="fas fa-square"></i> مربع</button>
+                          </div>
+                        </div>
+                        <!-- Crop info + clear -->
+                        <div class="crop-row">
+                          <div class="crop-info-badge" id="cropInfo0">لم يتم التحديد بعد</div>
+                          <button class="btn-sm btn-outline" onclick="autoTrim(0)" title="قص المساحات الفارغة تلقائياً"><i class="fas fa-magic"></i> قص تلقائي</button>
+                          <button class="btn-sm btn-outline" onclick="clearSelection(0)"><i class="fas fa-times"></i> مسح</button>
+                          <button class="btn-sm btn-primary" onclick="useFullImage(0)"><i class="fas fa-expand"></i> كل الصورة</button>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <!-- Panel 2 -->
+                    <div class="image-panel" id="panel-card-1">
+                      <div class="panel-title">
+                        <span class="panel-num">٢</span>
+                        الصورة الثانية <small style="font-size:0.78rem;color:var(--text-color-light);font-weight:400;">(الوجه الخلفي)</small>
+                        <button class="paste-target-btn" id="pasteTargetBtn1" onclick="setPasteTarget(1)" title="Ctrl+V يلصق هنا">
+                          <i class="fas fa-paste"></i> لصق هنا
+                        </button>
+                      </div>
+        
+                      <div class="upload-zone" id="uploadZone1">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>اضغط هنا أو اسحب وأفلت الصورة</p>
+                        <small style="font-size:0.73rem;color:var(--text-color-light);opacity:.7;">Ctrl+V للصق من الحافظة</small>
+                        <input type="file" id="fileInput1" accept="image/*" onchange="loadImageFromInput(1, this)">
+                      </div>
+        
+                      <div class="canvas-wrapper" id="canvasWrapper1">
+                        <canvas id="canvas1"></canvas>
+                        <div class="canvas-empty-msg" id="emptyMsg1">
+                          <i class="fas fa-image"></i>
+                          ارفع صورة أولاً<br>
+                          <small style="font-size:0.75rem;">ثم اسحب على الصورة لتحديد منطقة القص</small>
+                        </div>
+                        <div class="canvas-hint">اسحب لتحديد • اسحب النقاط لضبط التحديد</div>
+                      </div>
+        
+                      <div class="panel-controls">
+                        <div class="ctrl-row">
+                          <span class="ctrl-label"><i class="fas fa-sync-alt"></i> التدوير</span>
+                          <div class="range-wrap">
+                            <input type="range" id="rotation1" min="0" max="360" value="0" oninput="updateRotation(1, this.value)">
+                            <span class="range-val" id="rotVal1">0°</span>
+                          </div>
+                        </div>
+                        <!-- Quick Rotation -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label">تدوير سريع</span>
+                          <div class="toggle-btn-group">
+                            <button class="btn-sm btn-outline" onclick="rotateBy(1,-90)" title="90° يساراً">⟲ ‑90°</button>
+                            <button class="btn-sm btn-outline" onclick="rotateBy(1,180)" title="قلب 180°">↕ 180°</button>
+                            <button class="btn-sm btn-outline" onclick="rotateBy(1,90)" title="90° يميناً">⟳ +90°</button>
+                          </div>
+                        </div>
+                        <!-- Straighten Mode -->
+                        <div class="ctrl-row">
+                          <span class="ctrl-label"><i class="fas fa-ruler"></i> تسوية</span>
+                          <button class="btn-sm btn-outline" id="straightenBtn1" onclick="toggleStraighten(1)">
+                            <i class="fas fa-crosshairs"></i> حدد خطاً مرجعياً
+                          </button>
+                          <span class="straighten-hint" id="straightenHint1">انقر نقطة ← ثم نقطة أخرى</span>
+                        </div>
+                        <div class="ctrl-row">
+                          <span class="ctrl-label">التحديد</span>
+                          <div class="toggle-btn-group">
+                            <button class="toggle-btn active" id="shape1-free" onclick="setShape(1,'free')"><i class="fas fa-vector-square"></i> حر</button>
+                            <button class="toggle-btn" id="shape1-square" onclick="setShape(1,'square')"><i class="fas fa-square"></i> مربع</button>
+                          </div>
+                        </div>
+                        <div class="crop-row">
+                          <div class="crop-info-badge" id="cropInfo1">لم يتم التحديد بعد</div>
+                          <button class="btn-sm btn-outline" onclick="autoTrim(1)" title="قص المساحات الفارغة تلقائياً"><i class="fas fa-magic"></i> قص تلقائي</button>
+                          <button class="btn-sm btn-outline" onclick="clearSelection(1)"><i class="fas fa-times"></i> مسح</button>
+                          <button class="btn-sm btn-primary" onclick="useFullImage(1)"><i class="fas fa-expand"></i> كل الصورة</button>
+                        </div>
+                      </div>
+                    </div>
+        
+                  </div><!-- /images-section -->
+        
+                  <!-- Bottom Layout (Settings on RIGHT | Live Preview on LEFT in RTL) -->
+                  <div class="bottom-layout">
+        
+                  <!-- Settings Column (RIGHT in RTL = first in DOM) -->
+                  <div class="settings-col">
+                  <!-- Merge + Adjustments -->
+                  <div class="merge-adj-section">
+                    <div class="section-title">
+                      <i class="fas fa-sliders-h"></i> إعدادات الدمج والفلاتر
+                    </div>
+        
+                    <div class="settings-grid">
+        
+                      <!-- Merge settings -->
+                      <div class="settings-group">
+                        <h4><i class="fas fa-object-group"></i> إعدادات الدمج</h4>
+        
+                        <div class="setting-row">
+                          <label class="s-label">الترتيب</label>
+                          <div class="toggle-btn-group">
+                            <button class="toggle-btn" id="arrangeSide" onclick="setArrangement('side')">
+                              <i class="fas fa-grip-lines-vertical"></i> جنب بجنب
+                            </button>
+                            <button class="toggle-btn active" id="arrangeStack" onclick="setArrangement('stack')">
+                              <i class="fas fa-grip-lines"></i> فوق بعض
+                            </button>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">المسافة الفاصلة</label>
+                          <div class="range-wrap">
+                            <input type="range" id="gapSlider" min="0" max="100" value="10" oninput="gapVal=+this.value;document.getElementById('gapValTxt').textContent=this.value+'px'">
+                            <span class="range-val" id="gapValTxt">10px</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">لون الخلفية</label>
+                          <input type="color" id="bgColor" value="#ffffff">
+                          <span style="font-size:0.8rem;color:var(--text-color-light);">شفاف</span>
+                          <label class="toggle-switch" style="margin:0">
+                            <input type="checkbox" id="transparentBg">
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">حجم الإخراج</label>
+                          <div class="toggle-btn-group">
+                            <button class="toggle-btn active" id="sizeOrig" onclick="setOutputSize('1')">أصلي</button>
+                            <button class="toggle-btn" id="size2x" onclick="setOutputSize('2')">×2</button>
+                            <button class="toggle-btn" id="sizeHalf" onclick="setOutputSize('0.5')">×0.5</button>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">محاذاة العناصر</label>
+                          <div class="toggle-btn-group">
+                            <button class="toggle-btn active" id="alignCenter" onclick="setAlignment('center')">وسط</button>
+                            <button class="toggle-btn" id="alignStart" onclick="setAlignment('start')">بداية</button>
+                            <button class="toggle-btn" id="alignEnd" onclick="setAlignment('end')">نهاية</button>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">قد بعض</label>
+                          <label class="toggle-switch">
+                            <input type="checkbox" id="normalizeSizeToggle" onchange="toggleNormalize()">
+                            <span class="toggle-slider"></span>
+                          </label>
+                          <span style="font-size:0.78rem;color:var(--text-color-light);">توحيد حجم الصورتين</span>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">حدود مستديرة</label>
+                          <div class="range-wrap">
+                            <input type="range" id="cornerRadius" min="0" max="60" value="0" oninput="document.getElementById('cornerRadiusVal').textContent=this.value+'px'">
+                            <span class="range-val" id="cornerRadiusVal">0px</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">حجم الصورة في الورقة</label>
+                          <div class="range-wrap">
+                            <input type="range" id="pageScaleSlider" min="20" max="100" value="100"
+                              oninput="onPageScaleChange(+this.value)">
+                            <span class="range-val" id="pageScaleVal">100%</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row" style="align-items:flex-start;">
+                          <label class="s-label" style="padding-top:4px;">موضع الصورة</label>
+                          <div class="pos-grid" id="posGrid">
+                            <button id="pos_tl" class="pos-btn" onclick="setPageAlign('tl')" title="أعلى يسار">↖</button>
+                            <button id="pos_tc" class="pos-btn" onclick="setPageAlign('tc')" title="أعلى وسط">↑</button>
+                            <button id="pos_tr" class="pos-btn" onclick="setPageAlign('tr')" title="أعلى يمين">↗</button>
+                            <button id="pos_ml" class="pos-btn" onclick="setPageAlign('ml')" title="وسط يسار">←</button>
+                            <button id="pos_mc" class="pos-btn pos-active" onclick="setPageAlign('mc')" title="المنتصف">⊙</button>
+                            <button id="pos_mr" class="pos-btn" onclick="setPageAlign('mr')" title="وسط يمين">→</button>
+                            <button id="pos_bl" class="pos-btn" onclick="setPageAlign('bl')" title="أسفل يسار">↙</button>
+                            <button id="pos_bc" class="pos-btn" onclick="setPageAlign('bc')" title="أسفل وسط">↓</button>
+                            <button id="pos_br" class="pos-btn" onclick="setPageAlign('br')" title="أسفل يمين">↘</button>
+                          </div>
+                        </div>
+                      </div>
+        
+                      <!-- Filters / Adjustments -->
+                      <div class="settings-group">
+                        <h4><i class="fas fa-magic"></i> فلاتر وتعديلات</h4>
+        
+                        <div class="setting-row">
+                          <label class="s-label">السطوع</label>
+                          <div class="range-wrap">
+                            <input type="range" id="cmBrightness" min="-100" max="100" value="0" oninput="document.getElementById('brightnessVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="brightnessVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">التباين</label>
+                          <div class="range-wrap">
+                            <input type="range" id="cmContrast" min="-100" max="100" value="0" oninput="document.getElementById('contrastVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="contrastVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">التشبع</label>
+                          <div class="range-wrap">
+                            <input type="range" id="cmSaturation" min="-100" max="100" value="0" oninput="document.getElementById('saturationVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="saturationVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">الحدة (Sharpen)</label>
+                          <div class="range-wrap">
+                            <input type="range" id="cmSharpen" min="0" max="10" value="0" step="0.5" oninput="document.getElementById('sharpenVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="sharpenVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">الدرجات (Levels) <small style="opacity:.65;font-size:.75em">− تبييض / + تسويد</small></label>
+                          <div class="range-wrap">
+                            <input type="range" id="levels" min="-100" max="100" value="0" oninput="document.getElementById('levelsVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="levelsVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">الضبابية (Blur)</label>
+                          <div class="range-wrap">
+                            <input type="range" id="blurAmount" min="0" max="10" value="0" step="0.5" oninput="document.getElementById('blurVal').textContent=this.value;updateFilter()">
+                            <span class="range-val" id="blurVal">0</span>
+                          </div>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">أبيض وأسود</label>
+                          <label class="toggle-switch">
+                            <input type="checkbox" id="bwToggle" onchange="updateFilter()">
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">عكس الألوان</label>
+                          <label class="toggle-switch">
+                            <input type="checkbox" id="invertToggle" onchange="updateFilter()">
+                            <span class="toggle-slider"></span>
+                          </label>
+                        </div>
+        
+                        <div class="setting-row">
+                          <label class="s-label">إعادة تعيين الفلاتر</label>
+                          <button class="btn-sm btn-outline" onclick="resetFilters()"><i class="fas fa-undo"></i> إعادة</button>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <!-- ======= A4 Mode Panel ======= -->
+                    <div class="extra-panel">
+                      <div class="extra-panel-header">
+                        <div class="section-title" style="margin-bottom:0;">
+                          <i class="fas fa-file-alt"></i> وضع A4
+                        </div>
+                        <label class="toggle-switch">
+                          <input type="checkbox" id="a4ModeToggle" onchange="toggleA4Mode()">
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                      <div class="extra-panel-body" id="a4PanelBody">
+                        <div class="settings-grid">
+                          <div class="settings-group">
+                            <h4><i class="fas fa-ruler-combined"></i> إعدادات الصفحة</h4>
+                            <div class="setting-row">
+                              <label class="s-label">الاتجاه</label>
+                              <div class="toggle-btn-group">
+                                <button class="toggle-btn active" id="a4Portrait" onclick="setA4Orientation('portrait')">
+                                  <i class="fas fa-file"></i> عمودي
+                                </button>
+                                <button class="toggle-btn" id="a4Landscape" onclick="setA4Orientation('landscape')">
+                                  <i class="fas fa-file" style="transform:rotate(90deg);display:inline-block;"></i> أفقي
+                                </button>
+                              </div>
+                            </div>
+                            <div class="setting-row">
+                              <label class="s-label">الدقة (DPI)</label>
+                              <div class="toggle-btn-group">
+                                <button class="toggle-btn" id="dpi72" onclick="setA4Dpi(72)">72 dpi</button>
+                                <button class="toggle-btn active" id="dpi150" onclick="setA4Dpi(150)">150 dpi</button>
+                                <button class="toggle-btn" id="dpi300" onclick="setA4Dpi(300)">300 dpi</button>
+                              </div>
+                            </div>
+                            <div class="setting-row" style="font-size:0.78rem;color:var(--text-color-light);">
+                              <i class="fas fa-info-circle" style="color:var(--primary-color);"></i>
+                              <span id="a4DimLabel">1240 × 1754 بكسل (A4 عمودي)</span>
+                            </div>
+                          </div>
+                          <div class="settings-group">
+                            <h4><i class="fas fa-crosshairs"></i> موضع وحجم الصورة على A4</h4>
+                            <div class="setting-row">
+                              <label class="s-label">موضع X (أفقي)</label>
+                              <div class="range-wrap">
+                                <input type="range" id="a4PosXSlider" min="0" max="100" value="50"
+                                  oninput="a4PosX=+this.value;document.getElementById('a4PosXVal').textContent=this.value+'%';onA4SettingChange()">
+                                <span class="range-val" id="a4PosXVal">50%</span>
+                              </div>
+                            </div>
+                            <div class="setting-row">
+                              <label class="s-label">موضع Y (رأسي)</label>
+                              <div class="range-wrap">
+                                <input type="range" id="a4PosYSlider" min="0" max="100" value="50"
+                                  oninput="a4PosY=+this.value;document.getElementById('a4PosYVal').textContent=this.value+'%';onA4SettingChange()">
+                                <span class="range-val" id="a4PosYVal">50%</span>
+                              </div>
+                            </div>
+                            <div class="setting-row">
+                              <label class="s-label">حجم الصورة</label>
+                              <div class="range-wrap">
+                                <input type="range" id="a4ScaleSlider" min="5" max="100" value="80"
+                                  oninput="a4Scale=+this.value;document.getElementById('a4ScaleVal').textContent=this.value+'%';onA4SettingChange()">
+                                <span class="range-val" id="a4ScaleVal">80%</span>
+                              </div>
+                            </div>
+                            <div class="a4-thumb-wrap">
+                              <canvas id="a4ThumbCanvas" width="60" height="85"></canvas>
+                              <div class="a4-thumb-info">
+                                معاينة مصغّرة لموضع الصورة<br>
+                                داخل صفحة A4<br>
+                                <strong id="a4ThumbSizeLabel">150 dpi — عمودي</strong>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <!-- ======= Tile / Repeat Panel ======= -->
+                    <div class="extra-panel">
+                      <div class="extra-panel-header">
+                        <div class="section-title" style="margin-bottom:0;">
+                          <i class="fas fa-th"></i> تكرار الصورة (Grid)
+                        </div>
+                        <label class="toggle-switch">
+                          <input type="checkbox" id="tileModeToggle" onchange="toggleTileMode()">
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                      <div class="extra-panel-body" id="tilePanelBody">
+                        <div class="settings-grid">
+                          <div class="settings-group">
+                            <h4><i class="fas fa-border-all"></i> شبكة التكرار</h4>
+                            <div class="setting-row">
+                              <label class="s-label">الأعمدة <small style="font-weight:400;">(جنب بجنب)</small></label>
+                              <input type="number" id="tileColsInput" class="num-input" min="1" max="10" value="2"
+                                oninput="onTileSettingChange()">
+                            </div>
+                            <div class="setting-row">
+                              <label class="s-label">الصفوف <small style="font-weight:400;">(تحت بعض)</small></label>
+                              <input type="number" id="tileRowsInput" class="num-input" min="1" max="10" value="1"
+                                oninput="onTileSettingChange()">
+                            </div>
+                            <div class="setting-row">
+                              <label class="s-label">المسافة الفاصلة</label>
+                              <div class="range-wrap">
+                                <input type="range" id="tileSpacingSlider" min="0" max="120" value="10"
+                                  oninput="onTileSettingChange()">
+                                <span class="range-val" id="tileSpacingVal">10px</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="settings-group">
+                            <h4><i class="fas fa-info-circle"></i> كيف يعمل؟</h4>
+                            <p style="font-size:0.83rem;color:var(--text-color-light);line-height:1.8;">
+                              تُكرَّر الصورة المدموجة في شبكة <strong style="color:var(--primary-color);">أعمدة × صفوف</strong>
+                              مع الحفاظ على نسب الأبعاد الأصلية وبمقاسات ثابتة لكل نسخة.
+                              <br><br>
+                              يمكن تفعيل <strong style="color:var(--primary-color);">وضع A4</strong> في نفس الوقت
+                              لتوزيع النسخ داخل صفحة A4.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <!-- Manual Refresh -->
+                    <div class="merge-action-compact">
+                      <button class="btn-sm btn-outline" onclick="mergeImages()">
+                        <i class="fas fa-sync-alt"></i> تحديث يدوي
+                      </button>
+                    </div>
+                  </div><!-- /merge-adj-section -->
+                  </div><!-- /settings-col -->
+        
+                  <!-- Preview Column (LEFT in RTL = second in DOM) -->
+                  <div class="preview-col">
+                  <div class="result-section" id="resultSection">
+                    <div class="section-title" style="margin-bottom:14px;">
+                      <i class="fas fa-eye"></i> معاينة مباشرة
+                    </div>
+                    <!-- Placeholder shown until first image is loaded -->
+                    <div class="live-preview-placeholder" id="previewPlaceholder">
+                      <i class="fas fa-layer-group"></i>
+                      <span class="ph-title">سيظهر الناتج هنا تلقائياً</span>
+                      <small>ارفع صورة وستُحدّث المعاينة فوراً<br>دون الحاجة لضغط أي زر</small>
+                    </div>
+                    <div class="result-canvas-wrapper">
+                      <canvas id="resultCanvas"></canvas>
+                    </div>
+                    <div class="result-info" id="resultInfo"></div>
+                    <div class="preview-zoom-bar">
+                      <span style="font-size:0.78rem;color:var(--text-color-light);font-weight:700;">حجم المعاينة:</span>
+                      <button class="btn-sm btn-outline" id="pz50btn" onclick="setPreviewZoom(0.5)">50%</button>
+                      <button class="btn-sm btn-outline" id="pz75btn" onclick="setPreviewZoom(0.75)">75%</button>
+                      <button class="btn-sm btn-primary" id="pz100btn" onclick="setPreviewZoom(1)">ملاءمة</button>
+                    </div>
+                    <div class="export-grid">
+                      <button class="btn-export btn-primary" onclick="downloadResult('png')">
+                        <i class="fas fa-download"></i> تحميل PNG
+                      </button>
+                      <button class="btn-export btn-secondary" onclick="downloadResult('jpg')">
+                        <i class="fas fa-download"></i> تحميل JPG
+                      </button>
+                      <button class="btn-export btn-success" onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i> نسخ للحافظة
+                      </button>
+                      <button class="btn-export btn-dark" onclick="downloadResult('webp')">
+                        <i class="fas fa-download"></i> تحميل WebP
+                      </button>
+                      <button class="btn-export btn-danger" onclick="resetAll()">
+                        <i class="fas fa-redo"></i> إعادة تعيين الكل
+                      </button>
+                    </div>
+                  </div><!-- /result-section -->
+                  </div><!-- /preview-col -->
+        
+                  </div><!-- /bottom-layout -->
+        
+                  </div><!-- /tab-cropmerge -->
+        
+                  <!-- ═══════════════════════════════════════════
+                       TAB: أدوات PDF
+                  ═══════════════════════════════════════════ -->
+                  <div id="tab-pdftools" class="tab-panel" style="display:none">
+                    <div class="pdf-panel-wrap">
+        
+                      <!-- Upload + content (right in RTL) -->
+                      <div class="pdf-upload-section" style="flex:1;min-width:0">
+        
+                        <!-- Mode indicator bar -->
+                        <div id="pdfModeBar" class="pdf-mode-bar" style="display:none">
+                          <span id="pdfModeLabel"></span>
+                          <button onclick="resetPdfTool()" class="pdf-mode-reset"><i class="fas fa-undo"></i> بدء من جديد</button>
+                        </div>
+        
+                        <!-- Unified drop zone -->
+                        <div class="pdf-dropzone" id="pdfUnifiedDrop" onclick="document.getElementById('pdfUnifiedInput').click()">
+                          <i class="fas fa-cloud-upload-alt"></i>
+                          <p id="pdfUnifiedDropText">اضغط أو اسحب صوراً أو ملفات PDF</p>
+                          <small id="pdfUnifiedDropSub">JPG، PNG، WebP، PDF — الأداة تكتشف النوع تلقائياً</small>
+                        </div>
+                        <input type="file" id="pdfUnifiedInput" accept="image/*,application/pdf" multiple style="display:none" onchange="handleUnifiedFiles(this.files)">
+        
+                        <!-- img2pdf: image list -->
+                        <div id="pdfContent-img2pdf" style="display:none">
+                          <div id="img2pdfList" class="pdf-file-list"></div>
+                        </div>
+        
+                        <!-- pdf2img: page thumbnails -->
+                        <div id="pdfContent-pdf2img" style="display:none">
+                          <div id="pdf2imgPages" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;align-items:flex-start;"></div>
+                        </div>
+        
+                        <!-- pdfmerge: PDF file list -->
+                        <div id="pdfContent-pdfmerge" style="display:none">
+                          <div id="pdfmergeList" class="pdf-file-list"></div>
+                        </div>
+        
+                      </div>
+        
+                      <!-- Adaptive settings panel (left in RTL) -->
+                      <div class="pdf-settings-section">
+        
+                        <!-- Empty state -->
+                        <div id="pdfSettings-empty">
+                          <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-magic"></i> أداة PDF الذكية</div>
+                          <div class="pdf-merge-info">
+                            <p>ارفع ملفات وستكتشف الأداة تلقائياً:</p>
+                            <ul>
+                              <li><strong>صور JPG/PNG/WebP</strong> → تحويل إلى PDF</li>
+                              <li><strong>ملف PDF واحد</strong> → تحويل إلى صور</li>
+                              <li><strong>ملفات PDF متعددة</strong> → دمج في ملف واحد</li>
+                            </ul>
+                          </div>
+                        </div>
+        
+                        <!-- img2pdf settings -->
+                        <div id="pdfSettings-img2pdf" style="display:none">
+                          <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-sliders-h"></i> إعدادات PDF</div>
+                          <div class="setting-row">
+                            <label class="s-label">حجم الصفحة</label>
+                            <select id="pdfPageSize" class="s-select">
+                              <option value="a4">A4</option>
+                              <option value="a3">A3</option>
+                              <option value="letter">Letter</option>
+                              <option value="a5">A5</option>
+                            </select>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">الاتجاه</label>
+                            <div class="toggle-btn-group">
+                              <button class="toggle-btn active" id="pdfOrientPort" onclick="setPdfOrientation('portrait')"><i class="fas fa-mobile-alt"></i> عمودي</button>
+                              <button class="toggle-btn" id="pdfOrientLand" onclick="setPdfOrientation('landscape')"><i class="fas fa-tablet-alt"></i> أفقي</button>
+                            </div>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">الهامش</label>
+                            <div class="range-wrap">
+                              <input type="range" id="pdfMargin" min="0" max="30" value="5" oninput="document.getElementById('pdfMarginVal').textContent=this.value+'mm'">
+                              <span class="range-val" id="pdfMarginVal">5mm</span>
+                            </div>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">ملاءمة الصورة</label>
+                            <select id="pdfFitMode" class="s-select">
+                              <option value="fit">ملاءمة (Fit)</option>
+                              <option value="fill">تعبئة (Fill)</option>
+                              <option value="stretch">تمديد كامل</option>
+                            </select>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">جودة الصور</label>
+                            <div class="range-wrap">
+                              <input type="range" id="cmPdfQuality" min="0.3" max="1" step="0.1" value="0.9" oninput="document.getElementById('pdfQualityVal').textContent=Math.round(+this.value*100)+'%'">
+                              <span class="range-val" id="pdfQualityVal">90%</span>
+                            </div>
+                          </div>
+                          <div id="img2pdfCount" style="text-align:center;font-size:0.82rem;color:var(--text-color-light);margin:10px 0;"></div>
+                          <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="generateImagesPDF()" id="img2pdfBtn">
+                            <i class="fas fa-file-pdf"></i> إنشاء PDF وتحميله
+                          </button>
+                        </div>
+        
+                        <!-- pdf2img settings -->
+                        <div id="pdfSettings-pdf2img" style="display:none">
+                          <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-sliders-h"></i> إعدادات التحويل</div>
+                          <div class="setting-row">
+                            <label class="s-label">تنسيق الصورة</label>
+                            <select class="s-select" id="pdf2imgFormat">
+                              <option value="image/jpeg" selected>JPG</option>
+                              <option value="image/png">PNG</option>
+                              <option value="image/webp">WebP</option>
+                            </select>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">الجودة</label>
+                            <div class="range-wrap">
+                              <input type="range" id="pdf2imgQuality" min="50" max="100" value="92"
+                                oninput="document.getElementById('pdf2imgQVal').textContent=this.value+'%'">
+                              <span class="range-val" id="pdf2imgQVal">92%</span>
+                            </div>
+                          </div>
+                          <div class="setting-row">
+                            <label class="s-label">الدقة</label>
+                            <select class="s-select" id="pdf2imgScale">
+                              <option value="1.5">متوسط (1.5x)</option>
+                              <option value="2" selected>عالي (2x)</option>
+                              <option value="3">فائق (3x)</option>
+                            </select>
+                          </div>
+                          <div id="pdf2imgInfo" style="font-size:0.82rem;color:var(--text-color-light);margin:14px 0;text-align:center;"></div>
+                          <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="downloadAllPdf2Img()" id="pdf2imgDownloadBtn">
+                            <i class="fas fa-download"></i> تحميل كل الصفحات
+                          </button>
+                        </div>
+        
+                        <!-- pdfmerge settings -->
+                        <div id="pdfSettings-pdfmerge" style="display:none">
+                          <div class="section-title" style="margin-bottom:18px;"><i class="fas fa-info-circle"></i> معلومات الدمج</div>
+                          <div class="pdf-merge-info">
+                            <p>ارفع ملفين PDF أو أكثر ثم اضغط دمج وتحميل</p>
+                            <ul>
+                              <li>الملفات تُدمج بالترتيب المعروض</li>
+                              <li>استخدم ↑ ↓ لإعادة الترتيب</li>
+                              <li>الدمج يتم كاملاً في المتصفح بدون رفع لأي خادم</li>
+                              <li>تُحفظ جودة الصور والنصوص الأصلية</li>
+                            </ul>
+                          </div>
+                          <div id="pdfmergeCount" style="text-align:center;font-size:0.82rem;color:var(--text-color-light);margin:14px 0;"></div>
+                          <button class="btn-merge" style="width:100%;justify-content:center;margin-top:10px;" onclick="mergePDFFiles()" id="pdfmergeBtn">
+                            <i class="fas fa-object-group"></i> دمج وتحميل PDF
+                          </button>
+                        </div>
+        
+                      </div>
+                    </div>
+                  </div><!-- /tab-pdftools -->
+        
+                </div><!-- /tool-main-container -->
+          <!-- PDF full-page preview lightbox -->
+          <div id="pdfPreviewModal" onclick="if(event.target===this)closePdfPreview()">
+            <div class="pdf-preview-box">
+              <div class="pdf-preview-bar">
+                <span class="pdf-preview-title" id="pdfPreviewTitle">معاينة الصفحة</span>
+                <button class="pdf-preview-close" onclick="closePdfPreview()" title="إغلاق">✕</button>
+              </div>
+              <div class="pdf-preview-scroll">
+                <canvas id="pdfPreviewCanvas"></canvas>
+              </div>
+              <div class="pdf-preview-actions">
+                <button class="pdf-page-btn" id="pdfPreviewDlBtn" onclick="downloadPdf2ImgPage(window._previewPageNum)" style="flex:1">
+                  <i class="fas fa-download"></i> تحميل الصفحة
+                </button>
+                <button class="pdf-page-btn pdf-page-btn-crop" id="pdfPreviewCropBtn" onclick="openPageInCrop(window._previewPageNum);closePdfPreview()" style="flex:1">
+                  <i class="fas fa-crop-alt"></i> فتح في لوح القص
+                </button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
 
         <div class="loading-overlay" id="loadingOverlay"><div class="loader-ring"></div><span id="loadingText">Processing...</span></div>
         <div class="pdf-nav" id="pdfNav">
@@ -1744,6 +3342,14 @@
             <line x1="8.12" y1="8.12" x2="12" y2="12"/>
           </svg>
           <span class="rail-tip" role="tooltip">Split &middot; تقطيع</span>
+        </div>
+        <div class="panel-tab" data-panel="merge" role="button" tabindex="0" aria-label="Crop and merge images">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="8" height="8" rx="1"></rect>
+            <rect x="13" y="3" width="8" height="18" rx="1"></rect>
+            <rect x="3" y="13" width="8" height="8" rx="1"></rect>
+          </svg>
+          <span class="rail-tip" role="tooltip">Crop &amp; Merge &middot; قص ودمج</span>
         </div>
         <div class="rail-spacer"></div>
 <button type="button" class="panel-tab rail-save" id="railSaveBtn" aria-label="Save as PNG (Alt/Ctrl/right-click for more formats)">
@@ -2129,6 +3735,28 @@
         </div>
       </div>
 
+        <!-- CROP & MERGE PANEL (ported from image-crop-merge.html) -->
+        <div class="panel-content" data-panel="merge">
+          <div class="panel-savebar">
+            <button class="ib save-export-btn" id="cmOpenBtn" title="Open the Crop &amp; Merge workspace">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg>
+              Open Crop &amp; Merge
+            </button>
+          </div>
+          <div class="panel-section">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>Crop &amp; Merge</h4></div>
+            <div class="panel-body">
+              <p class="ms-hint" id="cmStageHint">Two image slots, drag to crop, merge side-by-side or stacked, apply filters, place on A4 or repeat in a grid &mdash; plus a full PDF toolbox.</p>
+              <div class="ms-row" style="margin-top:7px;">
+                <button class="ib" id="cmOpenTabBtn" title="Open the Crop &amp; Merge workspace as a tab">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg>
+                  Open Workspace Tab
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /panel-stack -->
     </div>
   </div>
@@ -2446,6 +4074,25 @@
     if(!cdn.jspdf)return Promise.reject(new Error("jspdf config missing"));
     return loadScriptCandidates(cdn.jspdf);
   }
+  /* pdf-lib is only needed by the Crop&Merge PDF tools (PDF merge) */
+  function ensurePdfLib(){
+    if(window.PDFLib)return Promise.resolve();
+    const cdn=(window.__pfCDN||{});
+    const list=cdn.pdfLib;
+    if(!list||!list.length)return Promise.reject(new Error("pdf-lib config missing"));
+    return loadScriptCandidates(list);
+  }
+  /* Globals the ported Crop&Merge module needs from the editor shell. */
+  window.__pfToast=(m,t,d)=>toast(m,t||"info",d||2600);
+  window.__pfEnsurePdfJs=ensurePdfJs;
+  window.__pfEnsureJsPdf=ensureJsPdf;
+  window.__pfEnsurePdfLib=ensurePdfLib;
+  window.__pfPdfWorkerSrc=(c=>Array.isArray(c)?c[0]:(typeof c==="string"&&c?c:null))((window.__pfCDN||{}).pdfWorker);
+  /* save an arbitrary canvas through the editor's export pipeline */
+  window.__pfSaveCanvas=(canvas,baseName)=>{
+    if(!canvas||!canvas.width)return;
+    downloadCanvas(canvas,exportFileName("png"),"image/png");
+  };
 
   /* ===================== DEFAULTS ===================== */
   const DEFAULTS = { red:100,green:100,blue:100,hue:0,brightness:100,contrast:100,saturation:100,exposure:0,blur:0,sharpen:0,noise:0,vigIntensity:0,vigSpread:65,rotate:0,flipH:false,flipV:false,sepia:false,gray:false,borderWidth:0,borderColor:"#000000",borderRadius:0 };
@@ -2543,7 +4190,12 @@
   const activeTab=()=>tabs.find(t=>t.id===activeTabId);
   const isSplitTab=t=>!!(t&&t.kind==="split");
   const activeIsSplit=()=>isSplitTab(activeTab());
-  function tabHasImage(t){if(!t)return false;if(t.kind==="split")return false;if(t.loading)return false;if(t.id===activeTabId)return !!originalImage;return !!(t.session&&t.session.originalImage);}
+  /* Crop & Merge workspace tab (ported from image-crop-merge.html) */
+  const isMergeTab=t=>!!(t&&t.kind==="merge");
+  const activeIsMerge=()=>isMergeTab(activeTab());
+  const isWorkspaceTab=t=>isSplitTab(t)||isMergeTab(t);
+  const activeIsWorkspace=()=>isWorkspaceTab(activeTab());
+  function tabHasImage(t){if(!t)return false;if(isWorkspaceTab(t))return false;if(t.loading)return false;if(t.id===activeTabId)return !!originalImage;return !!(t.session&&t.session.originalImage);}
   function tabZoom(t){
     if(!t)return 1;
     if(t.id===activeTabId)return state.zoom;
@@ -2604,7 +4256,7 @@
     cropStart=null;marqueeStart=null;isDraggingCrop=false;isDraggingMarquee=false;isDraggingShape=false;
     isPainting=false;paintLast=null;paintStroke=null;cursorPt=null;cloneSource=null;cloneOffset=null;
   }
-  function captureActiveTab(){const cur=activeTab();if(!cur||isSplitTab(cur))return;cur.session=grabSession();}
+  function captureActiveTab(){const cur=activeTab();if(!cur||isWorkspaceTab(cur))return;cur.session=grabSession();}
   function noDoc(){
     originalImage=null;layers=[];activeLayerIdx=0;nextLayerId=1;strokes=[];
     groups=[];nextGroupId=1;multiSel=new Set();shiftAnchorIdx=0;
@@ -2623,24 +4275,26 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     if(del)del.disabled=true;if(mg)mg.disabled=true;if(dn)dn.disabled=true;if(up)up.disabled=true;
   }
   function createTab(kind){
-    const t={id:nextTabId++,kind:kind==="split"?"split":"doc",
-      name:kind==="split"?"Split · تقطيع":"Untitled-"+(++untitledCounter),
+    const isMerge=kind==="merge",isSpl=kind==="split";
+    const t={id:nextTabId++,kind:isSpl?"split":(isMerge?"merge":"doc"),
+      name:isSpl?"Split · تقطيع":(isMerge?"قص ودمج · Crop & Merge":"Untitled-"+(++untitledCounter)),
       session:null,dirty:false,loading:false};
     tabs.push(t);return t;
   }
   /* Activate a tab by id without touching the document state when the target
-     is the Split workspace (the document stays exactly as the user left it). */
+     is a tool workspace (Split / Crop&Merge) — the document stays exactly as
+     the user left it. */
   function activateTabState(id){
     const t=tabs.find(x=>x.id===id);
     if(!t)return;
     activeTabId=id;
-    if(isSplitTab(t))return;
+    if(isWorkspaceTab(t))return;
     if(t.session)putSession(t.session);else noDoc();
   }
   function openDocSlot(base){
     const cur=activeTab();
-    /* the Split workspace is not a document slot — a new file always gets its own tab */
-    if(cur&&(tabHasImage(cur)||isSplitTab(cur))){
+    /* a tool workspace is not a document slot — a new file always gets its own tab */
+    if(cur&&(tabHasImage(cur)||isWorkspaceTab(cur))){
       captureActiveTab();
       const nt=createTab();nt.loading=true;nt.name=base||nt.name;activeTabId=nt.id;renderTabBar();
       return nt;
@@ -2669,7 +4323,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     syncMoveOptionsBar();
   }
   function refreshAfterSwitch(){
+    if(activeIsMerge()){applyMergeTabView();return;}
     if(activeIsSplit()){applySplitTabView();return;}
+    leaveMergeMode();
     leaveSplitMode();
     if(originalImage){emptyState.style.display="none";canvasWrapper.style.display="block";}
     else{emptyState.style.display="flex";canvasWrapper.style.display="none";}
@@ -2711,9 +4367,10 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     $("statusDimensions").textContent=d.w+"×"+d.h;
     $("statusSize").textContent=n+" cut"+(n===1?"":"s");
   }
-  function applySplitTabView(){
-    const stage=$("splitStage");
-    document.body.classList.add("split-mode");
+function applySplitTabView(){
+  const stage=$("splitStage");
+  leaveMergeMode();
+  document.body.classList.add("split-mode");
     if(stage)stage.classList.add("on");
     emptyState.style.display="none";
     canvasWrapper.style.display="none";
@@ -2749,6 +4406,82 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     if(wasNew&&!suppressAutoSave)saveProject();
     return t;
   }
+
+  /* ---------- CROP & MERGE WORKSPACE TAB VIEW ---------- */
+  const mergeApi=()=>window.__mergeTool||null;
+  window.__mergeToolChanged=()=>{renderTabBar();if(activeIsMerge())syncMergeStatus();};
+  function syncMergeStatus(){
+    const m=mergeApi();
+    const metaEl=$("cmMeta"),saveBtn=$("cmSave");
+    if(saveBtn)saveBtn.disabled=!(m&&m.hasResult());
+    if(!m)return;
+    metaEl.textContent=m.hasSource()?m.tabMeta():"No image yet — drop one in, paste, or use the image you are editing";
+    const c=m.hasResult()?m.resultCanvas():null;
+    $("statusFileName").textContent="Crop & Merge";
+    $("statusDimensions").textContent=c?(c.width+"×"+c.height):"—";
+    $("statusSize").textContent=m.hasSource()?"2-slot merge":"—";
+  }
+  function applyMergeTabView(){
+    leaveSplitMode();
+    const stage=$("cmStage");
+    document.body.classList.add("merge-mode");
+    if(stage)stage.classList.add("on");
+    emptyState.style.display="none";
+    canvasWrapper.style.display="none";
+    $("rulersRow").style.display="none";
+    $("pdfNav").classList.remove("visible");
+    loadingOverlay.classList.remove("visible");
+    hideLoupe();
+    if($("colorPickerPop")&&$("colorPickerPop").classList.contains("open"))closeColorPicker(false);
+    activatePanelTab("merge");
+    $("toolNameLabel").textContent="Crop & Merge";
+    const m=mergeApi();
+    if(m&&m.onShow)m.onShow();
+    /* first entry (or a return to an empty workspace): pull the picture the
+       user is editing into slot 1 so the tool is never a blank screen */
+    if(m&&m.useCurrentIfEmpty&&m.useCurrentIfEmpty()&&originalImage)window.__mergeUseCurrent();
+    syncMergeStatus();
+    renderTabBar();
+    updateQe();
+    requestAnimationFrame(()=>{if(m&&m.relayout)m.relayout();});
+  }
+  function leaveMergeMode(){
+    if(!document.body.classList.contains("merge-mode"))return;
+    document.body.classList.remove("merge-mode");
+    const stage=$("cmStage");
+    if(stage)stage.classList.remove("on");
+    activatePanelTab(lastDocPanel);
+  }
+  function openMergeTab(){
+    let t=tabs.find(x=>x.kind==="merge");
+    const wasNew=!t;
+    if(!t){captureActiveTab();t=createTab("merge");}
+    activateTabState(t.id);
+    refreshAfterSwitch();
+    if(wasNew&&!suppressAutoSave)saveProject();
+    return t;
+  }
+  /* the "use the image I am editing" button in the merge stage */
+  window.__mergeUseCurrent=()=>{
+    const m=mergeApi();
+    if(!m)return;
+    let src=originalImage;
+    if(!src)src=activeTab()&&activeTab().session?activeTab().session.originalImage:null;
+    if(!src){toast("Open an image first, or drop one into the workspace.","warning");return;}
+    const c=(src instanceof HTMLCanvasElement)?src:(()=>{const cc=mkCanvas(src.width,src.height);cc.getContext("2d").drawImage(src,0,0);return cc;})();
+    if(m.useCurrentImage(c.toDataURL("image/png"),currentFileName)){
+      toast("Loaded the current image into slot 1.","success",2000);
+      syncMergeStatus();renderTabBar();
+    }else{
+      toast("Slot 1 already has an image — clear it first.","info",2200);
+    }
+  };
+  window.__mergeSaveResult=()=>{
+    const m=mergeApi();
+    if(!m||!m.hasResult()){toast("No merge result yet.","warning");return;}
+    window.__pfSaveCanvas(m.resultCanvas(),"crop-merge");
+  };
+  window.__mergeCloseTab=()=>{const t=activeTab();if(t&&isMergeTab(t))closeTab(t.id);};
   function renderTabBar(){
     const bar=$("tabBar");if(!bar)return;
     const ae=document.activeElement;
@@ -2757,14 +4490,18 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     bar.innerHTML="";
     for(const t of tabs){
       const el=document.createElement("div");
-      const isSplit=isSplitTab(t);
-      el.className="tab"+(t.id===activeTabId?" active":"")+(isSplit?" tab-split":"");
+      const isSplit=isSplitTab(t),isMerge=isMergeTab(t);
+      el.className="tab"+(t.id===activeTabId?" active":"")+(isSplit?" tab-split":"")+(isMerge?" tab-merge":"");
       el.dataset.id=t.id;el.draggable=true;
       const nm=document.createElement("span");nm.className="tab-name";nm.textContent=t.name;
       const meta=document.createElement("span");meta.className="tab-meta";
       if(isSplit){
         const s=splitPanelApi();
         meta.textContent=s&&s.hasSource()?s.tabMeta():"no source";
+        el.title=t.name+"   "+meta.textContent;
+      }else if(isMerge){
+        const m=mergeApi();
+        meta.textContent=m&&m.hasSource()?m.tabMeta():"no image";
         el.title=t.name+"   "+meta.textContent;
       }else{
         const zo=(t.id===activeTabId)?state.zoom:tabZoom(t);
@@ -2793,7 +4530,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   let pendingCloseId=null;
   function closeTab(id){
     const t=tabs.find(x=>x.id===id);if(!t)return;
-    if(tabs.length===1&&!isSplitTab(t)&&!t.dirty&&!t.loading&&!tabHasImage(t)){
+    if(tabs.length===1&&!isWorkspaceTab(t)&&!t.dirty&&!t.loading&&!tabHasImage(t)){
       toast("No open document — this is the empty tab.","info",2200);return;
     }
     if(t.id===activeTabId)captureActiveTab();
@@ -2804,10 +4541,10 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       return;
     }
     const onlyOne=tabs.length===1;
-    const wasSplit=isSplitTab(t);
+    const wasWorkspace=isWorkspaceTab(t);
     removeTab(id);
     if(onlyOne)toast("All documents closed.","info",1800);
-    else if(wasSplit&&!tabs.some(x=>x.kind==="split"))toast("Split workspace closed.","info",1600);
+    else if(wasWorkspace&&!tabs.some(x=>isWorkspaceTab(x)))toast("Tool workspace closed.","info",1600);
   }
   function removeTab(id){
     const idx=tabs.findIndex(t=>t.id===id);if(idx<0)return;
@@ -3540,10 +5277,12 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   /* Save/export target: the document canvas normally, or the Split workspace
    source when the Split tab is active — so Save behaves identically in both. */
 function saveTargetCanvas(){
+  if(activeIsMerge()){const m=mergeApi();return m&&m.hasResult()?m.resultCanvas():null;}
   if(activeIsSplit()){const s=splitPanelApi();return s?s.saveCanvas():null;}
   return originalImage?currentExportCanvas():null;
 }
 function saveBaseName(){
+  if(activeIsMerge())return "crop-merge";
   if(activeIsSplit()){const s=splitPanelApi();if(s&&s.hasSource())return s.sourceBaseName()||"split";}
   return (currentFileNameBase||"edit");
 }
@@ -3877,6 +5616,7 @@ const dataUrl=src.toDataURL("image/png");
   }
   function serializeTab(t){
     if(isSplitTab(t))return{name:t.name,kind:"split",dirty:false};
+    if(isMergeTab(t))return{name:t.name,kind:"merge",dirty:false};
     const s=t&&t.session;
     if(!s||!s.originalImage)return{name:t.name,dirty:!!t.dirty,empty:true};
     let src=s.originalImage;
@@ -3938,10 +5678,10 @@ const dataUrl=src.toDataURL("image/png");
   async function restoreTabsFromArray(arr){
     tabs=[];activeTabId=null;nextTabId=1;
     for(const td of arr){
-      if(td.kind==="split"){
-        const nt=createTab("split");activeTabId=nt.id;nt.name=td.name||nt.name;
-        continue; /* the document state is left untouched by the Split workspace */
-      }
+    if(td.kind==="split"||td.kind==="merge"){
+    const nt=createTab(td.kind);activeTabId=nt.id;nt.name=td.name||nt.name;
+    continue; /* the document state is left untouched by tool workspaces */
+    }
       const nt=createTab();activeTabId=nt.id;
       if(td.empty||!td.session||!td.session.dataUrl){noDoc();nt.name=td.name||nt.name;nt.dirty=!!td.dirty;captureActiveTab();continue;}
       const img=await loadImagePromise(td.session.dataUrl);
@@ -3989,7 +5729,8 @@ const dataUrl=src.toDataURL("image/png");
   /* ===================== COMBINED PDF QUEUE ===================== */
   function updateQe(){
     const sp=activeIsSplit()?splitPanelApi():null;
-    const has=activeIsSplit()?!!(sp&&sp.hasSource()):!!originalImage;
+    const mg=activeIsMerge()?mergeApi():null;
+    const has=activeIsMerge()?!!(mg&&mg.hasResult()):(activeIsSplit()?!!(sp&&sp.hasSource()):!!originalImage);
     ["qePng","qeJpg","qeWebp","qePdf","qeAddPdf","qeExportAll"].forEach(id=>{const el=$(id);if(el)el.disabled=!has;});
     const b=$("qePdfCount");if(b){b.textContent=pdfPages.length;b.classList.toggle("show",pdfPages.length>0);}
     const ea=$("qeExportAll");if(ea)ea.title=pdfPages.length?("Export Combined PDF ("+pdfPages.length+" pages)"):"Export Combined PDF";
@@ -8749,7 +10490,7 @@ const dataUrl=src.toDataURL("image/png");
     $("ssSave")&&$("ssSave").addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();toggleExportMenu($("ssSave"));});
     $("ssClose")&&$("ssClose").addEventListener("click",()=>{
       const t=activeTab();
-      if(isSplitTab(t))closeTab(t.id);
+      if(isSplitTab(t)||isMergeTab(t))closeTab(t.id);
       else leaveSplitMode();
     });
 
@@ -9564,6 +11305,11 @@ const dataUrl=src.toDataURL("image/png");
     $("ssPick")&&$("ssPick").addEventListener("click",()=>el.file.click());
     $("ssFile")&&$("ssFile").addEventListener("change",e=>{msHandleFile(e.target.files&&e.target.files[0]);e.target.value="";});
     $("msOpenTab")&&$("msOpenTab").addEventListener("click",()=>{if(window.openSplitTab)window.openSplitTab();});
+  /* Crop & Merge workspace: the rail/panel buttons.
+     The stage's own buttons (cmUseCurrent / cmSave / cmClose) are wired by the
+     ported module itself, so they are deliberately NOT bound here. */
+  $("cmOpenBtn")&&$("cmOpenBtn").addEventListener("click",()=>{if(window.openMergeTab)window.openMergeTab();});
+  $("cmOpenTabBtn")&&$("cmOpenTabBtn").addEventListener("click",()=>{if(window.openMergeTab)window.openMergeTab();});
 
     /* Public surface for the tab bar / save pipeline. */
     window.__splitPanel={
@@ -9593,6 +11339,7 @@ const dataUrl=src.toDataURL("image/png");
       relayout:msRelayout
     };
     window.openSplitTab=openSplitTab;
+  window.openMergeTab=openMergeTab;
 
     msRenderLineList();
     msSyncUi();
@@ -9604,5 +11351,2008 @@ const dataUrl=src.toDataURL("image/png");
   updateNetState();
 })();
 </script>
+  <!-- ══════════ CROP & MERGE MODULE (ported from image-crop-merge.html) ══════════ -->
+  <script>
+
+      /* ══════════════════════════════════════════════════════════
+         EDITOR BRIDGE  —  ProPhotoForge (pro-image-editor.html)
+         ══════════════════════════════════════════════════════════ */
+      var cmReadyFns = [], cmReadyDone = false;
+      function cmOnReady(fn) {
+        if (cmReadyDone) { fn(); return; }
+        cmReadyFns.push(fn);
+      }
+      function cmRunReady() {
+        if (cmReadyDone) return;
+        cmReadyDone = true;
+        cmReadyFns.forEach(function (f) { try { f(); } catch (e) { console.error('crop-merge init', e); } });
+        cmReadyFns.length = 0;
+      }
+      function cmEl(id) { return document.getElementById(id); }
+      /* The editor owns the lazy library loaders (local vendor copy first,
+         CDN as a fallback). Returns false instead of throwing so the PDF
+         tools can show a proper message when the user is offline. */
+      function cmEnsureLib(kind) {
+        var fn = { pdfjs: window.__pfEnsurePdfJs, jspdf: window.__pfEnsureJsPdf, pdflib: window.__pfEnsurePdfLib }[kind];
+        if (!fn) return Promise.resolve(!!({ pdfjs: window.pdfjsLib, jspdf: window.jspdf, pdflib: window.PDFLib })[kind]);
+        return fn().then(function () { return true; }).catch(function (e) {
+          console.error('crop-merge: cannot load ' + kind, e);
+          showToast('تعذّر تحميل مكتبة ' + kind + ' — تحقّق من الاتصال بالإنترنت', 'error');
+          return false;
+        });
+      }
+      /* PDF.js worker — the editor resolves this after it loads the engine */
+      function cmWorkerSrc() {
+        if (window.__pfPdfWorkerSrc) return window.__pfPdfWorkerSrc;
+        var c = (window.__pfCDN || {}).pdfWorker;
+        return Array.isArray(c) ? c[0] : c;
+      }
+      /* Tell the editor shell that the tool state changed, so the tab label,
+         the stage header and the status bar stay in sync. */
+      var _cmNotifyQueued = false;
+      function cmNotify() {
+        if (_cmNotifyQueued) return;
+        _cmNotifyQueued = true;
+        requestAnimationFrame(function () {
+          _cmNotifyQueued = false;
+          try { if (typeof window.__mergeToolChanged === 'function') window.__mergeToolChanged(); } catch (e) {}
+        });
+      }
+      function cmIsActive() {
+        return !!(window.__mergeTool && window.__mergeTool.isActive());
+      }
+      function cmResultCanvas() {
+        return (typeof filteredCanvas !== 'undefined' && filteredCanvas) || cmEl('resultCanvas');
+      }
+      /* canvases are sized from their wrapper, which is 0 while the stage is
+         hidden — so re-fit them every time the workspace is shown */
+      function cmRefit() {
+        for (var i = 0; i < 2; i++) {
+          var canvas = cmEl('canvas' + i), wrapper = cmEl('canvasWrapper' + i);
+          if (!canvas || !wrapper) continue;
+          var w = wrapper.offsetWidth, h = wrapper.offsetHeight;
+          if (!w || !h) continue;
+          if (canvas.width !== w) canvas.width = w;
+          if (canvas.height !== h) canvas.height = h;
+          try { renderPanel(i); } catch (e) { /* not ready yet */ }
+        }
+        try { if (typeof mergedRaw !== 'undefined' && mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); } } catch (e) {}
+      }
+'use strict';
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      // dragHandle: which handle is being dragged ('tl','tr','bl','br','tm','bm','ml','mr','move')
+      const panels = [
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [], strPreview: null },
+        { img: null, rotation: 0, sel: null, isDragging: false, startX: 0, startY: 0, shape: 'free', useFullImg: false, dragHandle: null, lastPos: null, straightenMode: false, strPts: [], strPreview: null }
+      ];
+
+      var HANDLE_HIT = 14; // px hit radius for handles
+      var activePastePanel = 0; // which panel Ctrl+V targets
+
+      window.setPasteTarget = function (idx) {
+        activePastePanel = idx;
+        [0, 1].forEach(function (i) {
+          var btn = document.getElementById('pasteTargetBtn' + i);
+          if (btn) btn.classList.toggle('active', i === idx);
+        });
+        showToast('Ctrl+V سيلصق في اللوحة ' + (idx + 1));
+      };
+
+      function getHandleAt(sel, px, py) {
+        if (!sel || sel.w < 5 || sel.h < 5) return null;
+        var sx = sel.x, sy = sel.y, sw = sel.w, sh = sel.h;
+        var pts = [
+          {n:'tl',x:sx,      y:sy      }, {n:'tr',x:sx+sw,   y:sy      },
+          {n:'bl',x:sx,      y:sy+sh   }, {n:'br',x:sx+sw,   y:sy+sh   },
+          {n:'tm',x:sx+sw/2, y:sy      }, {n:'bm',x:sx+sw/2, y:sy+sh   },
+          {n:'ml',x:sx,      y:sy+sh/2 }, {n:'mr',x:sx+sw,   y:sy+sh/2 }
+        ];
+        for (var i=0;i<pts.length;i++) {
+          if (Math.abs(px-pts[i].x)<=HANDLE_HIT && Math.abs(py-pts[i].y)<=HANDLE_HIT) return pts[i].n;
+        }
+        if (px>sx+HANDLE_HIT && px<sx+sw-HANDLE_HIT && py>sy+HANDLE_HIT && py<sy+sh-HANDLE_HIT) return 'move';
+        return null;
+      }
+
+      function getCursorForHandle(h, active) {
+        if (!h) return 'crosshair';
+        var m={tl:'nwse-resize',br:'nwse-resize',tr:'nesw-resize',bl:'nesw-resize',
+               tm:'ns-resize',bm:'ns-resize',ml:'ew-resize',mr:'ew-resize',
+               move: active ? 'grabbing' : 'grab'};
+        return m[h] || 'crosshair';
+      }
+
+      function resizeSel(idx, handle, pos) {
+        var p = panels[idx];
+        if (!p.sel) return;
+        var s = p.sel;
+        var R = s.x+s.w, B = s.y+s.h, MIN=10;
+        switch(handle) {
+          case 'tl': s.x=Math.min(pos.x,R-MIN); s.y=Math.min(pos.y,B-MIN); s.w=R-s.x; s.h=B-s.y; break;
+          case 'tr': s.y=Math.min(pos.y,B-MIN); s.w=Math.max(MIN,pos.x-s.x); s.h=B-s.y; break;
+          case 'bl': s.x=Math.min(pos.x,R-MIN); s.w=R-s.x; s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'br': s.w=Math.max(MIN,pos.x-s.x); s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'tm': s.y=Math.min(pos.y,B-MIN); s.h=B-s.y; break;
+          case 'bm': s.h=Math.max(MIN,pos.y-s.y); break;
+          case 'ml': s.x=Math.min(pos.x,R-MIN); s.w=R-s.x; break;
+          case 'mr': s.w=Math.max(MIN,pos.x-s.x); break;
+          case 'move':
+            var dx=pos.x-p.lastPos.x, dy=pos.y-p.lastPos.y;
+            s.x+=dx; s.y+=dy;
+            break;
+        }
+      }
+
+      let arrangement  = 'stack';  // 'side' | 'stack'
+      let alignment    = 'center'; // 'center' | 'start' | 'end'
+      let gapVal       = 10;
+      let outputScale  = 1;
+      let singleMode   = false;
+      let mergedRaw    = null;     // merged canvas before filters
+      let filteredCanvas = null;   // final canvas after filters
+      let outputRaw     = null;    // after A4/tile processing
+
+      // ============================================================
+      // AUTO-MERGE DEBOUNCE
+      // ============================================================
+      var _autoMergeTimer = null;
+      function scheduleAutoMerge() {
+        clearTimeout(_autoMergeTimer);
+        _autoMergeTimer = setTimeout(function () {
+          window.mergeImages(true); // silent = no toast / no scroll
+        }, 150);
+        cmNotify();
+      }
+
+      // A4 mode
+      let a4Mode        = false;
+      let a4Orientation = 'portrait';
+      let a4Dpi         = 150;
+      let a4PosX        = 50;
+      let a4PosY        = 50;
+      let a4Scale       = 80;
+
+      // Tile mode
+      let tileMode     = false;
+      let tileCols     = 2;
+      let tileRows     = 1;
+      let tileSpacing  = 10;
+
+      // New features
+      let normalizeSize = false;  // "قد بعض" — equalize both crop sizes
+      let previewZoom   = 1;      // multiplier for preview display (0.5 / 0.75 / 1)
+      let pageScale     = 100;    // image size as % of background canvas (20-100)
+      let pageAlign     = 'mc';   // position: tl tc tr ml mc mr bl bc br
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      cmOnReady(function () {
+
+        // Clipboard paste → load into the active paste-target panel (Ctrl+V)
+        document.addEventListener('paste', function (e) {
+          if (!window.__mergeTool || !window.__mergeTool.isActive()) return;
+          var items = (e.clipboardData || {}).items || [];
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+              var file = items[i].getAsFile();
+              if (!file) continue;
+              loadImgFile(activePastePanel, file);
+              showToast('تم لصق الصورة في اللوحة ' + (activePastePanel + 1), 'success');
+              break;
+            }
+          }
+        });
+
+        // Auto-merge when merge-settings inputs change
+        ['gapSlider', 'bgColor', 'transparentBg', 'cornerRadius'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('input',  scheduleAutoMerge);
+          el.addEventListener('change', scheduleAutoMerge);
+        });
+
+        panels.forEach(function (p, idx) {
+          var canvas  = document.getElementById('canvas' + idx);
+          var wrapper = document.getElementById('canvasWrapper' + idx);
+
+          // Fix canvas resolution to wrapper size (once)
+          canvas.width  = wrapper.offsetWidth  || 600;
+          canvas.height = wrapper.offsetHeight || 310;
+
+          // Mouse events
+          canvas.addEventListener('mousedown',  function (e) { onDown(e, idx); });
+          canvas.addEventListener('mousemove',  function (e) { onMove(e, idx); });
+          canvas.addEventListener('mouseup',    function (e) { onUp(e, idx); });
+          canvas.addEventListener('mouseleave', function (e) { onUp(e, idx); });
+
+          // Touch events
+          canvas.addEventListener('touchstart', function (e) { e.preventDefault(); onDown(touchToMouse(e, canvas), idx); }, { passive: false });
+          canvas.addEventListener('touchmove',  function (e) { e.preventDefault(); onMove(touchToMouse(e, canvas), idx); }, { passive: false });
+          canvas.addEventListener('touchend',   function (e) { e.preventDefault(); onUp(touchToMouse(e, canvas), idx); }, { passive: false });
+
+          // Upload zone drag-drop
+          var zone = document.getElementById('uploadZone' + idx);
+          zone.addEventListener('click', function () { document.getElementById('fileInput' + idx).click(); });
+          zone.addEventListener('dragover',  function (e) { e.preventDefault(); zone.classList.add('drag-over'); });
+          zone.addEventListener('dragleave', function ()  { zone.classList.remove('drag-over'); });
+          zone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            var f = e.dataTransfer.files[0];
+            if (f && f.type.startsWith('image/')) loadImgFile(idx, f);
+          });
+
+          renderPanel(idx);
+        });
+      });
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function touchToMouse(e, canvas) {
+        var t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || {};
+        return { clientX: t.clientX || 0, clientY: t.clientY || 0 };
+      }
+
+      function getCanvasPos(e, canvas) {
+        var rect   = canvas.getBoundingClientRect();
+        var scaleX = canvas.width  / rect.width;
+        var scaleY = canvas.height / rect.height;
+        return {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top)  * scaleY
+        };
+      }
+
+      function clampPx(v) { return Math.max(0, Math.min(255, Math.round(v))); }
+
+      function showToast(msg, type) {
+        /* route to the editor's toast system; fall back to a local div */
+        if (window.__pfToast) { window.__pfToast(msg, type || 'info'); return; }
+        var t = document.getElementById('cmLocalToast');
+        if (!t) {
+          t = document.createElement('div');
+          t.id = 'cmLocalToast';
+          t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:99999;' +
+            'padding:9px 18px;border-radius:8px;background:#252b3a;color:#e8ecf4;font-size:13px;' +
+            'box-shadow:0 8px 26px rgba(0,0,0,.45);transition:opacity .25s';
+          document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.opacity = '1';
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.style.opacity = '0'; }, 2600);
+      }
+
+      // ============================================================
+      // IMAGE LOADING
+      // ============================================================
+      window.loadImageFromInput = function (idx, input) {
+        var f = input.files[0];
+        if (f) loadImgFile(idx, f);
+      };
+
+      function loadImgFile(idx, file) {
+        // Read as data URL for image display
+        var urlReader = new FileReader();
+        urlReader.onload = function (e) {
+          var dataUrl = e.target.result;
+          // For JPEG: read as ArrayBuffer too to detect EXIF orientation
+          if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+            var abReader = new FileReader();
+            abReader.onload = function (ev) {
+              var orient  = getExifOrientation(ev.target.result);
+              var initRot = exifOrientationToRotation(orient);
+              _applyImageLoad(idx, dataUrl, initRot);
+            };
+            abReader.readAsArrayBuffer(file);
+          } else {
+            _applyImageLoad(idx, dataUrl, 0);
+          }
+        };
+        urlReader.readAsDataURL(file);
+      }
+
+      function _applyImageLoad(idx, dataUrl, initRot) {
+        var img = new Image();
+        img.onload = function () {
+          panels[idx].img           = img;
+          panels[idx].sel           = null;
+          panels[idx].rotation      = initRot;
+          panels[idx].useFullImg    = false;
+          panels[idx].straightenMode = false;
+          panels[idx].strPts        = [];
+          panels[idx].strPreview    = null;
+          document.getElementById('rotation' + idx).value = initRot;
+          document.getElementById('rotVal'   + idx).textContent = initRot + '°';
+          document.getElementById('emptyMsg' + idx).style.display = 'none';
+          document.getElementById('cropInfo' + idx).innerHTML = 'اسحب لتحديد منطقة القص';
+          if (initRot !== 0) {
+            showToast('تم تصحيح اتجاه الصورة تلقائياً (' + initRot + '°)', 'success');
+          }
+          renderPanel(idx);
+          scheduleAutoMerge();
+          cmNotify();
+        };
+        img.src = dataUrl;
+      }
+
+      // Load a dataUrl into a crop panel and switch to the crop tab
+      window.loadImageInCropPanel = function (dataUrl, panelIdx) {
+        _applyImageLoad(panelIdx, dataUrl, 0);
+        switchTab('cropmerge');
+        showToast('تم فتح الصفحة في اللوح ' + (panelIdx + 1));
+      };
+
+      // Render a PDF page at full quality and open it in the crop canvas
+      window.openPageInCrop = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        try {
+          var page = await pdf2imgDoc.getPage(pageNum);
+          var vp   = page.getViewport({ scale: scale });
+          var cv   = document.createElement('canvas');
+          cv.width = vp.width; cv.height = vp.height;
+          await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+          var dataUrl   = cv.toDataURL(fmt, quality);
+          // Auto-select: use first empty panel, fallback to panel 0
+          var panelIdx  = (!panels[0].img) ? 0 : (!panels[1].img ? 1 : 0);
+          window.loadImageInCropPanel(dataUrl, panelIdx);
+        } catch (e) {
+          showToast('خطأ في فتح الصفحة: ' + e.message);
+        }
+      };
+
+      // ============================================================
+      // ROTATION
+      // ============================================================
+      window.updateRotation = function (idx, val) {
+        panels[idx].rotation = Number(val);
+        document.getElementById('rotVal' + idx).textContent = val + '°';
+        renderPanel(idx);
+        scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // SELECTION SHAPE / CLEAR / FULL IMAGE
+      // ============================================================
+      window.setShape = function (idx, shape) {
+        panels[idx].shape = shape;
+        ['free', 'square'].forEach(function (s) {
+          document.getElementById('shape' + idx + '-' + s).classList.toggle('active', s === shape);
+        });
+      };
+
+      window.clearSelection = function (idx) {
+        panels[idx].sel       = null;
+        panels[idx].useFullImg = false;
+        document.getElementById('cropInfo' + idx).textContent = 'لم يتم التحديد بعد';
+        renderPanel(idx);
+        scheduleAutoMerge();
+      };
+
+      window.useFullImage = function (idx) {
+        panels[idx].sel       = null;
+        panels[idx].useFullImg = true;
+        document.getElementById('cropInfo' + idx).innerHTML = '<span>كل الصورة</span>';
+        renderPanel(idx);
+        scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // AUTO TRIM — crop away white / transparent borders
+      // ============================================================
+      window.autoTrim = function (idx) {
+        var p = panels[idx];
+        if (!p.img) { showToast('ارفع صورة أولاً'); return; }
+
+        var m  = getDisplayMapping(idx);
+        var rw = Math.ceil(m.rw);
+        var rh = Math.ceil(m.rh);
+
+        // Render the (possibly rotated) image at native resolution into a temp canvas
+        var tmp    = document.createElement('canvas');
+        tmp.width  = rw;
+        tmp.height = rh;
+        var tc = tmp.getContext('2d');
+        tc.save();
+        tc.translate(rw / 2, rh / 2);
+        tc.rotate(p.rotation * Math.PI / 180);
+        tc.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
+        tc.restore();
+
+        var data   = tc.getImageData(0, 0, rw, rh).data;
+        var thresh = 238;
+        var minX = rw, minY = rh, maxX = 0, maxY = 0;
+        var found  = false;
+
+        for (var y = 0; y < rh; y++) {
+          for (var x = 0; x < rw; x++) {
+            var i = (y * rw + x) * 4;
+            if (data[i + 3] < 15) continue;                      // transparent
+            if (data[i] > thresh && data[i+1] > thresh && data[i+2] > thresh) continue; // white
+            found = true;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+
+        if (!found || maxX <= minX || maxY <= minY) {
+          showToast('لم يُعثر على محتوى للقص');
+          return;
+        }
+
+        // Small padding so edges aren't clipped
+        var pad = 3;
+        minX = Math.max(0,      minX - pad);
+        minY = Math.max(0,      minY - pad);
+        maxX = Math.min(rw - 1, maxX + pad);
+        maxY = Math.min(rh - 1, maxY + pad);
+
+        // Map temp-canvas coords → panel canvas display coords
+        var cv   = document.getElementById('canvas' + idx);
+        var selX = m.offX + minX * m.scale;
+        var selY = m.offY + minY * m.scale;
+        var selW = (maxX - minX) * m.scale;
+        var selH = (maxY - minY) * m.scale;
+
+        selX = Math.max(0, selX);
+        selY = Math.max(0, selY);
+        selW = Math.min(selW, cv.width  - selX);
+        selH = Math.min(selH, cv.height - selY);
+
+        p.sel        = { x: selX, y: selY, w: selW, h: selH };
+        p.useFullImg = false;
+        renderPanel(idx);
+        scheduleAutoMerge();
+
+        var pw = maxX - minX, ph = maxY - minY;
+        document.getElementById('cropInfo' + idx).innerHTML =
+          '<i class="fas fa-magic"></i> ' + pw + ' \xd7 ' + ph + ' px';
+        showToast('\u2702 تم قص الفراغات: ' + pw + '\xd7' + ph);
+      };
+
+      // ============================================================
+      // ROTATED DIMENSIONS
+      // ============================================================
+      function getRotDim(img, deg) {
+        var rad = deg * Math.PI / 180;
+        var cos = Math.abs(Math.cos(rad));
+        var sin = Math.abs(Math.sin(rad));
+        return {
+          rw: img.width  * cos + img.height * sin,
+          rh: img.width  * sin + img.height * cos
+        };
+      }
+
+      // Returns { scale, offX, offY, rw, rh } mapping rotated-image-space → canvas-display-space
+      function getDisplayMapping(idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var dim    = getRotDim(p.img, p.rotation);
+        var scale  = Math.min(canvas.width / dim.rw, canvas.height / dim.rh) * 0.94;
+        return {
+          scale : scale,
+          offX  : (canvas.width  - dim.rw * scale) / 2,
+          offY  : (canvas.height - dim.rh * scale) / 2,
+          rw    : dim.rw,
+          rh    : dim.rh
+        };
+      }
+
+      // ============================================================
+      // RENDER PANEL
+      // ============================================================
+      function renderPanel(idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var ctx    = canvas.getContext('2d');
+        var W      = canvas.width;
+        var H      = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+        if (!p.img) return;
+
+        var m = getDisplayMapping(idx);
+
+        // Draw rotated image
+        ctx.save();
+        ctx.translate(W / 2, H / 2);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.drawImage(p.img,
+          -p.img.width  * m.scale / 2,
+          -p.img.height * m.scale / 2,
+           p.img.width  * m.scale,
+           p.img.height * m.scale
+        );
+        ctx.restore();
+
+        // Selection overlay
+        if (p.sel && p.sel.w > 3 && p.sel.h > 3) {
+          var sx = p.sel.x, sy = p.sel.y, sw = p.sel.w, sh = p.sel.h;
+
+          // Dark overlay outside selection
+          ctx.fillStyle = 'rgba(0,0,0,0.45)';
+          ctx.fillRect(0, 0, W, H);
+
+          // Restore image inside selection
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(sx, sy, sw, sh);
+          ctx.clip();
+          ctx.translate(W / 2, H / 2);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.drawImage(p.img,
+            -p.img.width  * m.scale / 2,
+            -p.img.height * m.scale / 2,
+             p.img.width  * m.scale,
+             p.img.height * m.scale
+          );
+          ctx.restore();
+
+          // Selection border — dashed orange
+          ctx.strokeStyle = '#FF6B2B';
+          ctx.lineWidth   = 2;
+          ctx.setLineDash([7, 4]);
+          ctx.strokeRect(sx, sy, sw, sh);
+          ctx.setLineDash([]);
+
+          // Rule-of-thirds grid lines (thin)
+          ctx.strokeStyle = 'rgba(255,107,43,0.25)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(sx+sw/3, sy); ctx.lineTo(sx+sw/3, sy+sh);
+          ctx.moveTo(sx+2*sw/3, sy); ctx.lineTo(sx+2*sw/3, sy+sh);
+          ctx.moveTo(sx, sy+sh/3); ctx.lineTo(sx+sw, sy+sh/3);
+          ctx.moveTo(sx, sy+2*sh/3); ctx.lineTo(sx+sw, sy+2*sh/3);
+          ctx.stroke();
+
+          // Corner handles — filled orange circles with white border
+          [[sx,sy],[sx+sw,sy],[sx,sy+sh],[sx+sw,sy+sh]].forEach(function (pt) {
+            ctx.beginPath();
+            ctx.arc(pt[0], pt[1], 8, 0, Math.PI*2);
+            ctx.fillStyle = '#FF6B2B';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+          });
+
+          // Edge midpoint handles — white circles with orange border
+          [[sx+sw/2,sy],[sx+sw/2,sy+sh],[sx,sy+sh/2],[sx+sw,sy+sh/2]].forEach(function (pt) {
+            ctx.beginPath();
+            ctx.arc(pt[0], pt[1], 6, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#FF6B2B';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+          });
+
+          // Crop info
+          var actualW = Math.round(sw / m.scale);
+          var actualH = Math.round(sh / m.scale);
+          document.getElementById('cropInfo' + idx).innerHTML =
+            'المنطقة المحددة: <span>' + actualW + ' × ' + actualH + ' بكسل</span>';
+        } else if (p.useFullImg) {
+          // Light border around full image
+          ctx.strokeStyle = 'rgba(255,107,43,0.5)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(m.offX, m.offY, m.rw * m.scale, m.rh * m.scale);
+        }
+
+        // ── Draw straighten-mode UI (waiting for 2nd point) ──
+        if (p.straightenMode && p.strPts.length > 0) {
+          // Draw dashed reference line (to cursor preview or to 2nd point)
+          var endPt = p.strPts[1] || p.strPreview;
+          if (endPt) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(p.strPts[0].x, p.strPts[0].y);
+            ctx.lineTo(endPt.x, endPt.y);
+            ctx.strokeStyle = 'rgba(255, 220, 60, 0.9)';
+            ctx.lineWidth   = 2;
+            ctx.setLineDash([7, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+          }
+          // Draw numbered dots
+          p.strPts.forEach(function (pt, i) {
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = i === 0 ? '#10b981' : '#f59e0b';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(i + 1, pt.x, pt.y);
+          });
+        }
+      }
+
+      // ============================================================
+      // MOUSE / TOUCH INTERACTION (handles draggable)
+      // ============================================================
+      function onDown(e, idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var pos    = getCanvasPos(e, canvas);
+
+        // ── Straighten mode: collect two points then compute rotation ──
+        if (p.straightenMode) {
+          p.strPts.push({ x: pos.x, y: pos.y });
+          if (p.strPts.length >= 2) {
+            var dx      = p.strPts[1].x - p.strPts[0].x;
+            var dy      = p.strPts[1].y - p.strPts[0].y;
+            // Normalise direction so atan2 always measures angle from left→right
+            if (dx < 0) { dx = -dx; dy = -dy; }
+            var alphaDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+            var newRot  = ((p.rotation - alphaDeg) % 360 + 360) % 360;
+            p.rotation  = newRot;
+            p.strPts    = [];
+            p.strPreview = null;
+            p.straightenMode = false;
+            var btn  = document.getElementById('straightenBtn' + idx);
+            var hint = document.getElementById('straightenHint' + idx);
+            if (btn)  { btn.className = 'btn-sm btn-outline'; }
+            if (hint) { hint.style.display = 'none'; }
+            document.getElementById('rotation' + idx).value = Math.round(newRot);
+            document.getElementById('rotVal'   + idx).textContent = Math.round(newRot) + '°';
+            canvas.style.cursor = 'crosshair';
+            showToast('تم تطبيق التسوية (' + Math.round(alphaDeg * 10) / 10 + '°)', 'success');
+            renderPanel(idx);
+            scheduleAutoMerge();
+          } else {
+            renderPanel(idx); // show first point
+          }
+          return;
+        }
+
+        // Check if clicking on an existing handle
+        if (p.sel && p.sel.w > 5 && p.sel.h > 5) {
+          var h = getHandleAt(p.sel, pos.x, pos.y);
+          if (h) {
+            p.dragHandle  = h;
+            p.lastPos     = pos;
+            p.isDragging  = false;
+            canvas.style.cursor = getCursorForHandle(h, true);
+            return;
+          }
+        }
+
+        // Start a new selection
+        p.dragHandle = null;
+        p.isDragging = true;
+        p.startX     = pos.x;
+        p.startY     = pos.y;
+        p.sel        = { x: pos.x, y: pos.y, w: 0, h: 0 };
+        p.useFullImg = false;
+        canvas.style.cursor = 'crosshair';
+      }
+
+      function onMove(e, idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var pos    = getCanvasPos(e, canvas);
+
+        // Live preview line while waiting for 2nd straighten point
+        if (p.straightenMode && p.strPts.length === 1) {
+          p.strPreview = pos;
+          renderPanel(idx);
+          return;
+        }
+
+        // Handle drag (resize / move)
+        if (p.dragHandle) {
+          resizeSel(idx, p.dragHandle, pos);
+          p.lastPos = pos;
+          renderPanel(idx);
+          return;
+        }
+
+        // Cursor feedback when hovering over handles
+        if (!p.isDragging && p.sel && p.sel.w > 5) {
+          var hov = getHandleAt(p.sel, pos.x, pos.y);
+          canvas.style.cursor = getCursorForHandle(hov);
+        }
+
+        if (!p.isDragging) return;
+
+        // Draw new selection
+        var dx = pos.x - p.startX;
+        var dy = pos.y - p.startY;
+
+        if (p.shape === 'square') {
+          var side = Math.min(Math.abs(dx), Math.abs(dy));
+          dx = dx < 0 ? -side : side;
+          dy = dy < 0 ? -side : side;
+        }
+
+        p.sel = {
+          x: dx < 0 ? p.startX + dx : p.startX,
+          y: dy < 0 ? p.startY + dy : p.startY,
+          w: Math.abs(dx),
+          h: Math.abs(dy)
+        };
+
+        renderPanel(idx);
+      }
+
+      function onUp(e, idx) {
+        var p      = panels[idx];
+        var canvas = document.getElementById('canvas' + idx);
+        var doMerge = false;
+
+        if (p.dragHandle) {
+          p.dragHandle = null;
+          canvas.style.cursor = 'crosshair';
+          doMerge = true;
+        }
+
+        if (p.isDragging) {
+          p.isDragging = false;
+          if (p.sel && (p.sel.w < 5 || p.sel.h < 5)) {
+            p.sel = null;
+            renderPanel(idx);
+          } else if (p.sel) {
+            doMerge = true;
+          }
+        }
+
+        if (doMerge) scheduleAutoMerge();
+      }
+
+      // ============================================================
+      // CROP PANEL → returns a canvas with the cropped portion
+      // ============================================================
+      function cropPanel(idx) {
+        var p = panels[idx];
+        if (!p.img) return null;
+
+        // Build full-resolution rotated canvas
+        var dim    = getRotDim(p.img, p.rotation);
+        var rotC   = document.createElement('canvas');
+        rotC.width  = Math.ceil(dim.rw);
+        rotC.height = Math.ceil(dim.rh);
+        var rCtx = rotC.getContext('2d');
+        rCtx.translate(rotC.width / 2, rotC.height / 2);
+        rCtx.rotate(p.rotation * Math.PI / 180);
+        rCtx.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
+
+        // If no selection or useFullImg, return entire rotated canvas
+        if (p.useFullImg || !p.sel || p.sel.w < 5 || p.sel.h < 5) {
+          return rotC;
+        }
+
+        // Map display selection → actual rotated-image coords
+        var m = getDisplayMapping(idx);
+        var ax = (p.sel.x - m.offX) / m.scale;
+        var ay = (p.sel.y - m.offY) / m.scale;
+        var aw = p.sel.w / m.scale;
+        var ah = p.sel.h / m.scale;
+
+        // Clamp to image bounds
+        var cx  = Math.max(0, ax);
+        var cy  = Math.max(0, ay);
+        var cw  = Math.min(aw, rotC.width  - cx);
+        var ch  = Math.min(ah, rotC.height - cy);
+        if (cw <= 0 || ch <= 0) return rotC;
+
+        var out   = document.createElement('canvas');
+        out.width  = Math.ceil(cw);
+        out.height = Math.ceil(ch);
+        out.getContext('2d').drawImage(rotC, cx, cy, cw, ch, 0, 0, cw, ch);
+        return out;
+      }
+
+      // ============================================================
+      // A4 HELPERS
+      // ============================================================
+      function getA4Px() {
+        var map = { 72: [595, 842], 150: [1240, 1754], 300: [2480, 3508] };
+        var dim = map[a4Dpi] || map[150];
+        return a4Orientation === 'landscape' ? [dim[1], dim[0]] : dim;
+      }
+
+      function buildOutputCanvas() {
+        if (!mergedRaw) { outputRaw = null; return; }
+        var src = mergedRaw;
+
+        // Step 1: Tile
+        if (tileMode) {
+          var cols = Math.max(1, parseInt(document.getElementById('tileColsInput').value) || 1);
+          var rows = Math.max(1, parseInt(document.getElementById('tileRowsInput').value) || 1);
+          var sp   = Number(document.getElementById('tileSpacingSlider').value);
+          var tC   = document.createElement('canvas');
+          tC.width  = src.width  * cols + sp * Math.max(0, cols - 1);
+          tC.height = src.height * rows + sp * Math.max(0, rows - 1);
+          var tCtx = tC.getContext('2d');
+          for (var row = 0; row < rows; row++) {
+            for (var col = 0; col < cols; col++) {
+              tCtx.drawImage(src, col * (src.width + sp), row * (src.height + sp));
+            }
+          }
+          src = tC;
+        }
+
+        // Step 2: Page Layout (scale + position) — only when A4 mode is off
+        if (!a4Mode && (pageScale < 100 || pageAlign !== 'mc')) {
+          var psBg = document.createElement('canvas');
+          var psW  = Math.round(src.width  / (pageScale / 100));
+          var psH  = Math.round(src.height / (pageScale / 100));
+          psBg.width  = psW;
+          psBg.height = psH;
+          var psBgCtx = psBg.getContext('2d');
+          var isTrans = document.getElementById('transparentBg').checked;
+          if (!isTrans) {
+            psBgCtx.fillStyle = document.getElementById('bgColor').value;
+            psBgCtx.fillRect(0, 0, psW, psH);
+          }
+          var alignMap = {
+            tl: [0,              0             ],
+            tc: [(psW-src.width)/2, 0          ],
+            tr: [psW-src.width,  0             ],
+            ml: [0,              (psH-src.height)/2],
+            mc: [(psW-src.width)/2, (psH-src.height)/2],
+            mr: [psW-src.width,  (psH-src.height)/2],
+            bl: [0,              psH-src.height],
+            bc: [(psW-src.width)/2, psH-src.height],
+            br: [psW-src.width,  psH-src.height]
+          };
+          var pa = alignMap[pageAlign] || alignMap.mc;
+          psBgCtx.drawImage(src, Math.round(pa[0]), Math.round(pa[1]));
+          src = psBg;
+        }
+
+        // Step 3: A4
+        if (a4Mode) {
+          var a4dim  = getA4Px();
+          var a4W    = a4dim[0];
+          var a4H    = a4dim[1];
+          var a4C    = document.createElement('canvas');
+          a4C.width  = a4W;
+          a4C.height = a4H;
+          var a4Ctx  = a4C.getContext('2d');
+          a4Ctx.fillStyle = '#ffffff';
+          a4Ctx.fillRect(0, 0, a4W, a4H);
+          // Scale to a4Scale% of A4 width, preserve aspect ratio
+          var imgW = Math.round(a4W * a4Scale / 100);
+          var imgH = Math.round(imgW * src.height / src.width);
+          // Clamp to A4 height
+          if (imgH > a4H * 0.97) {
+            imgH = Math.round(a4H * 0.97);
+            imgW = Math.round(imgH * src.width / src.height);
+          }
+          // a4PosX/Y = centre of image as % of A4
+          var drawX = Math.round(a4W * a4PosX / 100 - imgW / 2);
+          var drawY = Math.round(a4H * a4PosY / 100 - imgH / 2);
+          drawX = Math.max(0, Math.min(a4W - imgW, drawX));
+          drawY = Math.max(0, Math.min(a4H - imgH, drawY));
+          a4Ctx.drawImage(src, drawX, drawY, imgW, imgH);
+          src = a4C;
+        }
+
+        outputRaw = src;
+        updateA4Preview();
+      }
+
+      function updateA4Preview() {
+        var canvas = document.getElementById('a4ThumbCanvas');
+        if (!canvas) return;
+        var isLand = a4Orientation === 'landscape';
+        var TW = isLand ? 90 : 60;
+        var TH = isLand ? 60 : 85;
+        canvas.width  = TW;
+        canvas.height = TH;
+        canvas.style.width  = TW + 'px';
+        canvas.style.height = TH + 'px';
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, TW, TH);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(0.75, 0.75, TW - 1.5, TH - 1.5);
+        var srcImg = mergedRaw;
+        if (srcImg) {
+          var imgW = Math.round(TW * a4Scale / 100);
+          var imgH = Math.round(imgW * srcImg.height / srcImg.width);
+          if (imgH > TH * 0.97) {
+            imgH = Math.round(TH * 0.97);
+            imgW = Math.round(imgH * srcImg.width / srcImg.height);
+          }
+          var tx = Math.round(TW * a4PosX / 100 - imgW / 2);
+          var ty = Math.round(TH * a4PosY / 100 - imgH / 2);
+          tx = Math.max(0, Math.min(TW - imgW, tx));
+          ty = Math.max(0, Math.min(TH - imgH, ty));
+          ctx.drawImage(srcImg, tx, ty, Math.max(1, imgW), Math.max(1, imgH));
+        } else {
+          var bW = Math.round(TW * a4Scale / 100);
+          var bH = Math.round(bW * 0.6);
+          var bx = Math.round(TW * a4PosX / 100 - bW / 2);
+          var by = Math.round(TH * a4PosY / 100 - bH / 2);
+          bx = Math.max(0, Math.min(TW - bW, bx));
+          by = Math.max(0, Math.min(TH - bH, by));
+          ctx.fillStyle = 'rgba(99,102,241,0.3)';
+          ctx.fillRect(bx, by, bW, bH);
+          ctx.strokeStyle = '#6366f1';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(bx, by, bW, bH);
+        }
+      }
+
+      // ============================================================
+      // MERGE IMAGES
+      // ============================================================
+      window.mergeImages = function (silent) {
+        var c0 = cropPanel(0);
+        if (!c0) { if (!silent) showToast('الرجاء رفع الصورة الأولى أولاً', 'error'); return; }
+
+        var c1 = (!singleMode) ? cropPanel(1) : null;
+
+        // ── "قد بعض": normalize both crops to the same width ──
+        if (normalizeSize && c1) {
+          var normW = Math.max(c0.width, c1.width);
+          c0 = scaleCanvas(c0, normW, Math.round(normW * c0.height / c0.width));
+          c1 = scaleCanvas(c1, normW, Math.round(normW * c1.height / c1.width));
+        }
+
+        var sm   = outputScale;
+        var gap  = Number(document.getElementById('gapSlider').value);
+        var cr   = Number(document.getElementById('cornerRadius').value);
+
+        var totalW, totalH;
+
+        if (!c1) {
+          totalW = Math.ceil(c0.width  * sm);
+          totalH = Math.ceil(c0.height * sm);
+        } else if (arrangement === 'side') {
+          totalW = Math.ceil((c0.width + gap + c1.width) * sm);
+          totalH = Math.ceil(Math.max(c0.height, c1.height) * sm);
+        } else {
+          totalW = Math.ceil(Math.max(c0.width, c1.width) * sm);
+          totalH = Math.ceil((c0.height + gap + c1.height) * sm);
+        }
+
+        var outC   = document.createElement('canvas');
+        outC.width  = totalW;
+        outC.height = totalH;
+        var ctx    = outC.getContext('2d');
+
+        // Background
+        var transparent = document.getElementById('transparentBg').checked;
+        if (!transparent) {
+          ctx.fillStyle = document.getElementById('bgColor').value;
+          ctx.fillRect(0, 0, totalW, totalH);
+        }
+
+        function drawRounded(srcCanvas, dx, dy, dw, dh) {
+          if (cr <= 0) {
+            ctx.drawImage(srcCanvas, dx, dy, dw, dh);
+          } else {
+            ctx.save();
+            ctx.beginPath();
+            var r = Math.min(cr, dw / 2, dh / 2);
+            ctx.moveTo(dx + r, dy);
+            ctx.lineTo(dx + dw - r, dy);
+            ctx.quadraticCurveTo(dx + dw, dy, dx + dw, dy + r);
+            ctx.lineTo(dx + dw, dy + dh - r);
+            ctx.quadraticCurveTo(dx + dw, dy + dh, dx + dw - r, dy + dh);
+            ctx.lineTo(dx + r, dy + dh);
+            ctx.quadraticCurveTo(dx, dy + dh, dx, dy + dh - r);
+            ctx.lineTo(dx, dy + r);
+            ctx.quadraticCurveTo(dx, dy, dx + r, dy);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(srcCanvas, dx, dy, dw, dh);
+            ctx.restore();
+          }
+        }
+
+        function calcOffset(mainSize, itemSize) {
+          if (alignment === 'center') return (mainSize - itemSize * sm) / 2;
+          if (alignment === 'end')    return (mainSize - itemSize * sm);
+          return 0;
+        }
+
+        if (!c1) {
+          drawRounded(c0, 0, 0, c0.width * sm, c0.height * sm);
+        } else if (arrangement === 'side') {
+          var y0 = calcOffset(totalH, c0.height);
+          var y1 = calcOffset(totalH, c1.height);
+          drawRounded(c0, 0,                         y0, c0.width * sm, c0.height * sm);
+          drawRounded(c1, (c0.width + gap) * sm,     y1, c1.width * sm, c1.height * sm);
+        } else {
+          var x0 = calcOffset(totalW, c0.width);
+          var x1 = calcOffset(totalW, c1.width);
+          drawRounded(c0, x0, 0,                         c0.width * sm, c0.height * sm);
+          drawRounded(c1, x1, (c0.height + gap) * sm,   c1.width * sm, c1.height * sm);
+        }
+
+        mergedRaw = outC;
+        buildOutputCanvas();
+        applyFiltersAndShow();
+
+        document.getElementById('resultSection').classList.add('visible');
+        if (!silent) {
+          showToast('تم دمج الصور بنجاح!', 'success');
+        }
+      };
+
+      // ============================================================
+      // FILTERS
+      // ============================================================
+      window.updateFilter = function () {
+        if (outputRaw) applyFiltersAndShow();
+      };
+
+      window.resetFilters = function () {
+        ['brightness','contrast','saturation'].forEach(function (id) {
+          document.getElementById(id).value = 0;
+          document.getElementById(id + 'Val').textContent = '0';
+        });
+        document.getElementById('cmSharpen').value = 0;
+        document.getElementById('sharpenVal').textContent = '0';
+        document.getElementById('levels').value = 0;
+        document.getElementById('levelsVal').textContent = '0';
+        document.getElementById('blurAmount').value = 0;
+        document.getElementById('blurVal').textContent = '0';
+        document.getElementById('bwToggle').checked = false;
+        document.getElementById('invertToggle').checked = false;
+        if (outputRaw) applyFiltersAndShow();
+      };
+
+      function applyFiltersAndShow() {
+        if (!outputRaw) return;
+
+        var brightAdj  = Number(document.getElementById('cmBrightness').value)  * 2.55;
+        var contrastV  = Number(document.getElementById('cmContrast').value);
+        var satV       = Number(document.getElementById('cmSaturation').value);
+        var sharpenV   = Number(document.getElementById('cmSharpen').value);
+        var levelsV    = Number(document.getElementById('levels').value);
+        var blurV      = Number(document.getElementById('blurAmount').value);
+        var bw         = document.getElementById('bwToggle').checked;
+        var inv        = document.getElementById('invertToggle').checked;
+
+        var contrastF  = (contrastV + 100) / 100;      // 0 → 2
+        var satFactor  = bw ? 0 : (satV + 100) / 100;  // 0 → 2
+
+        // Work canvas
+        var wC   = document.createElement('canvas');
+        wC.width  = outputRaw.width;
+        wC.height = outputRaw.height;
+        var wCtx = wC.getContext('2d');
+
+        // Apply blur via CSS filter (fast)
+        if (blurV > 0) {
+          wCtx.filter = 'blur(' + blurV + 'px)';
+        }
+        wCtx.drawImage(outputRaw, 0, 0);
+        wCtx.filter = 'none';
+
+        // Pixel manipulation
+        var imgData = wCtx.getImageData(0, 0, wC.width, wC.height);
+        var d       = imgData.data;
+
+        for (var i = 0; i < d.length; i += 4) {
+          var r = d[i], g = d[i+1], b = d[i+2];
+
+          // Brightness
+          r += brightAdj; g += brightAdj; b += brightAdj;
+
+          // Contrast (centre on 128)
+          r = contrastF * (r - 128) + 128;
+          g = contrastF * (g - 128) + 128;
+          b = contrastF * (b - 128) + 128;
+
+          // Saturation / B&W
+          var gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          r = gray + satFactor * (r - gray);
+          g = gray + satFactor * (g - gray);
+          b = gray + satFactor * (b - gray);
+
+          // Levels: positive → raise black point (darken/sharpen text)
+          //         negative → lower white point (brighten/whiten)
+          if (levelsV > 0) {
+            var threshold = levelsV * 2.55;
+            var stretch   = 255 / (255 - threshold + 1e-6);
+            r = (r - threshold) * stretch;
+            g = (g - threshold) * stretch;
+            b = (b - threshold) * stretch;
+          } else if (levelsV < 0) {
+            var whitePoint = 255 - (Math.abs(levelsV) * 2.55);
+            var wStretch   = 255 / (whitePoint + 1e-6);
+            r = r * wStretch;
+            g = g * wStretch;
+            b = b * wStretch;
+          }
+
+          // Invert
+          if (inv) { r = 255 - r; g = 255 - g; b = 255 - b; }
+
+          d[i]   = clampPx(r);
+          d[i+1] = clampPx(g);
+          d[i+2] = clampPx(b);
+        }
+
+        wCtx.putImageData(imgData, 0, 0);
+
+        // Sharpen (convolution unsharp mask)
+        if (sharpenV > 0) {
+          applySharpen(wCtx, wC.width, wC.height, Math.min(sharpenV / 5, 1));
+        }
+
+        filteredCanvas = wC;
+
+        // Display on result canvas (scaled to fit, with previewZoom)
+        var resCanvas = document.getElementById('resultCanvas');
+        var maxW      = resCanvas.parentElement.clientWidth - 40;
+        var fitScale  = Math.min(1, maxW / wC.width);
+        var dispScale = fitScale * previewZoom;
+        resCanvas.width  = wC.width;
+        resCanvas.height = wC.height;
+        resCanvas.style.width  = Math.round(wC.width  * dispScale) + 'px';
+        resCanvas.style.height = Math.round(wC.height * dispScale) + 'px';
+        resCanvas.getContext('2d').drawImage(wC, 0, 0);
+
+        document.getElementById('resultInfo').innerHTML =
+          'الأبعاد النهائية: <span>' + wC.width + ' × ' + wC.height + ' بكسل</span>';
+        cmNotify();
+      }
+
+      function applySharpen(ctx, W, H, strength) {
+        var src   = ctx.getImageData(0, 0, W, H);
+        var copy  = new Uint8ClampedArray(src.data);
+        var out   = src.data;
+        var kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+
+        for (var y = 1; y < H - 1; y++) {
+          for (var x = 1; x < W - 1; x++) {
+            var base = (y * W + x) * 4;
+            var r = 0, g = 0, b = 0;
+            for (var ky = -1; ky <= 1; ky++) {
+              for (var kx = -1; kx <= 1; kx++) {
+                var ki  = (ky + 1) * 3 + (kx + 1);
+                var pi  = ((y + ky) * W + (x + kx)) * 4;
+                var k   = kernel[ki];
+                r += copy[pi]   * k;
+                g += copy[pi+1] * k;
+                b += copy[pi+2] * k;
+              }
+            }
+            out[base]   = clampPx(copy[base]   + (r - copy[base])   * strength);
+            out[base+1] = clampPx(copy[base+1] + (g - copy[base+1]) * strength);
+            out[base+2] = clampPx(copy[base+2] + (b - copy[base+2]) * strength);
+          }
+        }
+        ctx.putImageData(src, 0, 0);
+      }
+
+      // ============================================================
+      // QUICK ROTATION
+      // ============================================================
+      window.rotateBy = function (idx, deg) {
+        var newVal = ((panels[idx].rotation + deg) % 360 + 360) % 360;
+        panels[idx].rotation = newVal;
+        document.getElementById('rotation' + idx).value = Math.round(newVal);
+        document.getElementById('rotVal'   + idx).textContent = Math.round(newVal) + '°';
+        renderPanel(idx);
+        scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // STRAIGHTEN MODE (2-point deskew)
+      // ============================================================
+      window.toggleStraighten = function (idx) {
+        var p = panels[idx];
+        if (!p.img) { showToast('ارفع صورة أولاً', 'error'); return; }
+        p.straightenMode = !p.straightenMode;
+        p.strPts = [];
+        p.strPreview = null;
+        var btn    = document.getElementById('straightenBtn' + idx);
+        var hint   = document.getElementById('straightenHint' + idx);
+        var canvas = document.getElementById('canvas' + idx);
+        if (p.straightenMode) {
+          btn.className      = 'btn-sm btn-active';
+          hint.style.display = 'inline';
+          canvas.style.cursor = 'crosshair';
+          showToast('انقر على نقطتين تمثلان خطاً أفقياً (مثل حافة البطاقة)', '');
+        } else {
+          btn.className      = 'btn-sm btn-outline';
+          hint.style.display = 'none';
+          canvas.style.cursor = 'crosshair';
+          renderPanel(idx);
+        }
+      };
+
+      // ============================================================
+      // NORMALIZE SIZES ("قد بعض")
+      // ============================================================
+      window.toggleNormalize = function () {
+        normalizeSize = document.getElementById('normalizeSizeToggle').checked;
+        scheduleAutoMerge();
+      };
+
+      function scaleCanvas(src, w, h) {
+        var c = document.createElement('canvas');
+        c.width  = Math.max(1, w);
+        c.height = Math.max(1, h);
+        c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+        return c;
+      }
+
+      // ============================================================
+      // PREVIEW ZOOM
+      // ============================================================
+      window.setPreviewZoom = function (val) {
+        previewZoom = val;
+        [['50', 0.5], ['75', 0.75], ['100', 1]].forEach(function (pair) {
+          var el = document.getElementById('pz' + pair[0] + 'btn');
+          if (!el) return;
+          el.className = (val === pair[1]) ? 'btn-sm btn-primary' : 'btn-sm btn-outline';
+        });
+        if (filteredCanvas) applyFiltersAndShow();
+      };
+
+      window.setPageAlign = function (pos) {
+        pageAlign = pos;
+        document.querySelectorAll('.pos-btn').forEach(function(b){ b.classList.remove('pos-active'); });
+        var btn = document.getElementById('pos_' + pos);
+        if (btn) btn.classList.add('pos-active');
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.onPageScaleChange = function (val) {
+        pageScale = val;
+        document.getElementById('pageScaleVal').textContent = val + '%';
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      // ============================================================
+      // TAB SWITCHING
+      // ============================================================
+      window.switchTab = function (tabName) {
+        ['cropmerge', 'pdftools'].forEach(function (t) {
+          document.getElementById('tab-'    + t).style.display = (t === tabName) ? '' : 'none';
+          document.getElementById('tabBtn-' + t).classList.toggle('active', t === tabName);
+        });
+      };
+
+      // Unified PDF mode state
+      var _pdfMode = 'empty'; // 'empty' | 'img2pdf' | 'pdf2img' | 'pdfmerge'
+
+      function setUnifiedMode(mode) {
+        _pdfMode = mode;
+        var allModes = ['img2pdf', 'pdf2img', 'pdfmerge'];
+        allModes.forEach(function (m) {
+          document.getElementById('pdfContent-'  + m).style.display = (m === mode) ? '' : 'none';
+          document.getElementById('pdfSettings-' + m).style.display = (m === mode) ? '' : 'none';
+        });
+        var emptyEl  = document.getElementById('pdfSettings-empty');
+        var modeBar  = document.getElementById('pdfModeBar');
+        var dropText = document.getElementById('pdfUnifiedDropText');
+        var dropSub  = document.getElementById('pdfUnifiedDropSub');
+        var inp      = document.getElementById('pdfUnifiedInput');
+        if (mode === 'empty') {
+          emptyEl.style.display = '';
+          modeBar.style.display = 'none';
+          dropText.textContent  = 'اضغط أو اسحب صوراً أو ملفات PDF';
+          dropSub.textContent   = 'JPG، PNG، WebP، PDF — الأداة تكتشف النوع تلقائياً';
+          inp.accept   = 'image/*,application/pdf';
+          inp.multiple = true;
+        } else {
+          emptyEl.style.display = 'none';
+          modeBar.style.display = '';
+          var lbl = document.getElementById('pdfModeLabel');
+          if (mode === 'img2pdf') {
+            lbl.innerHTML        = '<i class="fas fa-file-image"></i> صور → PDF';
+            dropText.textContent = 'اضغط أو اسحب لإضافة صور';
+            dropSub.textContent  = 'JPG، PNG، WebP — عدد غير محدود';
+            inp.accept   = 'image/*';
+            inp.multiple = true;
+          } else if (mode === 'pdf2img') {
+            lbl.innerHTML        = '<i class="fas fa-images"></i> PDF → صور';
+            dropText.textContent = 'اضغط أو اسحب لاستبدال الملف';
+            dropSub.textContent  = 'ملف PDF — كل صفحة تتحول لصورة';
+            inp.accept   = 'application/pdf';
+            inp.multiple = false;
+          } else if (mode === 'pdfmerge') {
+            lbl.innerHTML        = '<i class="fas fa-object-group"></i> دمج ملفات PDF';
+            dropText.textContent = 'اضغط أو اسحب لإضافة ملفات PDF';
+            dropSub.textContent  = 'ملفات PDF فقط — ستُدمج بالترتيب المعروض';
+            inp.accept   = 'application/pdf';
+            inp.multiple = true;
+          }
+        }
+      }
+
+      window.handleUnifiedFiles = function (files) {
+        var arr = Array.from(files);
+        if (!arr.length) return;
+        var pdfs = arr.filter(function (f) { return f.type === 'application/pdf'; });
+        var imgs = arr.filter(function (f) { return f.type.startsWith('image/'); });
+
+        if (_pdfMode !== 'empty') {
+          // Already in a mode — add to existing
+          if (_pdfMode === 'img2pdf' && imgs.length) {
+            addImg2PdfFiles(imgs);
+          } else if (_pdfMode === 'pdf2img') {
+            var pdf = pdfs[0] || arr[0];
+            if (pdf && pdf.type === 'application/pdf') loadPdf2Img(pdf);
+          } else if (_pdfMode === 'pdfmerge' && pdfs.length) {
+            addPdfMergeFiles(pdfs);
+          }
+          document.getElementById('pdfUnifiedInput').value = '';
+          return;
+        }
+
+        // Auto-detect mode from uploaded files
+        if (imgs.length && !pdfs.length) {
+          setUnifiedMode('img2pdf');
+          addImg2PdfFiles(imgs);
+        } else if (pdfs.length === 1 && !imgs.length) {
+          setUnifiedMode('pdf2img');
+          loadPdf2Img(pdfs[0]);
+        } else if (pdfs.length >= 2 && !imgs.length) {
+          setUnifiedMode('pdfmerge');
+          addPdfMergeFiles(pdfs);
+        } else if (imgs.length && pdfs.length) {
+          setUnifiedMode('img2pdf');
+          addImg2PdfFiles(imgs);
+          showToast('تم تحميل الصور — لدمج PDF ارفع ملفات PDF فقط');
+        } else {
+          showToast('نوع الملف غير مدعوم');
+        }
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      window.resetPdfTool = function () {
+        img2pdfFiles  = [];
+        pdfmergeFiles = [];
+        pdf2imgDoc    = null;
+        renderImg2PdfList();
+        renderPdfMergeList();
+        var pages = document.getElementById('pdf2imgPages');
+        if (pages) pages.innerHTML = '';
+        var info = document.getElementById('pdf2imgInfo');
+        if (info) info.textContent = '';
+        setUnifiedMode('empty');
+      };
+
+      // Legacy stubs (kept so any old inline refs don't throw)
+      window.switchPdfSub    = function () {};
+      window.setConverterMode = function () {};
+      window.handleConverterFiles = window.handleUnifiedFiles;
+
+      // ============================================================
+      // IMAGES → PDF
+      // ============================================================
+      var img2pdfFiles   = [];   // { dataUrl, name, width, height }
+      var pdfOrientation = 'portrait';
+
+      window.addImg2PdfFiles = function (files) {
+        var arr = Array.from(files);
+        arr.forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var img = new Image();
+            img.onload = function () {
+              img2pdfFiles.push({ dataUrl: e.target.result, name: file.name, width: img.width, height: img.height });
+              renderImg2PdfList();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      function renderImg2PdfList() {
+        var list = document.getElementById('img2pdfList');
+        var cnt  = document.getElementById('img2pdfCount');
+        if (!list) return;
+        if (img2pdfFiles.length === 0) { list.innerHTML = ''; if (cnt) cnt.textContent = ''; return; }
+        if (cnt) cnt.textContent = img2pdfFiles.length + ' صورة محملة';
+        list.innerHTML = img2pdfFiles.map(function (f, i) {
+          return '<div class="pdf-file-item">' +
+            '<img class="p-thumb" src="' + f.dataUrl + '" alt="">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="p-name">' + f.name + '</div>' +
+              '<div class="p-meta">' + f.width + ' × ' + f.height + 'px</div>' +
+            '</div>' +
+            '<div class="pdf-order-btns">' +
+              '<button onclick="moveImg2Pdf(' + i + ',-1)" title="أعلى">↑</button>' +
+              '<button onclick="moveImg2Pdf(' + i + ',1)"  title="أسفل">↓</button>' +
+            '</div>' +
+            '<button class="pdf-del-btn" onclick="removeImg2Pdf(' + i + ')" title="حذف"><i class="fas fa-times"></i></button>' +
+          '</div>';
+        }).join('');
+      }
+
+      window.moveImg2Pdf = function (i, dir) {
+        var j = i + dir;
+        if (j < 0 || j >= img2pdfFiles.length) return;
+        var tmp = img2pdfFiles[i]; img2pdfFiles[i] = img2pdfFiles[j]; img2pdfFiles[j] = tmp;
+        renderImg2PdfList();
+      };
+
+      window.removeImg2Pdf = function (i) {
+        img2pdfFiles.splice(i, 1);
+        renderImg2PdfList();
+      };
+
+      window.setPdfOrientation = function (o) {
+        pdfOrientation = o;
+        document.getElementById('pdfOrientPort').classList.toggle('active', o === 'portrait');
+        document.getElementById('pdfOrientLand').classList.toggle('active', o === 'landscape');
+      };
+
+      window.generateImagesPDF = async function () {
+        if (img2pdfFiles.length === 0) { showToast('ارفع صوراً أولاً', 'error'); return; }
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          if (!(await cmEnsureLib('jspdf'))) return;
+        }
+        var btn = document.getElementById('img2pdfBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإنشاء…';
+        setTimeout(function () {
+          try {
+            var pageSize = document.getElementById('pdfPageSize').value;
+            var margin   = +document.getElementById('pdfMargin').value;
+            var fitMode  = document.getElementById('pdfFitMode').value;
+            var quality  = +document.getElementById('cmPdfQuality').value;
+            var doc = new window.jspdf.jsPDF({ orientation: pdfOrientation, unit: 'mm', format: pageSize });
+            var pageW = doc.internal.pageSize.getWidth();
+            var pageH = doc.internal.pageSize.getHeight();
+            var areaW = pageW - margin * 2;
+            var areaH = pageH - margin * 2;
+            img2pdfFiles.forEach(function (f, idx) {
+              if (idx > 0) doc.addPage();
+              var aspect = f.width / f.height;
+              var areaAspect = areaW / areaH;
+              var drawW, drawH, drawX, drawY;
+              if (fitMode === 'fit') {
+                if (aspect > areaAspect) {
+                  drawW = areaW; drawH = areaW / aspect;
+                  drawX = margin; drawY = margin + (areaH - drawH) / 2;
+                } else {
+                  drawH = areaH; drawW = areaH * aspect;
+                  drawY = margin; drawX = margin + (areaW - drawW) / 2;
+                }
+              } else {
+                drawW = areaW; drawH = areaH; drawX = margin; drawY = margin;
+              }
+              var fmt = /\.png$/i.test(f.name) ? 'PNG' : 'JPEG';
+              doc.addImage(f.dataUrl, fmt, drawX, drawY, drawW, drawH, undefined, 'FAST');
+            });
+            doc.save('images_merged.pdf');
+            showToast('تم إنشاء PDF (' + img2pdfFiles.length + ' صورة)!', 'success');
+          } catch (e) {
+            showToast('خطأ: ' + e.message, 'error');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-file-pdf"></i> إنشاء PDF وتحميله';
+          }
+        }, 60);
+      };
+
+      // ============================================================
+      // PDF MERGE
+      // ============================================================
+      var pdfmergeFiles = [];   // { bytes: ArrayBuffer, name: string }
+
+      window.addPdfMergeFiles = function (files) {
+        var remaining = files.length;
+        if (!remaining) return;
+        Array.from(files).forEach(function (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            pdfmergeFiles.push({ bytes: e.target.result, name: file.name });
+            remaining--;
+            if (remaining === 0) renderPdfMergeList();
+          };
+          reader.readAsArrayBuffer(file);
+        });
+        document.getElementById('pdfUnifiedInput').value = '';
+      };
+
+      function renderPdfMergeList() {
+        var list = document.getElementById('pdfmergeList');
+        var cnt  = document.getElementById('pdfmergeCount');
+        if (!list) return;
+        if (pdfmergeFiles.length === 0) { list.innerHTML = ''; if (cnt) cnt.textContent = ''; return; }
+        if (cnt) cnt.textContent = pdfmergeFiles.length + ' ملف محمل';
+        list.innerHTML = pdfmergeFiles.map(function (f, i) {
+          return '<div class="pdf-file-item">' +
+            '<div class="p-icon"><i class="fas fa-file-pdf"></i></div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="p-name">' + f.name + '</div>' +
+              '<div class="p-meta">' + (f.bytes.byteLength / 1024).toFixed(1) + ' KB</div>' +
+            '</div>' +
+            '<div class="pdf-order-btns">' +
+              '<button onclick="movePdfMerge(' + i + ',-1)">↑</button>' +
+              '<button onclick="movePdfMerge(' + i + ',1)">↓</button>' +
+            '</div>' +
+            '<button class="pdf-del-btn" onclick="removePdfMerge(' + i + ')"><i class="fas fa-times"></i></button>' +
+          '</div>';
+        }).join('');
+      }
+
+      window.movePdfMerge = function (i, dir) {
+        var j = i + dir;
+        if (j < 0 || j >= pdfmergeFiles.length) return;
+        var tmp = pdfmergeFiles[i]; pdfmergeFiles[i] = pdfmergeFiles[j]; pdfmergeFiles[j] = tmp;
+        renderPdfMergeList();
+      };
+
+      window.removePdfMerge = function (i) {
+        pdfmergeFiles.splice(i, 1);
+        renderPdfMergeList();
+      };
+
+      window.mergePDFFiles = async function () {
+        if (pdfmergeFiles.length < 2) { showToast('ارفع ملفين PDF على الأقل', 'error'); return; }
+        if (!window.PDFLib) { if (!(await cmEnsureLib('pdflib'))) return; }
+        var btn = document.getElementById('pdfmergeBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدمج…';
+        try {
+          var mergedPdf = await window.PDFLib.PDFDocument.create();
+          for (var fi = 0; fi < pdfmergeFiles.length; fi++) {
+            var pdfDoc = await window.PDFLib.PDFDocument.load(pdfmergeFiles[fi].bytes);
+            var pages  = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+            pages.forEach(function (page) { mergedPdf.addPage(page); });
+          }
+          var mergedBytes = await mergedPdf.save();
+          var blob = new Blob([mergedBytes], { type: 'application/pdf' });
+          var url  = URL.createObjectURL(blob);
+          var a    = document.createElement('a');
+          a.href = url; a.download = 'merged.pdf'; a.click();
+          URL.revokeObjectURL(url);
+          showToast('تم دمج ' + pdfmergeFiles.length + ' ملف PDF بنجاح!', 'success');
+        } catch (e) {
+          showToast('خطأ في الدمج: ' + e.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-object-group"></i> دمج وتحميل PDF';
+        }
+      };
+
+      // ============================================================
+      // PDF → IMAGES
+      // ============================================================
+      (function () {
+        // init PDF.js worker (CDN)
+        if (window.pdfjsLib) {
+          var _ws = cmWorkerSrc();
+          if (_ws) window.pdfjsLib.GlobalWorkerOptions.workerSrc = _ws;
+        }
+      })();
+
+      var pdf2imgDoc = null;
+
+      window.loadPdf2Img = async function (file) {
+        if (!file) return;
+        if (!window.pdfjsLib) { if (!(await cmEnsureLib('pdfjs'))) return; }
+        var pages = document.getElementById('pdf2imgPages');
+        pages.innerHTML = '<div style="color:var(--text-color-light);font-size:0.85rem;padding:10px"><i class="fas fa-spinner fa-spin"></i> جاري قراءة الملف…</div>';
+        document.getElementById('pdf2imgInfo').textContent = '';
+        try {
+          var ab = await file.arrayBuffer();
+          pdf2imgDoc = await window.pdfjsLib.getDocument({ data: ab }).promise;
+          var total = pdf2imgDoc.numPages;
+          document.getElementById('pdf2imgInfo').textContent = 'إجمالي الصفحات: ' + total;
+          document.getElementById('pdf2imgDownloadBtn').innerHTML =
+            '<i class="fas fa-download"></i> تحميل كل الصفحات (' + total + ')';
+          pages.innerHTML = '';
+          for (var i = 1; i <= total; i++) {
+            var wrap = document.createElement('div');
+            wrap.className = 'pdf-page-card';
+
+            var cv = document.createElement('canvas');
+            var page = await pdf2imgDoc.getPage(i);
+            var vp = page.getViewport({ scale: 0.35 });
+            cv.width = vp.width; cv.height = vp.height;
+            await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+            (function(n){ cv.addEventListener('click', function(){ previewPdf2ImgPage(n); }); })(i);
+
+            var lbl = document.createElement('div');
+            lbl.className = 'pdf-page-label';
+            lbl.textContent = 'صفحة ' + i;
+
+            var actions = document.createElement('div');
+            actions.className = 'pdf-page-actions';
+
+            var dlBtn = document.createElement('button');
+            dlBtn.className = 'pdf-page-btn';
+            dlBtn.title = 'تحميل صفحة ' + i;
+            dlBtn.innerHTML = '<i class="fas fa-download"></i> تحميل';
+
+            var cropBtn = document.createElement('button');
+            cropBtn.className = 'pdf-page-btn pdf-page-btn-crop';
+            cropBtn.title = 'فتح في لوح القص';
+            cropBtn.innerHTML = '<i class="fas fa-crop-alt"></i> قص';
+
+            (function (n, dlB, crB) {
+              dlB.addEventListener('click', function () { downloadPdf2ImgPage(n); });
+              crB.addEventListener('click', function () { openPageInCrop(n); });
+            })(i, dlBtn, cropBtn);
+
+            actions.appendChild(dlBtn);
+            actions.appendChild(cropBtn);
+            wrap.appendChild(cv);
+            wrap.appendChild(lbl);
+            wrap.appendChild(actions);
+            pages.appendChild(wrap);
+          }
+          showToast('تم تحميل الملف — ' + total + ' صفحة');
+        } catch (e) {
+          pages.innerHTML = '';
+          showToast('خطأ في قراءة الملف: ' + e.message);
+        }
+      };
+
+      window._previewPageNum = 1;
+
+      window.previewPdf2ImgPage = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        window._previewPageNum = pageNum;
+        var modal = document.getElementById('pdfPreviewModal');
+        var cv    = document.getElementById('pdfPreviewCanvas');
+        var title = document.getElementById('pdfPreviewTitle');
+        title.textContent = 'معاينة — صفحة ' + pageNum;
+        // Render at screen-friendly scale (fit to ~85vw / ~80vh)
+        var page   = await pdf2imgDoc.getPage(pageNum);
+        var rawVp  = page.getViewport({ scale: 1 });
+        var maxW   = Math.round(window.innerWidth  * 0.82);
+        var maxH   = Math.round(window.innerHeight * 0.74);
+        var scale  = Math.min(maxW / rawVp.width, maxH / rawVp.height, 3);
+        var vp     = page.getViewport({ scale: scale });
+        cv.width   = vp.width;
+        cv.height  = vp.height;
+        cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      };
+
+      window.closePdfPreview = function () {
+        document.getElementById('pdfPreviewModal').classList.remove('open');
+        document.body.style.overflow = '';
+      };
+
+      // Close on Escape
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closePdfPreview();
+      });
+
+      window.downloadPdf2ImgPage = async function (pageNum) {
+        if (!pdf2imgDoc) return;
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        var ext     = fmt === 'image/png' ? 'png' : fmt === 'image/webp' ? 'webp' : 'jpg';
+        var page = await pdf2imgDoc.getPage(pageNum);
+        var vp   = page.getViewport({ scale: scale });
+        var cv   = document.createElement('canvas');
+        cv.width = vp.width; cv.height = vp.height;
+        await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+        var a = document.createElement('a');
+        a.href = cv.toDataURL(fmt, quality);
+        a.download = 'page_' + pageNum + '.' + ext;
+        a.click();
+        showToast('تم تحميل صفحة ' + pageNum);
+      };
+
+      window.downloadAllPdf2Img = async function () {
+        if (!pdf2imgDoc) { showToast('ارفع ملف PDF أولاً'); return; }
+        var scale   = parseFloat(document.getElementById('pdf2imgScale').value) || 2;
+        var fmt     = document.getElementById('pdf2imgFormat').value;
+        var quality = parseInt(document.getElementById('pdf2imgQuality').value, 10) / 100;
+        var ext     = fmt === 'image/png' ? 'png' : fmt === 'image/webp' ? 'webp' : 'jpg';
+        var total   = pdf2imgDoc.numPages;
+        var btn     = document.getElementById('pdf2imgDownloadBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل…';
+        try {
+          for (var i = 1; i <= total; i++) {
+            var page = await pdf2imgDoc.getPage(i);
+            var vp   = page.getViewport({ scale: scale });
+            var cv   = document.createElement('canvas');
+            cv.width = vp.width; cv.height = vp.height;
+            await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+            var a = document.createElement('a');
+            a.href = cv.toDataURL(fmt, quality);
+            a.download = 'page_' + String(i).padStart(3, '0') + '.' + ext;
+            a.click();
+            await new Promise(function (r) { setTimeout(r, 350); });
+          }
+          showToast('تم تحميل كل الصفحات (' + total + ')!');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-download"></i> تحميل كل الصفحات (' + total + ')';
+        }
+      };
+
+      // drag-over visual feedback on dropzones
+      cmOnReady(function () {
+        ['pdfUnifiedDrop'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('dragover',  function (e) { e.preventDefault(); el.classList.add('drag-over'); });
+          el.addEventListener('dragleave', function ()  { el.classList.remove('drag-over'); });
+          el.addEventListener('drop', function (e) {
+            e.preventDefault(); el.classList.remove('drag-over');
+            handleUnifiedFiles(e.dataTransfer.files);
+          });
+        });
+
+        // init PDF.js worker after DOM ready (ensures script loaded)
+        if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+          var _ws2 = cmWorkerSrc();
+          if (_ws2) window.pdfjsLib.GlobalWorkerOptions.workerSrc = _ws2;
+        }
+      });
+      function getExifOrientation(buffer) {
+        try {
+          var view   = new DataView(buffer);
+          if (view.getUint16(0, false) !== 0xFFD8) return 1; // not JPEG
+          var len    = view.byteLength;
+          var offset = 2;
+          while (offset < len) {
+            var marker = view.getUint16(offset, false);
+            offset += 2;
+            if (marker === 0xFFE1) {
+              if (view.getUint32(offset + 2, false) !== 0x45786966) return 1;
+              var little = view.getUint16(offset + 8, false) === 0x4949;
+              offset += 10;
+              var tags = view.getUint16(offset, little);
+              offset += 2;
+              for (var i = 0; i < tags; i++) {
+                if (view.getUint16(offset + i * 12, little) === 0x0112) {
+                  return view.getUint16(offset + i * 12 + 8, little);
+                }
+              }
+            } else if ((marker & 0xFF00) !== 0xFF00) { break; }
+            else { offset += view.getUint16(offset, false); }
+          }
+        } catch (ex) { /* ignore */ }
+        return 1;
+      }
+
+      function exifOrientationToRotation(o) {
+        if (o === 3) return 180;
+        if (o === 6) return 90;
+        if (o === 8) return 270;
+        return 0;
+      }
+
+      // ============================================================
+      // SETTINGS HELPERS
+      // ============================================================
+      window.setArrangement = function (type) {
+        arrangement = type;
+        document.getElementById('arrangeSide').classList.toggle('active', type === 'side');
+        document.getElementById('arrangeStack').classList.toggle('active', type === 'stack');
+        scheduleAutoMerge();
+      };
+
+      window.setAlignment = function (val) {
+        alignment = val;
+        ['center','start','end'].forEach(function (v) {
+          document.getElementById('align' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('active', v === val);
+        });
+        scheduleAutoMerge();
+      };
+
+      window.setOutputSize = function (val) {
+        outputScale = Number(val);
+        document.getElementById('sizeOrig').classList.toggle('active', val === '1');
+        document.getElementById('size2x').classList.toggle('active', val === '2');
+        document.getElementById('sizeHalf').classList.toggle('active', val === '0.5');
+        scheduleAutoMerge();
+      };
+
+      window.toggleSingleMode = function () {
+        singleMode = document.getElementById('singleImageMode').checked;
+        var card = document.getElementById('panel-card-1');
+        card.classList.toggle('disabled', singleMode);
+        scheduleAutoMerge();
+      };
+
+      // ============================================================
+      // EXPORT
+      // ============================================================
+      window.downloadResult = function (fmt) {
+        var canvas = filteredCanvas || document.getElementById('resultCanvas');
+        if (!canvas || !canvas.width) { showToast('لا توجد نتيجة بعد', 'error'); return; }
+        var mimeMap  = { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp' };
+        var qualMap  = { png: 1, jpg: 0.92, webp: 0.9 };
+        var mime     = mimeMap[fmt] || 'image/png';
+        var quality  = qualMap[fmt] || 1;
+        var link     = document.createElement('a');
+        link.href    = canvas.toDataURL(mime, quality);
+        link.download = 'image-crop-merge-aliahmed.' + fmt;
+        link.click();
+        showToast('تم تحميل الصورة بصيغة ' + fmt.toUpperCase() + '!', 'success');
+      };
+
+      window.copyToClipboard = function () {
+        var canvas = filteredCanvas || document.getElementById('resultCanvas');
+        if (!canvas || !canvas.width) { showToast('لا توجد نتيجة بعد', 'error'); return; }
+        if (!navigator.clipboard || !window.ClipboardItem) {
+          showToast('المتصفح لا يدعم هذه الميزة', 'error');
+          return;
+        }
+        canvas.toBlob(function (blob) {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+            .then(function () { showToast('تم نسخ الصورة للحافظة!', 'success'); })
+            .catch(function (err) { showToast('فشل النسخ: ' + err.message, 'error'); });
+        });
+      };
+
+      window.resetAll = function () {
+        panels.forEach(function (p, idx) {
+          p.img            = null;
+          p.sel            = null;
+          p.rotation       = 0;
+          p.useFullImg     = false;
+          p.straightenMode = false;
+          p.strPts         = [];
+          p.strPreview     = null;
+          var btn  = document.getElementById('straightenBtn' + idx);
+          var hint = document.getElementById('straightenHint' + idx);
+          if (btn)  btn.className      = 'btn-sm btn-outline';
+          if (hint) hint.style.display = 'none';
+          document.getElementById('rotation' + idx).value = 0;
+          document.getElementById('rotVal'   + idx).textContent = '0°';
+          document.getElementById('emptyMsg' + idx).style.display = '';
+          document.getElementById('cropInfo' + idx).textContent = 'لم يتم التحديد بعد';
+          document.getElementById('fileInput' + idx).value = '';
+          renderPanel(idx);
+        });
+        mergedRaw      = null;
+        filteredCanvas = null;
+        outputRaw      = null;
+        normalizeSize  = false;
+        pageScale      = 100;
+        pageAlign      = 'mc';
+        document.getElementById('normalizeSizeToggle').checked = false;
+        document.getElementById('pageScaleSlider').value = 100;
+        document.getElementById('pageScaleVal').textContent = '100%';
+        document.querySelectorAll('.pos-btn').forEach(function(b){b.classList.remove('pos-active');});
+        var mcBtn = document.getElementById('pos_mc');
+        if (mcBtn) mcBtn.classList.add('pos-active');
+        document.getElementById('resultSection').classList.remove('visible');
+        resetFilters();
+        cmNotify();
+        showToast('تم إعادة التعيين الكامل');
+      };
+
+      // ============================================================
+      // A4 + TILE WINDOW FUNCTIONS
+      // ============================================================
+      window.toggleA4Mode = function () {
+        a4Mode = document.getElementById('a4ModeToggle').checked;
+        document.getElementById('a4PanelBody').classList.toggle('open', a4Mode);
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.setA4Orientation = function (val) {
+        a4Orientation = val;
+        document.getElementById('a4Portrait').classList.toggle('active', val === 'portrait');
+        document.getElementById('a4Landscape').classList.toggle('active', val === 'landscape');
+        updateA4DimLabel();
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.setA4Dpi = function (val) {
+        a4Dpi = val;
+        [72, 150, 300].forEach(function (v) {
+          document.getElementById('dpi' + v).classList.toggle('active', v === val);
+        });
+        updateA4DimLabel();
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      function updateA4DimLabel() {
+        var dim = getA4Px();
+        var orient = a4Orientation === 'portrait' ? 'عمودي' : 'أفقي';
+        document.getElementById('a4DimLabel').textContent =
+          dim[0] + ' × ' + dim[1] + ' بكسل (A4 ' + orient + ' — ' + a4Dpi + ' dpi)';
+        var lbl = document.getElementById('a4ThumbSizeLabel');
+        if (lbl) lbl.textContent = a4Dpi + ' dpi — ' + orient;
+        updateA4Preview();
+      }
+
+      window.onA4SettingChange = function () {
+        updateA4Preview();
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.toggleTileMode = function () {
+        tileMode = document.getElementById('tileModeToggle').checked;
+        document.getElementById('tilePanelBody').classList.toggle('open', tileMode);
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      window.onTileSettingChange = function () {
+        // Update display label for spacing
+        var sp = document.getElementById('tileSpacingSlider').value;
+        document.getElementById('tileSpacingVal').textContent = sp + 'px';
+        if (mergedRaw) { buildOutputCanvas(); applyFiltersAndShow(); }
+      };
+
+      /* ══════════════════════════════════════════════════════════
+         PUBLIC API used by pro-image-editor.html
+         ══════════════════════════════════════════════════════════ */
+      window.__mergeTool = {
+        isActive: function () {
+          return document.body.classList.contains('merge-mode');
+        },
+        hasSource: function () {
+          return !!(panels[0].img || panels[1].img);
+        },
+        hasResult: function () {
+          var c = cmResultCanvas();
+          return !!(c && c.width && c.height);
+        },
+        resultCanvas: cmResultCanvas,
+        tabMeta: function () {
+          var loaded = panels.filter(function (p) { return !!p.img; }).length;
+          var c = cmResultCanvas();
+          var size = (c && c.width) ? (' · ' + c.width + '\u00d7' + c.height) : '';
+          return loaded + '/2 image' + (loaded === 1 ? '' : 's') + size;
+        },
+        /* pull the image the user is currently editing into slot 1 */
+        useCurrentImage: function (dataUrl, name) {
+          if (!dataUrl) return false;
+          if (panels[0].img) return false;      // slot 1 already taken
+          _applyImageLoad(0, dataUrl, 0);
+          if (name) cmEl('cmMeta').setAttribute('data-src', name);
+          return true;
+        },
+        useCurrentIfEmpty: function () { return !panels[0].img && !panels[1].img; },
+        onShow: function () {
+          cmRunReady();
+          cmRefit();
+          updateA4DimLabel();
+          try { if (window.mergeImages && panels[0].img) window.mergeImages(true); } catch (e) {}
+        },
+        relayout: cmRefit,
+        reset: function () { if (window.resetAll) window.resetAll(); }
+      };
+
+      /* stage buttons */
+      document.addEventListener('DOMContentLoaded', function () {
+        var uc = cmEl('cmUseCurrent');
+        if (uc) uc.addEventListener('click', function () {
+          if (window.__mergeUseCurrent) window.__mergeUseCurrent();
+        });
+        var sv = cmEl('cmSave');
+        if (sv) sv.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (window.__mergeSaveResult) window.__mergeSaveResult();
+        });
+        var cl = cmEl('cmClose');
+        if (cl) cl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (window.__mergeCloseTab) window.__mergeCloseTab();
+        });
+        cmRunReady();
+      });
+  </script>
 </body>
 </html>
