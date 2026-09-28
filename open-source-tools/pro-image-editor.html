@@ -135,6 +135,8 @@
     .tab:hover{background:var(--pf-bg-3);color:var(--pf-text);}
     .tab.active{background:var(--pf-surface-hover);color:var(--pf-text);
       box-shadow:inset 0 2px 0 var(--pf-accent);}
+    .tab-split .tab-name{font-weight:700;color:var(--pf-accent);}
+    .tab-split.active{box-shadow:inset 0 2px 0 var(--pf-accent),inset 3px 0 0 #8b5cf6;}
     .tab.dragging{opacity:0.45;}
     .tab .tab-name{overflow:hidden;text-overflow:ellipsis;flex-shrink:0;font-weight:600;}
     .tab .tab-meta{color:var(--pf-text-muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;flex:1;}
@@ -971,6 +973,50 @@
       opacity:0;transition:opacity var(--pf-transition);}
     .ms-seg:hover .ms-seg-dl{opacity:1;}
     .ms-seg-dl svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
+
+    /* ===== SPLIT WORKSPACE STAGE (full-size preview inside the canvas area) ===== */
+    .split-stage{position:absolute;inset:0;display:none;flex-direction:column;z-index:3;}
+    .split-stage.on{display:flex;}
+    .split-stage-bar{display:flex;align-items:center;gap:10px;height:42px;flex:0 0 auto;padding:0 10px 0 12px;
+      background:var(--pf-bg-1);border-bottom:1px solid var(--pf-border);box-shadow:0 1px 0 rgba(0,0,0,.25);}
+    .ss-title{display:flex;align-items:center;gap:6px;flex:0 0 auto;font-size:11.5px;font-weight:700;
+      color:var(--pf-text);letter-spacing:.2px;white-space:nowrap;}
+    .ss-title svg{width:16px;height:16px;stroke:var(--pf-accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .ss-title span{color:var(--pf-accent);font-weight:600;}
+    .ss-meta{flex:1;min-width:0;font-family:var(--pf-mono);font-size:10.5px;color:var(--pf-text-dim);
+      direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .ss-actions{display:flex;align-items:center;gap:5px;flex:0 0 auto;}
+    .ss-actions .ib{height:27px;padding:0 10px;gap:5px;font-size:10.5px;font-weight:600;white-space:nowrap;}
+    .ss-actions .ib svg{width:13px;height:13px;flex:0 0 auto;}
+    .ss-save{background:linear-gradient(135deg,var(--pf-accent),#8b5cf6);border-color:transparent;color:#fff;box-shadow:0 0 12px var(--pf-accent-glow);}
+    .ss-save:hover{filter:brightness(1.12);}
+    .ss-save:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;filter:none;}
+    .split-stage-body{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+      padding:20px;overflow:hidden;}
+    .split-stage-body.drop-over{box-shadow:inset 0 0 0 2px var(--pf-accent);background:rgba(79,172,254,.06);}
+    .split-stage-body.drop-over::after{content:"Drop to load the source image";position:absolute;inset:0;display:flex;
+      align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--pf-accent);
+      background:rgba(8,12,20,.72);pointer-events:none;}
+
+    /* stage-sized preview: fills the workspace instead of the 180px panel slot */
+    .ms-prev-stage{width:100%;height:100%;max-width:100%;max-height:100%;border:0;border-radius:6px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.07),0 24px 60px rgba(0,0,0,.55);}
+    .ms-prev-stage.empty{box-shadow:none;}
+    .ms-prev-stage canvas{max-width:100%;max-height:100%;}
+    .ms-prev-stage .ms-prev-ph{font-size:12.5px;padding:24px;}
+
+    /* the stage replaces the canvas, so the panel slot just points at it */
+    .ms-stage-hint{border:1.5px dashed var(--pf-border-focus);border-radius:8px;background:var(--pf-bg-3);
+      padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;}
+    .ms-stage-hint svg{width:20px;height:20px;stroke:var(--pf-accent);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+    .ms-sh-t{font-size:10px;line-height:1.6;color:var(--pf-text-dim);}
+    .ms-sh-t b{color:var(--pf-text);}
+    .ms-stage-hint .ib{width:100%;height:28px;font-size:10.5px;font-weight:700;font-family:var(--pf-font);}
+
+    /* split-mode shell: the document canvas is hidden, so dim the tools that act on it */
+    body.split-mode .toolbar{opacity:.32;pointer-events:none;}
+    body.split-mode .canvas-viewport{cursor:default;}
+    body.split-mode .split-stage .ms-prev{cursor:crosshair;}
   </style>
 </head>
 <body>
@@ -1594,6 +1640,44 @@
           <canvas id="overlayCanvas"></canvas>
           <canvas id="drawCanvas"></canvas>
         </div>
+
+        <!-- SPLIT WORKSPACE STAGE (the #msPrev preview is mounted here by the Split module) -->
+        <div class="split-stage" id="splitStage">
+          <div class="split-stage-bar">
+            <div class="ss-title">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+              Split &middot; <span>تقطيع</span>
+            </div>
+            <div class="ss-meta" id="ssMeta">No source image</div>
+            <div class="ss-actions">
+              <button type="button" class="ib ss-btn" id="ssUseCurrent" title="Load the image currently open in the editor">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                Use Current Image
+              </button>
+              <button type="button" class="ib ss-btn" id="ssPick" title="Choose an image or PDF to split">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Open&hellip;
+              </button>
+              <button type="button" class="ib ss-save" id="ssSave" title="Save the split source image (Alt / Right-click for more formats)">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Save
+              </button>
+              <button type="button" class="ib ss-btn" id="ssClose" title="Close the split tab and go back to editing">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to Editing
+              </button>
+            </div>
+          </div>
+          <div class="split-stage-body" id="splitStageBody">
+            <div class="ms-prev ms-prev-stage empty" id="msPrev">
+              <canvas id="msPrevCanvas" hidden></canvas>
+              <div class="ms-lines" id="msLines"></div>
+              <div class="ms-prev-ph" id="msPrevPh">No source image yet.<br>Load one to start cutting.</div>
+            </div>
+          </div>
+          <input type="file" id="ssFile" accept="image/*,.pdf" hidden />
+        </div>
+
         <div class="loading-overlay" id="loadingOverlay"><div class="loader-ring"></div><span id="loadingText">Processing...</span></div>
         <div class="pdf-nav" id="pdfNav">
           <button class="ib" id="pdfPrevBtn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -1944,10 +2028,10 @@
           <div class="panel-header"><h4><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>Cut Lines</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
           <div class="panel-body">
             <div class="ms-wrap">
-              <div class="ms-prev empty" id="msPrev">
-                <canvas id="msPrevCanvas" hidden></canvas>
-                <div class="ms-lines" id="msLines"></div>
-                <div class="ms-prev-ph" id="msPrevPh">No source image yet.<br>Load one to start cutting.</div>
+              <div class="ms-stage-hint" id="msStageHint">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+                <div class="ms-sh-t">The full-size preview lives in the <b>Split</b> workspace tab.</div>
+                <button type="button" class="ib ms-btn-primary" id="msOpenTab">Open Split Tab</button>
               </div>
 
               <div class="ms-dir" style="margin-top:8px;">
@@ -2457,7 +2541,9 @@
   let tabs=[],activeTabId=null,nextTabId=1,untitledCounter=0,suppressAutoSave=false;
   const OVERLAY_TOOLS=new Set(["crop","marquee","lasso","ploy","eyedropper","sampler","ruler","brush","eraser","pen","clone","gradient","smudge","dodge","shape","move","qsel","wand","mageraser","artboard"]);
   const activeTab=()=>tabs.find(t=>t.id===activeTabId);
-  function tabHasImage(t){if(!t)return false;if(t.loading)return false;if(t.id===activeTabId)return !!originalImage;return !!(t.session&&t.session.originalImage);}
+  const isSplitTab=t=>!!(t&&t.kind==="split");
+  const activeIsSplit=()=>isSplitTab(activeTab());
+  function tabHasImage(t){if(!t)return false;if(t.kind==="split")return false;if(t.loading)return false;if(t.id===activeTabId)return !!originalImage;return !!(t.session&&t.session.originalImage);}
   function tabZoom(t){
     if(!t)return 1;
     if(t.id===activeTabId)return state.zoom;
@@ -2518,7 +2604,7 @@
     cropStart=null;marqueeStart=null;isDraggingCrop=false;isDraggingMarquee=false;isDraggingShape=false;
     isPainting=false;paintLast=null;paintStroke=null;cursorPt=null;cloneSource=null;cloneOffset=null;
   }
-  function captureActiveTab(){const cur=activeTab();if(cur)cur.session=grabSession();}
+  function captureActiveTab(){const cur=activeTab();if(!cur||isSplitTab(cur))return;cur.session=grabSession();}
   function noDoc(){
     originalImage=null;layers=[];activeLayerIdx=0;nextLayerId=1;strokes=[];
     groups=[];nextGroupId=1;multiSel=new Set();shiftAnchorIdx=0;
@@ -2536,13 +2622,25 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     const del=$("delLayerBtn"),mg=$("mergeDownBtn"),dn=$("layerDownBtn"),up=$("layerUpBtn");
     if(del)del.disabled=true;if(mg)mg.disabled=true;if(dn)dn.disabled=true;if(up)up.disabled=true;
   }
-  function createTab(){
-    const t={id:nextTabId++,name:"Untitled-"+(++untitledCounter),session:null,dirty:false,loading:false};
+  function createTab(kind){
+    const t={id:nextTabId++,kind:kind==="split"?"split":"doc",
+      name:kind==="split"?"Split · تقطيع":"Untitled-"+(++untitledCounter),
+      session:null,dirty:false,loading:false};
     tabs.push(t);return t;
+  }
+  /* Activate a tab by id without touching the document state when the target
+     is the Split workspace (the document stays exactly as the user left it). */
+  function activateTabState(id){
+    const t=tabs.find(x=>x.id===id);
+    if(!t)return;
+    activeTabId=id;
+    if(isSplitTab(t))return;
+    if(t.session)putSession(t.session);else noDoc();
   }
   function openDocSlot(base){
     const cur=activeTab();
-    if(cur&&tabHasImage(cur)){
+    /* the Split workspace is not a document slot — a new file always gets its own tab */
+    if(cur&&(tabHasImage(cur)||isSplitTab(cur))){
       captureActiveTab();
       const nt=createTab();nt.loading=true;nt.name=base||nt.name;activeTabId=nt.id;renderTabBar();
       return nt;
@@ -2554,10 +2652,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   function focusTab(id){
     if(!tabs.length)return;
     if(id===activeTabId){refreshAfterSwitch();return;}
-    const cur=activeTab();if(cur)captureActiveTab();
+    captureActiveTab();
     const t=tabs.find(x=>x.id===id);if(!t)return;
-    activeTabId=id;
-    if(t.session)putSession(t.session);else noDoc();
+    activateTabState(id);
     refreshAfterSwitch();
     if(!suppressAutoSave)saveProject();
   }
@@ -2572,6 +2669,8 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     syncMoveOptionsBar();
   }
   function refreshAfterSwitch(){
+    if(activeIsSplit()){applySplitTabView();return;}
+    leaveSplitMode();
     if(originalImage){emptyState.style.display="none";canvasWrapper.style.display="block";}
     else{emptyState.style.display="flex";canvasWrapper.style.display="none";}
     syncControlsFromState();updateValueLabels();updateToggleButtons();
@@ -2588,6 +2687,68 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     syncOverlayPointerEvents();
     renderTabBar();
   }
+
+  /* ---------- SPLIT WORKSPACE TAB VIEW ---------- */
+  let lastDocPanel="adjustments";
+  function activatePanelTab(name){
+    document.querySelectorAll(".panel-tab[data-panel]").forEach(x=>x.classList.toggle("active",x.dataset.panel===name));
+    document.querySelectorAll(".panel-content").forEach(p=>p.classList.toggle("active",p.dataset.panel===name));
+  }
+  const splitPanelApi=()=>window.__splitPanel||null;
+  /* the Split module calls this whenever its state changes, so the tab bar,
+     the stage header and the status bar stay in sync */
+  window.__splitPanelChanged=()=>{renderTabBar();if(activeIsSplit())syncSplitStatus();};
+  function syncSplitStatus(){
+    const s=splitPanelApi(),st=$("splitStageBody");
+    const metaEl=$("ssMeta"),saveBtn=$("ssSave");
+    if(saveBtn)saveBtn.disabled=!(s&&s.hasSource());
+    if(!s||!st)return;
+    if(!s.hasSource()){metaEl.textContent="No source image — drop a file or use the image you are editing";return;}
+    const d=s.dims(),n=s.lineCount();
+    metaEl.textContent=s.sourceName()+"  ·  "+d.w+"×"+d.h+"  ·  "+n+" cut line"+(n===1?"":"s")
+      +(s.partCount()?"  ·  "+s.partCount()+" parts":"");
+    $("statusFileName").textContent=s.sourceName();
+    $("statusDimensions").textContent=d.w+"×"+d.h;
+    $("statusSize").textContent=n+" cut"+(n===1?"":"s");
+  }
+  function applySplitTabView(){
+    const stage=$("splitStage");
+    document.body.classList.add("split-mode");
+    if(stage)stage.classList.add("on");
+    emptyState.style.display="none";
+    canvasWrapper.style.display="none";
+    $("rulersRow").style.display="none";
+    $("pdfNav").classList.remove("visible");
+    loadingOverlay.classList.remove("visible");
+    hideLoupe();
+    if($("colorPickerPop")&&$("colorPickerPop").classList.contains("open"))closeColorPicker(false);
+    activatePanelTab("split");
+    $("toolNameLabel").textContent="Split Tool";
+    const s=splitPanelApi();
+    if(s){s.onStageShow();s.useCurrentIfEmpty&&s.useCurrentIfEmpty();}
+    syncSplitStatus();
+    renderTabBar();
+    updateQe();
+    requestAnimationFrame(()=>{if(s)s.relayout();});
+  }
+  function leaveSplitMode(){
+    if(!document.body.classList.contains("split-mode"))return;
+    document.body.classList.remove("split-mode");
+    const stage=$("splitStage");
+    if(stage)stage.classList.remove("on");
+    activatePanelTab(lastDocPanel);
+    const s=splitPanelApi();
+    if(s)s.onStageHide();
+  }
+  function openSplitTab(){
+    let t=tabs.find(x=>x.kind==="split");
+    const wasNew=!t;
+    if(!t){captureActiveTab();t=createTab("split");}
+    activateTabState(t.id);
+    refreshAfterSwitch();
+    if(wasNew&&!suppressAutoSave)saveProject();
+    return t;
+  }
   function renderTabBar(){
     const bar=$("tabBar");if(!bar)return;
     const ae=document.activeElement;
@@ -2596,17 +2757,25 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     bar.innerHTML="";
     for(const t of tabs){
       const el=document.createElement("div");
-      el.className="tab"+(t.id===activeTabId?" active":"");
+      const isSplit=isSplitTab(t);
+      el.className="tab"+(t.id===activeTabId?" active":"")+(isSplit?" tab-split":"");
       el.dataset.id=t.id;el.draggable=true;
-      const zo=(t.id===activeTabId)?state.zoom:tabZoom(t);
-      const ly=(t.id===activeTabId)?layerActive():tabLayerName(t);
       const nm=document.createElement("span");nm.className="tab-name";nm.textContent=t.name;
-      const meta=document.createElement("span");meta.className="tab-meta";meta.textContent=Math.round(zo*100)+"% ("+ly+", RGB/8#)";
+      const meta=document.createElement("span");meta.className="tab-meta";
+      if(isSplit){
+        const s=splitPanelApi();
+        meta.textContent=s&&s.hasSource()?s.tabMeta():"no source";
+        el.title=t.name+"   "+meta.textContent;
+      }else{
+        const zo=(t.id===activeTabId)?state.zoom:tabZoom(t);
+        const ly=(t.id===activeTabId)?layerActive():tabLayerName(t);
+        meta.textContent=Math.round(zo*100)+"% ("+ly+", RGB/8#)";
+        el.title=(t.dirty?"* ":"")+t.name+"   "+meta.textContent;
+      }
       const xs=document.createElement("span");
       xs.className="tab-x";xs.textContent="×";xs.title="Close tab";xs.setAttribute("role","button");
       xs.setAttribute("tabindex","0");xs.setAttribute("aria-label","Close "+t.name);
       el.appendChild(nm);el.appendChild(meta);el.appendChild(xs);
-      el.title=(t.dirty?"* ":"")+t.name+"   "+meta.textContent;
       bar.appendChild(el);
     }
     updateTabOverflow();
@@ -2624,7 +2793,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   let pendingCloseId=null;
   function closeTab(id){
     const t=tabs.find(x=>x.id===id);if(!t)return;
-    if(tabs.length===1&&!t.dirty&&!t.loading&&!tabHasImage(t)){
+    if(tabs.length===1&&!isSplitTab(t)&&!t.dirty&&!t.loading&&!tabHasImage(t)){
       toast("No open document — this is the empty tab.","info",2200);return;
     }
     if(t.id===activeTabId)captureActiveTab();
@@ -2635,8 +2804,10 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       return;
     }
     const onlyOne=tabs.length===1;
+    const wasSplit=isSplitTab(t);
     removeTab(id);
     if(onlyOne)toast("All documents closed.","info",1800);
+    else if(wasSplit&&!tabs.some(x=>x.kind==="split"))toast("Split workspace closed.","info",1600);
   }
   function removeTab(id){
     const idx=tabs.findIndex(t=>t.id===id);if(idx<0)return;
@@ -2646,8 +2817,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
       const nt=createTab();activeTabId=nt.id;noDoc();refreshAfterSwitch();
     }else if(isActive){
       const next=tabs[Math.min(idx,tabs.length-1)];
-      activeTabId=next.id;
-      if(next.session)putSession(next.session);else noDoc();
+      activateTabState(next.id);
       refreshAfterSwitch();
     }else{
       renderTabBar();
@@ -3367,13 +3537,23 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
 
   /* ===================== EXPORT ===================== */
   function composeOutputCanvas(){const c=mkCanvas(imageCanvas.width,imageCanvas.height),cx=c.getContext("2d");cx.drawImage(imageCanvas,0,0);if(!state.showOriginal)cx.drawImage(drawCanvas,0,0);return c;}
-  function exportFileName(ext){return(currentFileNameBase||"edit")+"-edited."+ext;}
+  /* Save/export target: the document canvas normally, or the Split workspace
+   source when the Split tab is active — so Save behaves identically in both. */
+function saveTargetCanvas(){
+  if(activeIsSplit()){const s=splitPanelApi();return s?s.saveCanvas():null;}
+  return originalImage?currentExportCanvas():null;
+}
+function saveBaseName(){
+  if(activeIsSplit()){const s=splitPanelApi();if(s&&s.hasSource())return s.sourceBaseName()||"split";}
+  return (currentFileNameBase||"edit");
+}
+function exportFileName(ext){return saveBaseName()+"-edited."+ext;}
   function downloadCanvas(c,fn,mime,q){if(mime==="image/jpeg"&&canvasHasTransparency(c))toast("Notice: transparent areas will be white in JPG.","warning",3200);const a=document.createElement("a");a.href=c.toDataURL(mime,q);a.download=fn;a.click();const cur=activeTab();if(cur)cur.dirty=false;renderTabBar();saveProject();}
-  async function openInNewTab(){if(!originalImage){toast("Open an image first.","warning");return;}const nt=window.open("","_blank");if(!nt){toast("Allow popups.","warning");return;}try{const b=await new Promise(r=>currentExportCanvas().toBlob(r,"image/png"));if(b){const url=URL.createObjectURL(b);nt.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),60000);return;}}catch(e){}nt.location.href=currentExportCanvas().toDataURL("image/png");}
+  async function openInNewTab(){const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return;}const nt=window.open("","_blank");if(!nt){toast("Allow popups.","warning");return;}try{const b=await new Promise(r=>src.toBlob(r,"image/png"));if(b){const url=URL.createObjectURL(b);nt.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),60000);return;}}catch(e){}nt.location.href=src.toDataURL("image/png");}
   
   async function openAsDataUrl(){
-    if(!originalImage){toast("Open an image first.","warning");return;}
-    const dataUrl=composeOutputCanvas().toDataURL("image/png");
+    const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return;}
+    const dataUrl=src.toDataURL("image/png");
     const w=window.open();
     if(!w){toast("Allow popups.","warning");return;}
     w.document.write('<html><head><style>body{margin:0;padding:20px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;}img{max-width:95vw;max-height:95vh;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);}</style></head><body><img src="'+dataUrl+'"></body></html>');
@@ -3381,9 +3561,9 @@ const TOOL_SLIDER_UNITS={drawOpacity:"%",drawHardness:"%",drawFlow:"%",cloneOpac
   }
   
   async function copyDataUrl(){
-    if(!originalImage){toast("Open an image first.","warning");return;}
+    const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return;}
     try{
-const dataUrl=currentExportCanvas().toDataURL("image/png");
+const dataUrl=src.toDataURL("image/png");
       if(navigator.clipboard&&navigator.clipboard.writeText){
         await navigator.clipboard.writeText(dataUrl);
         toast("Copied ("+Math.round(dataUrl.length/1024)+"KB)","success");
@@ -3406,8 +3586,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     }
   }
   async function copyImage(){
-    if(!originalImage){toast("Open an image first.","warning");return false;}
-    try{const b=await new Promise(r=>currentExportCanvas().toBlob(r,"image/png"));
+    const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return false;}
+    try{const b=await new Promise(r=>src.toBlob(r,"image/png"));
       if(navigator.clipboard&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({[b.type]:b})]);return true;}}catch(e){}
     return false;
   }
@@ -3535,7 +3715,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const jobs=[],used=new Set();
     for(const t of docs)jobs.push({canvas:composeTabCanvas(t),name:uniqueOutputName(t,used)});
     const back=tabs.find(x=>x.id===savedTabId);
-    if(back){if(back.session)putSession(back.session);else noDoc();renderImmediately();refreshAfterSwitch();}
+    if(back){activateTabState(back.id);renderImmediately();refreshAfterSwitch();}
     const mime=format==="png"?"image/png":"image/jpeg";
     const q=format==="png"?undefined:(typeof quality==="number"&&quality>0&&quality<=1?quality:0.92);
     let savedCount=0,transJobs=0;
@@ -3696,6 +3876,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     });
   }
   function serializeTab(t){
+    if(isSplitTab(t))return{name:t.name,kind:"split",dirty:false};
     const s=t&&t.session;
     if(!s||!s.originalImage)return{name:t.name,dirty:!!t.dirty,empty:true};
     let src=s.originalImage;
@@ -3748,8 +3929,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       await restoreTabsFromArray(arr);
       if(!tabs.length){const nt=createTab();activeTabId=nt.id;noDoc();}
       const target=tabs.find(t=>t.id===saved.activeTabId)||tabs[tabs.length-1];
-      activeTabId=target.id;
-      if(target.session)putSession(target.session);else noDoc();
+      activateTabState(target.id);
       refreshAfterSwitch();
       suppressAutoSave=false;
       hideLoading();toast("Session restored.","success",2000);
@@ -3758,6 +3938,10 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
   async function restoreTabsFromArray(arr){
     tabs=[];activeTabId=null;nextTabId=1;
     for(const td of arr){
+      if(td.kind==="split"){
+        const nt=createTab("split");activeTabId=nt.id;nt.name=td.name||nt.name;
+        continue; /* the document state is left untouched by the Split workspace */
+      }
       const nt=createTab();activeTabId=nt.id;
       if(td.empty||!td.session||!td.session.dataUrl){noDoc();nt.name=td.name||nt.name;nt.dirty=!!td.dirty;captureActiveTab();continue;}
       const img=await loadImagePromise(td.session.dataUrl);
@@ -3795,8 +3979,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       const arr=Array.isArray(data.tabs)&&data.tabs.length?data.tabs:(data.dataUrl?[{name:(data.meta&&data.meta.currentFileNameBase)||"Untitled",dirty:true,session:data}]:[]);
       await restoreTabsFromArray(arr);
       const target=tabs.find(t=>t.id===data.activeTabId)||tabs[tabs.length-1];
-      activeTabId=target.id;
-      if(target.session)putSession(target.session);else noDoc();
+      activateTabState(target.id);
       refreshAfterSwitch();
       suppressAutoSave=false;hideLoading();
       toast("Project opened.","success",1800);
@@ -3805,7 +3988,8 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
 
   /* ===================== COMBINED PDF QUEUE ===================== */
   function updateQe(){
-    const has=!!originalImage;
+    const sp=activeIsSplit()?splitPanelApi():null;
+    const has=activeIsSplit()?!!(sp&&sp.hasSource()):!!originalImage;
     ["qePng","qeJpg","qeWebp","qePdf","qeAddPdf","qeExportAll"].forEach(id=>{const el=$(id);if(el)el.disabled=!has;});
     const b=$("qePdfCount");if(b){b.textContent=pdfPages.length;b.classList.toggle("show",pdfPages.length>0);}
     const ea=$("qeExportAll");if(ea)ea.title=pdfPages.length?("Export Combined PDF ("+pdfPages.length+" pages)"):"Export Combined PDF";
@@ -3816,17 +4000,17 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     if(ca){ca.disabled=!tabs.length;}
   }
   async function exportPdfCurrent(){
-    if(!originalImage){toast("Open an image first.","warning");return;}
+    const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return;}
     try{await ensureJsPdf();}catch(e){toast("Could not load PDF library. Check your connection.","error");return;}
     if(!window.jspdf||!window.jspdf.jsPDF){toast("Could not load PDF library. Check your connection.","error");return;}
-    const{jsPDF}=window.jspdf,MM=25.4/72,outc=currentExportCanvas(),w=Math.max(1,outc.width),h=Math.max(1,outc.height);
+    const{jsPDF}=window.jspdf,MM=25.4/72,outc=src,w=Math.max(1,outc.width),h=Math.max(1,outc.height);
     const pdf=new jsPDF({orientation:w>=h?"landscape":"portrait",unit:"mm",format:[w*MM,h*MM],compress:true});
     pdf.addImage(outc.toDataURL("image/png"),"PNG",0,0,w*MM,h*MM,undefined,"FAST");
     pdf.save(exportFileName("pdf"));const cur=activeTab();if(cur)cur.dirty=false;renderTabBar();toast("PDF saved.","success");
   }
   function addToPdf(){
-    if(!originalImage){toast("Open an image first.","warning");return;}
-    pdfPages.push(currentExportCanvas());
+    const src=saveTargetCanvas();if(!src){toast("Open an image first.","warning");return;}
+    pdfPages.push(src);
     updateQe();toast("Added to PDF queue ("+pdfPages.length+" pages).","success");
   }
   function clearPdfQueue(){if(!pdfPages.length){toast("PDF queue is already empty.","info");return;}pdfPages=[];updateQe();toast("PDF queue cleared.","info");}
@@ -4553,8 +4737,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
 
   /* ===================== NEW: EMPTY TAB ===================== */
   function newEmptyTab(){
+    captureActiveTab();
     const nt=createTab();
-    activeTabId=nt.id;noDoc();refreshAfterSwitch();
+    activateTabState(nt.id);refreshAfterSwitch();
     if(!suppressAutoSave)saveProject();
     return nt;
   }
@@ -5016,12 +5201,15 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     if(cpDropActive)cpDropActive=false;
     const db=$("cpDrop");if(db)db.classList.remove("active");
     toast("Picked "+hex.toUpperCase(),"info",1000);
+    const pop=$("colorPickerPop");
+    if(pop&&pop.classList.contains("open"))closeColorPicker(true);
   }
   function eyedropperPick(e){dropperPickFromEvent(e);}
 
   /* ===================== CUSTOM IN-PAGE COLOR PICKER ===================== */
   const CP_PALETTE=["#ffffff","#000000","#1f1f1f","#f2f3f5","#e63946","#f77f00","#fcbf49","#06d6a0","#2ec4b6","#4facfe","#4361ee","#9d6bff","#f46bbd","#d9d9d9","#8d99ae","#3a86ff","#5f0f40","#8338ec","#ff006e","#3d405b"];
   const cpState={h:0,s:1,v:1,hex:"#ffffff",oldHex:"#ffffff"};
+  let cpOpenedAt=0;   /* guards against the opening gesture closing it again */
   function cpHexFromHsv(){
     const c=adjHslToRgb(cpState.h,cpState.s,cpState.v);
     return rgbToHex(c.r,c.g,c.b);
@@ -5060,7 +5248,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       '<button type="button" class="cp-dropper" id="cpDrop"><svg viewBox="0 0 24 24"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>Pick color from the image</button>'+
       '<div class="cp-pal"></div>'+
       '<div class="cp-actions"><button type="button" class="cp-cancel">Cancel</button><button type="button" class="cp-ok">Apply</button></div>'+
-      '<div class="cp-note">This panel stays open even if you switch browser tabs. Click <b>Pick color from the image</b>, then click any pixel of the canvas to sample it.</div>';
+      '<div class="cp-note">Click anywhere outside this panel and the colour is applied and the panel closes \u2014 <b>Apply</b> is not required. Click <b>Pick color from the image</b>, then click any pixel of the canvas to sample it. <b>Cancel</b> or <b>Esc</b> reverts to the original colour.</div>';
     const pal=pop.querySelector(".cp-pal");
     CP_PALETTE.forEach(h=>{
       const s=document.createElement("button");s.type="button";s.className="cp-swat";s.style.background=h;s.dataset.h=h;
@@ -5173,12 +5361,17 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     }
     pop.style.left=left+"px";pop.style.top=top+"px";
     pop.classList.add("open");
+    cpOpenedAt=performance.now();
   }
   function closeColorPicker(apply){
     const pop=$("colorPickerPop");if(!pop)return;
+    const wasOpen=pop.classList.contains("open");
     cpDropActive=false;const db=$("cpDrop");if(db)db.classList.remove("active");
     hideLoupe();
-    if(!apply&&colorPickTarget)setInputColorValue(colorPickTarget,colorPickTarget.value);
+    /* the colour is already applied live, so "apply" only means: keep it.
+       "cancel" means: put the original colour back. */
+    if(!apply&&colorPickTarget&&cpState.oldHex)applyPickerColor(cpState.oldHex);
+    else if(apply&&wasOpen&&colorPickTarget)setInputColorValue(colorPickTarget,cpState.hex);
     pop.classList.remove("open");
     colorPickTarget=null;
     syncOverlayPointerEvents();
@@ -8272,16 +8465,17 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     });
     $("ctxOpenTab").addEventListener("click",openInNewTab);
     $("ctxCopy").addEventListener("click",async()=>{const ok=await copyImage();toast(ok?"Image copied.":"Copy failed.",ok?"success":"error");});
-    $("ctxDownloadPng").addEventListener("click",()=>{if(originalImage)downloadCanvas(currentExportCanvas(),exportFileName("png"),"image/png");});
-    $("ctxDownloadJpg").addEventListener("click",()=>{if(originalImage)downloadCanvas(currentExportCanvas(),exportFileName("jpg"),"image/jpeg",0.92);});
+    $("ctxDownloadPng").addEventListener("click",()=>{const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("png"),"image/png");});
+    $("ctxDownloadJpg").addEventListener("click",()=>{const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("jpg"),"image/jpeg",0.92);});
     $("ctxOpenDataUrl").addEventListener("click",openAsDataUrl);
     $("ctxCopyDataUrl").addEventListener("click",copyDataUrl);
 
     /* Panel Tabs (vertical icon rail) */
     document.querySelectorAll(".panel-tab[data-panel]").forEach(t=>{
       const activate=()=>{
-        document.querySelectorAll(".panel-tab[data-panel]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
-        document.querySelectorAll(".panel-content").forEach(p=>{p.classList.toggle("active",p.dataset.panel===t.dataset.panel);});
+        if(t.dataset.panel==="split"){openSplitTab();return;}
+        lastDocPanel=t.dataset.panel;
+        activatePanelTab(t.dataset.panel);
       };
       t.addEventListener("click",activate);
       t.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate();}});
@@ -8300,9 +8494,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
         document.querySelectorAll(".menu-dropdown").forEach(d=>d.classList.remove("open"));
         if(a==="open"){fileInput.value="";fileInput.click();}
         else if(a==="pasteImg"){pasteCatcher.focus();toast("Press Ctrl+V to paste.","info");}
-        else if(a==="exportPng"&&originalImage)downloadCanvas(currentExportCanvas(),exportFileName("png"),"image/png");
+        else if(a==="exportPng"){const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("png"),"image/png");}
         else if(a==="exportJpg"&&originalImage)openJpgQualityModal("current");
-        else if(a==="exportWebp"&&originalImage)downloadCanvas(currentExportCanvas(),exportFileName("webp"),"image/webp",0.9);
+        else if(a==="exportWebp"){const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("webp"),"image/webp",0.9);}
         else if(a==="exportPdf")exportPdfCurrent();
         else if(a==="saveAllJpg")openJpgQualityModal();
         else if(a==="saveAllPng")saveAllImages("png",true);
@@ -8383,7 +8577,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     $("ncH").addEventListener("keydown",e=>{if(e.key==="Enter")$("createNewCanvas").click();});
     $("ncName").addEventListener("keydown",e=>{if(e.key==="Enter")$("createNewCanvas").click();});
 
-    /* NEW: New tab button -->
+    /* NEW: New tab button */
     $("tabNewBtn")&&$("tabNewBtn").addEventListener("click",()=>newEmptyTab());
 
     /* NEW: Canvas Size modal */
@@ -8491,9 +8685,9 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     $("pdfQuality").addEventListener("change",()=>{pdfScale=parseFloat($("pdfQuality").value)||1.5;if(pdfDoc)loadPdfPage(pdfCurrentPage);});
 
     /* Quick-export icon buttons */
-    $("qePng").addEventListener("click",()=>{if(originalImage)downloadCanvas(currentExportCanvas(),exportFileName("png"),"image/png");});
-    $("qeJpg").addEventListener("click",()=>{if(originalImage)openJpgQualityModal("current");});
-    $("qeWebp").addEventListener("click",()=>{if(originalImage)downloadCanvas(currentExportCanvas(),exportFileName("webp"),"image/webp",0.9);});
+    $("qePng").addEventListener("click",()=>{const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("png"),"image/png");});
+    $("qeJpg").addEventListener("click",()=>{if(saveTargetCanvas())openJpgQualityModal("current");});
+    $("qeWebp").addEventListener("click",()=>{const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("webp"),"image/webp",0.9);});
     $("qePdf").addEventListener("click",exportPdfCurrent);
     $("qeAddPdf").addEventListener("click",addToPdf);
     $("qeExportAll").addEventListener("click",exportCombinedPdf);
@@ -8509,7 +8703,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       $("jpgQCancel").addEventListener("click",jpgQHide);
       $("jpgQConfirm").addEventListener("click",()=>{jpgQHide();const q=lastJpgQuality/100;
         if(jpgQMode==="current"){
-          if(originalImage)downloadCanvas(currentExportCanvas(),exportFileName("jpg"),"image/jpeg",q);
+          const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("jpg"),"image/jpeg",q);
         }else{
           try{saveAllImages("jpg",true,q);}catch(e){hideLoading();toast("Save failed.","error");}
         }});
@@ -8543,11 +8737,28 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       positionExportMenu(btn);
     };
     $("saveExportBtn")&&$("saveExportBtn").addEventListener("click",e=>{e.stopPropagation();toggleExportMenu($("saveExportBtn"));});
+
+    /* Split workspace stage bar — Save reuses the editor's export pipeline */
+    $("ssSave")&&$("ssSave").addEventListener("click",e=>{
+      e.stopPropagation();
+      if(e.altKey||e.ctrlKey||e.metaKey){toggleExportMenu($("ssSave"));return;}
+      const c=saveTargetCanvas();
+      if(!c){toast("Load a source image first.","warning");return;}
+      downloadCanvas(c,exportFileName("png"),"image/png");
+    });
+    $("ssSave")&&$("ssSave").addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();toggleExportMenu($("ssSave"));});
+    $("ssClose")&&$("ssClose").addEventListener("click",()=>{
+      const t=activeTab();
+      if(isSplitTab(t))closeTab(t.id);
+      else leaveSplitMode();
+    });
+
     $("railSaveBtn")&&$("railSaveBtn").addEventListener("click",e=>{
       e.stopPropagation();
       if(e.altKey||e.ctrlKey||e.metaKey){toggleExportMenu($("railSaveBtn"));return;}
-      if(!originalImage){toast("Open an image first.","warning");return;}
-      downloadCanvas(currentExportCanvas(),exportFileName("png"),"image/png");
+      const c=saveTargetCanvas();
+      if(!c){toast("Open an image first.","warning");return;}
+      downloadCanvas(c,exportFileName("png"),"image/png");
     });
     $("railSaveBtn")&&$("railSaveBtn").addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation();toggleExportMenu($("railSaveBtn"));});
     document.addEventListener("click",e=>{if(exportMenu&&!exportMenu.contains(e.target)){exportMenu.classList.remove("visible");exportMenu._anchor=null;}});
@@ -8555,14 +8766,15 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       item.addEventListener("click",()=>{
         exportMenu.classList.remove("visible");exportMenu._anchor=null;
         const mode=item.dataset.export;
-        if(!originalImage){toast("Open an image first.","warning");return;}
-        if(mode==="png")downloadCanvas(currentExportCanvas(),exportFileName("png"),"image/png");
-        else if(mode==="jpg")downloadCanvas(currentExportCanvas(),exportFileName("jpg"),"image/jpeg",0.92);
-        else if(mode==="webp")downloadCanvas(currentExportCanvas(),exportFileName("webp"),"image/webp",0.9);
+        if(mode==="pfx"){saveProjectFile();return;}
+        const c=saveTargetCanvas();
+        if(!c){toast("Open an image first.","warning");return;}
+        if(mode==="png")downloadCanvas(c,exportFileName("png"),"image/png");
+        else if(mode==="jpg")downloadCanvas(c,exportFileName("jpg"),"image/jpeg",0.92);
+        else if(mode==="webp")downloadCanvas(c,exportFileName("webp"),"image/webp",0.9);
         else if(mode==="pdf")exportPdfCurrent();
         else if(mode==="copy"){(async()=>{const ok=await copyImage();toast(ok?"Image copied to clipboard.":"Copy failed — clipboard unavailable.",ok?"success":"error");})();}
-        else if(mode==="pfx")saveProjectFile();
-        else if(mode==="saveas"){const fn=prompt("Save As (PNG) — enter file name:",exportFileName("png"));if(fn)downloadCanvas(currentExportCanvas(),fn.replace(/\.[^.]*$/,"")+".png","image/png");}
+        else if(mode==="saveas"){const fn=prompt("Save As (PNG) — enter file name:",exportFileName("png"));if(fn)downloadCanvas(c,fn.replace(/\.[^.]*$/,"")+".png","image/png");}
       });
     });
 
@@ -8611,6 +8823,16 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       if(pop&&pop.classList.contains("open")){closeColorPicker(false);return;}
     }
   });
+  /* Clicking anywhere outside the picker keeps the chosen colour and closes the
+     panel straight away, so "Apply" is never needed. */
+  document.addEventListener("pointerdown",e=>{
+    const pop=$("colorPickerPop");
+    if(!pop||!pop.classList.contains("open"))return;
+    if(performance.now()-cpOpenedAt<350)return;   // the gesture that opened it
+    if(cpDropActive)return;                      // sampling flow closes itself in dropperPickFromEvent
+    if(e.target&&pop.contains(e.target))return;  // interacting with the picker itself
+    closeColorPicker(true);
+  },true);
   (function initArtboardPanel(){
     const add=$("abAddBtn"),go=$("abGo"),doc=$("abDocBtn"),presets=$("abPresets");
     const doAdd=()=>{
@@ -8869,6 +9091,7 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
       el.backBtn.style.display=msView==="result"?"":"none";
       el.startOverBtn.style.display=msView==="result"?"":"none";
       if(msView!=="result"){el.segGrid.innerHTML="";el.sum.classList.remove("on");}
+      if(typeof window.__splitPanelChanged==="function")window.__splitPanelChanged();
     }
 
     /* ---------- cut line ops ---------- */
@@ -9321,8 +9544,60 @@ const dataUrl=currentExportCanvas().toDataURL("image/png");
     const msPanel=document.querySelector('.panel-content[data-panel="split"]');
     if(msPanel)msPanel.addEventListener("scroll",()=>{if(msW&&msH)msRenderLines();},{passive:true});
 
+    /* ---------- Split workspace stage (the big preview lives in the canvas area) ---------- */
+    const msStage=$("splitStage"),msStageBody=$("splitStageBody");
+    const msRelayout=()=>{if(msW&&msH)msRenderLines();};
+    if(window.ResizeObserver&&msStageBody)new ResizeObserver(msRelayout).observe(msStageBody);
+    if(msStageBody){
+      ["dragenter","dragover"].forEach(t=>msStageBody.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();msStageBody.classList.add("drop-over");}));
+      ["dragleave","drop"].forEach(t=>msStageBody.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();msStageBody.classList.remove("drop-over");}));
+      msStageBody.addEventListener("drop",e=>{
+        const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+        if(!f){toast("Please drop an image or PDF file.","warning");return;}
+        if(!(/^image\//.test(f.type)||f.type==="application/pdf"||/\.pdf$/i.test(f.name||""))){
+          toast("Please drop an image or PDF file.","warning");return;
+        }
+        msHandleFile(f);
+      });
+    }
+    $("ssUseCurrent")&&$("ssUseCurrent").addEventListener("click",msUseCurrentImage);
+    $("ssPick")&&$("ssPick").addEventListener("click",()=>el.file.click());
+    $("ssFile")&&$("ssFile").addEventListener("change",e=>{msHandleFile(e.target.files&&e.target.files[0]);e.target.value="";});
+    $("msOpenTab")&&$("msOpenTab").addEventListener("click",()=>{if(window.openSplitTab)window.openSplitTab();});
+
+    /* Public surface for the tab bar / save pipeline. */
+    window.__splitPanel={
+      hasSource:()=>!!msSource,
+      sourceName:()=>msSourceName,
+      sourceBaseName:()=>msBaseName(),
+      dims:()=>({w:msW,h:msH}),
+      lineCount:()=>msLines.length,
+      partCount:()=>msSegments.length,
+      tabMeta:()=>{
+        if(!msSource)return "no source";
+        return msW+"×"+msH+" · "+msLines.length+" cut"+(msLines.length===1?"":"s")
+          +(msSegments.length?" · "+msSegments.length+" parts":"");
+      },
+      /* the source image as a canvas, so Save/Export works exactly like the main editor */
+      saveCanvas:()=>{
+        if(!msSource||!msW||!msH)return null;
+        const c=mkCanvas(msW,msH);
+        c.getContext("2d").drawImage(msSource,0,0,msW,msH);
+        return c;
+      },
+      useCurrent:msUseCurrentImage,
+      useCurrentIfEmpty:()=>{if(!msSource&&originalImage)msUseCurrentImage();},
+      handleFile:msHandleFile,
+      onStageShow:()=>{if(msStage)msStage.classList.add("on");requestAnimationFrame(msRelayout);},
+      onStageHide:()=>{if(msStage)msStage.classList.remove("on");},
+      relayout:msRelayout
+    };
+    window.openSplitTab=openSplitTab;
+
     msRenderLineList();
     msSyncUi();
+    msRelayout();
+    if(typeof window.__splitPanelChanged==="function")window.__splitPanelChanged();
   })();
 
   applyToolUi(getToolMode());
