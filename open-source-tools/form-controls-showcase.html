@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>معرض تصميمات Checkbox و Radio بـ CSS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ===== متغيرات الألوان: عدّلها من هنا ===== */
+:root{
+--primary:#6c5ce7;   /* اللون الأساسي */
+--bg1:#eef0ff;       /* خلفية الصفحة (بداية التدرج) */
+--bg2:#fdf0f7;       /* خلفية الصفحة (نهاية التدرج) */
+--card:#ffffff;      /* خلفية الكروت */
+--text:#2d3142;      /* لون النص */
+--muted:#8a90a6;     /* نص ثانوي */
+--border:#e3e6f0;    /* حدود */
+--code:#1e2033;      /* خلفية بلوك الكود */
+--radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;font-family:Cairo,Tahoma,sans-serif;color:var(--text);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;line-height:1.7}
+nav{position:sticky;top:0;z-index:10;display:flex;gap:8px;justify-content:center;padding:12px;background:#ffffffcc;backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+nav a{padding:8px 26px;border-radius:30px;text-decoration:none;color:var(--text);font-weight:600;transition:.2s}
+nav a:hover,nav a:focus-visible{background:var(--primary);color:#fff;outline:0}
+header{text-align:center;padding:48px 16px 8px}
+h1{margin:0 0 6px;font-size:clamp(26px,5vw,42px);font-weight:800}
+header p{margin:0;color:var(--muted)}
+main{max-width:1180px;margin:auto;padding:16px}
+h2{margin:40px 0 18px;font-size:26px;font-weight:800;padding-inline-start:14px;border-inline-start:6px solid var(--primary)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 30px #2d314214;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card h3{margin:0;font-size:17px;font-weight:600}
+.demo{min-height:110px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;padding:14px;border-radius:14px;background:#f7f8fd;border:1px dashed var(--border)}
+.code{position:relative}
+.code button{position:absolute;top:8px;inset-inline-end:8px;border:0;border-radius:8px;padding:5px 12px;background:var(--primary);color:#fff;font:600 12px Cairo,Tahoma,sans-serif;cursor:pointer}
+.code button:hover{filter:brightness(1.1)}
+pre{margin:0;direction:ltr;text-align:left;background:var(--code);color:#cdd3f5;padding:40px 14px 14px;border-radius:12px;font:12px/1.6 Consolas,monospace;max-height:190px;overflow:auto;white-space:pre}
+footer{text-align:center;color:var(--muted);padding:30px}
+</style>
+</head>
+<body>
+<nav><a href="#checkbox">Checkbox</a><a href="#radio">Radio</a></nav>
+<header><h1>معرض عناصر الفورم بـ CSS</h1><p>10 تصميمات Checkbox و10 تصميمات Radio — انسخ الكود وابدأ</p></header>
+<main>
+
+<!-- ================= قسم Checkbox ================= -->
+<h2 id="checkbox">Checkbox</h2>
+<div class="grid">
+
+<article class="card"><h3>1. مربع كلاسيكي مع علامة صح</h3>
+<div class="demo">
+<label class="c1"><input type="checkbox" checked><span></span>مفعّل</label>
+<label class="c1"><input type="checkbox"><span></span>غير مفعّل</label>
+<label class="c1"><input type="checkbox" disabled><span></span>معطّل</label>
+</div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* مربع كلاسيكي */
+.c1{--p:var(--primary,#6c5ce7);position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.c1 input{position:absolute;opacity:0;pointer-events:none}
+.c1 span{width:24px;height:24px;border:2px solid #c5c9da;border-radius:7px;display:grid;place-items:center;transition:.2s}
+.c1 span::after{content:"";width:6px;height:11px;margin-top:-2px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) scale(0);transition:.2s}
+.c1:hover span{border-color:var(--p)}
+.c1 input:checked+span{background:var(--p);border-color:var(--p)}
+.c1 input:checked+span::after{transform:rotate(45deg) scale(1)}
+.c1 input:focus-visible+span{outline:3px solid #6c5ce755;outline-offset:2px}
+.c1 input:disabled+span{opacity:.4;cursor:not-allowed}
+</style></article>
+
+<article class="card"><h3>2. Toggle Switch (آيفون)</h3>
+<div class="demo">
+<label class="c2"><input type="checkbox" checked><span></span></label>
+<label class="c2"><input type="checkbox"><span></span></label>
+<label class="c2"><input type="checkbox" disabled><span></span></label>
+</div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* مفتاح تبديل */
+.c2{--p:#34c759;position:relative;display:inline-block;cursor:pointer}
+.c2 input{position:absolute;opacity:0;pointer-events:none}
+.c2 span{display:block;position:relative;width:54px;height:31px;border-radius:31px;background:#d4d8e4;transition:.3s}
+.c2 span::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0003;transition:.3s}
+.c2 input:checked+span{background:var(--p)}
+.c2 input:checked+span::after{inset-inline-start:26px}
+.c2:hover span::after{width:28px}
+.c2 input:checked:hover+span::after{inset-inline-start:23px}
+.c2 input:focus-visible+span{outline:3px solid #34c75966;outline-offset:2px}
+.c2 input:disabled+span{opacity:.4}
+</style></article>
+
+<article class="card"><h3>3. دائرة تتحول لقلب</h3>
+<div class="demo"><label class="c3"><input type="checkbox"><span></span></label><label class="c3"><input type="checkbox" checked><span></span></label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* دائرة ← قلب */
+.c3{position:relative;cursor:pointer;display:inline-block}
+.c3 input{position:absolute;opacity:0;pointer-events:none}
+.c3 span{width:38px;height:38px;border-radius:50%;border:2px solid #c5c9da;display:grid;place-items:center;transition:.25s}
+.c3 span::after{content:"♥";font-size:34px;line-height:1;color:#ff4d6d;transform:scale(0);transition:.35s cubic-bezier(.5,2,.5,1)}
+.c3:hover span{border-color:#ff4d6d}
+.c3 input:checked+span{border-color:transparent}
+.c3 input:checked+span::after{transform:scale(1)}
+.c3 input:focus-visible+span{outline:3px solid #ff4d6d66;outline-offset:2px}
+</style></article>
+
+<article class="card"><h3>4. تصميم نجمة</h3>
+<div class="demo"><label class="c4"><input type="checkbox"><span></span>أضف للمفضلة</label><label class="c4"><input type="checkbox" checked><span></span>مفضّل</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نجمة */
+.c4{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.c4 input{position:absolute;opacity:0;pointer-events:none}
+.c4 span{font-size:34px;line-height:1;color:#d4d8e4;transition:.25s}
+.c4 span::before{content:"★"}
+.c4:hover span{color:#ffd98a}
+.c4 input:checked+span{color:#ffb400;text-shadow:0 0 12px #ffb40088;animation:c4pop .4s}
+.c4 input:focus-visible+span{outline:3px solid #ffb40066;border-radius:6px}
+@keyframes c4pop{50%{transform:scale(1.35) rotate(18deg)}}
+</style></article>
+
+<article class="card"><h3>5. رسم علامة الصح بأنيميشن</h3>
+<div class="demo"><label class="c5"><input type="checkbox"><span><svg viewBox="0 0 24 24"><path d="M5 12.5l5 5L19 7"/></svg></span>تم الإنجاز</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* علامة صح تُرسم بالـ SVG */
+.c5{--p:var(--primary,#6c5ce7);position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.c5 input{position:absolute;opacity:0;pointer-events:none}
+.c5 span{width:30px;height:30px;border-radius:9px;border:2px solid #c5c9da;display:grid;place-items:center;transition:.3s}
+.c5 svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.c5 path{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .4s .1s}
+.c5 input:checked+span{background:var(--p);border-color:var(--p)}
+.c5 input:checked+span path{stroke-dashoffset:0}
+.c5 input:focus-visible+span{outline:3px solid #6c5ce755;outline-offset:2px}
+</style></article>
+
+<article class="card"><h3>6. كارت كامل قابل للاختيار</h3>
+<div class="demo"><label class="c6"><input type="checkbox" checked><div><b>شحن سريع</b><small>توصيل خلال 24 ساعة</small></div></label>
+<label class="c6"><input type="checkbox"><div><b>تغليف هدية</b><small>مع بطاقة إهداء</small></div></label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت اختيار */
+.c6{--p:var(--primary,#6c5ce7);position:relative;display:block;cursor:pointer;flex:1 1 130px}
+.c6 input{position:absolute;opacity:0;pointer-events:none}
+.c6 div{position:relative;padding:14px 14px 14px 40px;border:2px solid #e3e6f0;border-radius:14px;background:#fff;transition:.2s}
+.c6 b,.c6 small{display:block}
+.c6 small{color:#8a90a6;font-size:12px}
+.c6 div::after{content:"✓";position:absolute;top:12px;inset-inline-start:12px;width:22px;height:22px;border-radius:50%;background:#e9ebf4;color:transparent;display:grid;place-items:center;font-size:13px;transition:.2s}
+.c6:hover div{border-color:var(--p)}
+.c6 input:checked+div{border-color:var(--p);background:#6c5ce710}
+.c6 input:checked+div::after{background:var(--p);color:#fff}
+.c6 input:focus-visible+div{outline:3px solid #6c5ce755}
+</style></article>
+
+<article class="card"><h3>7. Neumorphism</h3>
+<div class="demo" style="background:#e6e9f2"><label class="c7"><input type="checkbox"><span></span>وضع الهدوء</label><label class="c7"><input type="checkbox" checked><span></span>الإشعارات</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيومورفيزم: الخلفية لازم تكون #e6e9f2 */
+.c7{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;color:#5b6178}
+.c7 input{position:absolute;opacity:0;pointer-events:none}
+.c7 span{width:32px;height:32px;border-radius:10px;background:#e6e9f2;box-shadow:5px 5px 10px #c3c7d6,-5px -5px 10px #fff;display:grid;place-items:center;transition:.25s}
+.c7 span::after{content:"✓";font-weight:800;color:#6c5ce7;transform:scale(0);transition:.25s}
+.c7 input:checked+span{box-shadow:inset 4px 4px 8px #c3c7d6,inset -4px -4px 8px #fff}
+.c7 input:checked+span::after{transform:scale(1)}
+.c7 input:focus-visible+span{outline:2px solid #6c5ce7}
+</style></article>
+
+<article class="card"><h3>8. Glassmorphism</h3>
+<div class="demo" style="padding:0;border:0"><label class="c8"><input type="checkbox" checked><span></span>أوافق على الشروط</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* زجاجي */
+.c8{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:26px;border-radius:14px;color:#fff;cursor:pointer;background:linear-gradient(135deg,#667eea,#f093fb)}
+.c8 input{position:absolute;opacity:0;pointer-events:none}
+.c8 span{width:28px;height:28px;border-radius:9px;background:#ffffff33;border:1px solid #ffffff99;backdrop-filter:blur(8px);box-shadow:0 4px 14px #0002;display:grid;place-items:center;transition:.25s}
+.c8 span::after{content:"✓";color:#7a5cff;font-weight:800;transform:scale(0);transition:.25s}
+.c8:hover span{background:#ffffff55}
+.c8 input:checked+span{background:#ffffffe6}
+.c8 input:checked+span::after{transform:scale(1)}
+.c8 input:focus-visible+span{outline:2px solid #fff;outline-offset:2px}
+</style></article>
+
+<article class="card"><h3>9. نيون (Neon Glow)</h3>
+<div class="demo" style="background:#0b0d1a;border-color:#0b0d1a"><label class="c9"><input type="checkbox" checked><span></span>Neon ON</label><label class="c9"><input type="checkbox"><span></span>Neon OFF</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيون على خلفية داكنة */
+.c9{--n:#0ff;position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;color:#9ff}
+.c9 input{position:absolute;opacity:0;pointer-events:none}
+.c9 span{width:26px;height:26px;border-radius:6px;border:2px solid var(--n);display:grid;place-items:center;transition:.3s}
+.c9 span::after{content:"";width:12px;height:12px;border-radius:3px;background:var(--n);transform:scale(0);transition:.3s}
+.c9 input:checked+span{box-shadow:0 0 6px var(--n),0 0 18px var(--n),inset 0 0 8px var(--n)}
+.c9 input:checked+span::after{transform:scale(1);box-shadow:0 0 10px var(--n)}
+.c9:hover span{box-shadow:0 0 8px var(--n)}
+.c9 input:focus-visible+span{outline:2px dashed #fff;outline-offset:3px}
+</style></article>
+
+<article class="card"><h3>10. Minimal بخط متحرك</h3>
+<div class="demo"><label class="c10"><input type="checkbox"><span>اشتري الخبز</span></label><label class="c10"><input type="checkbox" checked><span>ذاكر الدرس</span></label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* خط يمر على النص عند التفعيل */
+.c10{position:relative;cursor:pointer;font-size:18px}
+.c10 input{position:absolute;opacity:0;pointer-events:none}
+.c10 span{position:relative;transition:.3s}
+.c10 span::after{content:"";position:absolute;top:55%;inset-inline-start:-2px;width:0;height:2px;background:var(--primary,#6c5ce7);transition:width .35s}
+.c10:hover span{color:var(--primary,#6c5ce7)}
+.c10 input:checked+span{color:#9aa0b5}
+.c10 input:checked+span::after{width:calc(100% + 4px)}
+.c10 input:focus-visible+span{outline:2px solid var(--primary,#6c5ce7);outline-offset:4px;border-radius:4px}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Radio ================= -->
+<h2 id="radio">Radio</h2>
+<div class="grid">
+
+<article class="card"><h3>1. دائرة كلاسيكية بنقطة</h3>
+<div class="demo">
+<label class="r1"><input type="radio" name="r1" checked><span></span>أ</label>
+<label class="r1"><input type="radio" name="r1"><span></span>ب</label>
+<label class="r1"><input type="radio" name="r1" disabled><span></span>معطّل</label>
+</div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* دائرة بنقطة */
+.r1{--p:var(--primary,#6c5ce7);position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.r1 input{position:absolute;opacity:0;pointer-events:none}
+.r1 span{width:24px;height:24px;border-radius:50%;border:2px solid #c5c9da;display:grid;place-items:center;transition:.2s}
+.r1 span::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--p);transform:scale(0);transition:.2s}
+.r1:hover span{border-color:var(--p)}
+.r1 input:checked+span{border-color:var(--p)}
+.r1 input:checked+span::after{transform:scale(1)}
+.r1 input:focus-visible+span{outline:3px solid #6c5ce755;outline-offset:2px}
+.r1 input:disabled+span{opacity:.4;cursor:not-allowed}
+</style></article>
+
+<article class="card"><h3>2. أزرار مقسمة (Segmented)</h3>
+<div class="demo"><div class="r2">
+<label><input type="radio" name="r2" checked><span>يومي</span></label>
+<label><input type="radio" name="r2"><span>أسبوعي</span></label>
+<label><input type="radio" name="r2"><span>شهري</span></label>
+</div></div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Segmented Control */
+.r2{display:inline-flex;padding:4px;border-radius:12px;background:#e6e9f3}
+.r2 label{position:relative;cursor:pointer}
+.r2 input{position:absolute;opacity:0;pointer-events:none}
+.r2 span{display:block;padding:8px 18px;border-radius:9px;color:#6b7190;font-weight:600;transition:.25s}
+.r2 label:hover span{color:var(--primary,#6c5ce7)}
+.r2 input:checked+span{background:#fff;color:var(--primary,#6c5ce7);box-shadow:0 2px 8px #2d31422a}
+.r2 input:focus-visible+span{outline:2px solid var(--primary,#6c5ce7)}
+</style></article>
+
+<article class="card"><h3>3. كروت اختيار (خطط الأسعار)</h3>
+<div class="demo">
+<label class="r3"><input type="radio" name="r3"><div><b>مجانية</b><strong>0$</strong></div></label>
+<label class="r3"><input type="radio" name="r3" checked><div><b>احترافية</b><strong>12$</strong></div></label>
+<label class="r3"><input type="radio" name="r3"><div><b>شركات</b><strong>39$</strong></div></label>
+</div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كروت الخطط */
+.r3{--p:var(--primary,#6c5ce7);position:relative;flex:1 1 80px;cursor:pointer}
+.r3 input{position:absolute;opacity:0;pointer-events:none}
+.r3 div{padding:14px 8px;text-align:center;border:2px solid #e3e6f0;border-radius:14px;background:#fff;transition:.25s}
+.r3 b,.r3 strong{display:block}
+.r3 strong{font-size:22px;color:var(--p)}
+.r3:hover div{transform:translateY(-3px)}
+.r3 input:checked+div{border-color:var(--p);background:var(--p);color:#fff;box-shadow:0 10px 20px #6c5ce74d}
+.r3 input:checked+div strong{color:#fff}
+.r3 input:focus-visible+div{outline:3px solid #6c5ce766;outline-offset:2px}
+</style></article>
+
+<article class="card"><h3>4. إيموجي قابلة للاختيار</h3>
+<div class="demo"><div class="r4">
+<label><input type="radio" name="r4"><span>😡</span></label>
+<label><input type="radio" name="r4"><span>😕</span></label>
+<label><input type="radio" name="r4"><span>😐</span></label>
+<label><input type="radio" name="r4" checked><span>🙂</span></label>
+<label><input type="radio" name="r4"><span>😍</span></label>
+</div></div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* تقييم بالإيموجي */
+.r4{display:flex;gap:6px}
+.r4 label{position:relative;cursor:pointer}
+.r4 input{position:absolute;opacity:0;pointer-events:none}
+.r4 span{display:block;font-size:34px;line-height:1.2;filter:grayscale(1);opacity:.5;transition:.25s}
+.r4 label:hover span{opacity:.9;transform:translateY(-4px)}
+.r4 input:checked+span{filter:none;opacity:1;transform:scale(1.3)}
+.r4 input:focus-visible+span{outline:2px solid #6c5ce7;border-radius:8px}
+</style></article>
+
+<article class="card"><h3>5. تقييم بالنجوم</h3>
+<div class="demo"><div class="r5">
+<input type="radio" name="r5" id="r5-5"><label for="r5-5">★</label>
+<input type="radio" name="r5" id="r5-4"><label for="r5-4">★</label>
+<input type="radio" name="r5" id="r5-3" checked><label for="r5-3">★</label>
+<input type="radio" name="r5" id="r5-2"><label for="r5-2">★</label>
+<input type="radio" name="r5" id="r5-1"><label for="r5-1">★</label>
+</div></div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* النجوم بالترتيب المعكوس: 5 ← 1 */
+.r5{display:inline-flex;flex-direction:row-reverse}
+.r5 input{position:absolute;opacity:0;pointer-events:none}
+.r5 label{font-size:40px;line-height:1;color:#d4d8e4;cursor:pointer;transition:.2s}
+.r5 label:hover,.r5 label:hover~label,.r5 input:checked~label{color:#ffb400}
+.r5 label:hover{transform:scale(1.2)}
+.r5 input:focus-visible+label{outline:2px solid #6c5ce7;border-radius:6px}
+</style></article>
+
+<article class="card"><h3>6. اختيار الألوان</h3>
+<div class="demo"><div class="r6">
+<label><input type="radio" name="r6" checked><span style="--c:#ff6b6b"></span></label>
+<label><input type="radio" name="r6"><span style="--c:#feca57"></span></label>
+<label><input type="radio" name="r6"><span style="--c:#1dd1a1"></span></label>
+<label><input type="radio" name="r6"><span style="--c:#54a0ff"></span></label>
+<label><input type="radio" name="r6"><span style="--c:#6c5ce7"></span></label>
+</div></div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* عينات ألوان: اللون يُمرَّر بمتغير --c */
+.r6{display:flex;gap:12px}
+.r6 label{position:relative;cursor:pointer}
+.r6 input{position:absolute;opacity:0;pointer-events:none}
+.r6 span{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--c);transition:.25s}
+.r6 span::after{content:"✓";color:#fff;font-weight:800;transform:scale(0);transition:.25s}
+.r6 label:hover span{transform:scale(1.12)}
+.r6 input:checked+span{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--c)}
+.r6 input:checked+span::after{transform:scale(1)}
+.r6 input:focus-visible+span{outline:2px solid #2d3142;outline-offset:6px}
+</style></article>
+
+<article class="card"><h3>7. موجة (Ripple)</h3>
+<div class="demo"><label class="r7"><input type="radio" name="r7" checked><span></span>الأول</label><label class="r7"><input type="radio" name="r7"><span></span>الثاني</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* موجة تنتشر عند الاختيار */
+.r7{--p:var(--primary,#6c5ce7);position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.r7 input{position:absolute;opacity:0;pointer-events:none}
+.r7 span{position:relative;width:26px;height:26px;border-radius:50%;border:2px solid #c5c9da;transition:.25s}
+.r7 span::before{content:"";position:absolute;inset:-2px;border-radius:50%;background:var(--p);opacity:0}
+.r7 span::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--p);transform:scale(0);transition:.25s}
+.r7 input:checked+span{border-color:var(--p)}
+.r7 input:checked+span::after{transform:scale(1)}
+.r7 input:checked+span::before{animation:r7wave .6s ease-out}
+.r7 input:focus-visible+span{outline:3px solid #6c5ce755;outline-offset:2px}
+@keyframes r7wave{from{opacity:.45;transform:scale(1)}to{opacity:0;transform:scale(2.6)}}
+</style></article>
+
+<article class="card"><h3>8. Neumorphism</h3>
+<div class="demo" style="background:#e6e9f2"><label class="r8"><input type="radio" name="r8" checked><span></span>صباحًا</label><label class="r8"><input type="radio" name="r8"><span></span>مساءً</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيومورفيزم: الخلفية لازم تكون #e6e9f2 */
+.r8{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;color:#5b6178}
+.r8 input{position:absolute;opacity:0;pointer-events:none}
+.r8 span{width:32px;height:32px;border-radius:50%;background:#e6e9f2;box-shadow:5px 5px 10px #c3c7d6,-5px -5px 10px #fff;display:grid;place-items:center;transition:.25s}
+.r8 span::after{content:"";width:14px;height:14px;border-radius:50%;background:#6c5ce7;transform:scale(0);transition:.25s}
+.r8 input:checked+span{box-shadow:inset 4px 4px 8px #c3c7d6,inset -4px -4px 8px #fff}
+.r8 input:checked+span::after{transform:scale(1)}
+.r8 input:focus-visible+span{outline:2px solid #6c5ce7}
+</style></article>
+
+<article class="card"><h3>9. نيون</h3>
+<div class="demo" style="background:#0b0d1a;border-color:#0b0d1a"><label class="r9"><input type="radio" name="r9" checked><span></span>Pink</label><label class="r9"><input type="radio" name="r9"><span></span>Glow</label></div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيون على خلفية داكنة */
+.r9{--n:#ff2bd6;position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;color:#ffb3f0}
+.r9 input{position:absolute;opacity:0;pointer-events:none}
+.r9 span{width:26px;height:26px;border-radius:50%;border:2px solid var(--n);display:grid;place-items:center;transition:.3s}
+.r9 span::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--n);transform:scale(0);transition:.3s}
+.r9 input:checked+span{box-shadow:0 0 6px var(--n),0 0 18px var(--n),inset 0 0 8px var(--n)}
+.r9 input:checked+span::after{transform:scale(1);box-shadow:0 0 12px var(--n)}
+.r9:hover span{box-shadow:0 0 8px var(--n)}
+.r9 input:focus-visible+span{outline:2px dashed #fff;outline-offset:3px}
+</style></article>
+
+<article class="card"><h3>10. Tabs بخط سفلي متحرك</h3>
+<div class="demo"><div class="r10">
+<label><input type="radio" name="r10" checked><span>الكل</span></label>
+<label><input type="radio" name="r10"><span>المقالات</span></label>
+<label><input type="radio" name="r10"><span>الفيديو</span></label>
+</div></div><div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* تبويبات بخط سفلي ينمو من المنتصف */
+.r10{display:flex;gap:6px;border-bottom:2px solid #e3e6f0}
+.r10 label{position:relative;cursor:pointer}
+.r10 input{position:absolute;opacity:0;pointer-events:none}
+.r10 span{position:relative;display:block;padding:10px 16px;color:#8a90a6;font-weight:600;transition:.25s}
+.r10 span::after{content:"";position:absolute;inset-inline:0;bottom:-2px;height:3px;border-radius:3px;background:var(--primary,#6c5ce7);transform:scaleX(0);transition:transform .3s}
+.r10 label:hover span{color:var(--primary,#6c5ce7)}
+.r10 input:checked+span{color:var(--primary,#6c5ce7)}
+.r10 input:checked+span::after{transform:scaleX(1)}
+.r10 input:focus-visible+span{outline:2px solid var(--primary,#6c5ce7);border-radius:6px}
+</style></article>
+
+</div>
+</main>
+<footer>عدّل ألوان :root في الأعلى وكل التصميمات اللي بتستخدم var(--primary) هتتغير معاها.</footer>
+
+<script>
+/* JS بسيط جدًا: يعرض كود كل كارت (HTML + CSS) ويفعّل زر النسخ */
+document.querySelectorAll('.card').forEach(function(card){
+  var clean=function(t){return t.split('\n').map(function(l){return l.trim()}).filter(Boolean).join('\n')};
+  var html=clean(card.querySelector('.demo').innerHTML.replace(/ style="[^"]*"/,''));
+  var css=card.querySelector('style').textContent.trim();
+  var text='<!-- HTML -->\n'+html+'\n\n/* CSS */\n'+css;
+  card.querySelector('pre').textContent=text;
+  var btn=card.querySelector('button');
+  btn.addEventListener('click',function(){
+    var done=function(){btn.textContent='تم النسخ ✓';setTimeout(function(){btn.textContent='نسخ الكود'},1500)};
+    if(navigator.clipboard){navigator.clipboard.writeText(text).then(done)}
+    else{var a=document.createElement('textarea');a.value=text;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();done()}
+  });
+});
+</script>
+</body>
+</html>
