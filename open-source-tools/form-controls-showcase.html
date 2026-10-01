@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>معرض تصميمات Checkbox و Radio بـ CSS</title>
+<title>مرجع CSS شامل — مرجع واحد لكل العناصر والديزاين</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 /* ===== متغيرات الألوان: عدّلها من هنا ===== */
@@ -17,36 +17,363 @@
 --border:#e3e6f0;    /* حدود */
 --code:#1e2033;      /* خلفية بلوك الكود */
 --radius:18px;
+/* ألوان دلالية إضافية — مستخدمة في البنرات والحالات */
+--ok:#00b894;  --ok-d:#009e82;
+--warn:#f39c12; --warn-d:#d9860b;
+--err:#e74c3c; --err-d:#c93b2c;
+--info:#0984e3; --info-d:#0a6fbe;
+--dark:#0b0d1a; --dark-2:#161a2e;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:76px}
 body{margin:0;font-family:Cairo,Tahoma,sans-serif;color:var(--text);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;line-height:1.7}
-nav{position:sticky;top:0;z-index:10;display:flex;gap:8px;justify-content:center;padding:12px;background:#ffffffcc;backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-nav a{padding:8px 26px;border-radius:30px;text-decoration:none;color:var(--text);font-weight:600;transition:.2s}
+
+/* ===== الشريط العلوي: روابط قابلة للتمرير أفقيًا ===== */
+nav{position:sticky;top:0;z-index:10;display:flex;gap:8px;align-items:center;padding:12px;background:#ffffffcc;backdrop-filter:blur(10px);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:thin}
+nav::-webkit-scrollbar{height:5px}
+nav::-webkit-scrollbar-thumb{background:#c9cde0;border-radius:9px}
+nav a{padding:8px 20px;border-radius:30px;text-decoration:none;color:var(--text);font-weight:600;transition:.2s;white-space:nowrap;font-size:14px}
 nav a:hover,nav a:focus-visible{background:var(--primary);color:#fff;outline:0}
+nav .sp{flex:1}
+#viewToggle{border:1px solid var(--border);background:#fff;border-radius:30px;padding:7px 18px;font:600 13px Cairo,Tahoma,sans-serif;color:var(--text);cursor:pointer;white-space:nowrap;transition:.2s}
+#viewToggle:hover{border-color:var(--primary);color:var(--primary)}
+
 header{text-align:center;padding:48px 16px 8px}
 h1{margin:0 0 6px;font-size:clamp(26px,5vw,42px);font-weight:800}
 header p{margin:0;color:var(--muted)}
+
 main{max-width:1180px;margin:auto;padding:16px}
 h2{margin:40px 0 18px;font-size:26px;font-weight:800;padding-inline-start:14px;border-inline-start:6px solid var(--primary)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px}
+.hint{color:var(--muted);font-size:14px;margin:-10px 0 18px;padding-inline-start:20px}
+
+/* ===== أمثلة كلها تحت بعض (عمود واحد) — اضغط زر "شبكة" لتغييرها ===== */
+.grid{display:grid;grid-template-columns:1fr;gap:22px}
+body.net .grid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+
 .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 30px #2d314214;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
 .card h3{margin:0;font-size:17px;font-weight:600}
+.card p.note{margin:0;color:var(--muted);font-size:13px}
+
 .demo{min-height:110px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;padding:14px;border-radius:14px;background:#f7f8fd;border:1px dashed var(--border)}
+.demo.dark{background:var(--dark);border-color:var(--dark);color:#e8ecff}
+.demo.flat{padding:0;border:0;background:transparent;min-height:0}
+.demo.tall{min-height:200px}
+.demo.taller{min-height:280px}
+.demo.top{align-items:flex-start}
+
 .code{position:relative}
-.code button{position:absolute;top:8px;inset-inline-end:8px;border:0;border-radius:8px;padding:5px 12px;background:var(--primary);color:#fff;font:600 12px Cairo,Tahoma,sans-serif;cursor:pointer}
+.code button{position:absolute;top:8px;inset-inline-end:8px;border:0;border-radius:8px;padding:5px 12px;background:var(--primary);color:#fff;font:600 12px Cairo,Tahoma,sans-serif;cursor:pointer;z-index:2}
 .code button:hover{filter:brightness(1.1)}
 pre{margin:0;direction:ltr;text-align:left;background:var(--code);color:#cdd3f5;padding:40px 14px 14px;border-radius:12px;font:12px/1.6 Consolas,monospace;max-height:190px;overflow:auto;white-space:pre}
 footer{text-align:center;color:var(--muted);padding:30px}
 </style>
 </head>
 <body>
-<nav><a href="#checkbox">Checkbox</a><a href="#radio">Radio</a></nav>
-<header><h1>معرض عناصر الفورم بـ CSS</h1><p>10 تصميمات Checkbox و10 تصميمات Radio — انسخ الكود وابدأ</p></header>
+<nav>
+<a href="#buttons">الأزرار</a>
+<a href="#banners">البنرات</a>
+<a href="#checkbox">Checkbox</a>
+<a href="#radio">Radio</a>
+<a href="#toggle">Toggle</a>
+<a href="#todo">ToDo</a>
+<a href="#feedback">Feedback</a>
+<a href="#badges">Badges</a>
+<a href="#cards">Cards</a>
+<a href="#inputs">Inputs</a>
+<a href="#shapes">الأشكال</a>
+<a href="#loaders">Loaders</a>
+<a href="#trends">التريندات</a>
+<a href="#ideas">أفكار و Snippets</a>
+<span class="sp"></span>
+<button id="viewToggle" type="button">🔀 شبكة / عمود</button>
+</nav>
+<header>
+<h1>مرجع CSS شامل — كل العناصر في صفحة واحدة</h1>
+<p>مرجع واحد فيه كل الأمثلة تحت بعض: أزرار، بنرات، شيك بوكس، تودو، تريندات، أشكال، أكواد برمجية وأفكار جديدة — انسخ أي كود واستخدمه على طول</p>
+</header>
 <main>
+
+<!-- ================= قسم الأزرار ================= -->
+<h2 id="buttons">الأزرار — Buttons</h2>
+<p class="hint">12 نمط: Solid، 3D، Outline، Ghost، Gradient، Glass، Neon، Brutal، Pill، Icon، Loading، مجموعة أزرار.</p>
+<div class="grid">
+
+<article class="card"><h3>1. أزرار Solid كلاسيكية (مع ضغط 3D)</h3>
+<p class="note">الأساس: متغير <code>--c</code> للون و <code>--d</code> للون الأغمق اللي بيعمل الظل السفلي.</p>
+<div class="demo">
+<button class="bt b1" style="--c:#6c5ce7;--d:#4b3fbd">أساسي</button>
+<button class="bt b1" style="--c:#00b894;--d:#009e82">نجاح</button>
+<button class="bt b1" style="--c:#f39c12;--d:#d9860b">تحذير</button>
+<button class="bt b1" style="--c:#e74c3c;--d:#c93b2c">حذف</button>
+<button class="bt b1" style="--c:#0984e3;--d:#0a6fbe">معلومة</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* زر Solid مع ظل سفلي (Push Button) */
+.b1{--c:#6c5ce7;--d:#4b3fbd;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border:0;border-radius:12px;background:var(--c);color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;box-shadow:0 5px 0 var(--d),0 12px 20px #2d31422e;transition:transform .12s,box-shadow .12s}
+.b1:hover{filter:brightness(1.06)}
+.b1:active{transform:translateY(5px);box-shadow:0 0 0 var(--d)}
+</style></article>
+
+<article class="card"><h3>2. Outline و Ghost و Soft</h3>
+<div class="demo">
+<button class="bt b2a">Outline</button>
+<button class="bt b2b">Ghost</button>
+<button class="bt b2c">Soft</button>
+<button class="bt b2a" disabled>معطّل</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* تلات انواع خفيفة */
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:12px;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+.b2a{background:#fff;color:var(--primary,#6c5ce7);border:2px solid currentColor}
+.b2a:hover{background:var(--primary,#6c5ce7);color:#fff}
+.b2b{background:transparent;color:var(--text,#2d3142)}
+.b2b:hover{background:#2d31420f}
+.b2c{background:#6c5ce71a;color:var(--primary,#6c5ce7);border:1px solid #6c5ce733}
+.b2c:hover{background:#6c5ce72e}
+.bt:disabled{opacity:.4;cursor:not-allowed}
+</style></article>
+
+<article class="card"><h3>3. Gradient متحرك (خلفيات)</h3>
+<div class="demo">
+<button class="bt b3a">تدرج بنفسجي</button>
+<button class="bt b3b">تدرج غروب</button>
+<button class="bt b3c">تدرج ocean</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* تدرجات لونية — background-size مع الأنيميشن */
+.b3a,.b3b,.b3c{display:inline-flex;padding:13px 26px;border:0;border-radius:14px;color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;background-size:200% 200%;animation:sh 5s ease infinite;transition:transform .2s}
+.b3a{background-image:linear-gradient(120deg,#6c5ce7,#a55eea,#4834d4)}
+.b3b{background-image:linear-gradient(120deg,#f093fb,#f5576c,#ffbe6f)}
+.b3c{background-image:linear-gradient(120deg,#0984e3,#00b894,#6c5ce7)}
+.b3a:hover,.b3b:hover,.b3c:hover{transform:translateY(-3px) scale(1.03)}
+@keyframes sh{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+</style></article>
+
+<article class="card"><h3>4. Glassmorphism (زجاجي)</h3>
+<div class="note">لازم يشتغل فوق صورة أو تدرج — الخلفية هنا تدرج متعدد الألوان.</div>
+<div class="demo tall" style="background:linear-gradient(135deg,#667eea,#764ba2,#f093fb)">
+<button class="bt b4">زر زجاجي</button>
+<button class="bt b4" style="--g:255,255,255">عالي الوضوح</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* زجاجي: blur + حدود بيضاء خفيفة + ظل داخلي */
+.b4{--g:255,255,255;display:inline-flex;padding:13px 28px;border-radius:16px;font:700 15px Cairo,Tahoma,sans-serif;color:#fff;cursor:pointer;background:rgba(var(--g),.16);border:1px solid rgba(var(--g),.42);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);box-shadow:0 8px 24px #0003,inset 0 1px 0 rgba(255,255,255,.45);transition:.25s}
+.b4:hover{background:rgba(var(--g),.3);transform:translateY(-2px);box-shadow:0 14px 30px #0004,inset 0 1px 0 rgba(255,255,255,.6)}
+</style></article>
+
+<article class="card"><h3>5. Neon Glow (نيون على خلفية داكنة)</h3>
+<div class="demo dark">
+<button class="bt b5a">CYAN</button>
+<button class="bt b5b">PINK</button>
+<button class="bt b5c">GREEN</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيون: متغير --n للون + طبقات box-shadow */
+.b5a,.b5b,.b5c{--n:#0ff;position:relative;display:inline-flex;padding:12px 26px;border:2px solid var(--n);border-radius:12px;background:#0b0d1a;color:var(--n);font:700 15px Cairo,Tahoma,sans-serif;letter-spacing:1px;cursor:pointer;transition:.3s}
+.b5b{--n:#ff2bd6}
+.b5c{--n:#39ff14}
+.b5a:hover,.b5b:hover,.b5c:hover{box-shadow:0 0 8px var(--n),0 0 22px var(--n),inset 0 0 12px color-mix(in srgb,var(--n) 30%,transparent)}
+.b5a:focus-visible,.b5b:focus-visible,.b5c:focus-visible{outline:2px dashed #fff;outline-offset:3px}
+</style></article>
+
+<article class="card"><h3>6. Neobrutalism (ظلال صريحة)</h3>
+<div class="demo" style="background:#f2f4ff">
+<button class="bt b6a">BRUTAL</button>
+<button class="bt b6b">BOLD</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيوبروتاليزم: حدود سميكة + ظل صلب يتحرك */
+.b6a,.b6b{display:inline-flex;padding:13px 28px;border:3px solid #1a1a1a;border-radius:12px;font:800 16px Cairo,Tahoma,sans-serif;cursor:pointer;box-shadow:6px 6px 0 #1a1a1a;transition:.12s}
+.b6a{background:#ffe14d}
+.b6b{background:#a29bfe;color:#fff}
+.b6a:hover,.b6b:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #1a1a1a}
+.b6a:active,.b6b:active{transform:translate(4px,4px);box-shadow:2px 2px 0 #1a1a1a}
+</style></article>
+
+<article class="card"><h3>7. أنماط خاصة: Pill / Circle / Neumorphism</h3>
+<div class="demo" style="background:#e6e9f2">
+<button class="bt b7a">Pill</button>
+<button class="bt b7b">Soft 3D</button>
+<button class="bt b7c">●</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* بيل / نيومورفيزم / دائري */
+.b7a{display:inline-flex;padding:12px 30px;border:0;border-radius:40px;background:var(--primary,#6c5ce7);color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+.b7a:hover{transform:translateY(-2px);box-shadow:0 10px 20px #6c5ce74d}
+.b7b{padding:13px 28px;border:0;border-radius:14px;background:#e6e9f2;color:#5b6178;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;box-shadow:6px 6px 12px #c3c7d6,-6px -6px 12px #fff;transition:.2s}
+.b7b:active{box-shadow:inset 5px 5px 10px #c3c7d6,inset -5px -5px 10px #fff}
+.b7c{width:46px;height:46px;padding:0;align-items:center;justify-content:center;border:0;border-radius:50%;background:#ff6b6b;color:#fff;font-size:20px;cursor:pointer;transition:.2s}
+.b7c:hover{transform:scale(1.12) rotate(8deg)}
+</style></article>
+
+<article class="card"><h3>8. أزرار أيقونات (Icon Buttons)</h3>
+<div class="demo">
+<button class="ic ic1" aria-label="إضافة">+</button>
+<button class="ic ic2" aria-label="مفضلة">♥</button>
+<button class="ic ic3" aria-label="حذف">✕</button>
+<button class="ic ic4" aria-label="الإعدادات">⚙</button>
+<button class="ic ic5" aria-label="مشاركة">↗</button>
+<button class="ic ic6" aria-label="خيارات">⋯</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أزرار أيقونات دائرية بألوان مختلفة */
+.ic{width:48px;height:48px;display:grid;place-items:center;border:0;border-radius:14px;font:700 20px Cairo,sans-serif;color:#fff;cursor:pointer;transition:.22s}
+.ic1{background:#6c5ce7}.ic2{background:#ff4d6d}.ic3{background:#e74c3c}
+.ic4{background:#2d3142}.ic5{background:#00b894}.ic6{background:#8a90a6}
+.ic:hover{transform:translateY(-4px) rotate(-6deg);box-shadow:0 10px 20px #2d31422e}
+.ic:focus-visible{outline:3px solid #6c5ce755;outline-offset:3px}
+</style></article>
+
+<article class="card"><h3>9. حالة التحميل (Loading) + المعطّل</h3>
+<div class="note">أضف الكلاس <code>load</code> واستخدم pseudo-element Lipsum لتوليد الدائرة الدوّارة.</div>
+<div class="demo">
+<button class="bt ld load">جارٍ الحفظ</button>
+<button class="bt ld load" style="border:0;background:#6c5ce7;color:#fff">جارٍ التحميل</button>
+<button class="bt" disabled>غير متاح</button>
+<button class="bt" aria-busy="true" style="background:#e3e6f0;color:#8a90a6">في الانتظار…</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* مؤشر تحميل بـ ::after — لازم يكون inline-flex عشان يظهر */
+.load{--sp:rgba(255,255,255,.35);background:#6c5ce7;color:#fff;padding:12px 24px;border:0;border-radius:12px;font:700 15px Cairo,Tahoma,sans-serif;cursor:progress;display:inline-flex;align-items:center;gap:10px}
+.load::after{content:"";width:16px;height:16px;border:2.5px solid var(--sp);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style></article>
+
+<article class="card"><h3>10. مجموعة أزرار متصلة (Segmented Buttons)</h3>
+<div class="demo">
+<div class="seg">
+<button class="on">الكل</button><button>صور</button><button>فيديو</button><button>مستندات</button>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أزرار متصلة: زوايا خارجية دائرية وداخلية حادة */
+.seg{display:inline-flex;background:#e9ecf7;padding:4px;border-radius:13px;gap:2px}
+.seg button{padding:9px 20px;border:0;border-radius:10px;background:transparent;color:#6b7190;font:700 14px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.22s}
+.seg button:hover{color:var(--primary,#6c5ce7)}
+.seg .on{background:#fff;color:var(--primary,#6c5ce7);box-shadow:0 3px 10px #2d314226}
+</style></article>
+
+<article class="card"><h3>11. زر بتأثيرRipple ناعم (JavaScript خفيف)</h3>
+<p class="note">الفكرة: نضيف span عند الضغط ونحذفه بعد ما الأنيميشن يخلص — كود JS صغير.</p>
+<div class="demo">
+<button class="rp">اضغطني</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<script type="text/plain">
+document.querySelectorAll('.rp').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    var r = btn.getBoundingClientRect();
+    var size = Math.max(r.width, r.height);
+    var w = document.createElement('span');
+    w.className = 'wave';
+    w.style.width = w.style.height = size + 'px';
+    w.style.left = (e.clientX - r.left - size/2) + 'px';
+    w.style.top  = (e.clientY - r.top  - size/2) + 'px';
+    btn.appendChild(w);
+    setTimeout(function(){ w.remove() }, 600);
+  });
+});
+</script>
+<style>
+/* الزر يستقبل موجة الماء من JS */
+.rp{position:relative;overflow:hidden;padding:14px 30px;border:0;border-radius:14px;background:var(--primary,#6c5ce7);color:#fff;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer}
+.rp .wave{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.55);animation:wv .6s ease-out;pointer-events:none}
+@keyframes wv{to{transform:scale(3);opacity:0}}
+</style></article>
+
+<article class="card"><h3>12. زر بأيقونة متحركة (Arrow Slide)</h3>
+<div class="demo">
+<button class="ar">أكمل الطلب <span>→</span></button>
+<button class="ar">حمّل الملف <span>↓</span></button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* الأيقونة تتحرك عند المرور */
+.ar{display:inline-flex;align-items:center;gap:10px;padding:13px 26px;border:2px solid #6c5ce7;border-radius:12px;background:#fff;color:#6c5ce7;font:700 15px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.25s}
+.ar span{transition:transform .25s}
+.ar:hover{background:#6c5ce7;color:#fff}
+.ar:hover span{transform:translateX(6px)}
+</style></article>
+
+</div>
+
+<!-- ================= قسم البنرات ================= -->
+<h2 id="banners">البنرات — Banners / Alerts</h2>
+<p class="hint">كل بنرات الألوان الدلالية + Glass + Gradient + Brutal، كلها بخط لوني على اليمين.</p>
+<div class="grid">
+
+<article class="card"><h3>1. بنر أساسي ملوّن (5 حالات)</h3>
+<div class="demo top" style="flex-direction:column;align-items:stretch;gap:12px">
+<div class="bn bn-info"><b>معلومة</b><p>تم تحديث الإعدادات بنجاح.</p></div>
+<div class="bn bn-ok"><b>تم بنجاح</b><p>تم حفظ التغييرات في حسابك.</p></div>
+<div class="bn bn-warn"><b>تحذير</b><p>التخزين شبه ممتلئ، راجع ملفاتك.</p></div>
+<div class="bn bn-err"><b>خطأ</b><p>تعذّر الاتصال بالخادم، حاول مجددًا.</p></div>
+<div class="bn bn-mut"><b>معلومة عامة</b><p>نسخة جديدة متاحة للتحميل.</p></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* بنر: خط لوني 4px على اليمين + خلفية tint */
+.bn{--c:var(--info,#0984e3);position:relative;padding:14px 18px 14px 16px;border-radius:14px;background:color-mix(in srgb,var(--c) 9%,#fff);border-inline-start:5px solid var(--c)}
+.bn b{display:block;color:color-mix(in srgb,var(--c) 78%,#000)}
+.bn p{margin:2px 0 0;font-size:14px;color:#5b6178}
+.bn-ok{--c:var(--ok,#00b894)}.bn-warn{--c:var(--warn,#f39c12)}
+.bn-err{--c:var(--err,#e74c3c)}.bn-mut{--c:#8a90a6}
+</style></article>
+
+<article class="card"><h3>2. بنر زجاجي Glass مع أيقونة</h3>
+<div class="demo tall" style="background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);border:0">
+<div class="bg1"><span class="ic">🎉</span><div><b>أهلًا بك!</b><p>تم إنشاء حسابك بنجاح، استمتع بالتجربة.</p></div></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Glass Alert فوق خلفية ملونة */
+.bg1{display:flex;align-items:center;gap:14px;width:100%;max-width:520px;padding:18px 20px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px);box-shadow:0 12px 34px #0003,inset 0 1px 0 rgba(255,255,255,.5);color:#fff}
+.bg1 .ic{width:44px;height:44px;display:grid;place-items:center;font-size:22px;border-radius:12px;background:rgba(255,255,255,.25);flex-shrink:0}
+.bg1 b{display:block}
+.bg1 p{margin:2px 0 0;font-size:14px;opacity:.92}
+</style></article>
+
+<article class="card"><h3>3. بنر بتدرج (Gradient Border Alert)</h3>
+<div class="demo">
+<div class="bg2"><div class="in"><b>⚠ تنبيه أمني</b><p>فعّل التحقق بخطوتين لحماية حسابك.</p><a class="lnk" href="#">فعّل الآن</a></div></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حاوية بـ padding مقصود لخلق حد متدرج */
+.bg2{padding:2px;border-radius:16px;background:linear-gradient(135deg,#f39c12,#e74c3c,#a55eea)}
+.bg2 .in{padding:16px 20px;border-radius:14px;background:#fff;border-radius:14px}
+.bg2 b{display:block;color:#2d3142}
+.bg2 p{margin:2px 0 8px;font-size:14px;color:#5b6178}
+.lnk{color:#a55eea;font-weight:700;font-size:14px}
+</style></article>
+
+<article class="card"><h3>4. بنر Neobrutalism</h3>
+<div class="demo" style="background:#f2f4ff">
+<div class="bg3"><b>STOP!</b><p>لا تفعل هذا.</p></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* بنر بحدود سميكة وظل صلب */
+.bg3{padding:14px 22px;border:3px solid #1a1a1a;border-radius:12px;background:#ff6b6b;box-shadow:6px 6px 0 #1a1a1a}
+.bg3 b{font-size:19px;font-weight:800}
+.bg3 p{margin:0;font-size:14px}
+</style></article>
+
+</div>
 
 <!-- ================= قسم Checkbox ================= -->
 <h2 id="checkbox">Checkbox</h2>
+<p class="hint">10 تصميمات: كلاسيكي، آيفون، قلب، نجمة، SVG check، كارت، نيومورفيزم، زجاجي، نيون، خط متحرك.</p>
 <div class="grid">
 
 <article class="card"><h3>1. مربع كلاسيكي مع علامة صح</h3>
@@ -212,8 +539,86 @@ footer{text-align:center;color:var(--muted);padding:30px}
 
 </div>
 
+<!-- ================= قسم Toggle ================= -->
+<h2 id="toggle">مفاتيح التبديل — Toggles / Switches</h2>
+<p class="hint">Toggle أفقي (نعم/لا)، زر انزلاقي، مفتاح نيون، مفتاح بأيقونات، و Checkbox على شكل مفتاح.</p>
+<div class="grid">
+
+<article class="card"><h3>1. Toggle أفقي كلاسيكي</h3>
+<div class="demo">
+<label class="tg1"><input type="checkbox" checked><span class="tr"></span></label>
+<label class="tg1"><input type="checkbox"><span class="tr"></span></label>
+<label class="tg1"><input type="checkbox" disabled><span class="tr"></span></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* مفتاح تبديل: input مخفي + span مع ::after */
+.tg1{position:relative;display:inline-block;cursor:pointer}
+.tg1 input{position:absolute;opacity:0;pointer-events:none}
+.tg1 .tr{display:block;position:relative;width:56px;height:32px;border-radius:32px;background:#d4d8e4;transition:.3s}
+.tg1 .tr::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px #0002;transition:.3s}
+.tg1 input:checked+.tr{background:#00b894}
+.tg1 input:checked+.tr::after{inset-inline-start:27px}
+.tg1 input:focus-visible+.tr{outline:3px solid #00b89455;outline-offset:2px}
+.tg1 input:disabled+.tr{opacity:.4;cursor:not-allowed}
+</style></article>
+
+<article class="card"><h3>2. زر انزلاقي (Slide) نص يتحرك</h3>
+<div class="demo">
+<label class="tg2"><input type="checkbox"><span>إيقاف</span></label>
+<label class="tg2 on"><input type="checkbox" checked><span>تشغيل</span></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* خلفية زرقاء + نص ينزلق من اليمين لليسار */
+.tg2{--on:#00b894;position:relative;display:block;width:130px;height:40px;border-radius:40px;background:#d4d8e4;cursor:pointer;transition:.3s;overflow:hidden}
+.tg2 input{position:absolute;opacity:0;pointer-events:none}
+.tg2 span{position:absolute;inset:0;display:grid;place-items:center;font:700 14px Cairo,sans-serif;color:#fff;transition:.3s}
+.tg2 input:not(:checked)~span{color:#5b6178}
+.tg2 input:checked~span{color:#fff;transform:translateX(-90px)}
+.tg2:has(input:checked){background:var(--on)}
+</style></article>
+
+<article class="card"><h3>3. مفتاح نيون (على خلفية داكنة)</h3>
+<div class="demo dark">
+<label class="tg3"><input type="checkbox" checked><span class="tr"></span></label>
+<label class="tg3"><input type="checkbox"><span class="tr"></span></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نيون: حدود متوهجة */
+.tg3{--n:#0ff;position:relative;display:inline-block;cursor:pointer}
+.tg3 input{position:absolute;opacity:0;pointer-events:none}
+.tg3 .tr{display:block;position:relative;width:58px;height:32px;border-radius:32px;background:#161a2e;border:2px solid var(--n);transition:.3s}
+.tg3 .tr::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:var(--n);transition:.3s}
+.tg3 input:checked+.tr{box-shadow:0 0 8px var(--n),0 0 20px var(--n),inset 0 0 10px color-mix(in srgb,var(--n) 40%,transparent)}
+.tg3 input:checked+.tr::after{inset-inline-start:28px}
+</style></article>
+
+<article class="card"><h3>4. مفتاح بأيقونات (صح / خطأ)</h3>
+<div class="demo">
+<label class="tg4"><input type="checkbox" checked><span class="tr"><b class="on">✔</b><b class="off">✕</b></span></label>
+<label class="tg4"><input type="checkbox"><span class="tr"><b class="on">✔</b><b class="off">✕</b></span></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* الأيقونة تتبدل مع الحالة */
+.tg4{position:relative;display:inline-block;cursor:pointer}
+.tg4 input{position:absolute;opacity:0;pointer-events:none}
+.tg4 .tr{display:grid;place-items:center;position:relative;width:56px;height:32px;border-radius:32px;background:#e6e9f2;box-shadow:inset 3px 3px 6px #c3c7d6,inset -3px -3px 6px #fff;transition:.3s}
+.tg4 .tr b{position:absolute;font:800 16px Cairo,sans-serif;transition:.3s}
+.tg4 .on{color:#00b894;opacity:0;transform:scale(.5)}
+.tg4 .off{color:#e74c3c;opacity:1}
+.tg4 input:checked+.tr{background:#e6e9f2}
+.tg4 input:checked+.tr .on{opacity:1;transform:scale(1)}
+.tg4 input:checked+.tr .off{opacity:0;transform:scale(.5)}
+</style></article>
+
+</div>
+
 <!-- ================= قسم Radio ================= -->
 <h2 id="radio">Radio</h2>
+<p class="hint">10 تصميمات: كلاسيكي، مقسم، كروت خطط، إيموجي، نجوم، ألوان، موجة، نيومورفيزم، نيون، تبويبات.</p>
 <div class="grid">
 
 <article class="card"><h3>1. دائرة كلاسيكية بنقطة</h3>
@@ -395,24 +800,929 @@ footer{text-align:center;color:var(--muted);padding:30px}
 </style></article>
 
 </div>
+
+<!-- ================= قسم ToDo ================= -->
+<h2 id="todo">قوائم المهام — ToDo Lists</h2>
+<p class="hint">4 أنماط: كلاسيكي بخط مشطوب، كروت بعلامة، بأيقونات أولوية، وشريط تقدّم للمهام.</p>
+<div class="grid">
+
+<article class="card"><h3>1. ToDo كلاسيكي (خط مشطوب متحرك)</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch">
+<ul class="td1">
+<li><input type="checkbox" checked><span>تصميم الواجهة الرئيسية</span></li>
+<li><input type="checkbox" checked><span>كتابة كود الأزرار</span></li>
+<li><input type="checkbox"><span>مراجعة الكود</span></li>
+<li><input type="checkbox"><span>نشر المشروع</span></li>
+</ul>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* عنصر قائمة: checkbox + نص + خط مشطوب ينمو */
+.td1{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:420px}
+.td1 li{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:#fff;border:1px solid #e3e6f0;position:relative;cursor:pointer}
+.td1 input{width:20px;height:20px;accent-color:#6c5ce7;cursor:pointer}
+.td1 span{position:relative;font-size:15px;transition:.25s}
+.td1 span::after{content:"";position:absolute;top:52%;inset-inline-start:0;width:0;height:2px;background:#e74c3c;transition:width .35s}
+.td1 input:checked~span{color:#a4a9bd}
+.td1 input:checked~span::after{width:100%}
+</style></article>
+
+<article class="card"><h3>2. ToDo كروت مع حالة أولوية</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:10px">
+<div class="td2 high"><span class="ic">🔥</span><div><b>إصلاح خلل في الـ Checkout</b><small>عاجل — اليوم</small></div><input type="checkbox"></div>
+<div class="td2 med"><span class="ic">⚡</span><div><b>تحديث التوثيق</b><small>متوسط — هذا الأسبوع</small></div><input type="checkbox" checked></div>
+<div class="td2 low"><span class="ic">🌱</span><div><b>أفكار جديدة للسوق</b><small>منخفض — later</small></div><input type="checkbox"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت todo: خط لوني يسهل بدون كلاس */
+.td2{--c:#00b894;display:flex;align-items:center;gap:12px;width:100%;max-width:460px;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid #e3e6f0;border-inline-start:5px solid var(--c);cursor:pointer;transition:.2s}
+.td2.high{--c:#e74c3c}.td2.med{--c:#f39c12}.td2.low{--c:#00b894}
+.td2:hover{transform:translateX(-4px)}
+.td2 .ic{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:color-mix(in srgb,var(--c) 14%,#fff);font-size:18px;flex-shrink:0}
+.td2 b{display:block;font-size:15px}
+.td2 small{color:#8a90a6;font-size:12px}
+.td2 input{width:20px;height:20px;margin-inline-start:auto;accent-color:var(--c);cursor:pointer}
+</style></article>
+
+<article class="card"><h3>3. ToDo مع شريط تقدّم (Progress)</h3>
+<p class="note">التقدم بيتحسب من الـ checkboxes نفسها — شوف الـ bar وهو بيتحدث.</p>
+<div class="demo tall" style="flex-direction:column;align-items:stretch">
+<div class="td3">
+<div class="hd"><b>مهامي</b><span>2 / 4</span></div>
+<div class="bar"><i style="width:50%"></i></div>
+<ul>
+<li><input type="checkbox" checked><span>التصميم</span></li>
+<li><input type="checkbox" checked><span>التطوير</span></li>
+<li><input type="checkbox"><span>الاختبار</span></li>
+<li><input type="checkbox"><span>الإطلاق</span></li>
+</ul>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شريط تقدّم + قائمة */
+.td3{width:100%;max-width:420px;padding:16px;border-radius:16px;background:#fff;border:1px solid #e3e6f0;display:flex;flex-direction:column;gap:12px}
+.td3 .hd{display:flex;justify-content:space-between;align-items:center}
+.td3 .hd span{color:#8a90a6;font-size:13px;font-weight:700}
+.td3 .bar{height:9px;border-radius:9px;background:#eef0f7;overflow:hidden}
+.td3 .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#6c5ce7,#a55eea)}
+.td3 ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.td3 li{display:flex;align-items:center;gap:9px}
+.td3 input{width:19px;height:19px;accent-color:#6c5ce7;cursor:pointer}
+.td3 input:checked+span{text-decoration:line-through;color:#a4a9bd}
+</style></article>
+
+<article class="card"><h3>4. ToDo تفاعلي — إضافة وحذف (JavaScript)</h3>
+<p class="note">أضف مهمة جديدة أو اضغط على ⌫ للحذف. الفكرة: DOM + classList.</p>
+<div class="demo tall" style="flex-direction:column;align-items:stretch">
+<div class="td4">
+<form class="add"><input type="text" placeholder="اكتب مهمة جديدة..." required><button type="submit">+</button></form>
+<ul class="list"></ul>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<script type="text/plain">
+var box = document.querySelector('.td4');
+var form = box.querySelector('.add');
+var input = form.querySelector('input');
+var list = box.querySelector('.list');
+
+function addItem(text){
+  var li = document.createElement('li');
+  var cb = document.createElement('input'); cb.type = 'checkbox';
+  var sp = document.createElement('span');  sp.textContent = text;
+  var del = document.createElement('button'); del.type = 'button'; del.textContent = '⌫';
+  cb.addEventListener('change', function(){ li.classList.toggle('done', cb.checked) });
+  del.addEventListener('click', function(){ li.remove() });
+  li.appendChild(cb); li.appendChild(sp); li.appendChild(del);
+  list.appendChild(li);
+}
+
+['تصميم الواجهة','كتابة الكود','اختبار على الموبايل'].forEach(addItem);
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  var v = input.value.trim();
+  if(!v) return;
+  addItem(v);
+  input.value = '';
+  input.focus();
+});
+</script>
+<style>
+/* ToDo ديناميكي */
+.td4{width:100%;max-width:420px;padding:16px;border-radius:16px;background:#fff;border:1px solid #e3e6f0;display:flex;flex-direction:column;gap:12px}
+.td4 .add{display:flex;gap:8px}
+.td4 .add input{flex:1;padding:10px 14px;border:1px solid #e3e6f0;border-radius:10px;font:14px Cairo,sans-serif;outline:0}
+.td4 .add input:focus{border-color:#6c5ce7}
+.td4 .add button{width:42px;border:0;border-radius:10px;background:#6c5ce7;color:#fff;font:700 20px Cairo;cursor:pointer}
+.td4 .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.td4 .list li{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;background:#f7f8fd;font-size:14px}
+.td4 .list li.done span{text-decoration:line-through;color:#a4a9bd}
+.td4 .list li button{margin-inline-start:auto;border:0;background:transparent;color:#c8ccdb;font:16px Cairo;cursor:pointer}
+.td4 .list li button:hover{color:#e74c3c}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Feedback ================= -->
+<h2 id="feedback">عناصر التفاعل — Toasts, Skeleton, Progress, Accordion</h2>
+<p class="hint">رسائل منبثقة، هيكل تحميل، أشرطة تقدم، أكورديون، Tooltip، Empty State.</p>
+<div class="grid">
+
+<article class="card"><h3>1. إشعارات منبثقة (Toasts)</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:10px">
+<div class="ts ok">✓ تم حفظ البيانات بنجاح</div>
+<div class="ts err">✕ فشل الاتصال بالخادم</div>
+<div class="ts warn">⚠ مساحة التخزين شبه ممتلئة</div>
+<div class="ts info">ⓘ تم تحديث النسخة إلى 2.1</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Toast: شريط جانبي + أيقونة */
+.ts{--c:#00b894;position:relative;padding:13px 16px 13px 16px;border-radius:12px;background:#fff;border:1px solid #e3e6f0;box-shadow:0 8px 20px #2d314214;font:600 14px Cairo,sans-serif;overflow:hidden}
+.ts::before{content:"";position:absolute;top:0;bottom:0;inset-inline-start:0;width:5px;background:var(--c)}
+.ts::after{content:"";position:absolute;bottom:0;inset-inline-start:0;height:3px;width:var(--c);background:var(--c);animation:tt 3s linear}
+.ts.ok{--c:#00b894}.ts.err{--c:#e74c3c}.ts.warn{--c:#f39c12}.ts.info{--c:#0984e3}
+@keyframes tt{from{width:0}to{width:100%}}
+</style></article>
+
+<article class="card"><h3>2. هيكل التحميل (Skeleton)</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch">
+<div class="sk">
+<div class="av"></div>
+<div class="ln"><i style="width:70%"></i><i style="width:45%"></i></div>
+</div>
+<div class="sk"><div class="av"></div><div class="ln"><i style="width:60%"></i><i style="width:38%"></i></div></div>
+<div class="sk"><div class="av"></div><div class="ln"><i style="width:80%"></i><i style="width:52%"></i></div></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Skeleton shimmer */
+.sk{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#fff;border:1px solid #e3e6f0}
+.sk .av{width:48px;height:48px;border-radius:50%;background:#eef0f7;flex-shrink:0;animation:shm 1.4s infinite}
+.sk .ln{flex:1;display:flex;flex-direction:column;gap:8px}
+.sk .ln i{height:11px;border-radius:6px;background:#eef0f7;animation:shm 1.4s infinite}
+.sk .ln i:last-child{animation-delay:.15s}
+@keyframes shm{0%{background:#eef0f7}50%{background:#e3e6f0}100%{background:#eef0f7}}
+</style></article>
+
+<article class="card"><h3>3. أشرطة تقدم (Linear + Steps + Circular)</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:18px">
+<div class="pg1"><div class="bar"><i style="width:65%"></i></div><span>65%</span></div>
+<div class="pg3"><i style="--d:75"></i><b>75%</b></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شريط خطي + شريط دائري بـ conic-gradient */
+.pg1{display:flex;align-items:center;gap:12px}
+.pg1 .bar{flex:1;height:12px;border-radius:12px;background:#eef0f7;overflow:hidden}
+.pg1 .bar i{display:block;height:100%;border-radius:12px;background:linear-gradient(90deg,#6c5ce7,#a55eea);animation:fill 2s ease}
+.pg1 span{font:800 14px Cairo;color:#6c5ce7}
+@keyframes fill{from{width:0}}
+.pg3{--d:75;display:grid;place-items:center;width:100px;height:100px;border-radius:50%;background:conic-gradient(#6c5ce7 calc(var(--d)*1%),#eef0f7 0);position:relative;margin:auto}
+.pg3::after{content:"";position:absolute;inset:12px;border-radius:50%;background:#f7f8fd}
+.pg3 b{position:relative;z-index:1;font:800 20px Cairo;color:#2d3142}
+</style></article>
+
+<article class="card"><h3>4. أكورديون (Accordion) بـ details</h3>
+<div class="demo" style="flex-direction:column;align-items:stretch">
+<details class="ac"><summary>ما هو CSS؟</summary><p>لغة تنسيق صفحات الويب...</p></details>
+<details class="ac" open><summary>ما هي المتغيرات؟</summary><p>-box:Custom Properties-- لتخزين القيم وإعادة الاستخدام.</p></details>
+<details class="ac"><summary>مثال آخر؟</summary><p>نعم، يعمل بشكل ممتاز.</p></details>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أكورديون بـ details/summary — بدون JS */
+.ac{border:1px solid #e3e6f0;border-radius:12px;background:#fff;margin-bottom:8px;overflow:hidden}
+.ac summary{padding:13px 16px;cursor:pointer;font:700 15px Cairo;list-style:none;display:flex;align-items:center;justify-content:space-between}
+.ac summary::after{content:"+";font:800 20px;color:#6c5ce7;transition:.2s}
+.ac[open] summary::after{content:"−";transform:rotate(180deg)}
+.ac p{margin:0;padding:0 16px 14px;font-size:14px;color:#5b6178}
+</style></article>
+
+<article class="card"><h3>5. Tooltip (يظهر عند المرور)</h3>
+<div class="demo" style="min-height:150px">
+<span class="tp" data-tip="نص التلميح يظهر هنا">مرّر المؤشر 👆</span>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Tooltip من data attribute */
+.tp{position:relative;padding:10px 18px;border-radius:10px;background:#2d3142;color:#fff;font:600 14px Cairo;cursor:help}
+.tp::after{content:attr(data-tip);position:absolute;bottom:130%;inset-inline-start:50%;transform:translateX(50%) scale(.9);background:#1a1a2e;color:#fff;padding:8px 12px;border-radius:8px;font:13px Cairo;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s}
+.tp:hover::after{opacity:1;transform:translateX(50%) scale(1)}
+</style></article>
+
+<article class="card"><h3>6. Empty State (حالة فارغة)</h3>
+<div class="demo tall">
+<div class="emp"><div class="ico">📦</div><b>لا توجد بيانات بعد</b><p>ابدأ بإضافة أول عنصر لك.</p><button class="act">+ إضافة جديد</button></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حالة فارغة */
+.emp{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.emp .ico{font-size:44px;opacity:.5}
+.emp b{font-size:17px}
+.emp p{margin:0;color:#8a90a6;font-size:14px}
+.emp .act{padding:10px 20px;border:0;border-radius:10px;background:#6c5ce7;color:#fff;font:700 14px Cairo;cursor:pointer;margin-top:6px}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Badges ================= -->
+<h2 id="badges">الشارات — Badges & Chips</h2>
+<p class="hint">شارات ملوّنة، شارات قابلة للإزالة، شارات صغيرة على الأيقونات.</p>
+<div class="grid">
+
+<article class="card"><h3>1. شارات ملوّنة (Badges)</h3>
+<div class="demo">
+<span class="bd b-ok">ناجح</span>
+<span class="bd b-err">خطأ</span>
+<span class="bd b-warn">تحذير</span>
+<span class="bd b-info">معلومة</span>
+<span class="bd b-pri">جديد</span>
+<span class="bd b-mut">مسودة</span>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شارة: لون شفاف + نص غامق */
+.bd{--c:#6c5ce7;padding:5px 12px;border-radius:20px;font:700 13px Cairo;background:color-mix(in srgb,var(--c) 14%,#fff);color:color-mix(in srgb,var(--c) 85%,#000);border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.b-ok{--c:#00b894}.b-err{--c:#e74c3c}.b-warn{--c:#f39c12}.b-info{--c:#0984e3}.b-mut{--c:#8a90a6}
+</style></article>
+
+<article class="card"><h3>2. شارات على أيقونات (Notification Badge)</h3>
+<div class="demo">
+<div class="ib"><span>🔔</span><i>5</i></div>
+<div class="ib"><span>✉</span><i class="dotb"></i></div>
+<div class="ib"><span>👤</span><i>99+</i></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شارة عدّاد على أيقونة */
+.ib{position:relative;font-size:32px;cursor:pointer}
+.ib i{position:absolute;top:-4px;inset-inline-end:-8px;min-width:20px;height:20px;display:grid;place-items:center;background:#e74c3c;color:#fff;font:800 11px Cairo;border-radius:20px;border:2px solid #fff;padding:0 5px;font-style:normal}
+.ib .dotb{min-width:12px;width:12px;height:12px;padding:0;inset-inline-end:-2px;top:0}
+</style></article>
+
+<article class="card"><h3>3. شرائح قابلة للإزالة (Chips/Tags)</h3>
+<div class="demo">
+<span class="ch">CSS <b>×</b></span>
+<span class="ch">HTML <b>×</b></span>
+<span class="ch">JavaScript <b>×</b></span>
+<span class="ch ch-on">محدد ✓ <b>×</b></span>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شريحة قابلة للحذف */
+.ch{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:20px;background:#eef0f7;font:600 14px Cairo;color:#5b6178;cursor:pointer;transition:.2s}
+.ch:hover{background:#e3e6f0}
+.ch b{width:18px;height:18px;display:grid;place-items:center;border-radius:50%;background:#cfd3e2;color:#fff;font:800 12px;cursor:pointer}
+.ch b:hover{background:#e74c3c}
+.ch-on{background:#6c5ce7;color:#fff}
+.ch-on b{background:rgba(255,255,255,.3)}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Cards ================= -->
+<h2 id="cards">الكروت — Cards</h2>
+<p class="hint">كروت بأساليب مختلفة: عادي، زجاجي، تدرج، نيومورفيزم، نيون، مائل.</p>
+<div class="grid">
+
+<article class="card"><h3>1. كارت منتج عادي</h3>
+<div class="demo" style="flex:1">
+<div class="kc">
+<div class="th">📷</div>
+<h4>كاميرا احترافية</h4>
+<p>مستشعر 50MP، تصوير 4K، بطارية تدوم يومين.</p>
+<div class="ft"><b>$499</b><button>أضف للسلة</button></div>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت منتج */
+.kc{width:250px;padding:18px;border-radius:18px;background:#fff;border:1px solid #e3e6f0;box-shadow:0 10px 24px #2d314214;text-align:center;transition:.25s}
+.kc:hover{transform:translateY(-6px);box-shadow:0 18px 34px #2d31422b}
+.kc .th{font-size:40px;margin-bottom:10px}
+.kc h4{margin:0 0 6px;font-size:17px}
+.kc p{margin:0 0 14px;font-size:13px;color:#8a90a6;line-height:1.6}
+.kc .ft{display:flex;align-items:center;justify-content:space-between}
+.kc .ft b{color:#6c5ce7;font:800 20px Cairo}
+.kc .ft button{padding:9px 16px;border:0;border-radius:9px;background:#6c5ce7;color:#fff;font:700 13px Cairo;cursor:pointer}
+</style></article>
+
+<article class="card"><h3>2. كارت زجاجي (Glass Card)</h3>
+<div class="demo tall" style="background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);border:0">
+<div class="gc"><b>✨ Premium</b><p>تجربة مميزة مع كل المزايا.</p><button>اشترك</button></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت زجاجي */
+.gc{width:280px;padding:24px;border-radius:20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 36px #0003,inset 0 1px 0 rgba(255,255,255,.5);color:#fff;text-align:center}
+.gc b{font-size:19px}
+.gc p{margin:8px 0 16px;font-size:14px;opacity:.9}
+.gc button{padding:10px 24px;border:0;border-radius:10px;background:#fff;color:#6c5ce7;font:700 14px Cairo;cursor:pointer}
+</style></article>
+
+<article class="card"><h3>3. كارت نيون (Neon Card)</h3>
+<div class="demo dark">
+<div class="nc"><b>GAMING</b><p>إعداد احترافي</p><span>#NEON</span></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت نيون على داكن */
+.nc{padding:20px 28px;border-radius:16px;background:#161a2e;border:2px solid #0ff;box-shadow:0 0 12px #0ff,0 0 30px #0ff55,inset 0 0 20px #0ff22;text-align:center;color:#0ff}
+.nc b{font:800 22px Cairo;letter-spacing:2px}
+.nc p{margin:4px 0;color:#7df}
+.nc span{font:700 13px Cairo;color:#ff2bd6}
+</style></article>
+
+<article class="card"><h3>4. كارت إحصائيات (Stats Card)</h3>
+<div class="demo" style="flex-wrap:wrap">
+<div class="st"><span class="ic">👁</span><b>12.5K</b><small>المشاهدات</small></div>
+<div class="st"><span class="ic">♥</span><b>3.2K</b><small>الإعجابات</small></div>
+<div class="st"><span class="ic">★</span><b>4.8</b><small>التقييم</small></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كارت إحصائية */
+.st{flex:1 1 110px;min-width:110px;padding:16px;border-radius:16px;background:#fff;border:1px solid #e3e6f0;text-align:center;box-shadow:0 6px 14px #2d31420f;transition:.2s}
+.st:hover{transform:translateY(-4px);box-shadow:0 12px 22px #2d31421c}
+.st .ic{font-size:22px;display:block;margin-bottom:6px}
+.st b{display:block;font:800 22px Cairo;color:#2d3142}
+.st small{color:#8a90a6;font-size:12px}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Inputs ================= -->
+<h2 id="inputs">حقول الإدخال — Form Inputs</h2>
+<p class="hint">حقول نص، بحث، select، textarea، range، file upload، حقل بتأثير float.</p>
+<div class="grid">
+
+<article class="card"><h3>1. حقول نص وبحث</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:16px">
+<label class="fi"><span>الاسم</span><input type="text" placeholder="اكتب اسمك"></label>
+<label class="fi"><span>البريد الإلكتروني</span><input type="email" placeholder="you@example.com"></label>
+<label class="fi srch"><span>بحث</span><input type="search" placeholder="ابحث هنا..."></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حقل بتسمية فوق */
+.fi{display:flex;flex-direction:column;gap:6px}
+.fi span{font:700 14px Cairo;color:#5b6178}
+.fi input{padding:12px 15px;border:1.5px solid #e3e6f0;border-radius:11px;font:15px Cairo;outline:0;transition:.2s;background:#fff;width:100%}
+.fi input:focus{border-color:#6c5ce7;box-shadow:0 0 0 4px #6c5ce71f}
+.fi input::placeholder{color:#b8bccf}
+.fi.srch input{padding-inline-start:40px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238a90a6'%3E%3Cpath d='M21 21l-4.3-4.3M17 11a6 6 0 11-12 0 6 6 0 0112 0z'/%3E%3C/svg%3E") no-repeat 12px center/18px;background-repeat:no-repeat}
+</style></article>
+
+<article class="card"><h3>2. حقل بتأثير Float Label</h3>
+<p class="note">التسمية تطلع لفوق لما الحقل ياخد قيمة أو focus — بطريقتين: :placeholder-shown أو JS.</p>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:20px">
+<div class="fl"><input type="text" placeholder=" " id="f1"><label for="f1">اسمك الكامل</label></div>
+<div class="fl"><input type="email" placeholder=" " id="f2"><label for="f2">البريد الإلكتروني</label></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Float Label: الحقل لازم يكون placeholder=" " (مسافة) */
+.fl{position:relative}
+.fl input{width:100%;padding:18px 15px 8px;border:1.5px solid #e3e6f0;border-radius:12px;font:15px Cairo;outline:0;background:#fff;transition:.2s}
+.fl label{position:absolute;inset-inline-start:15px;top:14px;font:15px Cairo;color:#8a90a6;pointer-events:none;transition:.2s;transform-origin:left top}
+.fl input:focus+label,.fl input:not(:placeholder-shown)+label{top:6px;font-size:12px;color:#6c5ce7}
+.fl input:focus{border-color:#6c5ce7;box-shadow:0 0 0 4px #6c5ce71f}
+</style></article>
+
+<article class="card"><h3>3. قائمة منسدلة (Select) و Textarea</h3>
+<div class="demo tall" style="flex-direction:column;align-items:stretch;gap:16px">
+<label class="sel"><span>اختر الدولة</span><div><select><option>مصر</option><option>السعودية</option><option>الإمارات</option></select><b>▾</b></div></label>
+<label class="sel"><span>رسالتك</span><textarea rows="3" placeholder="اكتب هنا..."></textarea></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Select + Textarea */
+.sel{display:flex;flex-direction:column;gap:6px}
+.sel span{font:700 14px Cairo;color:#5b6178}
+.sel>div{position:relative}
+.sel select,.sel textarea{width:100%;padding:12px 15px;border:1.5px solid #e3e6f0;border-radius:11px;font:15px Cairo;outline:0;background:#fff;transition:.2s}
+.sel select{appearance:none;cursor:pointer}
+.sel>div b{position:absolute;inset-inline-end:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8a90a6}
+.sel select:focus,.sel textarea:focus{border-color:#6c5ce7;box-shadow:0 0 0 4px #6c5ce71f}
+</style></article>
+
+<article class="card"><h3>4. Range Slider (شريط تمرير ملوّن)</h3>
+<div class="demo tall" style="flex-direction:column;gap:22px;width:100%">
+<label class="rg">الحجم: <input type="range" value="60"></label>
+<label class="rg2">الجودة: <input type="range" value="35"></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Range: thumb مخصص */
+.rg,.rg2{display:flex;align-items:center;gap:14px;font:700 14px Cairo;color:#5b6178;width:100%;max-width:400px}
+.rg input,.rg2 input{flex:1;appearance:none;height:8px;border-radius:8px;background:linear-gradient(90deg,#6c5ce7,#a55eea);outline:0}
+.rg input::-webkit-slider-thumb,.rg2 input::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #6c5ce7;cursor:pointer;box-shadow:0 2px 8px #2d314233;transition:.2s}
+.rg input::-webkit-slider-thumb:hover,.rg2 input::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.rg2 input{background:linear-gradient(90deg,#00b894,#6c5ce7)}
+</style></article>
+
+<article class="card"><h3>5. رفع ملف (File Upload Zone)</h3>
+<div class="demo tall" style="width:100%">
+<label class="up"><input type="file" hidden><div class="ic">⬆</div><b>اسحب الملف هنا أو اضغط</b><small>PNG / JPG / PDF — حتى 5MB</small></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* منطقة رفع ملف */
+.up{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;padding:34px 20px;border:2px dashed #d8dcec;border-radius:16px;background:#fff;cursor:pointer;text-align:center;transition:.2s}
+.up:hover{border-color:#6c5ce7;background:#f7f8ff}
+.up .ic{width:48px;height:48px;display:grid;place-items:center;font-size:24px;color:#6c5ce7;background:#6c5ce714;border-radius:50%}
+.up b{font:700 15px Cairo;color:#2d3142}
+.up small{font-size:12px;color:#8a90a6}
+</style></article>
+
+</div>
+
+<!-- ================= قسم الأشكال ================= -->
+<h2 id="shapes">الأشكال — Shapes & Geometry</h2>
+<p class="hint">أشكال هندسية متنوعة بألوان متدرجة: دائرة، مربع، مثلث، نجمة، مسدس، كبسولة.</p>
+<div class="grid">
+
+<article class="card"><h3>1. أشكال هندسية ملوّنة</h3>
+<div class="demo">
+<div class="sh circle"></div>
+<div class="sh square"></div>
+<div class="sh tri"></div>
+<div class="sh star"></div>
+<div class="sh hex"></div>
+<div class="sh pill"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أشكال بـ clip-path و border-radius */
+.sh{width:64px;height:64px;background:linear-gradient(135deg,#6c5ce7,#a55eea)}
+.circle{border-radius:50%}
+.square{border-radius:12px}
+.tri{clip-path:polygon(50% 0,100% 100%,0 100%);background:linear-gradient(180deg,#f093fb,#e74c3c)}
+.star{clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:linear-gradient(135deg,#ffd98a,#f39c12)}
+.hex{clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);background:linear-gradient(135deg,#00b894,#0984e3)}
+.pill{border-radius:40px;background:linear-gradient(135deg,#ff6b6b,#a55eea)}
+</style></article>
+
+<article class="card"><h3>2. Blob متحرك (أشكال عضوية)</h3>
+<p class="note">border-radius متغير + keyframes ← شكل حي.</p>
+<div class="demo tall">
+<div class="blob"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Blob: أربع نقاط تتحرك */
+.blob{width:130px;height:130px;background:linear-gradient(135deg,#6c5ce7,#f093fb);border-radius:60% 40% 30% 70%/60% 30% 70% 40%;animation:blob 8s ease-in-out infinite}
+@keyframes blob{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}25%{border-radius:40% 60% 70% 30%/50% 60% 30% 60%}50%{border-radius:50% 60% 30% 60%/40% 50% 60% 50%}75%{border-radius:60% 30% 60% 40%/60% 40% 50% 40%}}
+</style></article>
+
+<article class="card"><h3>3. أشكال حلقة ومربع دوران</h3>
+<div class="demo">
+<div class="r1r"></div>
+<div class="sqr"></div>
+<div class="trr"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أشكال بحدود فقط */
+.r1r{width:70px;height:70px;border-radius:50%;border:12px solid #6c5ce7}
+.sqr{width:70px;height:70px;border:12px solid #00b894;border-radius:16px;transform:rotate(15deg)}
+.trr{width:0;height:0;border-left:38px solid transparent;border-right:38px solid transparent;border-bottom:64px solid #f39c12}
+</style></article>
+
+</div>
+
+<!-- ================= قسم Loaders ================= -->
+<h2 id="loaders">مؤشرات التحميل — Loaders & Spinners</h2>
+<p class="hint">6 أنماط: دائرة، نقاط، أشرطة، نبض، حلقة، نص متقطع.</p>
+<div class="grid">
+
+<article class="card"><h3>1. دائرة دوّارة (Spinner)</h3>
+<div class="demo">
+<div class="ld1"></div>
+<div class="ld1 sm"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Spinner: جزء من الدائرة فقط ويلف للأعلى */
+.ld1{width:48px;height:48px;border:5px solid #e3e6f0;border-top-color:#6c5ce7;border-radius:50%;animation:sp .8s linear infinite}
+.ld1.sm{width:32px;height:32px;border-width:4px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style></article>
+
+<article class="card"><h3>2. نقاط نابضة (Dots)</h3>
+<div class="demo">
+<div class="ld2"><i></i><i></i><i></i></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* 3 نقاط بتأخير مختلف */
+.ld2{display:flex;gap:8px}
+.ld2 i{width:14px;height:14px;border-radius:50%;background:#6c5ce7;animation:bnc 1.2s ease-in-out infinite}
+.ld2 i:nth-child(2){animation-delay:.16s;background:#a55eea}
+.ld2 i:nth-child(3){animation-delay:.32s;background:#f093fb}
+@keyframes bnc{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+</style></article>
+
+<article class="card"><h3>3. أشرطة متتالية (Bars)</h3>
+<div class="demo">
+<div class="ld3"><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* 5 أشرطة متناوبة */
+.ld3{display:flex;gap:5px;align-items:flex-end;height:40px}
+.ld3 i{width:7px;height:100%;border-radius:4px;background:linear-gradient(180deg,#6c5ce7,#a55eea);animation:br 1s ease-in-out infinite}
+.ld3 i:nth-child(2){animation-delay:.1s}
+.ld3 i:nth-child(3){animation-delay:.2s}
+.ld3 i:nth-child(4){animation-delay:.3s}
+.ld3 i:nth-child(5){animation-delay:.4s}
+@keyframes br{0%,100%{height:30%}50%{height:100%}}
+</style></article>
+
+<article class="card"><h3>4. نبضة (Pulse Ring)</h3>
+<div class="demo">
+<div class="ld4"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حلقة تتمدد وتختفي */
+.ld4{width:40px;height:40px;border-radius:50%;background:#6c5ce7;position:relative}
+.ld4::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid #6c5ce7;animation:pl 1.6s ease-out infinite}
+@keyframes pl{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.4);opacity:0}}
+</style></article>
+
+<article class="card"><h3>5. حلقة متدرجة (Ring Loader)</h3>
+<div class="demo">
+<div class="ld5"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حلقة بـ conic-gradient + mask لتكوين الفراغ */
+.ld5{width:56px;height:56px;border-radius:50%;background:conic-gradient(#6c5ce7,#a55eea,#f093fb,#6c5ce7);mask:radial-gradient(circle,transparent 58%,#000 60%);-webkit-mask:radial-gradient(circle,transparent 58%,#000 60%);animation:sp 1.2s linear infinite}
+</style></article>
+
+<article class="card"><h3>6. نص متقطع (Typing / Dots)</h3>
+<div class="demo" style="min-height:90px;align-items:flex-end">
+<div class="ld6">جار التحميل<span></span></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* ثلاث نقاط بعد النص */
+.ld6{font:700 16px Cairo;color:#5b6178;display:flex;align-items:flex-end}
+.ld6 span::after{content:"";animation:dt 1.5s steps(4) infinite}
+@keyframes dt{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+</style></article>
+
+</div>
+
+<!-- ================= قسم التريندات ================= -->
+<h2 id="trends">التريندات — Modern Design Trends</h2>
+<p class="hint">تأثيرات حديثة: Glassmorphism، Gradient Border، Mesh، Glow، Clay، Aurora، و Variable-driven theme.</p>
+<div class="grid">
+
+<article class="card"><h3>1. Glassmorphism (لوح زجاجي)</h3>
+<div class="demo tall" style="background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);border:0">
+<div class="gp"><b>Glass Panel</b><p>backdrop-filter: blur + saturate.</p></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* لوح زجاجي */
+.gp{padding:28px 34px;border-radius:20px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(16px) saturate(170%);-webkit-backdrop-filter:blur(16px);box-shadow:0 16px 40px #00000033,inset 0 1px 0 rgba(255,255,255,.5);color:#fff;text-align:center}
+.gp p{margin:6px 0 0;opacity:.9;font-size:14px}
+</style></article>
+
+<article class="card"><h3>2. Gradient Border (حد متدرج)</h3>
+<div class="demo tall" style="background:#f7f8fd">
+<div class="gb"><div class="in"><b>Gradient Border</b><p>padding 2px + inner block.</p></div></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حد متدرج: حشو 2px بلون التدرج + داخل بلون الخلفية */
+.gb{padding:3px;border-radius:20px;background:linear-gradient(135deg,#6c5ce7,#f093fb,#00b894);background-size:200% 200%;animation:gr 4s ease infinite}
+.gb .in{padding:30px 36px;border-radius:17px;background:#fff;text-align:center}
+.gb p{margin:6px 0 0;color:#8a90a6;font-size:14px}
+@keyframes gr{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+</style></article>
+
+<article class="card"><h3>3. Mesh Gradient (تدرج شبكي)</h3>
+<div class="demo tall" style="background:#f7f8fd">
+<div class="mg">Mesh Gradient</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* 3 تدرجات دائرية متداخلة */
+.mg{display:grid;place-items:center;height:100%;width:100%;border-radius:20px;background:radial-gradient(at 20% 20%,#6c5ce7 0,transparent 50%),radial-gradient(at 80% 10%,#f093fb 0,transparent 50%),radial-gradient(at 50% 90%,#00b894 0,transparent 50%);background-color:#1a1a2e;color:#fff;font:800 22px Cairo;letter-spacing:1px}
+</style></article>
+
+<article class="card"><h3>4. Glow + Neon Text</h3>
+<div class="demo dark" style="align-items:center;flex-direction:column;gap:16px">
+<h3 class="gw">Neon Text</h3>
+<button class="gb2">Glow Button</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* نص متوهج + زر متوهج */
+.gw{font:800 34px Cairo;color:#fff;text-shadow:0 0 6px #0ff,0 0 18px #0ff,0 0 40px #0ff88;margin:0}
+.gb2{padding:13px 28px;border:2px solid #ff2bd6;border-radius:12px;background:transparent;color:#ff2bd6;font:700 16px Cairo;cursor:pointer;box-shadow:0 0 10px #ff2bd6,0 0 26px #ff2bd666;transition:.3s}
+.gb2:hover{box-shadow:0 0 16px #ff2bd6,0 0 40px #ff2bd6aa}
+</style></article>
+
+<article class="card"><h3>5. Claymorphism (نيومورفيزم ناعم)</h3>
+<div class="demo tall" style="background:#e6e9f2">
+<div class="cl"><b>Clay Button</b></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Clay: ظل مزدوج ناعم */
+.cl{padding:20px 40px;border-radius:20px;background:#e6e9f2;box-shadow:10px 10px 20px #c3c7d6,-10px -10px 20px #fff;text-align:center;color:#5b6178;transition:.2s}
+.cl:active{box-shadow:inset 8px 8px 16px #c3c7d6,inset -8px -8px 16px #fff}
+</style></article>
+
+<article class="card"><h3>6. Aurora (تدرج متحرك في الخلفية)</h3>
+<div class="demo tall" style="background:#0b0d1a;border-color:#0b0d1a">
+<div class="au">Aurora Background</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* Aurora: 3 دوال تدرج + حركة */
+.au{display:grid;place-items:center;height:100%;width:100%;border-radius:20px;background:#0b0d1a;overflow:hidden;position:relative;color:#fff;font:800 22px Cairo}
+.au::before{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent,#6c5ce7,#f093fb,#00b894,transparent);animation:sp 8s linear infinite;filter:blur(60px);opacity:.7}
+.au>*{position:relative;z-index:1}
+</style></article>
+
+<article class="card"><h3>7. متغير CSS يدير الثيم (Theme Token)</h3>
+<p class="note">غيّر <code>--brand</code> واحد في :root وكل العناصر تتغيّر — نمط التصميم القابل للتوسع.</p>
+<div class="demo" style="flex-wrap:wrap;gap:14px">
+<button class="tk" style="--brand:#6c5ce7">زر Basic</button>
+<button class="tk" style="--brand:#e74c3c">أحمر</button>
+<button class="tk" style="--brand:#00b894">أخضر</button>
+<span class="tb" style="--brand:#a55eea">شارة</span>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* كل عنصر يقرأ من --brand فبدّل اللون من مكان واحد */
+.tk{padding:12px 24px;border:0;border-radius:12px;background:var(--brand,#6c5ce7);color:#fff;font:700 15px Cairo;cursor:pointer;box-shadow:0 8px 20px color-mix(in srgb,var(--brand) 40%,transparent);transition:.2s}
+.tk:hover{transform:translateY(-2px)}
+.tb{padding:5px 14px;border-radius:20px;background:color-mix(in srgb,var(--brand) 15%,#fff);color:var(--brand);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent);font:700 13px Cairo}
+</style></article>
+
+</div>
+
+<!-- ================= قسم الأفكار ================= -->
+<h2 id="ideas">أفكار و Snippets — أفكار برمجية للتطوير</h2>
+<p class="hint">8 أفكار جاهزة للتنفيذ: الوضع الليلي، تبديل النمط، مرجع ألوان، شريط تنقل لاصق، وضع ليلي، بحث فوري، اختصارات، نسخ الكل.</p>
+<div class="grid">
+
+<article class="card"><h3>1. 🌗 تبديل الوضع الليلي/النهاري (فكرة)</h3>
+<p class="note">CSS فقط: متغيرات تتحكم في الألوان + :has() لتبديل حالة الجسم. بدّل الثيم بإضافة كلاس <code>dark</code>.</p>
+<div class="demo" style="flex-direction:column;gap:12px">
+<div class="th-demo light">
+<button class="sw"></button><b>الوضع النهاري ☀️</b>
+</div>
+<div class="th-demo dark-mode">
+<button class="sw on"></button><b>الوضع الليلي 🌙</b>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* النظام: ثيمين عبر متغيرات + كلاس */
+body.dark{--bg:#0b0d1a;--tx:#e8ecff;--cd:#161a2e;--bd:#262b45}
+.th-demo{display:flex;align-items:center;gap:12px;width:100%;max-width:340px;padding:14px 18px;border-radius:14px;background:var(--cd,#fff);border:1px solid var(--bd,#e3e6f0);color:var(--tx,#2d3142)}
+.dark-mode{--cd:#161a2e;--bd:#262b45;--tx:#e8ecff}
+.sw{width:46px;height:26px;border-radius:26px;background:#d4d8e4;position:relative;cursor:pointer;border:0;margin-inline-end:auto}
+.sw::after{content:"☀";position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:#fff;font-size:11px;transition:.3s}
+.sw.on{background:#4a5170}
+.sw.on::after{transform:translateX(-20px);background:#1a1a2e;color:#ffd98a}
+</style></article>
+
+<article class="card"><h3>2. 🎨 مرجع الألوان (Color Palette) — فكرة</h3>
+<p class="note">لوحة ألوان مستخرجة من متغير واحد — مفيدة لتوثيق التصميم أو بناء Theme.</p>
+<div class="demo" style="width:100%">
+<div class="pal">
+<span style="--c:#6c5ce7">#6c5ce7</span>
+<span style="--c:#a55eea">#a55eea</span>
+<span style="--c:#f093fb">#f093fb</span>
+<span style="--c:#00b894">#00b894</span>
+<span style="--c:#f39c12">#f39c12</span>
+<span style="--c:#e74c3c">#e74c3c</span>
+<span style="--c:#0984e3">#0984e3</span>
+</div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* لوحة ألوان */
+.pal{display:flex;flex-wrap:wrap;gap:12px;width:100%;justify-content:center}
+.pal span{flex:1 1 90px;min-width:90px;display:grid;place-items:center;height:80px;border-radius:14px;background:var(--c);color:#fff;font:700 12px Consolas,monospace;box-shadow:0 8px 18px color-mix(in srgb,var(--c) 35%,transparent);transition:.2s}
+.pal span:hover{transform:translateY(-5px) scale(1.04)}
+</style></article>
+
+<article class="card"><h3>3. 📌 شريط تنقل لاصق (Sticky Nav) — فكرة</h3>
+<div class="demo" style="width:100%">
+<div class="sn"><a class="on">الرئيسية</a><a>خدمات</a><a>أعمال</a><a>تواصل</a></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شريط تبويب لاصق أسفل */
+.sn{position:sticky;bottom:10px;display:flex;gap:4px;padding:5px;border-radius:40px;background:#ffffffee;border:1px solid #e3e6f0;box-shadow:0 10px 26px #2d31422b;backdrop-filter:blur(10px);width:100%;max-width:340px;margin:auto}
+.sn a{flex:1;text-align:center;padding:9px 0;border-radius:30px;text-decoration:none;color:#5b6178;font:700 13px Cairo;transition:.2s}
+.sn a.on{background:#6c5ce7;color:#fff}
+</style></article>
+
+<article class="card"><h3>4. ⚡ اختصارات لوحة المفاتيح (فكرة برمجية)</h3>
+<p class="note">النسخ imprisoned بـ JavaScript: <code>Ctrl/Cmd + K</code> ينسخ كل كود الصفحة. حقيقي وشغال.</p>
+<div class="demo" style="min-height:90px">
+<button class="kb">اضغط Ctrl+K لنسخ كل الأكواد</button>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* زر الاختصار */
+.kb{padding:13px 26px;border:2px solid #2d3142;border-radius:12px;background:#fff;font:700 14px Cairo;cursor:pointer;transition:.2s}
+.kb:hover{background:#2d3142;color:#fff}
+</style></article>
+
+<article class="card"><h3>5. 💡 بحث فوري (Client-side Filter) — فكرة</h3>
+<p class="note">اكتب اسم أي عنصر (Button, Banner, ToDo) عشان يفلتر الكروت. JS خفيف.</p>
+<div class="demo" style="flex-direction:column;gap:10px;width:100%">
+<input type="search" id="flt" placeholder="اكتب للفلترة (مثال: Button)" style="width:100%;max-width:320px;padding:12px 16px;border:1.5px solid #e3e6f0;border-radius:12px;font:15px Cairo;outline:0">
+<small style="color:#8a90a6;font-size:13px" id="cnt"></small>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* حقل الفلترة */
+#flt:focus{border-color:#6c5ce7;box-shadow:0 0 0 4px #6c5ce71f}
+</style></article>
+
+<article class="card"><h3>6. 🌐 فلاتر CSS ذكية بـ :has() (فكرة حديثة)</h3>
+<p class="note">دعم الحالة بدون JS: أي كارت فيه input checked يغيّر لونه تلقائيًا.</p>
+<div class="demo" style="gap:16px">
+<label class="hs"><input type="checkbox"><span>مفعّل (يتلوّن تلقائيًا)</span></label>
+<label class="hs"><input type="checkbox" checked><span>مفعّل (أخضر)</span></label>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* :has() — الأب يتفاعل مع حالة الابن */
+.hs{display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;background:#fff;border:2px solid #e3e6f0;cursor:pointer;transition:.25s;font:600 14px Cairo}
+.hs input{width:19px;height:19px;accent-color:#6c5ce7;cursor:pointer}
+.hs:has(input:checked){border-color:#00b894;background:#00b89412}
+</style></article>
+
+<article class="card"><h3>7. 🧩 Pattern خلفيات CSS (فكرة)</h3>
+<p class="note">أنماط backgrounds بـ repeating-linear-gradient بدون صور.</p>
+<div class="demo" style="width:100%">
+<div class="pt dots"></div>
+<div class="pt stripes"></div>
+<div class="pt grid"></div>
+<div class="pt check"></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* أنماط خلفيات متكررة */
+.pt{flex:1 1 100px;min-width:100px;height:100px;border-radius:12px;border:1px solid #e3e6f0}
+.dots{background:radial-gradient(#6c5ce733 2px,transparent 2px) 0 0/18px 18px}
+.stripes{background:repeating-linear-gradient(45deg,#6c5ce71a 0 10px,transparent 10px 20px)}
+.grid{background-image:linear-gradient(#6c5ce71a 1px,transparent 1px),linear-gradient(90deg,#6c5ce71a 1px,transparent 1px);background-size:16px 16px}
+.check{background:repeating-conic-gradient(#00b89422 0 25%,transparent 0 50%) 0 0/20px 20px}
+</style></article>
+
+<article class="card"><h3>8. 🧠 تخطيطات CSS حديثة (Grid + Subgrid) — فكرة</h3>
+<p class="note">تعلم <code>repeat(auto-fit)</code> و <code>min()</code> و <code>clamp()</code> لتخطيطات متجاوبة بلا media queries.</p>
+<div class="demo" style="width:100%">
+<div class="gd"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div></div>
+</div>
+<div class="code"><button>نسخ الكود</button><pre></pre></div>
+<style>
+/* شبكة متجاوبة بدون media query */
+.gd{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));gap:10px;width:100%}
+.gd div{display:grid;place-items:center;padding:20px 0;border-radius:10px;background:#6c5ce71a;color:#6c5ce7;font:800 18px Cairo}
+</style></article>
+
+</div>
 </main>
-<footer>عدّل ألوان :root في الأعلى وكل التصميمات اللي بتستخدم var(--primary) هتتغير معاها.</footer>
+<footer>عدّل ألوان <code>:root</code> في الأعلى وكل التصميمات اللي بتستخدم <code>var(--primary)</code> هتتغير معاها. — كل الأمثلة في صفحة واحدة، والدوس على "شبكة / عمود" بيغيّر طريقة العرض.</footer>
 
 <script>
-/* JS بسيط جدًا: يعرض كود كل كارت (HTML + CSS) ويفعّل زر النسخ */
+/* ===== 1) كود كل كارت (HTML + CSS + JS) + زر النسخ ===== */
 document.querySelectorAll('.card').forEach(function(card){
   var clean=function(t){return t.split('\n').map(function(l){return l.trim()}).filter(Boolean).join('\n')};
-  var html=clean(card.querySelector('.demo').innerHTML.replace(/ style="[^"]*"/,''));
-  var css=card.querySelector('style').textContent.trim();
-  var text='<!-- HTML -->\n'+html+'\n\n/* CSS */\n'+css;
-  card.querySelector('pre').textContent=text;
-  var btn=card.querySelector('button');
+  var demo=card.querySelector('.demo');
+  var pre=card.querySelector('pre');
+  if(!demo||!pre) return;
+
+  var html=clean(demo.innerHTML.replace(/\sstyle="[^"]*"/g,''));
+  var css='';
+  var st=card.querySelectorAll('style');
+  st.forEach(function(s){ css += '\n'+s.textContent.trim() });
+
+  var jsEl=card.querySelector('script[type="text/plain"]');
+  var text='<!-- HTML -->\n'+html+'\n\n/* CSS */'+css;
+  if(jsEl){ text+='\n\n/* JavaScript */\n'+jsEl.textContent.trim() }
+  pre.textContent=text;
+
+  var btn=card.querySelector('.code button');
   btn.addEventListener('click',function(){
     var done=function(){btn.textContent='تم النسخ ✓';setTimeout(function(){btn.textContent='نسخ الكود'},1500)};
     if(navigator.clipboard){navigator.clipboard.writeText(text).then(done)}
     else{var a=document.createElement('textarea');a.value=text;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();done()}
   });
 });
+
+/* ===== 2) تبديل العرض: عمود واحد / شبكة ===== */
+document.getElementById('viewToggle').addEventListener('click',function(){
+  document.body.classList.toggle('net');
+});
+
+/* ===== 3) نسخ كل أكواد الصفحة بـ Ctrl/Cmd + K ===== */
+var allCode='';
+document.querySelectorAll('.card pre').forEach(function(p){ allCode += p.textContent+'\n\n' });
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){
+    e.preventDefault();
+    if(navigator.clipboard){ navigator.clipboard.writeText(allCode); flash('تم نسخ كل الأكواد ✓') }
+  }
+});
+function flash(msg){
+  var b=document.getElementById('viewToggle'), old=b.textContent;
+  b.textContent=msg;
+  setTimeout(function(){ b.textContent=old },1500);
+}
+
+/* ===== 4) فلترة فورية للكروت ===== */
+var flt=document.getElementById('flt');
+if(flt){
+  var cards=[].slice.call(document.querySelectorAll('.card'));
+  var cnt=document.getElementById('cnt');
+  flt.addEventListener('input',function(){
+    var q=flt.value.trim().toLowerCase();
+    var shown=0;
+    cards.forEach(function(c){
+      var hit=!q || c.textContent.toLowerCase().indexOf(q)>-1;
+      c.style.display=hit?'':'none';
+      if(hit) shown++;
+    });
+    cnt.textContent='عدد النتائج: '+shown+' / '+cards.length;
+  });
+  flt.dispatchEvent(new Event('input'));
+}
+</script>
+<script>
+/* ===== 5) Ripple للأزرار اللي عليها .rp ===== */
+document.querySelectorAll('.rp').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    var r=btn.getBoundingClientRect();
+    var size=Math.max(r.width,r.height);
+    var w=document.createElement('span');
+    w.className='wave';
+    w.style.width=w.style.height=size+'px';
+    w.style.left=(e.clientX-r.left-size/2)+'px';
+    w.style.top =(e.clientY-r.top -size/2)+'px';
+    btn.appendChild(w);
+    setTimeout(function(){ w.remove() },600);
+  });
+});
+</script>
+<script>
+/* ===== 6) تودو تفاعلي: إضافة / تِSci / حذف ===== */
+(function(){
+  var box=document.querySelector('.td4');
+  if(!box) return;
+  var form=box.querySelector('.add');
+  var input=form.querySelector('input');
+  var list=box.querySelector('.list');
+  var seed=['تصميم الواجهة','كتابة الكود','اختبار على الموبايل'];
+
+  function addItem(text){
+    var li=document.createElement('li');
+    var cb=document.createElement('input');
+    cb.type='checkbox';
+    var sp=document.createElement('span');
+    sp.textContent=text;
+    var del=document.createElement('button');
+    del.type='button';
+    del.textContent='⌫';
+    cb.addEventListener('change',function(){
+      li.classList.toggle('done',cb.checked);
+    });
+    del.addEventListener('click',function(){ li.remove() });
+    li.appendChild(cb); li.appendChild(sp); li.appendChild(del);
+    list.appendChild(li);
+  }
+
+  seed.forEach(addItem);
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=input.value.trim();
+    if(!v) return;
+    addItem(v);
+    input.value='';
+    input.focus();
+  });
+})();
 </script>
 </body>
 </html>
