@@ -750,6 +750,60 @@
   }
   .cv-builder-title i { color: var(--accent-warm); font-size: 18px; }
 
+  .cv-title-box {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md); padding: 12px 16px;
+  }
+  .cv-title-ic {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px; background: rgba(212,168,67,0.14); color: var(--accent-warm);
+  }
+  .cv-title-box h3 { font-size: 15px; font-weight: 700; color: var(--text-1); margin: 0; }
+  .cv-title-box p { font-size: 11.5px; color: var(--text-3); margin: 3px 0 0; }
+  .cv-title-code {
+    margin-inline-start: auto; font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    color: var(--accent-cool); background: var(--bg-elevated); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 6px 10px; direction: ltr; text-align: left;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42%;
+  }
+
+  .cv-replace-card {
+    background: var(--bg-overlay); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px;
+  }
+  .cv-replace-head {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;
+    color: var(--text-1); margin-bottom: 12px;
+  }
+  .cv-replace-head i { color: var(--accent-cool); font-size: 16px; }
+  .cv-replace-head .cv-replace-badge {
+    margin-inline-start: auto; font-size: 10px; font-weight: 500; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace; direction: ltr;
+    background: var(--bg-elevated); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 3px 8px;
+  }
+  .cv-replace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cv-field { display: flex; flex-direction: column; gap: 5px; }
+  .cv-field > span { font-size: 11px; color: var(--text-3); }
+  .cv-field > span i { color: var(--accent-warm); }
+  .cv-field .cv-input { min-height: 0; height: 36px; padding: 6px 10px; font-size: 11.5px; }
+  .cv-pick-sel {
+    background: var(--bg-elevated); color: var(--text-1); border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm); padding: 6px 8px; font-size: 11px; outline: none; direction: ltr;
+  }
+  .cv-replace-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .cv-replace-note { font-size: 11px; color: var(--text-3); }
+  .cv-replace-note.ok { color: var(--success); }
+  .cv-rule-preview {
+    margin-top: 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
+    background: var(--bg-elevated); padding: 10px 12px; font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; direction: ltr; text-align: left; color: var(--accent-cool);
+    white-space: pre-wrap; word-break: break-all; min-height: 22px; margin: 12px 0 0;
+  }
+  .cv-rule-preview.idle { color: var(--text-3); }
+
   .cv-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
   }
@@ -4131,6 +4185,10 @@ function getFiltered(){
   // ── CODE CONVERTER DASHBOARD ──
   let showCvDash = false;
   let cvImgs = [];
+  let cvManual = [];
+  let cvOldPick = '';
+  let cvNewPick = '';
+  let cvRuleNote = '';
 
   function toggleCvDash(){
     showCvDash = !showCvDash;
@@ -4234,13 +4292,114 @@ function getFiltered(){
         }
       });
     }
+    cvReapplyManual();
 
     renderCvDash();
     showToast('تم استخراج ' + cvImgs.length + ' صورة');
   }
 
+  // ── استبدال صورة سريعة (Old → New) ──
+  function cvKeyFromInput(v){
+    const s = (v || '').trim();
+    if(!s) return '';
+    const sel = s.match(/img\[(?:src|data-src)\*=\s*["']([^"']+)["']\]/i);
+    if(sel) return sel[1];
+    if(/^https?:\/\//i.test(s) || s.indexOf('/') > -1) return uniqueKey(s);
+    return s;
+  }
+
+  function cvMatchesKey(img, key){
+    const k = uniqueKey(img.src || img.dataSrc);
+    if(k && k === key) return true;
+    if(img.src && img.src.indexOf(key) > -1) return true;
+    if(img.dataSrc && img.dataSrc.indexOf(key) > -1) return true;
+    return false;
+  }
+
+  function cvApplyRule(key, newUrl){
+    let hits = 0;
+    cvImgs.forEach(function(im){
+      if(!cvMatchesKey(im, key)) return;
+      im.newUrl = newUrl;
+      im.enabled = true;
+      hits++;
+    });
+    if(!hits) cvImgs.push({ src: key, dataSrc: '', key: key, newUrl: newUrl, enabled: true });
+    return hits;
+  }
+
+  function cvReapplyManual(){
+    cvManual.forEach(r => cvApplyRule(r.key, r.newUrl));
+  }
+
+  function cvBuildRule(){
+    const key = cvKeyFromInput(cvOldPick);
+    const nu = (cvNewPick || '').trim();
+    if(!key || !nu) return '';
+    return 'img[src*="' + key + '"] {\n  content: url("' + nu + '");\n}';
+  }
+
+  function cvRulePreview(){
+    const pre = document.getElementById('cvRulePreview');
+    if(!pre) return;
+    const rule = cvBuildRule();
+    pre.textContent = rule || '/* املأ الحقلين لعرض القاعدة — وتقدر تلصق الـ selector جاهز */';
+    pre.classList.toggle('idle', !rule);
+    const badge = document.querySelector('.cv-replace-badge');
+    if(badge) badge.textContent = cvKeyFromInput(cvOldPick) || 'old → new';
+  }
+
+  function cvPickFromList(v){
+    if(!v) return;
+    cvOldPick = v;
+    const el = document.getElementById('cvOldPick');
+    if(el) el.value = v;
+    cvRulePreview();
+  }
+
+  function cvApplyReplace(){
+    const key = cvKeyFromInput(cvOldPick);
+    const nu = (cvNewPick || '').trim();
+    if(!key){ showToast('اكتب الصورة القديمة أولاً'); return; }
+    if(!nu){ showToast('اكتب رابط الصورة الجديدة'); return; }
+    const existing = cvManual.findIndex(r => r.key === key);
+    if(existing > -1) cvManual[existing].newUrl = nu;
+    else cvManual.push({ key: key, newUrl: nu });
+    const hits = cvApplyRule(key, nu);
+    cvRuleNote = hits ? 'تم تحديث ' + hits + ' صورة في القائمة' : 'تمت إضافة قاعدة جديدة للقائمة';
+    renderCvDash();
+    showToast(hits ? 'تم استبدال ' + hits + ' صورة' : 'تمت إضافة القاعدة');
+  }
+
+  function cvClearPick(){
+    cvOldPick = '';
+    cvNewPick = '';
+    cvRuleNote = '';
+    renderCvDash();
+  }
+
+  function cvPickOptions(){
+    const seen = [];
+    cvImgs.forEach(function(im){
+      const k = im.key || uniqueKey(im.src || im.dataSrc);
+      if(k && seen.indexOf(k) < 0) seen.push(k);
+    });
+    cvManual.forEach(function(r){
+      const dup = seen.some(s => s === r.key || s.indexOf(r.key) === 0 || r.key.indexOf(s) === 0);
+      if(!dup) seen.push(r.key);
+    });
+    return seen.map(function(k){
+      const short = k.length > 46 ? '…' + k.slice(-44) : k;
+      return '<option value="' + escHtml(k) + '">' + escHtml(short) + '</option>';
+    }).join('');
+  }
+
   function clearCv(){
     cvImgs = [];
+    cvManual = [];
+    cvOldPick = '';
+    cvNewPick = '';
+    cvRuleNote = '';
     const h = document.getElementById('cvHtmlInput');
     const c = document.getElementById('cvCssInput');
     if(h) h.value = '';
@@ -4252,7 +4411,7 @@ function getFiltered(){
     const rules = [];
     cvImgs.forEach((img, i) => {
       if(!img.enabled) return;
-      const key = uniqueKey(img.src || img.dataSrc);
+      const key = img.key || uniqueKey(img.src || img.dataSrc);
       if(!key) return;
       const newUrl = img.newUrl.trim() || 'NEW_IMAGE_URL';
       const sels = [];
@@ -4320,7 +4479,45 @@ function getFiltered(){
 
     document.getElementById('mainBody').innerHTML = `<div class="has-dash">
       <div class="cv-builder">
-        <div class="cv-builder-title"><i class="ti ti-arrows-shuffle"></i> محول HTML/CSS إلى كود صحيح — استبدال الصور</div>
+        <div class="cv-title-box">
+          <span class="cv-title-ic"><i class="ti ti-arrows-shuffle"></i></span>
+          <div>
+            <h3>محول HTML/CSS إلى كود صحيح — استبدال الصور</h3>
+            <p>الصق كود الصفحة، ثم اربط كل صورة قديمة برابط الصورة الجديدة — والـ CSS يتولّد لوحده</p>
+          </div>
+          <code class="cv-title-code">img[src*="old.webp"]{content:url("new.webp")}</code>
+        </div>
+
+        <div class="cv-replace-card">
+          <div class="cv-replace-head">
+            <i class="ti ti-swap"></i> استبدال صورة سريعة
+            <span class="cv-replace-badge">${escHtml(cvKeyFromInput(cvOldPick) || 'old → new')}</span>
+          </div>
+          <div class="cv-replace-grid">
+            <label class="cv-field">
+              <span><i class="ti ti-photo-off"></i> الصورة القديمة — رابط كامل أو جزء منه</span>
+              <input class="cv-input" id="cvOldPick" dir="ltr" value="${escHtml(cvOldPick)}" spellcheck="false"
+                placeholder='https://old.com/6-91e1-493e-94d5-7c55c2537ff1-original.webp'
+                oninput="cvOldPick=this.value; cvRulePreview()">
+              <select class="cv-pick-sel" id="cvPickSel" onchange="cvPickFromList(this.value)">
+                <option value="">— اختر من الصور المستخرجة —</option>
+                ${cvPickOptions()}
+              </select>
+            </label>
+            <label class="cv-field">
+              <span><i class="ti ti-photo-plus"></i> الصورة الجديدة — رابطها</span>
+              <input class="cv-input" id="cvNewPick" dir="ltr" value="${escHtml(cvNewPick)}" spellcheck="false"
+                placeholder="https://cdn.files.salla.network/other/944338005/8d8541e1-6765-4b32-8fb0-b2025e15cf47-original.webp"
+                oninput="cvNewPick=this.value; cvRulePreview()">
+            </label>
+          </div>
+          <div class="cv-replace-actions">
+            <button class="btn-primary" onclick="cvApplyReplace()"><i class="ti ti-refresh"></i> تطبيق الاستبدال</button>
+            <button class="btn-cancel" onclick="cvClearPick()"><i class="ti ti-eraser"></i> مسح الحقول</button>
+            <span class="cv-replace-note${cvRuleNote ? ' ok' : ''}">${escHtml(cvRuleNote)}</span>
+          </div>
+          <pre class="cv-rule-preview idle" id="cvRulePreview"></pre>
+        </div>
 
         <div class="cv-grid">
           <div class="form-group">
@@ -4354,6 +4551,8 @@ function getFiltered(){
         </div>
       </div>
     </div>`;
+
+    cvRulePreview();
   }
 
   // ── VERSIONS & DIFF DASHBOARD ──
