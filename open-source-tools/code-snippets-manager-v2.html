@@ -7548,7 +7548,7 @@ function getFiltered(){
   // ── RENDER ──
   function renderAll(){
     try { return renderAllInner(); }
-    finally { alOverlaySync(); if(typeof syncToolsUI === 'function'){ try { syncToolsUI(); } catch(e){} } }
+    finally { alOverlaySync(); if(typeof syncToolsUI === 'function'){ try { syncToolsUI(); } catch(e){} } if(typeof navSync === 'function'){ try { navSync(); } catch(e){} } }
   }
   function renderAllInner(){
     alSyncDash();
@@ -11771,18 +11771,139 @@ function hello() {
     m.hidden = true;
   });
 
+  // ── NAV HUB ──
+  const NAV_CATS = [
+    { tag:'all',        label:'الكل',       ic:'ti-layout-grid' },
+    { tag:'starred',    label:'محفوظ',      ic:'ti-star', star:true },
+    { tag:'css',        label:'CSS',        ic:'ti-brand-css3' },
+    { tag:'responsive', label:'Responsive', ic:'ti-devices' },
+    { tag:'brand',      label:'Brand',      ic:'ti-swatch' },
+    { tag:'salla',      label:'Salla',      ic:'ti-shopping-bag' },
+    { tag:'has',        label:':has()',     ic:'ti-code' },
+    { tag:'javascript', label:'JavaScript', ic:'ti-brand-javascript' }
+  ];
+  const NAV_TOOLS = [
+    { g:'تصميم', items:[
+      { id:'cpDashBtn',  cls:'cp-active',        label:'الألوان',   ic:'ti-palette',                k:'color colors gradient لون الوان تدرج' },
+      { id:'sbDashBtn',  cls:'scrollbar-active', label:'Scrollbar', ic:'ti-scroll',                 k:'scroll سكرول' },
+      { id:'rtDashBtn',  cls:'rt-active',        label:'التحكم',    ic:'ti-adjustments-horizontal', k:'route theme palette ثيم بالتة روت' },
+      { id:'pvDashBtn',  cls:'pv-active',        label:'معاينة',    ic:'ti-device-mobile-desktop',  k:'preview mobile desktop موبايل' } ]},
+    { g:'كود', items:[
+      { id:'edDashBtn',  cls:'ed-active',  label:'المحرر',  ic:'ti-terminal-2',     k:'editor محرر' },
+      { id:'vdDashBtn',  cls:'vd-active',  label:'النسخ',   ic:'ti-versions',       k:'diff versions compare مقارنة نسخ' },
+      { id:'cvDashBtn',  cls:'cv-active',  label:'محول',    ic:'ti-arrows-shuffle', k:'convert image صور استبدال' },
+      { id:'hasDashBtn', cls:'has-active', label:':has()',  ic:'ti-code',           k:'has selector محدد' } ]},
+    { g:'أدوات', items:[
+      { id:'devDashBtn', cls:'dev-active', label:'أدوات',  ic:'ti-tools',  k:'minify css js svg encode ضغط' },
+      { id:'b64DashBtn', cls:'b64-active', label:'Base64', ic:'ti-binary', k:'base64 encode decode image' },
+      { id:'qrDashBtn',  cls:'qr-active',  label:'QR',     ic:'ti-qrcode', k:'qr code' } ]}
+  ];
+  const NAV_RECENT_KEY = 'csman_v2_nav_recent';
+  let navView = 'codes', navLastHtml = '', npSel = 0, npItems = [];
+
+  function navRecent(){ try { return JSON.parse(localStorage.getItem(NAV_RECENT_KEY)||'[]'); } catch(e){ return []; } }
+  function navPushRecent(id){
+    try { localStorage.setItem(NAV_RECENT_KEY, JSON.stringify([id, ...navRecent().filter(x=>x!==id)].slice(0,6))); } catch(e){}
+  }
+  function navAllTools(){ return NAV_TOOLS.flatMap(g => g.items.map(t => ({ ...t, g:g.g }))); }
+  function navToolActive(t){ const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls)); }
+
+  function navSetView(v){ navView = v; navLastHtml = ''; navSync(); }
+
+  function navOpenTool(id){
+    const t = navAllTools().find(x => x.id === id);
+    const b = document.getElementById(id);
+    if(!t || !b) return;
+    if(!navToolActive(t)) navPushRecent(id);
+    b.click();
+  }
+  function navOpenCat(tag){
+    const b = document.querySelector('.filter-tag[data-tag="' + tag + '"]');
+    if(b){ navView = 'codes'; setTag(b); }
+  }
+
+  function navSync(){
+    const did = currentDashId();
+    if(did !== 'main' && did !== 'home' && did !== 'al') navView = 'tools';
+    else if(did === 'main') navView = 'codes';
+    const inCodes = (did === 'main');
+
+    document.getElementById('navSegCodes')?.classList.toggle('on', navView === 'codes');
+    document.getElementById('navSegTools')?.classList.toggle('on', navView === 'tools');
+
+    let html = '';
+    if(navView === 'codes'){
+      html = NAV_CATS.map(c => {
+        const n = c.tag==='all' ? DATA.length : c.tag==='starred' ? starredIds.size
+                : DATA.filter(s => s.tags.includes(c.tag)).length;
+        const on = inCodes && activeTag === c.tag;
+        return `<button class="nav-chip${on?' on':''}${c.star?' star':''}" onclick="navOpenCat('${c.tag}')">
+          <i class="ti ${c.ic}" aria-hidden="true"></i>${c.label}<span class="n">${n}</span></button>`;
+      }).join('');
+    } else {
+      html = NAV_TOOLS.map(g => `<div class="nav-group"><span class="nav-glabel">${g.g}</span>` +
+        g.items.map(t => `<button class="nav-tool${navToolActive(t)?' on':''}" onclick="navOpenTool('${t.id}')">
+          <i class="ti ${t.ic}" aria-hidden="true"></i>${t.label}</button>`).join('') + `</div>`).join('');
+    }
+    if(html !== navLastHtml){
+      document.getElementById('navRow').innerHTML = html;
+      navLastHtml = html;
+    }
+  }
+
+  /* ── Palette ── */
+  function npBuild(q){
+    q = (q||'').trim().toLowerCase();
+    const rec = navRecent();
+    const tools = navAllTools()
+      .sort((a,b) => (rec.indexOf(a.id)<0?99:rec.indexOf(a.id)) - (rec.indexOf(b.id)<0?99:rec.indexOf(b.id)))
+      .map(t => ({ type:'tool', id:t.id, label:t.label, ic:t.ic, sub:t.g, hay:(t.label+' '+t.k+' '+t.g).toLowerCase() }));
+    const cats = NAV_CATS.map(c => ({ type:'cat', id:c.tag, label:'فلتر: '+c.label, ic:c.ic, sub:'أكواد', hay:(c.label+' '+c.tag+' فلتر').toLowerCase() }));
+    return [...tools, ...cats].filter(i => !q || i.hay.includes(q));
+  }
+  function npRender(){
+    const list = document.getElementById('npList');
+    if(!npItems.length){ list.innerHTML = '<div class="np-empty">مفيش نتائج</div>'; return; }
+    list.innerHTML = npItems.map((it,i) =>
+      `<div class="np-item${i===npSel?' active':''}" onmouseenter="npSel=${i};npRender()" onclick="npRun(${i})">
+        <i class="ti ${it.ic}" aria-hidden="true"></i><b>${escHtml(it.label)}</b><small>${escHtml(it.sub)}</small></div>`).join('');
+    list.querySelector('.active')?.scrollIntoView({ block:'nearest' });
+  }
+  function npRun(i){
+    const it = npItems[i]; if(!it) return;
+    closeNavPalette();
+    it.type === 'tool' ? navOpenTool(it.id) : navOpenCat(it.id);
+  }
+  function openNavPalette(){
+    document.getElementById('npOverlay').classList.add('open');
+    const inp = document.getElementById('npInput');
+    inp.value = ''; npSel = 0; npItems = npBuild(''); npRender(); inp.focus();
+  }
+  function closeNavPalette(){ document.getElementById('npOverlay').classList.remove('open'); }
+
+  (function initNavPalette(){
+    const inp = document.getElementById('npInput');
+    inp.addEventListener('input', () => { npSel = 0; npItems = npBuild(inp.value); npRender(); });
+    inp.addEventListener('keydown', e => {
+      if(e.key==='ArrowDown'){ e.preventDefault(); npSel = Math.min(npSel+1, npItems.length-1); npRender(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); npSel = Math.max(npSel-1, 0); npRender(); }
+      else if(e.key==='Enter'){ e.preventDefault(); npRun(npSel); }
+      else if(e.key==='Escape'){ closeNavPalette(); }
+    });
+    document.addEventListener('keydown', e => {
+      if(e.altKey && !e.ctrlKey && !e.metaKey && (e.key==='t' || e.key==='T' || e.key==='ت')){
+        e.preventDefault(); openNavPalette();
+      }
+    });
+  })();
+
   // ── INIT ──
   DATA.forEach(s => openIds.add(s.id));
-  // اختصارات: "/" للبحث و Ctrl/Cmd+K للوحة بحث سريعة + Alt+T للأدوات + Alt+رقم لفتح مباشر
+  // اختصارات: "/" للبحث و Ctrl/Cmd+K للوحة بحث سريعة + Alt+رقم لفتح مباشر (Alt+T للبالتة الجديدة)
   document.addEventListener('keydown', e => {
     const tag = (e.target && e.target.tagName || '').toLowerCase();
     const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
-    // لانشر الأدوات: Alt+T (يعمل حتى أثناء الكتابة)
-    if(e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 't' || e.key === 'T' || e.key === 'ف')){
-      e.preventDefault();
-      toggleToolsMenu();
-      return;
-    }
+    // ملاحظة: Alt+T مملوك الآن لبالتة Nav Hub (openNavPalette) — لا تكرر هنا
     // فتح مباشر: Alt+1..0 و Alt+H للرئيسية (يعمل حتى أثناء الكتابة)
     if(e.altKey && !e.ctrlKey && !e.metaKey && !typing){
       const k = e.key.toLowerCase();
