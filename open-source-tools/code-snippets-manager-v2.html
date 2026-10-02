@@ -323,6 +323,120 @@
   }
   @media (max-width: 420px) { .tm-grid { grid-template-columns: 1fr; } }
 
+  /* ===== QUICK INDEX (فهرس سريع للقفز للأكواد) ===== */
+  .idx-bar {
+    grid-column: 1 / -1; position: sticky; top: 114px; z-index: 80;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-raised); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 10px;
+  }
+  .idx-label { font-size: 11px; font-weight: 700; color: var(--text-3); white-space: nowrap; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .idx-label i { color: var(--accent); }
+  .idx-list { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+  .idx-list::-webkit-scrollbar { display: none; }
+  .idx-chip {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; max-width: 190px;
+    padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border-sub);
+    background: transparent; color: var(--text-2);
+    font: 500 11px 'Cairo', sans-serif; cursor: pointer; transition: all 0.13s; white-space: nowrap;
+  }
+  .idx-chip:hover { border-color: var(--border-str); color: var(--text-1); background: var(--glass-sub); }
+  .idx-chip .idx-n { font: 600 9px 'JetBrains Mono', monospace; color: var(--text-3); background: var(--bg-elevated); border-radius: 10px; padding: 0 6px; flex-shrink: 0; }
+  .idx-chip .idx-t { overflow: hidden; text-overflow: ellipsis; }
+  .idx-chip.star { border-color: rgba(212,168,67,0.4); }
+  .idx-top {
+    flex-shrink: 0; width: 28px; height: 28px; display: grid; place-items: center;
+    border: 1px solid var(--border-sub); border-radius: 8px;
+    background: transparent; color: var(--text-3); cursor: pointer; transition: all 0.13s;
+  }
+  .idx-top:hover { color: var(--accent); border-color: var(--border-acc); }
+  @media (max-width: 640px) { .idx-bar { top: 162px; } }
+
+  /* ===== CODES BOX (مربع واحد مدمج لكل الأكواد) ===== */
+  .codesbox-bar {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px; margin-bottom: 10px;
+    background: var(--bg-raised); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md);
+  }
+  .cb-title { font-size: 13px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 7px; }
+  .cb-title i { color: var(--accent); font-size: 16px; }
+  .cb-title b { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); background: var(--accent-glow); border-radius: 12px; padding: 1px 9px; }
+  .cb-seg { display: flex; padding: 3px; gap: 2px; margin-inline-start: auto;
+    background: var(--bg-elevated); border: 1px solid var(--border-sub); border-radius: 10px; }
+  .cb-btn {
+    display: flex; align-items: center; gap: 5px; padding: 4px 12px; border: none; border-radius: 7px;
+    background: transparent; color: var(--text-2); font: 600 11px 'Cairo', sans-serif; cursor: pointer; transition: all 0.13s;
+  }
+  .cb-btn:hover { color: var(--text-1); }
+  .cb-btn.on { background: var(--accent); color: #fff; }
+  .cb-mini {
+    display: flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 8px;
+    border: 1px solid var(--border-sub); background: transparent;
+    color: var(--text-2); font: 500 11px 'Cairo', sans-serif; cursor: pointer; transition: all 0.13s;
+  }
+  .cb-mini:hover { color: var(--text-1); border-color: var(--border-str); }
+  .codes-box {
+    grid-column: 1 / -1;
+    background: var(--bg-raised); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px;
+  }
+  .crow { border-bottom: 1px solid var(--border-sub); }
+  .crow:last-child { border-bottom: none; }
+  .crow-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; cursor: pointer; user-select: none; transition: background 0.13s;
+  }
+  .crow-head:hover { background: var(--glass-sub); }
+  .crow.open .crow-head { background: var(--glass-sub); }
+  .crow-n {
+    flex-shrink: 0; min-width: 26px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+    font: 700 10.5px 'JetBrains Mono', monospace; color: var(--text-3);
+    background: var(--bg-elevated); border: 1px solid var(--border-sub); border-radius: 7px; padding: 0 6px;
+  }
+  .crow.open .crow-n { color: var(--accent); border-color: var(--border-acc); }
+  .crow-title { font-size: 13px; font-weight: 600; color: var(--text-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crow-tags { display: flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; }
+  .crow-actions { display: flex; align-items: center; gap: 6px; margin-inline-start: auto; flex-shrink: 0; }
+  .crow-copy {
+    display: flex; align-items: center; gap: 5px; padding: 4px 12px;
+    border: 1px solid var(--border-def); border-radius: 6px;
+    background: transparent; color: var(--text-2); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all 0.13s; font-family: 'Cairo', sans-serif;
+  }
+  .crow-copy:hover { background: var(--glass-mod); color: var(--text-1); border-color: var(--accent); }
+  .crow-copy.copied { color: var(--success); border-color: rgba(74,222,128,0.35); }
+  .crow .section-actions { margin-inline-start: 0; }
+  .crow:hover .delete-btn { opacity: 1; }
+  .crow .chevron { font-size: 14px; color: var(--text-3); transition: transform 0.2s; flex-shrink: 0; }
+  .crow .chevron.open { transform: rotate(90deg); color: var(--accent); }
+  .crow .section-body { border-top: 1px solid var(--border-sub); margin: 0 12px 12px; padding-left: 12px; padding-right: 12px; }
+  .crow-group {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; cursor: pointer; user-select: none;
+    background: var(--bg-overlay); border-bottom: 1px solid var(--border-sub);
+    font-size: 12px; font-weight: 700; color: var(--text-2);
+  }
+  .crow-group:hover { color: var(--text-1); }
+  .crow-group i:first-child { color: var(--accent); }
+  .crow-group b { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; color: var(--text-3); }
+  .crow-group i:last-child { margin-inline-start: auto; font-size: 13px; color: var(--text-3); }
+
+  /* ===== أرقام الأسطر داخل مربعات الكود ===== */
+  .code-pre.ln { counter-reset: cln; }
+  .code-pre .cl { display: block; position: relative; padding-inline-start: 46px; min-height: 1.6em; }
+  .code-pre .cl::before {
+    content: counter(cln); counter-increment: cln;
+    position: absolute; inset-inline-start: 0; top: 0; width: 34px; text-align: right;
+    color: var(--text-4); font-size: 11px; line-height: 1.8;
+    user-select: none; -webkit-user-select: none; pointer-events: none;
+  }
+  @media (max-width: 640px) {
+    .crow-tags { display: none; }
+    .crow-title { font-size: 12px; }
+  }
+
   /* ===== MAIN BODY ===== */
   .main-body {
     max-width: 1200px; margin: 0 auto; padding: 20px 28px 60px;
@@ -3375,6 +3489,67 @@
     renderAll();
   }
 
+  // ── CODES VIEW (قائمة مدمجة / شبكة) ──
+  const CODESVIEW_KEY = 'csman_v2_codesview_v1';
+  function getCodesView(){ try { return localStorage.getItem(CODESVIEW_KEY) || 'list'; } catch(e){ return 'list'; } }
+  function setCodesView(v){ try { localStorage.setItem(CODESVIEW_KEY, v); } catch(e){} renderAll(); }
+
+  // ── نسخ سريع لأول كود في القسم (زر نسخ في وضع القائمة) ──
+  function quickCopy(id, btn, e){
+    if(e) e.stopPropagation();
+    const s = DATA.find(d => d.id === id);
+    if(!s || !s.codes.length) return;
+    const values = varValues.get(id) || {};
+    const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+    const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
+    navigator.clipboard.writeText(liveCode).then(()=>{
+      showToast('تم نسخ الكود!');
+      if(btn){
+        const old = btn.innerHTML;
+        btn.classList.add('copied');
+        btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> تم';
+        setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = old; }, 1500);
+      }
+    }).catch(()=>showToast('تعذّر النسخ'));
+  }
+
+  // ── أرقام الأسطر داخل مربعات الكود ──
+  function collectLines(el){
+    const lines = [[]];
+    el.childNodes.forEach(ch => {
+      if(ch.nodeType === 3){
+        ch.textContent.split('\n').forEach((p,i)=>{
+          if(i > 0) lines.push([]);
+          if(p) lines[lines.length-1].push(document.createTextNode(p));
+        });
+      } else if(ch.nodeType === 1){
+        if(ch.tagName === 'BR'){ lines.push([]); return; }
+        collectLines(ch).forEach((seg,i)=>{
+          if(i > 0) lines.push([]);
+          if(seg.length){ const c = ch.cloneNode(false); seg.forEach(n=>c.appendChild(n)); lines[lines.length-1].push(c); }
+        });
+      }
+    });
+    return lines;
+  }
+  function addLn(pre){
+    if(!pre || pre.dataset.ln) return;
+    pre.dataset.ln = '1';
+    const lines = collectLines(pre);
+    if(lines.length > 1 && lines[lines.length-1].length === 0) lines.pop();
+    pre.textContent = '';
+    pre.classList.add('ln');
+    const frag = document.createDocumentFragment();
+    lines.forEach(nodes => {
+      const s = document.createElement('span');
+      s.className = 'cl';
+      if(!nodes.length) s.textContent = '​';
+      else nodes.forEach(n => s.appendChild(n));
+      frag.appendChild(s);
+    });
+    pre.appendChild(frag);
+  }
+
   // ── WRAP ──
   function toggleWrap(){
     wrapMode = !wrapMode;
@@ -3926,6 +4101,42 @@ function getFiltered(){
     renderAll();
     if(_sugTimer) clearTimeout(_sugTimer);
     _sugTimer = setTimeout(renderSuggest, 120);
+  }
+
+  /* ── QUICK INDEX: قفز فوري لأي كود ── */
+  function idxJump(id){
+    const s = DATA.find(d => d.id === id);
+    if(!s) return;
+    const g = sectionGroup(s);
+    if(collapsedGroups.has(g)) collapsedGroups.delete(g);
+    if(!openIds.has(id)) openIds.add(id);
+    if(!getFiltered().some(d => d.id === id)){
+      const allBtn = document.querySelector('.filter-tag[data-tag="all"]');
+      if(allBtn) setTag(allBtn);
+      else { activeTag = 'all'; }
+    }
+    renderAll();
+    requestAnimationFrame(() => {
+      const sec = document.querySelector('#mainBody [data-id="'+id+'"]');
+      if(sec){
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sec.classList.add('flash');
+        setTimeout(() => sec.classList.remove('flash'), 1900);
+      }
+    });
+  }
+  /* خطوة للتالي/السابق حسب مكان السكرول الحالي */
+  function idxStep(dir){
+    const cards = [...document.querySelectorAll('#mainBody .section, #mainBody .crow')];
+    if(!cards.length) return;
+    let target = null;
+    if(dir > 0){
+      target = cards.find(c => c.getBoundingClientRect().top > 170) || cards[cards.length - 1];
+    } else {
+      const above = cards.filter(c => c.getBoundingClientRect().top < 100);
+      target = above.length ? above[above.length - 1] : cards[0];
+    }
+    if(target && target.dataset.id) idxJump(target.dataset.id);
   }
 
   function closeSugIfOutside(ev){
@@ -7639,129 +7850,188 @@ function getFiltered(){
       return;
     }
 
-    const cardsHtml = list.map(s=>{
+    function secBodyHtml(s, searchWords){
+      if(!openIds.has(s.id)) return '';
+      const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+      const values = varValues.get(s.id) || {};
+
+      let varPanelHtml = '';
+      if (vars.length) {
+        const baseVarDef = vars.find(x => x.key === '--1');
+        const baseVal = values['--1'] !== undefined ? values['--1'] : (baseVarDef ? baseVarDef.value : '');
+
+        varPanelHtml = `<div class="var-panel">
+          <div class="var-title"><i class="ti ti-adjustments" aria-hidden="true"></i> تعديل المتغيرات</div>`;
+
+        if (baseVarDef) {
+          varPanelHtml += `<div class="base-row">
+            <span class="color-swatch-lg" id="swatch_${s.id}_base" style="background:${escHtml(baseVal)}"></span>
+            <input class="var-input picker-lg" type="color" value="${escHtml(baseVal)}"
+              oninput="updateVar('${s.id}','--1',this.value)">
+            <span class="base-hex">${escHtml(baseVal)}</span>
+          </div>`;
+        }
+
+        vars.forEach(v => {
+          if (v.key === '--1') return;
+          const val = values[v.key] !== undefined ? values[v.key] : v.value;
+          if (v.type === 'range') {
+            const baseSrc = baseVal || v.secondColor;
+            const initMixed = mixColors(baseSrc, v.secondColor, val);
+            varPanelHtml += `<div class="var-row">
+              <span class="var-label" title="${escHtml(v.varName||'')}">${escHtml(v.label)}</span>
+              <input type="range" min="0" max="100" value="${escHtml(val)}"
+                oninput="updateVar('${s.id}','${v.key}',this.value); document.getElementById('pctVal_${s.id}_${v.key}').textContent=this.value+'%'">
+              <span class="var-val" id="pctVal_${s.id}_${v.key}">${val}%</span>
+              <span class="color-swatch" id="swatch_${s.id}_${v.key}" style="background:${initMixed||'var(--bg-elevated)'}"></span>
+            </div>`;
+          } else {
+            varPanelHtml += `<div class="var-row">
+              <span class="var-label">${escHtml(v.label)}</span>
+              <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
+                placeholder="${v.type === 'url' ? 'https://...' : ''}"
+                oninput="updateVar('${s.id}','${v.key}',this.value)" ${v.type === 'url' ? 'dir="ltr"' : ''}>
+            </div>`;
+          }
+        });
+        varPanelHtml += `</div>`;
+      }
+
+      const codesHtml = s.codes.map((c,i)=>{
+        const liveCode = vars.length ? getLiveCode(c.code, values) : c.code;
+        const enc = encodeURIComponent(liveCode);
+        return `<div class="code-block">
+          <div class="code-header">
+            <span class="lang-badge ${c.lang.toLowerCase()}">${escHtml(c.lang)}</span>
+            <div class="code-actions">
+              <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ الكود">
+                <i class="ti ti-copy" aria-hidden="true"></i> نسخ
+              </button>
+            </div>
+          </div>
+          <pre class="code-pre${wrapMode?' wrap':''}">${hlCode(syntaxHL(liveCode), searchWords)}</pre>
+        </div>`;
+      }).join('');
+
+      let patternBarHtml = '';
+      if (s.patterns) {
+        patternBarHtml = `<div class="pattern-bar">${
+          s.patterns.map((p,i) =>
+            `<button class="pattern-tab${i === (s.selectedPattern||0) ? ' active' : ''}" onclick="event.stopPropagation(); selectPattern('${s.id}',${i})">${escHtml(p.name)}</button>`
+          ).join('')
+        }</div>`;
+      }
+      return `<div class="section-body open">
+        <p class="section-desc">${escHtml(s.desc)}</p>
+        ${patternBarHtml}
+        ${varPanelHtml}
+        ${codesHtml}
+      </div>`;
+    }
+
+    function secHeadBtns(s, isStar){
+      return `<div class="section-actions">
+        <button class="star-btn${isStar?' starred':''}" onclick="toggleStar('${s.id}',this,event)" title="${isStar?'تم الحفظ':'حفظ'}" aria-label="${isStar?'إزالة من المحفوظات':'حفظ'}">
+          <i class="ti ti-star" aria-hidden="true"></i>
+        </button>
+        <button class="delete-btn" onclick="confirmDelete('${s.id}',event)" title="حذف">
+          <i class="ti ti-trash" aria-hidden="true"></i>
+        </button>
+      </div>`;
+    }
+
+    function cardHtml(s, q, searchWords){
       const isOpen  = openIds.has(s.id);
       const isStar  = starredIds.has(s.id);
       const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
       const countLabel = s.codes.length > 1 ? `<span class="code-count">${s.codes.length} أكواد</span>` : '';
-
-      let bodyHtml = '';
-      if(isOpen){
-        const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
-        const values = varValues.get(s.id) || {};
-
-        let varPanelHtml = '';
-        if (vars.length) {
-          const baseVarDef = vars.find(x => x.key === '--1');
-          const baseVal = values['--1'] !== undefined ? values['--1'] : (baseVarDef ? baseVarDef.value : '');
-
-          varPanelHtml = `<div class="var-panel">
-            <div class="var-title"><i class="ti ti-adjustments" aria-hidden="true"></i> تعديل المتغيرات</div>`;
-
-          if (baseVarDef) {
-            varPanelHtml += `<div class="base-row">
-              <span class="color-swatch-lg" id="swatch_${s.id}_base" style="background:${escHtml(baseVal)}"></span>
-              <input class="var-input picker-lg" type="color" value="${escHtml(baseVal)}"
-                oninput="updateVar('${s.id}','--1',this.value)">
-              <span class="base-hex">${escHtml(baseVal)}</span>
-            </div>`;
-          }
-
-          vars.forEach(v => {
-            if (v.key === '--1') return;
-            const val = values[v.key] !== undefined ? values[v.key] : v.value;
-            if (v.type === 'range') {
-              const baseSrc = baseVal || v.secondColor;
-              const initMixed = mixColors(baseSrc, v.secondColor, val);
-              varPanelHtml += `<div class="var-row">
-                <span class="var-label" title="${escHtml(v.varName||'')}">${escHtml(v.label)}</span>
-                <input type="range" min="0" max="100" value="${escHtml(val)}"
-                  oninput="updateVar('${s.id}','${v.key}',this.value); document.getElementById('pctVal_${s.id}_${v.key}').textContent=this.value+'%'">
-                <span class="var-val" id="pctVal_${s.id}_${v.key}">${val}%</span>
-                <span class="color-swatch" id="swatch_${s.id}_${v.key}" style="background:${initMixed||'var(--bg-elevated)'}"></span>
-              </div>`;
-            } else {
-              varPanelHtml += `<div class="var-row">
-                <span class="var-label">${escHtml(v.label)}</span>
-                <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
-                  placeholder="${v.type === 'url' ? 'https://...' : ''}"
-                  oninput="updateVar('${s.id}','${v.key}',this.value)" ${v.type === 'url' ? 'dir="ltr"' : ''}>
-              </div>`;
-            }
-          });
-          varPanelHtml += `</div>`;
-        }
-
-        const codesHtml = s.codes.map((c,i)=>{
-          const liveCode = vars.length ? getLiveCode(c.code, values) : c.code;
-          const enc = encodeURIComponent(liveCode);
-          return `<div class="code-block">
-            <div class="code-header">
-              <span class="lang-badge ${c.lang.toLowerCase()}">${escHtml(c.lang)}</span>
-              <div class="code-actions">
-                <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ الكود">
-                  <i class="ti ti-copy" aria-hidden="true"></i> نسخ
-                </button>
-              </div>
-            </div>
-            <pre class="code-pre${wrapMode?' wrap':''}">${hlCode(syntaxHL(liveCode), _searchWords)}</pre>
-          </div>`;
-        }).join('');
-
-        let patternBarHtml = '';
-        if (s.patterns) {
-          patternBarHtml = `<div class="pattern-bar">${
-            s.patterns.map((p,i) =>
-              `<button class="pattern-tab${i === (s.selectedPattern||0) ? ' active' : ''}" onclick="event.stopPropagation(); selectPattern('${s.id}',${i})">${escHtml(p.name)}</button>`
-            ).join('')
-          }</div>`;
-        }
-        bodyHtml = `<div class="section-body open">
-          <p class="section-desc">${escHtml(s.desc)}</p>
-          ${patternBarHtml}
-          ${varPanelHtml}
-          ${codesHtml}
-        </div>`;
-      }
-
       return `<div class="section" data-id="${s.id}">
         <div class="section-head" onclick="toggleSection('${s.id}')">
           <i class="ti ti-chevron-left chevron${isOpen?' open':''}" aria-hidden="true"></i>
           <span class="section-title">${hlQuery(s.title, q)}</span>
           ${countLabel}
           <div class="section-tags">${tagsHtml}</div>
-          <div class="section-actions">
-            <button class="star-btn${isStar?' starred':''}" onclick="toggleStar('${s.id}',this,event)" title="${isStar?'تم الحفظ':'حفظ'}" aria-label="${isStar?'إزالة من المحفوظات':'حفظ'}">
-              <i class="ti ti-star" aria-hidden="true"></i>
+          ${secHeadBtns(s, isStar)}
+        </div>
+        ${secBodyHtml(s, searchWords)}
+      </div>`;
+    }
+
+    function rowHtml(s, i, q, searchWords){
+      const isOpen  = openIds.has(s.id);
+      const isStar  = starredIds.has(s.id);
+      const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
+      const countLabel = s.codes.length > 1 ? `<span class="code-count">${s.codes.length} أكواد</span>` : '';
+      const firstLang = (s.codes[0] && s.codes[0].lang) || '';
+      return `<div class="crow${isOpen?' open':''}" data-id="${s.id}">
+        <div class="crow-head" onclick="toggleSection('${s.id}')">
+          <span class="crow-n">${i+1}</span>
+          <span class="crow-title">${hlQuery(s.title, q)}</span>
+          ${countLabel}
+          <span class="lang-badge ${firstLang.toLowerCase()}">${escHtml(firstLang)}</span>
+          <div class="crow-tags">${tagsHtml}</div>
+          <div class="crow-actions">
+            <button class="crow-copy" onclick="quickCopy('${s.id}',this,event)" title="نسخ سريع">
+              <i class="ti ti-copy" aria-hidden="true"></i> نسخ
             </button>
-            <button class="delete-btn" onclick="confirmDelete('${s.id}',event)" title="حذف">
-              <i class="ti ti-trash" aria-hidden="true"></i>
-            </button>
+            ${secHeadBtns(s, isStar)}
+            <i class="ti ti-chevron-left chevron${isOpen?' open':''}" aria-hidden="true"></i>
           </div>
         </div>
-        ${bodyHtml}
+        ${secBodyHtml(s, searchWords)}
       </div>`;
-    });
-    const groupsHtml = GROUP_LIST.map(g=>{
-      const idxs = list.map((s,i) => [s,i]).filter(([s,i]) => sectionGroup(s) === g.key).map(([s,i]) => i);
-      if(!idxs.length) return '';
-      const itemsHtml = idxs.map(i => cardsHtml[i]).join('');
-      const isOpen = !collapsedGroups.has(g.key);
-      return `<div class="group-wrap">
-        <div class="group-head g-${g.key}${isOpen ? ' open' : ''}" onclick="toggleGroup('${g.key}', event)">
-          <i class="ti ${g.icon} group-ic" aria-hidden="true"></i>
-          <span class="group-title">${g.label}</span>
-          <span class="group-count">${idxs.length} كود</span>
-          <i class="ti ti-chevron-right group-arrow" aria-hidden="true"></i>
-        </div>
-        <div class="group-body${isOpen ? ' open' : ''}">${itemsHtml}</div>
-      </div>`;
-    }).join('');
+    }
+
+    const cardsHtml = list.map(s=>cardHtml(s, q, _searchWords));
     const useFlat = !!q || _searchWords.length || parseQuery((document.getElementById('searchInput')||{}).value||'').tags.length || parseQuery((document.getElementById('searchInput')||{}).value||'').excl.length;
-    const body2 = useFlat && list.length
-      ? `<div class="flat-head"><i class="ti ti-sparkles" aria-hidden="true"></i> أفضل النتائج لعبارة «${escHtml((document.getElementById('searchInput')||{}).value.trim())}» — ${list.length} كود</div>` + cardsHtml.join('')
-      : groupsHtml;
+    const idxHtml = `<div class="idx-bar"><span class="idx-label"><i class="ti ti-list" aria-hidden="true"></i> فهرس ${list.length}</span><div class="idx-list">${
+      list.map((s,i)=>`<button class="idx-chip${starredIds.has(s.id)?' star':''}" onclick="idxJump('${s.id}')" title="${escHtml(s.title)}"><span class="idx-n">${i+1}</span><span class="idx-t">${escHtml(s.title)}</span></button>`).join('')
+    }</div><button class="idx-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="أعلى الصفحة (Alt+↑ للتنقل بين الأكواد)"><i class="ti ti-arrow-up" aria-hidden="true"></i></button></div>`;
+    const view = getCodesView();
+    const segHtml = `<div class="cb-seg" title="طريقة العرض">
+      <button class="cb-btn${view==='list'?' on':''}" onclick="setCodesView('list')"><i class="ti ti-list" aria-hidden="true"></i> قائمة</button>
+      <button class="cb-btn${view==='grid'?' on':''}" onclick="setCodesView('grid')"><i class="ti ti-layout-grid" aria-hidden="true"></i> شبكة</button>
+    </div>`;
+    const foldHtml = `<button class="cb-mini" onclick="toggleAll(true)" title="فتح الكل"><i class="ti ti-arrows-maximize" aria-hidden="true"></i> فتح</button>
+      <button class="cb-mini" onclick="toggleAll(false)" title="طي الكل"><i class="ti ti-arrows-minimize" aria-hidden="true"></i> طي</button>`;
+    const barHtml = `<div class="codesbox-bar"><span class="cb-title"><i class="ti ti-box" aria-hidden="true"></i> ${useFlat ? 'نتائج البحث' : 'كل الأكواد'} <b>${list.length}</b></span>${segHtml}${foldHtml}</div>`;
+    let body2 = '';
+    if(view === 'list'){
+      if(useFlat && list.length){
+        body2 = idxHtml + barHtml + `<div class="codes-box">` + list.map((s,i)=>rowHtml(s,i,q,_searchWords)).join('') + `</div>`;
+      } else {
+        body2 = idxHtml + barHtml + `<div class="codes-box">` + GROUP_LIST.map(g=>{
+          const items = list.map((s,i)=>[s,i]).filter(([s]) => sectionGroup(s)===g.key);
+          if(!items.length) return '';
+          const isOpen = !collapsedGroups.has(g.key);
+          return `<div class="crow-group" onclick="toggleGroup('${g.key}', event)" title="طي/فتح المجموعة">
+            <i class="ti ${g.icon}" aria-hidden="true"></i><span>${g.label}</span><b>${items.length}</b>
+            <i class="ti ${isOpen?'ti-chevron-down':'ti-chevron-left'}" aria-hidden="true"></i>
+          </div>` + (isOpen ? items.map(([s,i])=>rowHtml(s,i,q,_searchWords)).join('') : '');
+        }).join('') + `</div>`;
+      }
+    } else {
+      const groupsHtml = GROUP_LIST.map(g=>{
+        const idxs = list.map((s,i) => [s,i]).filter(([s,i]) => sectionGroup(s) === g.key).map(([s,i]) => i);
+        if(!idxs.length) return '';
+        const itemsHtml = idxs.map(i => cardsHtml[i]).join('');
+        const isOpen = !collapsedGroups.has(g.key);
+        return `<div class="group-wrap">
+          <div class="group-head g-${g.key}${isOpen ? ' open' : ''}" onclick="toggleGroup('${g.key}', event)">
+            <i class="ti ${g.icon} group-ic" aria-hidden="true"></i>
+            <span class="group-title">${g.label}</span>
+            <span class="group-count">${idxs.length} كود</span>
+            <i class="ti ti-chevron-right group-arrow" aria-hidden="true"></i>
+          </div>
+          <div class="group-body${isOpen ? ' open' : ''}">${itemsHtml}</div>
+        </div>`;
+      }).join('');
+      body2 = useFlat && list.length
+        ? idxHtml + barHtml + `<div class="flat-head"><i class="ti ti-sparkles" aria-hidden="true"></i> أفضل النتائج لعبارة «${escHtml((document.getElementById('searchInput')||{}).value.trim())}» — ${list.length} كود</div>` + cardsHtml.join('')
+        : idxHtml + barHtml + groupsHtml;
+    }
     body.innerHTML = body2 || `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p></div>`;
+    body.querySelectorAll('.code-pre').forEach(addLn);
   }
 
   // ── MODAL ──
@@ -11970,6 +12240,12 @@ function hello() {
     const tag = (e.target && e.target.tagName || '').toLowerCase();
     const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
     // ملاحظة: Alt+T مملوك الآن لبالتة Nav Hub (openNavPalette) — لا تكرر هنا
+    // تنقل سريع بين الكروت: Alt+↓ / Alt+↑
+    if(e.altKey && !e.ctrlKey && !e.metaKey && !typing && (e.key === 'ArrowDown' || e.key === 'ArrowUp')){
+      e.preventDefault();
+      idxStep(e.key === 'ArrowDown' ? 1 : -1);
+      return;
+    }
     // فتح مباشر: Alt+1..0 و Alt+H للرئيسية (يعمل حتى أثناء الكتابة)
     if(e.altKey && !e.ctrlKey && !e.metaKey && !typing){
       const k = e.key.toLowerCase();
