@@ -188,18 +188,22 @@
   .topbar-btn:hover { background: var(--glass-mod); color: var(--text-1); border-color: var(--border-str); }
   .topbar-btn i { font-size: 14px; }
 
-  /* ===== FILTER BAR ===== */
+  /* ===== FILTER BAR (منظم: تاجات + استوديو أدوات) ===== */
   .filter-bar {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    display: flex; flex-direction: column; gap: 8px;
     padding: 10px 28px; border-bottom: 1px solid var(--border-sub);
     background: var(--bg-raised);
   }
-  .filter-label { font-size: 11px; color: var(--text-3); font-weight: 600; letter-spacing: 0.07em; margin-inline-end: 4px; }
+  .fb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fb-tags-row { min-width: 0; }
+  .fb-tools-row { position: relative; border-top: 1px dashed var(--border-sub); padding-top: 8px; }
+  .filter-label { font-size: 11px; color: var(--text-3); font-weight: 600; letter-spacing: 0.07em; margin-inline-end: 4px; white-space: nowrap; }
+  .filter-label.tools-label { color: var(--accent-warm); }
   .filter-tag {
     font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px;
     border: 1px solid var(--border-sub); background: transparent;
     color: var(--text-2); cursor: pointer; transition: all 0.15s;
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Cairo', sans-serif; white-space: nowrap;
   }
   .filter-tag:hover { border-color: var(--border-def); color: var(--text-1); }
   .filter-tag.active {
@@ -208,6 +212,86 @@
   }
   .filter-tag.starred-btn { display: flex; align-items: center; gap: 5px; }
   .filter-tag svg { vertical-align: -2px; margin-inline-end: 5px; }
+
+  /* زر استوديو الأدوات الموحد */
+  .tools-launcher {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700;
+    padding: 6px 14px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--border-acc); background: var(--accent-glow); color: var(--text-1);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .tools-launcher:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(232,115,74,0.25); }
+  .tools-launcher.tool-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tools-launcher .tl-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tools-launcher .tl-count { font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.14); border-radius: 20px; padding: 1px 8px; }
+  .tools-launcher .tl-kbd {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-2);
+    border: 1px solid var(--border-def); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px;
+    background: var(--bg-elevated);
+  }
+  .tools-launcher.tool-on .tl-kbd { color: #fff; border-color: rgba(255,255,255,0.35); background: rgba(0,0,0,0.2); }
+
+  /* شرائح الوصول السريع لآخر أدوات */
+  .tools-quick { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .tq-chip {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Cairo', sans-serif; font-size: 11px; font-weight: 500;
+    padding: 4px 11px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border-sub); background: var(--bg-overlay); color: var(--text-2);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .tq-chip:hover { color: var(--text-1); border-color: var(--border-str); }
+  .tq-chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+  .tq-chip i { font-size: 13px; }
+
+  /* قائمة الاستوديو المنبثقة */
+  .tools-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 500;
+    width: min(640px, calc(100vw - 32px)); max-height: min(70vh, 560px);
+    overflow: auto; text-align: right;
+    background: var(--bg-elevated); border: 1px solid var(--border-def);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 14px;
+  }
+  .tools-menu[hidden] { display: none; }
+  .tools-menu::-webkit-scrollbar { width: 8px; }
+  .tm-search {
+    width: 100%; padding: 8px 12px; margin-bottom: 10px;
+    border: 1px solid var(--border-def); border-radius: var(--radius-sm);
+    background: var(--bg-raised); color: var(--text-1);
+    font-family: 'Cairo', sans-serif; font-size: 12.5px; outline: none;
+  }
+  .tm-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .tm-group { margin-bottom: 12px; }
+  .tm-group:last-child { margin-bottom: 4px; }
+  .tm-group-t {
+    font-size: 11px; font-weight: 700; color: var(--text-3);
+    letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+  }
+  .tm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tm-item {
+    display: flex; align-items: center; gap: 8px; text-align: right;
+    padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    border: 1px solid var(--border-sub); background: var(--bg-raised); color: var(--text-2);
+    font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 600;
+    transition: all 0.13s; width: 100%;
+  }
+  .tm-item:hover { border-color: var(--border-str); color: var(--text-1); background: var(--glass-mod); }
+  .tm-item.on { border-color: var(--accent); background: var(--accent-glow); color: var(--text-1); }
+  .tm-item i { font-size: 16px; flex-shrink: 0; }
+  .tm-item .tm-sub { display: block; font-size: 10px; font-weight: 400; color: var(--text-3); }
+  .tm-item .tm-num {
+    margin-inline-start: auto; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    border: 1px solid var(--border-sub); border-radius: 4px; padding: 0 5px; color: var(--text-3); flex-shrink: 0;
+  }
+  .tm-foot { display: flex; gap: 12px; align-items: center; font-size: 10.5px; color: var(--text-3); border-top: 1px solid var(--border-sub); padding-top: 8px; margin-top: 4px; flex-wrap: wrap; }
+  .tm-foot kbd { font-family: 'JetBrains Mono', monospace; font-size: 9px; border: 1px solid var(--border-sub); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+  @media (max-width: 640px) {
+    .tm-grid { grid-template-columns: 1fr 1fr; }
+    .filter-bar { padding: 8px 16px; }
+  }
+  @media (max-width: 420px) { .tm-grid { grid-template-columns: 1fr; } }
 
   /* ===== MAIN BODY ===== */
   .main-body {
@@ -2574,53 +2658,82 @@
   </div>
 </header>
 
-<!-- FILTER BAR -->
+<!-- FILTER BAR : تاجات الأكواد + استوديو الأدوات الموحد -->
 <div class="filter-bar" id="filterBar">
-  <span class="filter-label">فلتر</span>
-  <button class="filter-tag active" data-tag="all" onclick="setTag(this)">الكل</button>
-  <button class="filter-tag" data-tag="css" onclick="setTag(this)">CSS</button>
-  <button class="filter-tag" data-tag="responsive" onclick="setTag(this)">Responsive</button>
-  <button class="filter-tag" data-tag="brand" onclick="setTag(this)">Brand</button>
-  <button class="filter-tag" data-tag="salla" onclick="setTag(this)">Salla</button>
-  <button class="filter-tag" data-tag="has" onclick="setTag(this)">:has()</button>
-  <button class="filter-tag" data-tag="javascript" onclick="setTag(this)">JavaScript</button>
-  <button class="filter-tag starred-btn" data-tag="starred" onclick="setTag(this)">
-    <i class="ti ti-star" aria-hidden="true"></i> محفوظ
-  </button>
-    <button class="filter-tag" id="hasDashBtn" onclick="toggleHasDash()" title="مُحددات :has()">
-      <i class="ti ti-code" aria-hidden="true"></i> :has()
-    </button>
-    <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار">
-      <i class="ti ti-scroll" aria-hidden="true"></i> Scrollbar
-    </button>
-    <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="محول HTML/CSS إلى كود صحيح">
-      <i class="ti ti-arrows-shuffle" aria-hidden="true"></i> محول
-    </button>
-    <button class="filter-tag" id="vdDashBtn" onclick="toggleVdDash()" title="نسخ ومقارنة الأكواد">
-      <i class="ti ti-versions" aria-hidden="true"></i> النسخ
-    </button>
-    <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> المحرر
-    </button>
-    <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG">
-      <i class="ti ti-tools" aria-hidden="true"></i> أدوات
-    </button>
-    <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64">
-      <i class="ti ti-binary" aria-hidden="true"></i> Base64
-    </button>
-    <button class="filter-tag" id="qrDashBtn" onclick="toggleQrDash()" title="مولد رموز QR">
-      <i class="ti ti-qrcode" aria-hidden="true"></i> QR
-    </button>
-    <button class="filter-tag" id="cpDashBtn" onclick="toggleCpDash()" title="مولد لوحة الألوان والتدرجات ومتغيرات CSS">
-      <i class="ti ti-palette" aria-hidden="true"></i> الألوان
-    </button>
-    <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص">
-      <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i> التحكم
-    </button>
-    <button class="filter-tag" id="pvDashBtn" onclick="togglePvDash()" title="معاينة الموقع للكمبيوتر والموبايل جنباً إلى جنب مع سكرول متزامن وتلقائي">
-      <i class="ti ti-device-mobile-desktop" aria-hidden="true"></i> معاينة
+  <div class="fb-row fb-tags-row">
+    <span class="filter-label">فلتر الأكواد</span>
+    <button class="filter-tag active" data-tag="all" onclick="setTag(this)">الكل</button>
+    <button class="filter-tag" data-tag="css" onclick="setTag(this)">CSS</button>
+    <button class="filter-tag" data-tag="responsive" onclick="setTag(this)">Responsive</button>
+    <button class="filter-tag" data-tag="brand" onclick="setTag(this)">Brand</button>
+    <button class="filter-tag" data-tag="salla" onclick="setTag(this)">Salla</button>
+    <button class="filter-tag" data-tag="has" onclick="setTag(this)">:has()</button>
+    <button class="filter-tag" data-tag="javascript" onclick="setTag(this)">JavaScript</button>
+    <button class="filter-tag starred-btn" data-tag="starred" onclick="setTag(this)">
+      <i class="ti ti-star" aria-hidden="true"></i> محفوظ
     </button>
   </div>
+  <div class="fb-row fb-tools-row">
+    <span class="filter-label tools-label">الاستوديو</span>
+    <button class="tools-launcher" id="toolsLauncher" onclick="toggleToolsMenu(event)" title="كل الأدوات في مكان واحد — بحث + اختصارات">
+      <i class="ti ti-apps" aria-hidden="true"></i>
+      <span class="tl-name" id="toolsLauncherName">كل الأدوات</span>
+      <span class="tl-count">13</span>
+      <span class="tl-kbd">Alt+T</span>
+    </button>
+    <div class="tools-quick" id="toolsQuick" title="آخر أدوات استخدمتها — وصول بضغطة"></div>
+    <div class="tools-menu" id="toolsMenu" hidden>
+      <input class="tm-search" id="toolsMenuSearch" type="text" placeholder="ابحث عن أداة... مثال: محول / QR / سكرول" oninput="filterToolsMenu(this.value)" autocomplete="off">
+      <div class="tm-group" data-group="css">
+        <div class="tm-group-t"><i class="ti ti-brush"></i> بناء وتنسيق CSS</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="hasDashBtn" onclick="toolsGo('hasDashBtn')"><i class="ti ti-code"></i><span>:has() <span class="tm-sub">مولد المحددات</span></span><span class="tm-num">1</span></button>
+          <button class="tm-item" data-src="sbDashBtn" onclick="toolsGo('sbDashBtn')"><i class="ti ti-scroll"></i><span>Scrollbar <span class="tm-sub">سكرول بار مخصص</span></span><span class="tm-num">2</span></button>
+          <button class="tm-item" data-src="cpDashBtn" onclick="toolsGo('cpDashBtn')"><i class="ti ti-palette"></i><span>الألوان <span class="tm-sub">باليت + تدرج + متغيرات</span></span><span class="tm-num">3</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="code">
+        <div class="tm-group-t"><i class="ti ti-braces"></i> كتابة ومقارنة الأكواد</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="edDashBtn" onclick="toolsGo('edDashBtn')"><i class="ti ti-code-dots"></i><span>المحرر <span class="tm-sub">محرر بترقيم الأسطر</span></span><span class="tm-num">4</span></button>
+          <button class="tm-item" data-src="vdDashBtn" onclick="toolsGo('vdDashBtn')"><i class="ti ti-versions"></i><span>النسخ <span class="tm-sub">نسخ ومقارنة Diff</span></span><span class="tm-num">5</span></button>
+          <button class="tm-item" data-src="cvDashBtn" onclick="toolsGo('cvDashBtn')"><i class="ti ti-arrows-shuffle"></i><span>محول <span class="tm-sub">HTML/CSS لكود صحيح</span></span><span class="tm-num">6</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="dev">
+        <div class="tm-group-t"><i class="ti ti-tools"></i> معالجة وتحويل</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="devDashBtn" onclick="toolsGo('devDashBtn')"><i class="ti ti-tools"></i><span>أدوات <span class="tm-sub">ضغط + تعمية + SVG</span></span><span class="tm-num">7</span></button>
+          <button class="tm-item" data-src="b64DashBtn" onclick="toolsGo('b64DashBtn')"><i class="ti ti-binary"></i><span>Base64 <span class="tm-sub">ترميز + صور</span></span><span class="tm-num">8</span></button>
+          <button class="tm-item" data-src="qrDashBtn" onclick="toolsGo('qrDashBtn')"><i class="ti ti-qrcode"></i><span>QR <span class="tm-sub">مولد رموز</span></span><span class="tm-num">9</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="view">
+        <div class="tm-group-t"><i class="ti ti-layout-dashboard"></i> عرض وتحكم</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="rtDashBtn" onclick="toolsGo('rtDashBtn')"><i class="ti ti-adjustments-horizontal"></i><span>التحكم <span class="tm-sub">باقة الثيم + بروت</span></span><span class="tm-num">0</span></button>
+          <button class="tm-item" data-src="pvDashBtn" onclick="toolsGo('pvDashBtn')"><i class="ti ti-device-mobile-desktop"></i><span>معاينة <span class="tm-sub">كمبيوتر + موبايل</span></span><span class="tm-num">-</span></button>
+          <button class="tm-item" data-src="__home" onclick="toolsGo('__home')"><i class="ti ti-home-2"></i><span>الرئيسية <span class="tm-sub">لوحاتي وأدواتي</span></span><span class="tm-num">H</span></button>
+        </div>
+      </div>
+      <!-- الأزرار الأصلية (مخفية — محفوظة للتوافق مع toggle/hash/persist) -->
+      <div hidden aria-hidden="true">
+        <button class="filter-tag" id="hasDashBtn" onclick="toggleHasDash()" title="مُحددات :has()"><i class="ti ti-code"></i> :has()</button>
+        <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار"><i class="ti ti-scroll"></i> Scrollbar</button>
+        <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="محول HTML/CSS إلى كود صحيح"><i class="ti ti-arrows-shuffle"></i> محول</button>
+        <button class="filter-tag" id="vdDashBtn" onclick="toggleVdDash()" title="نسخ ومقارنة الأكواد"><i class="ti ti-versions"></i> النسخ</button>
+        <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر">المحرر</button>
+        <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG"><i class="ti ti-tools"></i> أدوات</button>
+        <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64"><i class="ti ti-binary"></i> Base64</button>
+        <button class="filter-tag" id="qrDashBtn" onclick="toggleQrDash()" title="مولد رموز QR"><i class="ti ti-qrcode"></i> QR</button>
+        <button class="filter-tag" id="cpDashBtn" onclick="toggleCpDash()" title="مولد لوحة الألوان والتدرجات ومتغيرات CSS"><i class="ti ti-palette"></i> الألوان</button>
+        <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص"><i class="ti ti-adjustments-horizontal"></i> التحكم</button>
+        <button class="filter-tag" id="pvDashBtn" onclick="togglePvDash()" title="معاينة الموقع للكمبيوتر والموبايل جنباً إلى جنب مع سكرول متزامن وتلقائي"><i class="ti ti-device-mobile-desktop"></i> معاينة</button>
+      </div>
+      <div class="tm-foot"><span><kbd>Alt+T</kbd> فتح / إغلاق</span><span><kbd>Alt+1..0</kbd> فتح مباشر</span><span><kbd>Esc</kbd> إغلاق</span><span>الروابط العميقة مثل <b dir="ltr">#vd</b> ما زالت شغالة</span></div>
+    </div>
+  </div>
+</div>
 
 <!-- MAIN BODY -->
 <main class="main-body" id="mainBody"></main>
@@ -7347,7 +7460,7 @@ function getFiltered(){
   // ── RENDER ──
   function renderAll(){
     try { return renderAllInner(); }
-    finally { alOverlaySync(); }
+    finally { alOverlaySync(); if(typeof syncToolsUI === 'function'){ try { syncToolsUI(); } catch(e){} } }
   }
   function renderAllInner(){
     alSyncDash();
@@ -11483,12 +11596,111 @@ function hello() {
   }
   window.onhashchange = hashGo;
 
+  // ── TOOLS STUDIO (لانشر موحد: دمج كل الأدوات + وصول سريع) ──
+  const TOOLS_META = [
+    { src: 'hasDashBtn', name: ':has()',     icon: 'ti ti-code',                    key: '1' },
+    { src: 'sbDashBtn',  name: 'Scrollbar',  icon: 'ti ti-scroll',                  key: '2' },
+    { src: 'cpDashBtn',  name: 'الألوان',    icon: 'ti ti-palette',                 key: '3' },
+    { src: 'edDashBtn',  name: 'المحرر',     icon: 'ti ti-code-dots',               key: '4' },
+    { src: 'vdDashBtn',  name: 'النسخ',      icon: 'ti ti-versions',                key: '5' },
+    { src: 'cvDashBtn',  name: 'محول',       icon: 'ti ti-arrows-shuffle',          key: '6' },
+    { src: 'devDashBtn', name: 'أدوات',      icon: 'ti ti-tools',                   key: '7' },
+    { src: 'b64DashBtn', name: 'Base64',     icon: 'ti ti-binary',                  key: '8' },
+    { src: 'qrDashBtn',  name: 'QR',         icon: 'ti ti-qrcode',                  key: '9' },
+    { src: 'rtDashBtn',  name: 'التحكم',     icon: 'ti ti-adjustments-horizontal',  key: '0' },
+    { src: 'pvDashBtn',  name: 'معاينة',     icon: 'ti ti-device-mobile-desktop',   key: '-' },
+    { src: '__home',     name: 'الرئيسية',   icon: 'ti ti-home-2',                  key: 'H' },
+  ];
+  const TOOLS_RECENT_KEY = 'csman_v2_tools_recent';
+  function getRecentTools(){ try { return JSON.parse(localStorage.getItem(TOOLS_RECENT_KEY) || '[]'); } catch(e){ return []; } }
+  function pushRecentTool(src){
+    try {
+      let r = getRecentTools().filter(x => x !== src);
+      r.unshift(src); r = r.slice(0, 3);
+      localStorage.setItem(TOOLS_RECENT_KEY, JSON.stringify(r));
+    } catch(e){}
+  }
+  function toggleToolsMenu(e){
+    if(e){ e.stopPropagation(); }
+    const m = document.getElementById('toolsMenu');
+    if(!m) return;
+    const open = m.hidden;
+    m.hidden = !open;
+    if(open){
+      const s = document.getElementById('toolsMenuSearch');
+      if(s){ s.value = ''; filterToolsMenu(''); setTimeout(() => s.focus(), 30); }
+      syncToolsUI();
+    }
+  }
+  function closeToolsMenu(){ const m = document.getElementById('toolsMenu'); if(m) m.hidden = true; }
+  function toolsGo(src){
+    if(src === '__home'){ if(typeof toggleHomeDash === 'function') toggleHomeDash(); }
+    else { toggleById(src); }
+    pushRecentTool(src);
+    closeToolsMenu();
+    setTimeout(syncToolsUI, 0);
+    document.getElementById('mainBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function filterToolsMenu(q){
+    q = (q || '').trim();
+    document.querySelectorAll('#toolsMenu .tm-item').forEach(b => {
+      const t = b.textContent || '';
+      b.style.display = (!q || t.includes(q)) ? '' : 'none';
+    });
+    document.querySelectorAll('#toolsMenu .tm-group').forEach(g => {
+      const vis = [...g.querySelectorAll('.tm-item')].some(b => b.style.display !== 'none');
+      g.style.display = vis ? '' : 'none';
+    });
+  }
+  function syncToolsUI(){
+    const dash = (typeof currentDashId === 'function') ? currentDashId() : 'main';
+    const map = { has:'hasDashBtn', sb:'sbDashBtn', cv:'cvDashBtn', vd:'vdDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', pv:'pvDashBtn', home:'__home' };
+    const activeSrc = map[dash] || null;
+    const meta = TOOLS_META.find(t => t.src === activeSrc);
+    const nameEl = document.getElementById('toolsLauncherName');
+    const launcher = document.getElementById('toolsLauncher');
+    if(nameEl) nameEl.textContent = meta ? meta.name : 'كل الأدوات';
+    if(launcher) launcher.classList.toggle('tool-on', !!meta);
+    document.querySelectorAll('#toolsMenu .tm-item').forEach(b => {
+      b.classList.toggle('on', b.dataset.src === activeSrc);
+    });
+    // شرائح آخر استخدام
+    const q = document.getElementById('toolsQuick');
+    if(q){
+      const rec = getRecentTools().filter(s => TOOLS_META.some(t => t.src === s)).slice(0, 3);
+      q.innerHTML = rec.map(src => {
+        const m = TOOLS_META.find(t => t.src === src);
+        if(!m) return '';
+        return `<button class="tq-chip${src === activeSrc ? ' on' : ''}" onclick="toolsGo('${src}')" title="فتح سريع: ${m.name} (Alt+${m.key})"><i class="${m.icon}"></i>${m.name}</button>`;
+      }).join('');
+    }
+  }
+  document.addEventListener('click', e => {
+    const m = document.getElementById('toolsMenu');
+    if(!m || m.hidden) return;
+    if(m.contains(e.target)) return;
+    if(document.getElementById('toolsLauncher')?.contains(e.target)) return;
+    m.hidden = true;
+  });
+
   // ── INIT ──
   DATA.forEach(s => openIds.add(s.id));
-  // اختصارات: "/" للبحث و Ctrl/Cmd+K للوحة بحث سريعة
+  // اختصارات: "/" للبحث و Ctrl/Cmd+K للوحة بحث سريعة + Alt+T للأدوات + Alt+رقم لفتح مباشر
   document.addEventListener('keydown', e => {
     const tag = (e.target && e.target.tagName || '').toLowerCase();
     const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
+    // لانشر الأدوات: Alt+T (يعمل حتى أثناء الكتابة)
+    if(e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 't' || e.key === 'T' || e.key === 'ف')){
+      e.preventDefault();
+      toggleToolsMenu();
+      return;
+    }
+    // فتح مباشر: Alt+1..0 و Alt+H للرئيسية (يعمل حتى أثناء الكتابة)
+    if(e.altKey && !e.ctrlKey && !e.metaKey && !typing){
+      const k = e.key.toLowerCase();
+      const hit = (typeof TOOLS_META !== 'undefined') ? TOOLS_META.find(t => t.key.toLowerCase() === k) : null;
+      if(hit){ e.preventDefault(); toolsGo(hit.src); return; }
+    }
     if(e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey){
       e.preventDefault();
       const si = document.getElementById('searchInput');
@@ -11502,6 +11714,7 @@ function hello() {
     else if(e.key === 'Escape'){
       const box = document.getElementById('searchSug');
       if(box && box.classList.contains('open')) box.className = 'search-sug';
+      closeToolsMenu();
     }
   });
   // ── ALARM BOOTSTRAP — يشتغل مع الصفحة ويستمر في أي تاب ──
