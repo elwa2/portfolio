@@ -177,16 +177,46 @@
     border-radius: 20px; color: var(--text-2); white-space: nowrap;
   }
 
-  .topbar-actions { display: flex; gap: 8px; }
-  .topbar-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: var(--radius-sm);
+  .topbar-actions { display: flex; gap: 6px; align-items: center; }
+  /* أزرار أيقونات فقط — النص مخفي والتلميح عبر title */
+  .topbar-actions .topbar-btn {
+    width: 34px; height: 34px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--border-def); background: transparent;
     color: var(--text-2); font-size: 12px; font-weight: 500;
     cursor: pointer; transition: all 0.15s; font-family: 'Cairo', sans-serif;
+    white-space: nowrap; flex-shrink: 0;
   }
+  .topbar-actions .topbar-btn span { display: none; }
   .topbar-btn:hover { background: var(--glass-mod); color: var(--text-1); border-color: var(--border-str); }
-  .topbar-btn i { font-size: 14px; }
+  .topbar-btn i { font-size: 16px; margin: 0; }
+  /* فاصل بين مجموعات أزرار التوب بار */
+  .tb-sep { width: 1px; height: 22px; background: var(--border-def); flex-shrink: 0; }
+  /* الإجراء الرئيسي: إضافة كود */
+  .topbar-btn.primary {
+    background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700;
+  }
+  .topbar-btn.primary:hover { filter: brightness(1.1); box-shadow: 0 4px 16px rgba(232,115,74,0.4); color: #fff; }
+  /* قائمة ⋯ للإجراءات النادرة (تصدير/استيراد) */
+  .tb-more-wrap { position: relative; flex-shrink: 0; }
+  .tb-menu {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 600;
+    min-width: 190px; padding: 6px;
+    background: var(--bg-elevated); border: 1px solid var(--border-def);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-md);
+  }
+  .tb-menu[hidden] { display: none; }
+  .tb-menu-t { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 0.05em; padding: 6px 10px 4px; }
+  .tb-menu-item {
+    display: flex; align-items: center; gap: 9px; width: 100%;
+    padding: 8px 10px; border: none; border-radius: var(--radius-sm);
+    background: transparent; color: var(--text-2); cursor: pointer;
+    font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 500; text-align: right;
+  }
+  .tb-menu-item:hover { background: var(--glass-mod); color: var(--text-1); }
+  .tb-menu-item i { font-size: 15px; color: var(--text-3); }
+  .tb-menu-item:hover i { color: var(--accent); }
 
   /* ===== FILTER BAR (منظم: تاجات + استوديو أدوات) ===== */
   .filter-bar {
@@ -545,6 +575,7 @@
     .filter-bar { padding: 8px 16px; }
     .search-wrap { max-width: 200px; }
     .topbar-btn span { display: none; }
+    .tb-sep { display: none; }
     .logo-sub { display: none; }
   }
 
@@ -2685,43 +2716,56 @@
   <span class="count-badge" id="countBadge">منبه</span>
 
   <div class="topbar-actions">
-    <button class="topbar-btn" id="alDashBtn" onclick="toggleAlDash()" title="المنبه — ساعة وتنبيه صوتي (يرن كل 5 دقائق حتى توقفه)">
-      <i class="ti ti-alarm" aria-hidden="true"></i>
-      <span>المنبه</span>
+    <!-- إجراء رئيسي -->
+    <button class="topbar-btn primary" onclick="openModal()" title="إضافة كود جديد">
+      <i class="ti ti-plus" aria-hidden="true"></i>
+      <span>إضافة</span>
     </button>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- تنقل -->
     <button class="topbar-btn" id="homeBtn" onclick="toggleHomeDash()" title="الصفحة الرئيسية">
       <i class="ti ti-home-2" aria-hidden="true"></i>
       <span>الرئيسية</span>
     </button>
-    <button class="topbar-btn" onclick="openModal()" title="إضافة كود جديد">
-      <i class="ti ti-plus" aria-hidden="true"></i>
-      <span>إضافة</span>
+    <button class="topbar-btn" id="alDashBtn" onclick="toggleAlDash()" title="المنبه — ساعة وتنبيه صوتي (يرن كل 5 دقائق حتى توقفه)">
+      <i class="ti ti-alarm" aria-hidden="true"></i>
+      <span>المنبه</span>
     </button>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- عرض -->
     <button class="topbar-btn" onclick="toggleAll()" title="فتح الكل">
       <i class="ti ti-arrows-maximize" aria-hidden="true"></i>
       <span>فتح الكل</span>
-    </button>
-    <button class="topbar-btn" id="wrapBtn" onclick="toggleWrap()" title="لف الكود الطويل">
-      <i class="ti ti-text-wrap" aria-hidden="true"></i>
-      <span>لف</span>
     </button>
     <button class="topbar-btn" onclick="toggleAll(false)" title="إغلاق الكل">
       <i class="ti ti-arrows-minimize" aria-hidden="true"></i>
       <span>إغلاق الكل</span>
     </button>
+    <button class="topbar-btn" id="wrapBtn" onclick="toggleWrap()" title="لف الكود الطويل">
+      <i class="ti ti-text-wrap" aria-hidden="true"></i>
+      <span>لف</span>
+    </button>
     <button class="topbar-btn" onclick="openFindReplace()" title="البحث والاستبدال">
       <i class="ti ti-find-replace" aria-hidden="true"></i>
       <span>بحث/استبدال</span>
     </button>
-    <button class="topbar-btn" onclick="exportData()" title="تصدير JSON">
-      <i class="ti ti-download" aria-hidden="true"></i>
-      <span>تصدير</span>
-    </button>
-    <label class="topbar-btn" style="cursor:pointer" title="استيراد JSON">
-      <i class="ti ti-upload" aria-hidden="true"></i>
-      <span>استيراد</span>
-      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
-    </label>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- بيانات (نادر) -->
+    <div class="tb-more-wrap">
+      <button class="topbar-btn" id="tbMoreBtn" onclick="toggleTbMenu(event)" title="تصدير / استيراد">
+        <i class="ti ti-dots" aria-hidden="true"></i>
+      </button>
+      <div class="tb-menu" id="tbMenu" hidden>
+        <div class="tb-menu-t">البيانات</div>
+        <button class="tb-menu-item" onclick="closeTbMenu();exportData()">
+          <i class="ti ti-download" aria-hidden="true"></i> تصدير JSON
+        </button>
+        <label class="tb-menu-item" style="cursor:pointer" onclick="closeTbMenu()">
+          <i class="ti ti-upload" aria-hidden="true"></i> استيراد JSON
+          <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+        </label>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -11770,6 +11814,13 @@ function hello() {
     if(document.getElementById('toolsLauncher')?.contains(e.target)) return;
     m.hidden = true;
   });
+  document.addEventListener('click', e => {
+    const m = document.getElementById('tbMenu');
+    if(!m || m.hidden) return;
+    if(m.contains(e.target)) return;
+    if(document.getElementById('tbMoreBtn')?.contains(e.target)) return;
+    m.hidden = true;
+  });
 
   // ── NAV HUB ──
   const NAV_CATS = [
@@ -11800,6 +11851,7 @@ function hello() {
   ];
   const NAV_RECENT_KEY = 'csman_v2_nav_recent';
   let navView = 'codes', navLastHtml = '', npSel = 0, npItems = [];
+  let navLastDash = null;
 
   function navRecent(){ try { return JSON.parse(localStorage.getItem(NAV_RECENT_KEY)||'[]'); } catch(e){ return []; } }
   function navPushRecent(id){
@@ -11808,7 +11860,7 @@ function hello() {
   function navAllTools(){ return NAV_TOOLS.flatMap(g => g.items.map(t => ({ ...t, g:g.g }))); }
   function navToolActive(t){ const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls)); }
 
-  function navSetView(v){ navView = v; navLastHtml = ''; navSync(); }
+  function navSetView(v){ navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync(); }
 
   function navOpenTool(id){
     const t = navAllTools().find(x => x.id === id);
@@ -11819,13 +11871,18 @@ function hello() {
   }
   function navOpenCat(tag){
     const b = document.querySelector('.filter-tag[data-tag="' + tag + '"]');
-    if(b){ navView = 'codes'; setTag(b); }
+    if(b){ navView = 'codes'; navLastDash = 'main'; setTag(b); }
   }
 
   function navSync(){
     const did = currentDashId();
-    if(did !== 'main' && did !== 'home' && did !== 'al') navView = 'tools';
-    else if(did === 'main') navView = 'codes';
+    // تبديل تلقائي للفيو بس لما الداش نفسه يتغير — مش على كل رندر
+    // (لو عملناه على كل نداء كان ضغطة "الأدوات" بترجع فوراً لـ"الأكواد")
+    if(did !== navLastDash){
+      if(did !== 'main' && did !== 'home' && did !== 'al') navView = 'tools';
+      else if(did === 'main') navView = 'codes';
+      navLastDash = did;
+    }
     const inCodes = (did === 'main');
 
     document.getElementById('navSegCodes')?.classList.toggle('on', navView === 'codes');
@@ -11881,6 +11938,15 @@ function hello() {
   }
   function closeNavPalette(){ document.getElementById('npOverlay').classList.remove('open'); }
 
+  /* ── قائمة ⋯ في التوب بار (تصدير/استيراد) ── */
+  function toggleTbMenu(e){
+    if(e) e.stopPropagation();
+    const m = document.getElementById('tbMenu');
+    if(!m) return;
+    m.hidden = !m.hidden;
+  }
+  function closeTbMenu(){ const m = document.getElementById('tbMenu'); if(m) m.hidden = true; }
+
   (function initNavPalette(){
     const inp = document.getElementById('npInput');
     inp.addEventListener('input', () => { npSel = 0; npItems = npBuild(inp.value); npRender(); });
@@ -11924,6 +11990,7 @@ function hello() {
       const box = document.getElementById('searchSug');
       if(box && box.classList.contains('open')) box.className = 'search-sug';
       closeToolsMenu();
+      closeTbMenu();
     }
   });
   // ── ALARM BOOTSTRAP — يشتغل مع الصفحة ويستمر في أي تاب ──
