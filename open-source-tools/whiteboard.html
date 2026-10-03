@@ -157,7 +157,6 @@
             <button class="wb-tool" data-tool="arrow" title="Arrow — A">→<span class="kbd">A</span></button>
             <button class="wb-tool" data-tool="line" title="Line — L">─<span class="kbd">L</span></button>
             <button class="wb-tool" data-tool="freedraw" title="Draw — P">✎<span class="kbd">P</span></button>
-            <button class="wb-tool" id="rbBtn" title="قلم قوس قزح — G">🌈<span class="kbd">G</span></button>
             <button class="wb-tool" data-tool="text" title="Text — T">A<span class="kbd">T</span></button>
             <button class="wb-tool" data-tool="sticky" title="Sticky note — N">▦<span class="kbd">N</span></button>
             <button class="wb-tool" data-tool="table" title="Table — B">▤<span class="kbd">B</span></button>
@@ -828,7 +827,6 @@ function writeRainbowText(g,t,x,y,mw,align){
   rb.onclick=e=>{e.stopPropagation();setStroke("rainbow")};
   sd.appendChild(rb);
 })();
-$("#rbBtn").onclick=()=>{setStroke("rainbow");setTool("freedraw")};
 
 /* ---------- todo lists ---------- */
 function todoGeom(s){return{gx:Math.min(s.x,s.x2),gy:Math.min(s.y,s.y2),W:Math.max(200,Math.abs(s.x2-s.x)),rh:s.rowH||36,hh:s.headerH||40}}
