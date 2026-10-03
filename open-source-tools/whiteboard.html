@@ -48,6 +48,9 @@
     .wb-pill-btn.share{ background:var(--wb-accent); color:#23233b; border-color:transparent; font-weight:700; }
     .wb-hint{ position:absolute; top:62px; left:0; right:0; text-align:center; font-size:12px; color:var(--wb-muted); z-index:4; pointer-events:none; }
     .wb-hint kbd{ background:rgba(255,255,255,.1); border:1px solid var(--wb-border); border-radius:5px; padding:0 6px; font-size:11px; font-family:inherit; }
+    .wb-lockbadge{ position:absolute; top:64px; left:50%; transform:translateX(-50%); background:rgba(20,20,28,.92); border:1px solid var(--wb-accent); color:var(--wb-text); border-radius:999px; padding:7px 18px; font-size:12px; font-weight:700; z-index:6; pointer-events:none; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+    body.wb-locked .wb-toolbar{ opacity:.5; }
+    body.wb-locked #wbCanvas{ cursor:not-allowed; }
 
     /* ===== stylebar with picker boxes ===== */
     .wb-stylebar{ position:absolute; top:88px; left:50%; transform:translateX(-50%); display:flex; gap:8px; align-items:center; background:var(--wb-panel); border:1px solid var(--wb-border); border-radius:12px; padding:7px 12px; z-index:5; font-size:12px; white-space:nowrap; }
@@ -125,7 +128,12 @@
       .wb-stylebar{ font-size:11px; padding:6px 8px; gap:6px; max-width:94%; overflow-x:auto; }
       .wb-pill-btn{ padding:0 12px; }
       .sb-label{ display:none; }
-    }
+    }.wb-stylebar {
+    position: absolute;
+    
+   
+
+}
   </style>
 </head>
 <body>
@@ -138,7 +146,7 @@
         <div class="wb-top">
           <button class="wb-icon-btn" id="menuBtn" title="القائمة">☰</button>
           <div class="wb-toolbar" id="toolbar" role="toolbar" aria-label="Shapes">
-            <button class="wb-tool active" data-tool="lock" title="الأداة تفضل شغالة بعد الرسم — Q">🔒</button>
+            <button class="wb-tool" data-tool="lock" title="قفل اللوحة — Q">🔓</button>
             <div class="wb-sep"></div>
             <button class="wb-tool" data-tool="hand" title="Hand (panning) — H">✋</button>
             <button class="wb-tool active" data-tool="selection" title="Selection — V">➤<span class="kbd">V</span></button>
@@ -163,6 +171,7 @@
           </div>
         </div>
         <div class="wb-hint" id="wbHint">To move canvas, hold <kbd>Scroll wheel</kbd> or <kbd>Space</kbd> while dragging, or use the hand tool</div>
+        <div class="wb-lockbadge hidden" id="lockBadge">🔒 اللوحة مقفولة — اضغط 🔓 للتحرير</div>
 
         <div class="wb-stylebar" id="styleBar">
           <div class="sb-item">
@@ -329,7 +338,7 @@ function setFill(c){
   applyToSelection({bg:c});
 }
 function applyToSelection(patch){
-  if(!sel.size) return;
+  if(viewOnly||!sel.size) return;
   pushUndo();
   shapes.forEach(s=>{ if(sel.has(s.id)) Object.assign(s,patch); });
   save(); draw();
@@ -378,12 +387,12 @@ function refreshSelUI(){
 }
 function selectAll(){ sel=new Set(shapes.map(s=>s.id)); draw(); refreshSelUI(); }
 function deleteSel(){
-  if(!sel.size) return;
+  if(viewOnly||!sel.size) return;
   pushUndo(); shapes=shapes.filter(s=>!sel.has(s.id)); sel.clear();
   save(); draw(); syncBtns(); refreshSelUI();
 }
 function duplicateSel(){
-  if(!sel.size) return;
+  if(viewOnly||!sel.size) return;
   pushUndo();
   const clones=[];
   selectedShapes().forEach(s=>{
@@ -398,14 +407,14 @@ function duplicateSel(){
   save(); draw(); syncBtns(); refreshSelUI();
 }
 function bringFront(){
-  if(!sel.size) return;
+  if(viewOnly||!sel.size) return;
   pushUndo();
   const picked=selectedShapes();
   shapes=shapes.filter(s=>!sel.has(s.id)).concat(picked);
   save(); draw();
 }
 function sendBack(){
-  if(!sel.size) return;
+  if(viewOnly||!sel.size) return;
   pushUndo();
   const picked=selectedShapes();
   shapes=picked.concat(shapes.filter(s=>!sel.has(s.id)));
@@ -429,8 +438,8 @@ function save(){
 function load(){ try{const d=JSON.parse(localStorage.getItem(LS));if(d){shapes=d.shapes||[];Object.assign(cam,d.cam||{});canvasBg=d.canvasBg||canvasBg;dark=d.dark!==false;seq=shapes.reduce((m,s)=>Math.max(m,s.id||0),0)+1}}catch(e){} }
 function pushUndo(){undoStack.push(JSON.stringify(shapes));if(undoStack.length>60)undoStack.shift();redoStack.length=0;syncBtns()}
 function syncBtns(){$("#undoBtn").disabled=!undoStack.length;$("#redoBtn").disabled=!redoStack.length;$("#zoomLabel").textContent=Math.round(cam.z*100)+"%"}
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(shapes));shapes=JSON.parse(undoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(shapes));shapes=JSON.parse(redoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
+function undo(){if(viewOnly||!undoStack.length)return;redoStack.push(JSON.stringify(shapes));shapes=JSON.parse(undoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
+function redo(){if(viewOnly||!redoStack.length)return;undoStack.push(JSON.stringify(shapes));shapes=JSON.parse(redoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
 
 /* ---------- canvas sizing / transform ---------- */
 function resize(){const r=board.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,r.width*dpr);canvas.height=Math.max(1,r.height*dpr);draw()}
@@ -521,6 +530,7 @@ function viewCenter(){
   return { x:(board.clientWidth/2-cam.x)/cam.z, y:(board.clientHeight/2-cam.y)/cam.z };
 }
 function insertImages(files,atWorld){
+  if(viewOnly)return;
   const list=[...files].filter(f=>f.type&&f.type.indexOf("image/")===0);
   if(!list.length) return;
   pushUndo();
@@ -675,10 +685,10 @@ function sizeTableDraft(d,p){
 }
 function selTable(){if(sel.size!==1)return null;const s=selectedShapes()[0];return(s&&s.type==="table")?s:null}
 function normTable(t){t.x=Math.min(t.x,t.x2);t.y=Math.min(t.y,t.y2);t.cols=Math.min(20,Math.max(1,t.cols||3));t.rows=Math.min(20,Math.max(1,t.rows||3));t.colW=t.colW||110;t.rowH=t.rowH||36;t.x2=t.x+t.cols*t.colW;t.y2=t.y+t.rows*t.rowH}
-function addRow(){const t=selTable();if(!t||t.rows>=20)return;pushUndo();for(let c=0;c<t.cols;c++)t.cells.push("");t.rows++;normTable(t);save();draw()}
-function delRow(){const t=selTable();if(!t||t.rows<=1)return;pushUndo();t.cells.splice(t.cells.length-t.cols,t.cols);t.rows--;if(t.active&&t.active.r>=t.rows)t.active={r:t.rows-1,c:Math.min(t.active.c,t.cols-1)};normTable(t);save();draw()}
-function addCol(){const t=selTable();if(!t||t.cols>=20)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++){for(let c=0;c<t.cols;c++)nu.push(t.cells[r*t.cols+c]||"");nu.push("")}t.cells=nu;t.cols++;normTable(t);save();draw()}
-function delCol(){const t=selTable();if(!t||t.cols<=1)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++)for(let c=0;c<t.cols-1;c++)nu.push(t.cells[r*t.cols+c]||"");t.cells=nu;t.cols--;if(t.active&&t.active.c>=t.cols)t.active={r:Math.min(t.active.r,t.rows-1),c:t.cols-1};normTable(t);save();draw()}
+function addRow(){const t=selTable();if(viewOnly||!t||t.rows>=20)return;pushUndo();for(let c=0;c<t.cols;c++)t.cells.push("");t.rows++;normTable(t);save();draw()}
+function delRow(){const t=selTable();if(viewOnly||!t||t.rows<=1)return;pushUndo();t.cells.splice(t.cells.length-t.cols,t.cols);t.rows--;if(t.active&&t.active.r>=t.rows)t.active={r:t.rows-1,c:Math.min(t.active.c,t.cols-1)};normTable(t);save();draw()}
+function addCol(){const t=selTable();if(viewOnly||!t||t.cols>=20)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++){for(let c=0;c<t.cols;c++)nu.push(t.cells[r*t.cols+c]||"");nu.push("")}t.cells=nu;t.cols++;normTable(t);save();draw()}
+function delCol(){const t=selTable();if(viewOnly||!t||t.cols<=1)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++)for(let c=0;c<t.cols-1;c++)nu.push(t.cells[r*t.cols+c]||"");t.cells=nu;t.cols--;if(t.active&&t.active.c>=t.cols)t.active={r:Math.min(t.active.r,t.rows-1),c:t.cols-1};normTable(t);save();draw()}
 let cellEditSession=null;
 function insertRefAtCursor(inp,ref){
   const s=(inp.selectionStart==null?inp.value.length:inp.selectionStart);
@@ -688,6 +698,7 @@ function insertRefAtCursor(inp,ref){
   try{inp.focus();inp.setSelectionRange(np,np)}catch(_){}
 }
 function openCellEditor(t,cell){
+  if(viewOnly)return;
   closePops();hideCtx();
   const g=tableGeom(t);
   const sc=toScreen(g.gx+cell.c*g.cw,g.gy+cell.r*g.rh);
@@ -860,6 +871,7 @@ function hitTest(p){for(let i=shapes.length-1;i>=0;i--){const s=shapes[i],b=bbox
 
 /* text editor */
 function openTextEditor(p,isSticky){
+  if(viewOnly)return;
   const sc=toScreen(p.x,p.y);const ta=document.createElement("textarea");ta.className="wb-text-input";
   ta.style.left=sc.x+"px";ta.style.top=sc.y+"px";ta.style.width="240px";ta.style.height=isSticky?"140px":"60px";
   ta.style.color=isSticky?"#1a1a1a":stroke;if(isSticky){ta.style.background="#fff3a3";ta.style.padding="10px";ta.style.borderRadius="8px"}
@@ -883,7 +895,15 @@ function openTextEditor(p,isSticky){
 }
 
 /* ---------- toolbar ---------- */
-function setTool(t){if(t==="lock"){keepTool=!keepTool;document.querySelector('[data-tool="lock"]').classList.toggle("active",keepTool);return}tool=t;$$("#toolbar .wb-tool[data-tool]").forEach(b=>{if(b.dataset.tool!=="lock")b.classList.toggle("active",b.dataset.tool===t)});canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
+function setTool(t){if(t==="lock"){toggleCanvasLock();return}tool=t;$$("#toolbar .wb-tool[data-tool]").forEach(b=>{if(b.dataset.tool!=="lock")b.classList.toggle("active",b.dataset.tool===t)});canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
+function toggleCanvasLock(){
+  viewOnly=!viewOnly;
+  const b=document.querySelector('[data-tool="lock"]');
+  if(b){b.classList.toggle("active",viewOnly);b.textContent=viewOnly?"🔒":"🔓"}
+  document.body.classList.toggle("wb-locked",viewOnly);
+  $("#lockBadge").classList.toggle("hidden",!viewOnly);
+  draw();
+}
 $("#toolbar").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(!b)return;setTool(b.dataset.tool)});
 
 /* ---------- menu ---------- */
@@ -919,9 +939,9 @@ function menuAction(a){
   else if(a==="zen")toggleZen();
   else if(a==="find"){const q=prompt("Find on canvas — اكتب نصاً للبحث عنه:");if(q){let f=shapes.find(s=>(s.text||"").includes(q));let fcell=null;if(!f){for(const t of shapes){if(t.type!=="table")continue;let done2=false;for(let r=0;r<t.rows&&!done2;r++)for(let c=0;c<t.cols;c++){if((t.cells[r*t.cols+c]||"").includes(q)){f=t;fcell={r,c};done2=true;break}}if(f)break}}if(f){const b=bbox(f);cam.x=canvas.clientWidth/2-(b.x+b.w/2)*cam.z;cam.y=canvas.clientHeight/2-(b.y+b.h/2)*cam.z;sel=new Set([f.id]);if(fcell)f.active=fcell;draw();refreshSelUI()}else alert("Not found")}}
   else if(a==="help")openHelp();
-  else if(a==="reset"){if(confirm("Reset the canvas? سيتم مسح كل الرسومات.")){pushUndo();shapes=[];sel.clear();save();draw();syncBtns();refreshSelUI()}}
+  else if(a==="reset"){if(!viewOnly&&confirm("Reset the canvas? سيتم مسح كل الرسومات.")){pushUndo();shapes=[];sel.clear();save();draw();syncBtns();refreshSelUI()}}
 }
-$("#fileOpen").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);pushUndo();const arr=d.elements||d.shapes||d;if(!Array.isArray(arr))throw 0;shapes=arr;shapes.forEach(s=>{s.id=seq++});sel.clear();save();draw();syncBtns();refreshSelUI()}catch(_){alert("ملف غير صالح")}};r.readAsText(f);e.target.value=""};
+$("#fileOpen").onchange=e=>{if(viewOnly){e.target.value="";return}const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);pushUndo();const arr=d.elements||d.shapes||d;if(!Array.isArray(arr))throw 0;shapes=arr;shapes.forEach(s=>{s.id=seq++});sel.clear();save();draw();syncBtns();refreshSelUI()}catch(_){alert("ملف غير صالح")}};r.readAsText(f);e.target.value=""};
 
 /* ---------- export ---------- */
 function contentBox(){if(!shapes.length)return null;let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;shapes.forEach(s=>{const b=bbox(s);x1=Math.min(x1,b.x);y1=Math.min(y1,b.y);x2=Math.max(x2,b.x+b.w);y2=Math.max(y2,b.y+b.h)});return{x:x1-24,y:y1-24,w:x2-x1+48,h:y2-y1+48}}
@@ -1006,7 +1026,7 @@ $("#zoomLabel").onclick=()=>{cam.z=1;draw();syncBtns()};
 $("#undoBtn").onclick=undo;$("#redoBtn").onclick=redo;
 $("#gridBtn").onclick=toggleGrid;
 $("#helpBtn").onclick=openHelp;
-function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • B جدول • I إدراج صورة • E ممحاة • H يد • Q تثبيت الأداة • [ / ] حجم الفرشاة (ج / د)</div><div style='font-size:13px;line-height:2'>الجدول: حدده ثم دبل كليك على أي خلية للتحرير • المعادلات تبدأ بـ = مثل ‎=A1+B2‎ و ‎=SUM(A1:A5)‎ • الدوال: SUM AVG MIN MAX COUNT • العمليات: + - * / % ^ وأقواس</div> • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#mExport2");if(b)b.onclick=exportPNG},0)}
+function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • B جدول • I إدراج صورة • E ممحاة • H يد • Q قفل/فتح اللوحة • [ / ] حجم الفرشاة (ج / د)</div><div style='font-size:13px;line-height:2'>الجدول: حدده ثم دبل كليك على أي خلية للتحرير • المعادلات تبدأ بـ = مثل ‎=A1+B2‎ و ‎=SUM(A1:A5)‎ • الدوال: SUM AVG MIN MAX COUNT • العمليات: + - * / % ^ وأقواس</div> • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#mExport2");if(b)b.onclick=exportPNG},0)}
 $("#shareBtn").onclick=()=>{
   openModal("Share","صدّر اللوحة بأي صيغة أو انسخها للحافظة:",'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-tool primary" id="shPng">PNG</button><button class="btn-tool" id="shSvg">SVG</button><button class="btn-tool" id="shJson">JSON</button><button class="btn-tool" id="shCopy">نسخ للحافظة</button></div>');
   setTimeout(()=>{
@@ -1024,7 +1044,7 @@ $("#shareBtn").onclick=()=>{
 };
 $("#codeBtn").onclick=()=>open("code-snippets-manager-v2.html#tool","_blank");
 $("#libBtn").onclick=e=>{e.stopPropagation();closePops();$("#libPanel").classList.toggle("hidden")};
-$("#libPanel").addEventListener("click",e=>{const it=e.target.closest("[data-lib]");if(!it)return;pushUndo();const cx=-cam.x/cam.z+board.clientWidth/2/cam.z,cy=-cam.y/cam.z+board.clientHeight/2/cam.z;
+$("#libPanel").addEventListener("click",e=>{const it=e.target.closest("[data-lib]");if(!it||viewOnly)return;pushUndo();const cx=-cam.x/cam.z+board.clientWidth/2/cam.z,cy=-cam.y/cam.z+board.clientHeight/2/cam.z;
   if(it.dataset.lib==="flow"){shapes.push({id:seq++,type:"rectangle",x:cx-160,y:cy-30,x2:cx-40,y2:cy+30,color:stroke,bg:"transparent",sw,text:"Start"},{id:seq++,type:"arrow",x:cx-40,y:cy,x2:cx+40,y:cy,color:stroke,sw},{id:seq++,type:"ellipse",x:cx+40,y:cy-30,x2:cx+160,y2:cy+30,color:stroke,bg:"transparent",sw,text:"End"})}
   else if(it.dataset.lib==="mind"){shapes.push({id:seq++,type:"ellipse",x:cx-60,y:cy-30,x2:cx+60,y2:cy+30,color:stroke,bg:"#6c5ce7",sw,text:"Idea"},{id:seq++,type:"ellipse",x:cx-220,y:cy-90,x2:cx-120,y2:cy-40,color:stroke,bg:"transparent",sw},{id:seq++,type:"ellipse",x:cx+120,y:cy+40,x2:cx+220,y2:cy+90,color:stroke,bg:"transparent",sw})}
   else{shapes.push({id:seq++,type:"rectangle",x:cx-140,y:cy-60,x2:cx-20,y2:cy+60,color:stroke,bg:"transparent",sw},{id:seq++,type:"rectangle",x:cx,y:cy-60,x2:cx+120,y2:cy+60,color:stroke,bg:"transparent",sw})}
