@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>السبورة البيضاء التفاعلية</title>
+  <meta name="description" content="سبورة بيضاء تفاعلية مجانية — ارسم مخططات وخرائط ذهنية. تحفظ تلقائياً وتدعم التصدير PNG/SVG/JSON." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>" />
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    :root{
+      --wb-bg:#121212; --wb-panel:#232329; --wb-panel2:#2b2b33;
+      --wb-border:rgba(255,255,255,.09); --wb-text:#e9e9ef; --wb-muted:#9a9aa5;
+      --wb-accent:#b8a6ff; --wb-accent2:#6965db;
+      --page-bg:#0f0f14; --card-bg:#16161c; --text:#e9e9ef; --muted:#9a9aa5;
+    }
+    body{
+      font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+      background:var(--page-bg); color:var(--text);
+      height:100vh; height:100dvh; display:flex; flex-direction:column; overflow:hidden;
+    }
+    .hidden{ display:none !important; }
+    .page{ width:100%; max-width:none; margin:0; padding:0; flex:1; display:flex; flex-direction:column; min-height:0; }
+    .wb-shell{ max-width:none; margin:0; background:var(--card-bg); border:none; border-radius:0; overflow:hidden; box-shadow:none; flex:1; display:flex; flex-direction:column; min-height:0; }
+    .btn-tool{ padding:10px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#1e1e26; color:var(--text); font-weight:700; cursor:pointer; font-family:inherit; font-size:.85rem; transition:.25s; }
+    .btn-tool:hover{ transform:translateY(-2px); border-color:#4c9bf0; }
+    .btn-tool.primary{ background:#4c9bf0; color:#fff; border-color:transparent; }
+    .btn-tool.accent{ background:#b8a6ff; color:#1a1a2e; border-color:transparent; }
+    .btn-tool.danger{ background:transparent; border-color:rgba(255,90,90,.5); color:#ff8a8a; }
+
+    /* ===== Board (LTR) ===== */
+    .wb-board{ direction:ltr; position:relative; flex:1; min-height:0; height:100vh; height:100dvh; background:var(--wb-bg); color:var(--wb-text); overflow:hidden; user-select:none; }
+    .wb-board.zen{ height:100vh; height:100dvh; }
+    body.wb-zen .wb-top, body.wb-zen .wb-stylebar, body.wb-zen .wb-foot-left,
+    body.wb-zen .wb-foot-right, body.wb-zen .wb-hint{ display:none !important; }
+    .wb-top{ position:absolute; top:12px; left:12px; right:12px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; z-index:6; pointer-events:none; }
+    .wb-top > *{ pointer-events:auto; }
+    .wb-icon-btn{ width:38px; height:38px; border-radius:10px; border:1px solid transparent; background:var(--wb-panel); color:var(--wb-text); display:grid; place-items:center; cursor:pointer; font-size:16px; transition:.15s; }
+    .wb-icon-btn:hover{ background:var(--wb-panel2); border-color:var(--wb-border); }
+    .wb-toolbar{ display:flex; align-items:center; gap:2px; background:var(--wb-panel); border:1px solid var(--wb-border); border-radius:14px; padding:6px 8px; box-shadow:0 8px 28px rgba(0,0,0,.45); max-width:calc(100vw - 280px); overflow-x:auto; scrollbar-width:none; }
+    .wb-tool{ position:relative; min-width:38px; height:38px; padding:0 6px; border-radius:9px; border:none; background:transparent; color:var(--wb-text); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:17px; }
+    .wb-tool:hover{ background:rgba(255,255,255,.08); }
+    .wb-tool.active{ background:#4a4a6a; color:#fff; }
+    .wb-tool .kbd{ position:absolute; bottom:1px; right:3px; font-size:8px; color:var(--wb-muted); font-weight:700; }
+    .wb-sep{ width:1px; height:24px; background:var(--wb-border); margin:0 5px; flex:0 0 auto; }
+    .wb-top-right{ display:flex; gap:8px; align-items:center; }
+    .wb-pill-btn{ height:38px; padding:0 16px; border-radius:10px; border:1px solid var(--wb-border); background:var(--wb-panel); color:var(--wb-text); font-weight:600; font-size:13px; cursor:pointer; font-family:inherit; }
+    .wb-pill-btn.share{ background:var(--wb-accent); color:#23233b; border-color:transparent; font-weight:700; }
+    .wb-hint{ position:absolute; top:62px; left:0; right:0; text-align:center; font-size:12px; color:var(--wb-muted); z-index:4; pointer-events:none; }
+    .wb-hint kbd{ background:rgba(255,255,255,.1); border:1px solid var(--wb-border); border-radius:5px; padding:0 6px; font-size:11px; font-family:inherit; }
+
+    /* ===== stylebar with picker boxes ===== */
+    .wb-stylebar{ position:absolute; top:88px; left:50%; transform:translateX(-50%); display:flex; gap:8px; align-items:center; background:var(--wb-panel); border:1px solid var(--wb-border); border-radius:12px; padding:7px 12px; z-index:5; font-size:12px; white-space:nowrap; }
+    .sb-item{ position:relative; display:flex; align-items:center; gap:6px; }
+    .sb-label{ color:var(--wb-muted); }
+    .sb-picker{ display:flex; align-items:center; gap:7px; background:#2a2a33; color:var(--wb-text); border:1px solid var(--wb-border); border-radius:8px; padding:4px 8px 4px 4px; cursor:pointer; font-family:inherit; font-size:12px; }
+    .sb-picker:hover{ border-color:var(--wb-accent); }
+    .cp{ width:22px; height:22px; border-radius:6px; border:1px solid rgba(255,255,255,.25); flex:0 0 auto; }
+    .cp.transparent{ background:repeating-conic-gradient(#666 0 25%, #fff 0 50%) 0 0/10px 10px; }
+    .sb-sep{ width:1px; height:22px; background:var(--wb-border); }
+    .pop{ position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%); background:#1d1d24; border:1px solid var(--wb-border); border-radius:12px; box-shadow:0 18px 50px rgba(0,0,0,.6); padding:10px; z-index:30; min-width:172px; }
+    .pop.hidden{ display:none; }
+    .pop-grid{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:9px; }
+    .sw{ width:24px; height:24px; border-radius:7px; border:2px solid transparent; cursor:pointer; padding:0; }
+    .sw:hover{ transform:scale(1.12); }
+    .sw.on{ border-color:#fff; }
+    .custom-row{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--wb-muted); border-top:1px solid var(--wb-border); padding-top:9px; cursor:pointer; }
+    .custom-row input[type=color]{ width:30px; height:26px; border:none; border-radius:6px; background:none; cursor:pointer; padding:0; }
+    .mini-btn{ background:#2a2a33; color:var(--wb-text); border:1px solid var(--wb-border); border-radius:8px; padding:6px 10px; cursor:pointer; font-family:inherit; font-size:12px; }
+    .mini-btn:hover{ border-color:var(--wb-accent); }
+    .mini-btn.danger{ color:#ff8a8a; border-color:rgba(255,90,90,.4); }
+    #strokeW{ background:#2a2a33; color:#fff; border:1px solid var(--wb-border); border-radius:7px; padding:4px 6px; font-family:inherit; }
+
+    /* more tools menu */
+    .wb-more{ position:absolute; top:58px; left:50%; transform:translateX(-50%); width:250px; background:#1d1d24; border:1px solid var(--wb-border); border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.55); z-index:20; overflow:hidden; font-size:13px; }
+    .wb-more.hidden{ display:none; }
+    .wb-more button.mi{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; background:transparent; border:none; color:var(--wb-text); padding:9px 14px; cursor:pointer; font-family:inherit; }
+    .wb-more button.mi:hover{ background:rgba(255,255,255,.07); }
+    .wb-more button.mi.danger{ color:#ff8a8a; }
+    .wb-more .msep{ height:1px; background:var(--wb-border); margin:5px 0; }
+
+    .wb-foot-left{ position:absolute; left:12px; bottom:12px; display:flex; gap:8px; z-index:5; }
+    .wb-group{ display:flex; align-items:center; background:var(--wb-panel); border:1px solid var(--wb-border); border-radius:11px; overflow:hidden; }
+    .wb-group button{ min-width:36px; height:36px; background:transparent; border:none; color:var(--wb-text); cursor:pointer; font-size:14px; font-family:inherit; }
+    .wb-group button:hover{ background:rgba(255,255,255,.08); }
+    .wb-group button:disabled{ opacity:.35; cursor:default; }
+    .wb-group .zoom-label{ font-size:12px; min-width:52px; text-align:center; }
+    .wb-foot-right{ position:absolute; right:12px; bottom:12px; display:flex; gap:8px; z-index:5; }
+    #wbCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:crosshair; }
+    .wb-menu{ position:absolute; top:58px; left:12px; width:248px; background:#1d1d24; border:1px solid var(--wb-border); border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.55); z-index:20; overflow:hidden; font-size:13px; }
+    .wb-menu.hidden{ display:none; }
+    .wb-menu button.mi{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:8px; background:transparent; border:none; color:var(--wb-text); padding:9px 14px; cursor:pointer; text-align:left; font-family:inherit; }
+    .wb-menu button.mi:hover{ background:rgba(255,255,255,.07); }
+    .wb-menu button.mi.accent{ color:var(--wb-accent); }
+    .wb-menu .msep{ height:1px; background:var(--wb-border); margin:5px 0; }
+    .wb-menu .mrow{ padding:10px 14px; }
+    .wb-menu .mrow label{ font-size:12px; color:var(--wb-muted); display:block; margin-bottom:6px; }
+    .theme-seg{ display:flex; background:rgba(255,255,255,.07); border-radius:9px; padding:3px; gap:3px; }
+    .theme-seg button{ flex:1; border:none; background:transparent; color:var(--wb-text); border-radius:7px; padding:6px; cursor:pointer; }
+    .theme-seg button.on{ background:#5b5bd6; color:#fff; }
+    .bg-dots{ display:flex; gap:7px; }
+    .bg-dots button{ width:24px; height:24px; border-radius:7px; border:2px solid transparent; cursor:pointer; }
+    .bg-dots button.on{ border-color:#fff; }
+    .wb-select{ width:100%; background:#2a2a33; color:var(--wb-text); border:1px solid var(--wb-border); border-radius:8px; padding:7px; font-family:inherit; }
+    .wb-ctx{ position:absolute; min-width:230px; background:#1d1d24; border:1px solid var(--wb-border); border-radius:12px; box-shadow:0 18px 50px rgba(0,0,0,.6); z-index:30; overflow:hidden; font-size:13px; }
+    .wb-ctx.hidden{ display:none; }
+    .wb-ctx button{ display:flex; width:100%; justify-content:space-between; background:transparent; border:none; color:var(--wb-text); padding:9px 14px; cursor:pointer; font-family:inherit; }
+    .wb-ctx button:hover{ background:rgba(255,255,255,.07); }
+    .wb-ctx .msep{ height:1px; background:var(--wb-border); margin:5px 0; }
+    .wb-modal{ position:absolute; inset:0; background:rgba(0,0,0,.55); display:grid; place-items:center; z-index:40; }
+    .wb-modal.hidden{ display:none; }
+    .wb-card{ width:min(480px,92%); background:#1e1e26; border:1px solid var(--wb-border); border-radius:16px; padding:20px; }
+    .wb-card h3{ margin:0 0 6px; font-size:16px; }
+    .wb-card p{ margin:0 0 12px; font-size:13px; color:var(--wb-muted); line-height:1.8; }
+    .wb-card input{ width:100%; background:#2a2a33; border:1px solid var(--wb-border); color:#fff; border-radius:9px; padding:10px; font-family:inherit; margin-bottom:10px; }
+    .wb-lib{ position:absolute; top:58px; right:12px; width:230px; background:#1d1d24; border:1px solid var(--wb-border); border-radius:14px; z-index:20; padding:12px; font-size:13px; }
+    .wb-lib.hidden{ display:none; }
+    .wb-lib .lib-item{ background:#2a2a33; border:1px solid var(--wb-border); border-radius:10px; padding:12px; margin-bottom:8px; cursor:pointer; text-align:center; }
+    .wb-lib .lib-item:hover{ border-color:var(--wb-accent); }
+    .wb-text-input{ position:absolute; z-index:25; background:transparent; border:1px dashed var(--wb-accent); color:inherit; font-family:inherit; outline:none; resize:none; overflow:hidden; padding:4px; }
+    @media(max-width:768px){
+      .wb-toolbar{ max-width:calc(100vw - 40px); }
+      .wb-hint{ display:none; }
+      .wb-stylebar{ font-size:11px; padding:6px 8px; gap:6px; max-width:94%; overflow-x:auto; }
+      .wb-pill-btn{ padding:0 12px; }
+      .sb-label{ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="wb-shell">
+      <!-- ===== Board ===== -->
+      <div class="wb-board" id="wbBoard">
+        <canvas id="wbCanvas"></canvas>
+
+        <div class="wb-top">
+          <button class="wb-icon-btn" id="menuBtn" title="القائمة">☰</button>
+          <div class="wb-toolbar" id="toolbar" role="toolbar" aria-label="Shapes">
+            <button class="wb-tool active" data-tool="lock" title="الأداة تفضل شغالة بعد الرسم — Q">🔒</button>
+            <div class="wb-sep"></div>
+            <button class="wb-tool" data-tool="hand" title="Hand (panning) — H">✋</button>
+            <button class="wb-tool active" data-tool="selection" title="Selection — V">➤<span class="kbd">V</span></button>
+            <button class="wb-tool" data-tool="rectangle" title="Rectangle — R">▢<span class="kbd">R</span></button>
+            <button class="wb-tool" data-tool="diamond" title="Diamond — D">◇<span class="kbd">D</span></button>
+            <button class="wb-tool" data-tool="ellipse" title="Ellipse — O">○<span class="kbd">O</span></button>
+            <button class="wb-tool" data-tool="arrow" title="Arrow — A">→<span class="kbd">A</span></button>
+            <button class="wb-tool" data-tool="line" title="Line — L">─<span class="kbd">L</span></button>
+            <button class="wb-tool" data-tool="freedraw" title="Draw — P">✎<span class="kbd">P</span></button>
+            <button class="wb-tool" data-tool="text" title="Text — T">A<span class="kbd">T</span></button>
+            <button class="wb-tool" data-tool="sticky" title="Sticky note — N">▦<span class="kbd">N</span></button>
+            <button class="wb-tool" id="imgBtn" title="Insert image — I">🖼<span class="kbd">I</span></button>
+            <button class="wb-tool" data-tool="eraser" title="Eraser — E">⌫<span class="kbd">E</span></button>
+            <div class="wb-sep"></div>
+            <button class="wb-tool" id="moreBtn" title="More actions">⋮</button>
+          </div>
+          <div class="wb-top-right">
+            <button class="wb-pill-btn share" id="shareBtn">Share</button>
+            <button class="wb-icon-btn" id="libBtn" title="Library">📚</button>
+          </div>
+        </div>
+        <div class="wb-hint" id="wbHint">To move canvas, hold <kbd>Scroll wheel</kbd> or <kbd>Space</kbd> while dragging, or use the hand tool</div>
+
+        <div class="wb-stylebar" id="styleBar">
+          <div class="sb-item">
+            <span class="sb-label">Stroke</span>
+            <button class="sb-picker" id="strokeBtn" title="Stroke color"><span class="cp" id="strokePreview"></span><span>▾</span></button>
+            <div class="pop hidden" id="strokePop">
+              <div class="pop-grid" id="strokeDots"></div>
+              <label class="custom-row"><input type="color" id="strokeCustom" value="#ffffff" /> Custom…</label>
+            </div>
+          </div>
+          <div class="sb-item">
+            <span class="sb-label">Fill</span>
+            <button class="sb-picker" id="fillBtn" title="Fill color"><span class="cp transparent" id="fillPreview"></span><span>▾</span></button>
+            <div class="pop hidden" id="fillPop">
+              <div class="pop-grid" id="bgDots"></div>
+              <label class="custom-row"><input type="color" id="fillCustom" value="#6c5ce7" /> Custom…</label>
+            </div>
+          </div>
+          <div class="sb-item">
+            <span class="sb-label">Width</span>
+            <select id="strokeW"><option value="1.5">S</option><option value="2.5" selected>M</option><option value="4">L</option></select>
+          </div>
+          <div class="sb-sep hidden" id="selSep"></div>
+          <div class="sb-item hidden" id="selActions">
+            <button class="mini-btn" id="dupBtn" title="Duplicate (Ctrl+D)">⧉</button>
+            <button class="mini-btn" id="frontBtn" title="Bring to front">↑</button>
+            <button class="mini-btn" id="backBtn" title="Send to back">↓</button>
+            <button class="mini-btn danger" id="delBtn" title="Delete (Del)">🗑</button>
+          </div>
+        </div>
+
+        <div class="wb-more hidden" id="moreMenu">
+          <button class="mi" data-m="duplicate">⧉ Duplicate selection <span style="opacity:.5">Ctrl+D</span></button>
+          <button class="mi" data-m="all">Select all <span style="opacity:.5">Ctrl+A</span></button>
+          <div class="msep"></div>
+          <button class="mi" data-m="front">↑ Bring to front</button>
+          <button class="mi" data-m="back">↓ Send to back</button>
+          <div class="msep"></div>
+          <button class="mi danger" data-m="delete">🗑 Delete selection <span style="opacity:.5">Del</span></button>
+        </div>
+
+        <div class="wb-menu hidden" id="mainMenu">
+          <button class="mi" data-act="open">📁 Open <span style="opacity:.5">Ctrl+O</span></button>
+          <button class="mi" data-act="save">💾 Save to... </button>
+          <button class="mi" data-act="png">🖼 Export image... <span style="opacity:.5">Ctrl+Shift+E</span></button>
+          <button class="mi" data-act="svg">🎨 Export SVG...</button>
+          <button class="mi" data-act="collab">👥 Live collaboration...</button>
+          <button class="mi accent" data-act="palette">⚡ Command palette <span style="opacity:.5">Ctrl+/</span></button>
+          <button class="mi" data-act="find">🔍 Find on canvas <span style="opacity:.5">Ctrl+F</span></button>
+          <button class="mi" data-act="help">ⓘ Help <span style="opacity:.5">?</span></button>
+          <button class="mi" data-act="reset">🗑 Reset the canvas</button>
+          <div class="msep"></div>
+          <div class="mrow"><label>Theme</label><div class="theme-seg" id="themeSeg"><button data-th="light">☀</button><button data-th="dark" class="on">🌙</button><button data-th="system">🖥</button></div></div>
+          <div class="mrow"><label>Language</label><select class="wb-select" id="langSel"><option value="en" selected>English</option><option value="ar">العربية</option></select></div>
+          <div class="mrow"><label>Canvas background</label><div class="bg-dots" id="canvasBgDots"></div></div>
+        </div>
+
+        <div class="wb-lib hidden" id="libPanel">
+          <b>Library</b><p style="color:var(--wb-muted);font-size:12px">Click to insert</p>
+          <div class="lib-item" data-lib="flow">▢ → ○ &nbsp; Flow</div>
+          <div class="lib-item" data-lib="mind">○ — ○ — ○ &nbsp; Mindmap</div>
+          <div class="lib-item" data-lib="ui">▢ ▢ ▢ &nbsp; Wireframe</div>
+        </div>
+
+        <div class="wb-foot-left">
+          <div class="wb-group"><button id="zoomOut">−</button><button class="zoom-label" id="zoomLabel">100%</button><button id="zoomIn">+</button></div>
+          <div class="wb-group"><button id="undoBtn" title="Undo">↩</button><button id="redoBtn" title="Redo">↪</button></div>
+        </div>
+        <div class="wb-foot-right">
+          <button class="wb-icon-btn" id="gridBtn" title="Toggle grid">▦</button>
+          <button class="wb-icon-btn" id="helpBtn" title="Help">?</button>
+        </div>
+
+        <div class="wb-ctx hidden" id="ctxMenu">
+          <button data-c="dup">Duplicate</button><div class="msep"></div>
+          <button data-c="all">Select all <kbd>Ctrl+A</kbd></button><div class="msep"></div>
+          <button data-c="grid">Toggle grid</button>
+          <button data-c="zen">Zen mode <kbd>Alt+Z</kbd></button>
+          <button data-c="view">View mode <kbd>Alt+R</kbd></button>
+          <button data-c="stats">Canvas &amp; Shape properties</button>
+          <div class="msep"></div>
+          <button data-c="delete">Delete selection <kbd>Del</kbd></button>
+        </div>
+
+        <div class="wb-modal hidden" id="wbModal"><div class="wb-card">
+          <h3 id="mTitle">Share</h3><p id="mDesc"></p>
+          <div id="mBody"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn-tool" id="mClose">Close</button></div>
+        </div></div>
+        <input type="file" id="fileOpen" accept=".json" hidden />
+        <input type="file" id="imgOpen" accept="image/*" multiple hidden />
+      </div>
+    </div>
+  </main>
+
+<script>
+(()=>{ "use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const board=$("#wbBoard"), canvas=$("#wbCanvas"), ctx=canvas.getContext("2d");
+const LS="wb-whiteboard-v1";
+let shapes=[], sel=new Set(), tool="selection", keepTool=true, spaceDown=false, viewOnly=false;
+let cam={x:0,y:0,z:1}, showGrid=false, canvasBg="#121212", dark=true;
+let stroke="#ffffff", fill="transparent", sw=2.5;
+let undoStack=[], redoStack=[], drawing=null, panning=null, movingSel=null, erasing=false, erasingBefore=null, erasingChanged=false;
+let seq=1;
+
+const STROKES=["#ffffff","#ff7979","#f6e58d","#7bed9f","#70a1ff","#e056fd"];
+const FILLS=["transparent","#2f3542","#f9ca24","#6c5ce7","#00cec9","#ff7675"];
+const BGS=["#ffffff","#121212","#1e1e28","#2b2b1a","#2b1a1a","#16202b"];
+
+/* ---------- color / fill picker boxes ---------- */
+const sd=$("#strokeDots"), bd=$("#bgDots"), cbg=$("#canvasBgDots");
+const strokePop=$("#strokePop"), fillPop=$("#fillPop"), moreMenu=$("#moreMenu");
+const strokePreview=$("#strokePreview"), fillPreview=$("#fillPreview");
+
+function swatchBtn(color, isFill){
+  const b=document.createElement("button");
+  b.className="sw"; b.dataset.c=color; b.title=color==="transparent"?"transparent":color;
+  b.style.background=color==="transparent"?"repeating-conic-gradient(#666 0 25%, #fff 0 50%) 0 0/10px 10px":color;
+  b.onclick=e=>{ e.stopPropagation(); if(isFill) setFill(color); else setStroke(color); };
+  return b;
+}
+STROKES.forEach(c=>sd.appendChild(swatchBtn(c,false)));
+FILLS.forEach(c=>bd.appendChild(swatchBtn(c,true)));
+BGS.forEach(c=>{const b=document.createElement("button");b.dataset.c=c;b.style.background=c;b.title=c;b.onclick=()=>{canvasBg=c;save();draw();syncBgUI()};cbg.appendChild(b)});
+
+function syncStrokeUI(){
+  [...sd.children].forEach(x=>x.classList.toggle("on",x.dataset.c===stroke));
+  strokePreview.style.background=stroke;
+  const sc=$("#strokeCustom"); if(sc && /^#[0-9a-f]{6}$/i.test(stroke)) sc.value=stroke;
+}
+function syncFillUI(){
+  [...bd.children].forEach(x=>x.classList.toggle("on",x.dataset.c===fill));
+  if(fill==="transparent"){ fillPreview.style.background=""; fillPreview.classList.add("transparent"); }
+  else{ fillPreview.style.background=fill; fillPreview.classList.remove("transparent");
+    const fc=$("#fillCustom"); if(fc && /^#[0-9a-f]{6}$/i.test(fill)) fc.value=fill; }
+}
+function syncBgUI(){ [...cbg.children].forEach(x=>x.classList.toggle("on",x.dataset.c===canvasBg)); }
+function syncWidthUI(v){ const s=$("#strokeW"); const val=String(v); if(["1.5","2.5","4"].includes(val)) s.value=val; }
+
+function setStroke(c){
+  stroke=c; syncStrokeUI();
+  applyToSelection({color:c});
+}
+function setFill(c){
+  fill=c; syncFillUI();
+  applyToSelection({bg:c});
+}
+function applyToSelection(patch){
+  if(!sel.size) return;
+  pushUndo();
+  shapes.forEach(s=>{ if(sel.has(s.id)) Object.assign(s,patch); });
+  save(); draw();
+}
+$("#strokeCustom").oninput=e=>setStroke(e.target.value);
+$("#fillCustom").oninput=e=>setFill(e.target.value);
+$("#strokeW").onchange=e=>{ sw=parseFloat(e.target.value); applyToSelection({sw}); };
+
+function closePops(){
+  strokePop.classList.add("hidden"); fillPop.classList.add("hidden"); moreMenu.classList.add("hidden");
+}
+$("#strokeBtn").onclick=e=>{ e.stopPropagation(); const was=strokePop.classList.contains("hidden"); closePops(); if(was) strokePop.classList.remove("hidden"); };
+$("#fillBtn").onclick=e=>{ e.stopPropagation(); const was=fillPop.classList.contains("hidden"); closePops(); if(was) fillPop.classList.remove("hidden"); };
+$("#moreBtn").onclick=e=>{ e.stopPropagation(); const was=moreMenu.classList.contains("hidden"); closePops(); $("#libPanel").classList.add("hidden"); if(was) moreMenu.classList.remove("hidden"); };
+strokePop.addEventListener("click",e=>e.stopPropagation());
+fillPop.addEventListener("click",e=>e.stopPropagation());
+moreMenu.addEventListener("click",e=>{
+  const b=e.target.closest("[data-m]"); if(!b) return;
+  closePops(); moreAction(b.dataset.m);
+});
+function moreAction(m){
+  if(m==="duplicate") duplicateSel();
+  else if(m==="delete") deleteSel();
+  else if(m==="all") selectAll();
+  else if(m==="front") bringFront();
+  else if(m==="back") sendBack();
+}
+
+/* ---------- selection actions ---------- */
+function selectedShapes(){ return shapes.filter(s=>sel.has(s.id)); }
+function refreshSelUI(){
+  const n=sel.size;
+  $("#selActions").classList.toggle("hidden",!n);
+  $("#selSep").classList.toggle("hidden",!n);
+  if(n===1){
+    const s=selectedShapes()[0];
+    if(s.color) { stroke=s.color; syncStrokeUI(); }
+    if(s.bg!==undefined) { fill=s.bg; syncFillUI(); }
+    if(s.sw) { sw=s.sw; syncWidthUI(sw); }
+  }
+}
+function selectAll(){ sel=new Set(shapes.map(s=>s.id)); draw(); refreshSelUI(); }
+function deleteSel(){
+  if(!sel.size) return;
+  pushUndo(); shapes=shapes.filter(s=>!sel.has(s.id)); sel.clear();
+  save(); draw(); syncBtns(); refreshSelUI();
+}
+function duplicateSel(){
+  if(!sel.size) return;
+  pushUndo();
+  const clones=[];
+  selectedShapes().forEach(s=>{
+    const c=JSON.parse(JSON.stringify(s)); c.id=seq++;
+    const DX=24, DY=24;
+    if(c.points) c.points=c.points.map(p=>({x:p.x+DX,y:p.y+DY}));
+    if(c.x!==undefined){ c.x+=DX; c.y+=DY; }
+    if(c.x2!==undefined){ c.x2+=DX; c.y2+=DY; }
+    shapes.push(c); clones.push(c.id);
+  });
+  sel=new Set(clones);
+  save(); draw(); syncBtns(); refreshSelUI();
+}
+function bringFront(){
+  if(!sel.size) return;
+  pushUndo();
+  const picked=selectedShapes();
+  shapes=shapes.filter(s=>!sel.has(s.id)).concat(picked);
+  save(); draw();
+}
+function sendBack(){
+  if(!sel.size) return;
+  pushUndo();
+  const picked=selectedShapes();
+  shapes=picked.concat(shapes.filter(s=>!sel.has(s.id)));
+  save(); draw();
+}
+$("#dupBtn").onclick=duplicateSel;
+$("#delBtn").onclick=deleteSel;
+$("#frontBtn").onclick=bringFront;
+$("#backBtn").onclick=sendBack;
+
+/* ---------- persistence ---------- */
+function save(){ try{localStorage.setItem(LS,JSON.stringify({shapes,cam,canvasBg,dark}))}catch(e){} }
+function load(){ try{const d=JSON.parse(localStorage.getItem(LS));if(d){shapes=d.shapes||[];Object.assign(cam,d.cam||{});canvasBg=d.canvasBg||canvasBg;dark=d.dark!==false;seq=shapes.reduce((m,s)=>Math.max(m,s.id||0),0)+1}}catch(e){} }
+function pushUndo(){undoStack.push(JSON.stringify(shapes));if(undoStack.length>60)undoStack.shift();redoStack.length=0;syncBtns()}
+function syncBtns(){$("#undoBtn").disabled=!undoStack.length;$("#redoBtn").disabled=!redoStack.length;$("#zoomLabel").textContent=Math.round(cam.z*100)+"%"}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(shapes));shapes=JSON.parse(undoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(shapes));shapes=JSON.parse(redoStack.pop());sel.clear();save();draw();syncBtns();refreshSelUI()}
+
+/* ---------- canvas sizing / transform ---------- */
+function resize(){const r=board.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,r.width*dpr);canvas.height=Math.max(1,r.height*dpr);draw()}
+addEventListener("resize",resize);
+const toWorld=(px,py)=>{const r=canvas.getBoundingClientRect();return{x:(px-r.left-cam.x)/cam.z,y:(py-r.top-cam.y)/cam.z}};
+const toScreen=(x,y)=>({x:x*cam.z+cam.x,y:y*cam.z+cam.y});
+
+/* ---------- drawing ---------- */
+function draw(){
+  const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=canvasBg;ctx.fillRect(0,0,r.width,r.height);
+  if(showGrid){ctx.save();ctx.strokeStyle=dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.08)";ctx.lineWidth=1;const s=28*cam.z;const ox=((cam.x%s)+s)%s,oy=((cam.y%s)+s)%s;ctx.beginPath();for(let x=ox;x<r.width;x+=s){ctx.moveTo(x,0);ctx.lineTo(x,r.height)}for(let y=oy;y<r.height;y+=s){ctx.moveTo(0,y);ctx.lineTo(r.width,y)}ctx.stroke();ctx.restore()}
+  ctx.save();ctx.translate(cam.x,cam.y);ctx.scale(cam.z,cam.z);
+  ctx.lineJoin="round";ctx.lineCap="round";
+  shapes.forEach(s=>drawShape(s));
+  if(drawing)drawShape(drawing);
+  sel.forEach(id=>{const s=shapes.find(x=>x.id===id);if(!s)return;const b=bbox(s);ctx.save();ctx.strokeStyle="#6965db";ctx.setLineDash([6,4]);ctx.lineWidth=1.2/cam.z;ctx.strokeRect(b.x-8,b.y-8,b.w+16,b.h+16);ctx.restore()});
+  ctx.restore();
+  board.style.background=canvasBg;
+}
+function bbox(s){
+  if(s.type==="freedraw"&&s.points&&s.points.length){const xs=s.points.map(p=>p.x),ys=s.points.map(p=>p.y);const x=Math.min(...xs),y=Math.min(...ys);return{x,y,w:Math.max(...xs)-x||4,h:Math.max(...ys)-y||4}}
+  if((s.type==="line"||s.type==="arrow")){return{x:Math.min(s.x,s.x2),y:Math.min(s.y,s.y2),w:Math.abs(s.x2-s.x)||4,h:Math.abs(s.y2-s.y)||4}}
+  return{x:Math.min(s.x,s.x2??s.x+120),y:Math.min(s.y,s.y2??s.y+60),w:Math.abs((s.x2??s.x+120)-s.x)||4,h:Math.abs((s.y2??s.y+60)-s.y)||4};
+}
+function drawShape(s){
+  ctx.save();
+  ctx.strokeStyle=s.color||"#fff";ctx.lineWidth=(s.sw||2.5);ctx.globalAlpha=s.opacity??1;
+  if(s.type==="image"){drawImageShape(s)}
+  else if(s.type==="rectangle"||s.type==="sticky"){const b=bbox(s);if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;roundRect(b.x,b.y,b.w,b.h,8);ctx.fill()}roundRect(b.x,b.y,b.w,b.h,8);ctx.stroke();if(s.text){writeText(s.text,b.x+b.w/2,b.y+b.h/2,b.w-16,s.type==="sticky"?"#1a1a1a":(s.color||"#fff"))}}
+  else if(s.type==="diamond"){const b=bbox(s);const cx=b.x+b.w/2,cy=b.y+b.h/2;ctx.beginPath();ctx.moveTo(cx,b.y);ctx.lineTo(b.x+b.w,cy);ctx.lineTo(cx,b.y+b.h);ctx.lineTo(b.x,cy);ctx.closePath();if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;ctx.fill()}ctx.stroke();if(s.text)writeText(s.text,cx,cy,b.w-20,s.color)}
+  else if(s.type==="ellipse"){const b=bbox(s);ctx.beginPath();ctx.ellipse(b.x+b.w/2,b.y+b.h/2,Math.abs(b.w/2),Math.abs(b.h/2),0,0,7);if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;ctx.fill()}ctx.stroke();if(s.text)writeText(s.text,b.x+b.w/2,b.y+b.h/2,b.w-16,s.color)}
+  else if(s.type==="line"||s.type==="arrow"){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x2,s.y2);ctx.stroke();if(s.type==="arrow")strokeHead(ctx,s.x,s.y,s.x2,s.y2,s.color||"#fff",s.sw||2.5)}
+  else if(s.type==="freedraw"&&s.points&&s.points.length>1){ctx.beginPath();ctx.moveTo(s.points[0].x,s.points[0].y);for(let i=1;i<s.points.length;i++)ctx.lineTo(s.points[i].x,s.points[i].y);ctx.stroke()}
+  else if(s.type==="text"){writeText(s.text||"",s.x,s.y,600,s.color,true)}
+  ctx.restore();
+}
+function strokeHead(g,x1,y1,x2,y2,color,lw){
+  const a=Math.atan2(y2-y1,x2-x1),L=14;
+  g.save();g.strokeStyle=color;g.lineWidth=lw;g.beginPath();
+  g.moveTo(x2,y2);g.lineTo(x2-L*Math.cos(a-.4),y2-L*Math.sin(a-.4));
+  g.moveTo(x2,y2);g.lineTo(x2-L*Math.cos(a+.4),y2-L*Math.sin(a+.4));
+  g.stroke();g.restore();
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function writeText(t,x,y,mw,color,left){ctx.save();ctx.fillStyle=color||"#fff";ctx.font="20px 'Segoe UI',Tahoma,sans-serif";ctx.textAlign=left?"left":"center";ctx.textBaseline="middle";wrapFill(ctx,t||"",x,y,mw);ctx.restore()}
+function wrapLines(g,t,mw){
+  const words=String(t).split(" ");const ls=[];let line="";
+  words.forEach(w=>{const test=line?line+" "+w:w;if(g.measureText(test).width>mw&&line){ls.push(line);line=w}else line=test});
+  ls.push(line);return ls;
+}
+function wrapFill(g,t,x,y,mw){const ls=wrapLines(g,t,mw);let yy=y-(ls.length-1)*13;ls.forEach(l=>{g.fillText(l,x,yy);yy+=26})}
+
+/* ---------- pointer ---------- */
+function pos(e){return toWorld(e.clientX,e.clientY)}
+canvas.addEventListener("pointerdown",e=>{
+  try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+  const p=pos(e);
+  hideCtx(); closePops();
+  if(viewOnly)return;
+  if(spaceDown||tool==="hand"||e.button===1){panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y};return}
+  if(tool==="selection"){
+    const hit=hitTest(p);
+    if(hit){
+      if(!e.shiftKey&&!sel.has(hit.id))sel.clear();
+      sel.add(hit.id);
+      movingSel={sx:p.x,sy:p.y,moved:false,before:JSON.stringify(shapes),
+        orig:shapes.filter(s=>sel.has(s.id)).map(s=>({id:s.id,dx:(s.x??0),dy:(s.y??0),x2:s.x2,y2:s.y2,pts:s.points?JSON.parse(JSON.stringify(s.points)):null}))};
+    }else{sel.clear()}
+    draw(); refreshSelUI(); return;
+  }
+  if(tool==="eraser"){erasing=true;erasingChanged=false;erasingBefore=JSON.stringify(shapes);eraseAt(p);return}
+  if(tool==="text"||tool==="sticky"){openTextEditor(p,tool==="sticky");return}
+  drawing={id:seq++,type:tool,x:p.x,y:p.y,x2:p.x+1,y2:p.y+1,color:stroke,bg:tool==="sticky"?"#fff3a3":fill,sw,text:"",points:tool==="freedraw"?[p]:null};
+});
+canvas.addEventListener("pointermove",e=>{
+  const p=pos(e);
+  if(panning){cam.x=panning.cx+(e.clientX-panning.sx);cam.y=panning.cy+(e.clientY-panning.sy);draw();return}
+  if(erasing){eraseAt(p);return}
+  if(movingSel){const dx=p.x-movingSel.sx,dy=p.y-movingSel.sy;if(Math.abs(dx)+Math.abs(dy)>1)movingSel.moved=true;shapes.forEach(s=>{const o=movingSel.orig.find(o=>o.id===s.id);if(!o)return;if(s.points){s.points=o.pts.map(q=>({x:q.x+dx,y:q.y+dy}))}else{if(s.x!==undefined){s.x=o.dx+dx;s.y=o.dy+dy}if(s.x2!==undefined){s.x2=o.x2+dx;s.y2=o.y2+dy}}});draw();return}
+  if(drawing){if(drawing.type==="freedraw")drawing.points.push(p);else{drawing.x2=p.x;drawing.y2=p.y}draw()}
+});
+addEventListener("pointerup",()=>{
+  if(panning){panning=null;save();return}
+  if(erasing){
+    erasing=false;
+    if(erasingChanged){undoStack.push(erasingBefore);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save();syncBtns();}
+    erasingBefore=null;draw();refreshSelUI();return;
+  }
+  if(movingSel){if(movingSel.moved){undoStack.push(movingSel.before);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save()}movingSel=null;draw();syncBtns();return}
+  if(drawing){const d=drawing;drawing=null;
+    if(d.type==="freedraw"&&(!d.points||d.points.length<2)){draw();return}
+    if((d.type!=="freedraw")&&(Math.abs(d.x2-d.x)<4&&Math.abs(d.y2-d.y)<4)){draw();return}
+    pushUndo();
+    shapes.push(d);sel=new Set([d.id]);save();draw();syncBtns();refreshSelUI();
+    if(!keepTool)setTool("selection");
+  }
+});
+function eraseAt(p){
+  const hit=hitTest(p);
+  if(!hit) return;
+  erasingChanged=true;
+  shapes=shapes.filter(s=>s.id!==hit.id);sel.delete(hit.id);
+  save();draw();
+}
+/* wheel zoom */
+board.addEventListener("wheel",e=>{e.preventDefault();const f=e.deltaY<0?1.1:0.9;zoomAt(e.clientX,e.clientY,f)},{passive:false});
+function zoomAt(cx,cy,f){const before=toWorld(cx,cy);cam.z=Math.min(4,Math.max(.2,cam.z*f));const r=canvas.getBoundingClientRect();cam.x=cx-r.left-before.x*cam.z;cam.y=cy-r.top-before.y*cam.z;draw();syncBtns()}
+
+/* hit test */
+function hitTest(p){for(let i=shapes.length-1;i>=0;i--){const s=shapes[i],b=bbox(s);const pad=10/cam.z;if(p.x>=b.x-pad&&p.x<=b.x+b.w+pad&&p.y>=b.y-pad&&p.y<=b.y+b.h+pad)return s}return null}
+
+/* text editor */
+function openTextEditor(p,isSticky){
+  const sc=toScreen(p.x,p.y);const ta=document.createElement("textarea");ta.className="wb-text-input";
+  ta.style.left=sc.x+"px";ta.style.top=sc.y+"px";ta.style.width="240px";ta.style.height=isSticky?"140px":"60px";
+  ta.style.color=isSticky?"#1a1a1a":stroke;if(isSticky){ta.style.background="#fff3a3";ta.style.padding="10px";ta.style.borderRadius="8px"}
+  ta.placeholder=isSticky?"Sticky note...":"Type text...";board.appendChild(ta);ta.focus();
+  let done=false, cancelled=false;
+  ta.onkeydown=ev=>{
+    if(ev.key==="Escape"){ev.preventDefault();cancelled=true;finish();return}
+    if(ev.key==="Enter"&&!ev.shiftKey&&!isSticky){ev.preventDefault();commit();return}
+    if(ev.key==="Enter"&&(ev.ctrlKey||ev.metaKey)&&isSticky){ev.preventDefault();commit()}
+  };
+  ta.onblur=()=>{ if(done||cancelled) return; commit(); };
+  function finish(){ done=true; if(ta.isConnected) ta.remove(); }
+  function commit(){
+    if(done||cancelled) return; done=true;
+    const v=ta.value.trim(); if(ta.isConnected) ta.remove();
+    if(!v) return;
+    pushUndo();
+    shapes.push({id:seq++,type:isSticky?"sticky":"text",x:p.x,y:p.y,x2:p.x+220,y2:p.y+(isSticky?130:30),color:stroke,bg:isSticky?"#fff3a3":"transparent",sw,text:v});
+    save();draw();syncBtns();refreshSelUI();if(!keepTool)setTool("selection");
+  }
+}
+
+/* ---------- toolbar ---------- */
+function setTool(t){if(t==="lock"){keepTool=!keepTool;document.querySelector('[data-tool="lock"]').classList.toggle("active",keepTool);return}tool=t;$$("#toolbar .wb-tool[data-tool]").forEach(b=>b.classList.toggle("active",b.dataset.tool===t));canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
+$("#toolbar").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(!b)return;setTool(b.dataset.tool)});
+
+/* ---------- menu ---------- */
+const menu=$("#mainMenu");
+$("#menuBtn").onclick=e=>{e.stopPropagation();closePops();menu.classList.toggle("hidden");$("#libPanel").classList.add("hidden")};
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#mainMenu")&&!e.target.closest("#menuBtn"))menu.classList.add("hidden");
+  if(!e.target.closest(".sb-item")&&!e.target.closest("#moreMenu")&&!e.target.closest("#moreBtn"))closePops();
+  if(!e.target.closest("#libPanel")&&!e.target.closest("#libBtn"))$("#libPanel").classList.add("hidden");
+});
+menu.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;menuAction(b.dataset.act);menu.classList.add("hidden")});
+$("#themeSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;[...$("#themeSeg").children].forEach(x=>x.classList.remove("on"));b.classList.add("on");setTheme(b.dataset.th)});
+function setTheme(t){
+  if(t==="light"){dark=false;canvasBg="#ffffff";stroke="#1a1a1a"}
+  else if(t==="dark"){dark=true;canvasBg="#121212";stroke="#ffffff"}
+  else{dark=matchMedia("(prefers-color-scheme: dark)").matches;canvasBg=dark?"#121212":"#ffffff";stroke=dark?"#ffffff":"#1a1a1a"}
+  syncStrokeUI();syncBgUI();save();draw();
+}
+$("#langSel").onchange=e=>{$("#wbHint").textContent=e.target.value==="ar"?"للتحريك: اضغط عجلة الفأرة أو مسافة أثناء السحب، أو استخدم أداة اليد":"To move canvas, hold Scroll wheel or Space while dragging, or use the hand tool"};
+
+function toggleZen(){document.body.classList.toggle("wb-zen");board.classList.toggle("zen");setTimeout(resize,50)}
+function toggleGrid(){showGrid=!showGrid;draw();syncGridBtn()}
+function syncGridBtn(){const b=$("#gridBtn");if(b)b.style.borderColor=showGrid?"var(--wb-accent)":"transparent"}
+
+function menuAction(a){
+  if(a==="open")$("#fileOpen").click();
+  else if(a==="save")downloadJSON();
+  else if(a==="png")exportPNG();
+  else if(a==="svg")exportSVG();
+  else if(a==="collab")openModal("Live collaboration","هذه النسخة تعمل محلياً 100% بدون سيرفر — شارك عملك عبر تصدير PNG/SVG/JSON.",'<button class="btn-tool primary" id="collabPng">Export PNG</button>')||setTimeout(()=>{const b=$("#collabPng");if(b)b.onclick=exportPNG},0);
+  else if(a==="palette")openPalette();
+  else if(a==="grid")toggleGrid();
+  else if(a==="zen")toggleZen();
+  else if(a==="find"){const q=prompt("Find on canvas — اكتب نصاً للبحث عنه:");if(q){const f=shapes.find(s=>(s.text||"").includes(q));if(f){const b=bbox(f);cam.x=canvas.clientWidth/2-(b.x+b.w/2)*cam.z;cam.y=canvas.clientHeight/2-(b.y+b.h/2)*cam.z;sel=new Set([f.id]);draw();refreshSelUI()}else alert("Not found")}}
+  else if(a==="help")openHelp();
+  else if(a==="reset"){if(confirm("Reset the canvas? سيتم مسح كل الرسومات.")){pushUndo();shapes=[];sel.clear();save();draw();syncBtns();refreshSelUI()}}
+}
+$("#fileOpen").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);pushUndo();const arr=d.elements||d.shapes||d;if(!Array.isArray(arr))throw 0;shapes=arr;shapes.forEach(s=>{s.id=seq++});sel.clear();save();draw();syncBtns();refreshSelUI()}catch(_){alert("ملف غير صالح")}};r.readAsText(f);e.target.value=""};
+
+/* ---------- export ---------- */
+function contentBox(){if(!shapes.length)return null;let x1=1e9,y1=1e9,x2=-1e9,y2=-1e9;shapes.forEach(s=>{const b=bbox(s);x1=Math.min(x1,b.x);y1=Math.min(y1,b.y);x2=Math.max(x2,b.x+b.w);y2=Math.max(y2,b.y+b.h)});return{x:x1-24,y:y1-24,w:x2-x1+48,h:y2-y1+48}}
+function renderBoardToCanvas(){
+  const box=contentBox();const sc=2;
+  const W=Math.max(box?box.w:board.clientWidth,400),H=Math.max(box?box.h:board.clientHeight,300);
+  const c=document.createElement("canvas");c.width=W*sc;c.height=H*sc;
+  const g=c.getContext("2d");g.scale(sc,sc);g.fillStyle=canvasBg;g.fillRect(0,0,W,H);
+  g.save();g.translate(box?-box.x:0,box?-box.y:0);
+  g.lineJoin="round";g.lineCap="round";
+  shapes.forEach(s=>{
+    g.save();g.strokeStyle=s.color||"#fff";g.lineWidth=s.sw||2.5;
+    if(s.type==="rectangle"||s.type==="sticky"){
+      const b=bbox(s);
+      if(s.bg&&s.bg!=="transparent"){g.fillStyle=s.bg;g.beginPath();g.rect(b.x,b.y,b.w,b.h);g.fill()}
+      g.strokeRect(b.x,b.y,b.w,b.h);
+      if(s.text){g.fillStyle=s.type==="sticky"?"#1a1a1a":(s.color||"#fff");g.font="20px sans-serif";g.textAlign="center";g.textBaseline="middle";wrapFill(g,s.text,b.x+b.w/2,b.y+b.h/2,Math.max(20,b.w-16))}
+    }
+    else if(s.type==="ellipse"){const b=bbox(s);g.beginPath();g.ellipse(b.x+b.w/2,b.y+b.h/2,Math.abs(b.w/2),Math.abs(b.h/2),0,0,7);if(s.bg&&s.bg!=="transparent"){g.fillStyle=s.bg;g.fill()}g.stroke();if(s.text){g.fillStyle=s.color||"#fff";g.font="20px sans-serif";g.textAlign="center";g.textBaseline="middle";wrapFill(g,s.text,b.x+b.w/2,b.y+b.h/2,Math.max(20,b.w-16))}}
+    else if(s.type==="diamond"){const b=bbox(s),cx=b.x+b.w/2,cy=b.y+b.h/2;g.beginPath();g.moveTo(cx,b.y);g.lineTo(b.x+b.w,cy);g.lineTo(cx,b.y+b.h);g.lineTo(b.x,cy);g.closePath();if(s.bg&&s.bg!=="transparent"){g.fillStyle=s.bg;g.fill()}g.stroke();if(s.text){g.fillStyle=s.color||"#fff";g.font="20px sans-serif";g.textAlign="center";g.textBaseline="middle";wrapFill(g,s.text,cx,cy,Math.max(20,b.w-20))}}
+    else if(s.type==="line"||s.type==="arrow"){g.beginPath();g.moveTo(s.x,s.y);g.lineTo(s.x2,s.y2);g.stroke();if(s.type==="arrow")strokeHead(g,s.x,s.y,s.x2,s.y2,s.color||"#fff",s.sw||2.5)}
+    else if(s.type==="freedraw"&&s.points&&s.points.length>1){g.beginPath();g.moveTo(s.points[0].x,s.points[0].y);s.points.forEach(p=>g.lineTo(p.x,p.y));g.stroke()}
+    else if(s.type==="text"){g.fillStyle=s.color||"#fff";g.font="20px sans-serif";g.textAlign="left";g.textBaseline="middle";wrapFill(g,s.text||"",s.x,s.y+10,600)}
+    g.restore();
+  });
+  g.restore();
+  return c;
+}
+function exportPNG(){
+  const c=renderBoardToCanvas();
+  const a=document.createElement("a");a.download="whiteboard.png";a.href=c.toDataURL("image/png");a.click();
+}
+function downloadJSON(){const a=document.createElement("a");a.download="whiteboard.json";a.href=URL.createObjectURL(new Blob([JSON.stringify({type:"whiteboard",version:1,elements:shapes},null,2)],{type:"application/json"}));a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+function escXml(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function exportSVG(){
+  const box=contentBox();
+  const W=Math.round(box?box.w:1200), H=Math.round(box?box.h:800);
+  const ox=box?box.x:0, oy=box?box.y:0;
+  let s='<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"><rect width="100%" height="100%" fill="'+canvasBg+'"/>';
+  shapes.forEach(o=>{
+    const b=bbox(o);
+    const st='stroke="'+escXml(o.color||"#fff")+'" stroke-width="'+(o.sw||2.5)+'" fill="'+((o.bg&&o.bg!=="transparent")?escXml(o.bg):"none")+'" stroke-linecap="round" stroke-linejoin="round"';
+    const X=v=>Math.round((v-ox)*100)/100, Y=v=>Math.round((v-oy)*100)/100;
+    if(o.type==="rectangle"||o.type==="sticky"){
+      s+='<rect x="'+X(b.x)+'" y="'+Y(b.y)+'" width="'+Math.round(b.w*100)/100+'" height="'+Math.round(b.h*100)/100+'" rx="8" '+st+'/>';
+      if(o.text)s+='<text x="'+X(b.x+b.w/2)+'" y="'+Y(b.y+b.h/2)+'" fill="'+escXml(o.type==="sticky"?"#1a1a1a":(o.color||"#fff"))+'" font-size="20" text-anchor="middle" dominant-baseline="middle">'+escXml(o.text)+'</text>';
+    }
+    else if(o.type==="ellipse")s+='<ellipse cx="'+X(b.x+b.w/2)+'" cy="'+Y(b.y+b.h/2)+'" rx="'+Math.round(Math.abs(b.w/2)*100)/100+'" ry="'+Math.round(Math.abs(b.h/2)*100)/100+'" '+st+'/>';
+    else if(o.type==="diamond"){const cx=b.x+b.w/2,cy=b.y+b.h/2;s+='<polygon points="'+X(cx)+','+Y(b.y)+' '+X(b.x+b.w)+','+Y(cy)+' '+X(cx)+','+Y(b.y+b.h)+' '+X(b.x)+','+Y(cy)+'" '+st+'/>';}
+    else if(o.type==="line"||o.type==="arrow"){
+      s+='<line x1="'+X(o.x)+'" y1="'+Y(o.y)+'" x2="'+X(o.x2)+'" y2="'+Y(o.y2)+'" '+st+'/>';
+      if(o.type==="arrow"){const a2=Math.atan2(o.y2-o.y,o.x2-o.x),L=14;const hx=X(o.x2),hy=Y(o.y2);
+        s+='<path d="M '+hx+' '+hy+' L '+X(o.x2-L*Math.cos(a2-.4))+' '+Y(o.y2-L*Math.sin(a2-.4))+' M '+hx+' '+hy+' L '+X(o.x2-L*Math.cos(a2+.4))+' '+Y(o.y2-L*Math.sin(a2+.4))+'" fill="none" stroke="'+escXml(o.color||"#fff")+'" stroke-width="'+(o.sw||2.5)+'"/>';}
+    }
+    else if(o.type==="freedraw"&&o.points&&o.points.length>1){
+      s+='<path d="M '+o.points.map(p=>X(p.x)+' '+Y(p.y)).join(" L ")+'" fill="none" '+st+'/>';
+    }
+    else if(o.type==="text")s+='<text x="'+X(o.x)+'" y="'+Y(o.y+10)+'" fill="'+escXml(o.color||"#fff")+'" font-size="20">'+escXml(o.text)+'</text>';
+  });
+  s+="</svg>";
+  const a=document.createElement("a");a.download="whiteboard.svg";a.href=URL.createObjectURL(new Blob([s],{type:"image/svg+xml"}));a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+
+/* ---------- zoom/undo/help/share ---------- */
+$("#zoomIn").onclick=()=>zoomAt(board.clientWidth/2+board.getBoundingClientRect().left,board.clientHeight/2+board.getBoundingClientRect().top,1.2);
+$("#zoomOut").onclick=()=>zoomAt(board.clientWidth/2+board.getBoundingClientRect().left,board.clientHeight/2+board.getBoundingClientRect().top,1/1.2);
+$("#zoomLabel").onclick=()=>{cam.z=1;draw();syncBtns()};
+$("#undoBtn").onclick=undo;$("#redoBtn").onclick=redo;
+$("#gridBtn").onclick=toggleGrid;
+$("#helpBtn").onclick=openHelp;
+function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • E ممحاة • H يد • Q تثبيت الأداة • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#mExport2");if(b)b.onclick=exportPNG},0)}
+$("#shareBtn").onclick=()=>{
+  openModal("Share","صدّر اللوحة بأي صيغة أو انسخها للحافظة:",'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-tool primary" id="shPng">PNG</button><button class="btn-tool" id="shSvg">SVG</button><button class="btn-tool" id="shJson">JSON</button><button class="btn-tool" id="shCopy">نسخ للحافظة</button></div>');
+  setTimeout(()=>{
+    $("#shPng").onclick=exportPNG;$("#shSvg").onclick=exportSVG;$("#shJson").onclick=downloadJSON;
+    $("#shCopy").onclick=async()=>{
+      try{
+        const c=renderBoardToCanvas();
+        const blob=await new Promise(res=>c.toBlob(res,"image/png"));
+        if(!blob) throw 0;
+        await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);
+        alert("تم النسخ للحافظة ✅");
+      }catch(e){ exportPNG(); }
+    };
+  },0);
+};
+$("#libBtn").onclick=e=>{e.stopPropagation();closePops();$("#libPanel").classList.toggle("hidden")};
+$("#libPanel").addEventListener("click",e=>{const it=e.target.closest("[data-lib]");if(!it)return;pushUndo();const cx=-cam.x/cam.z+board.clientWidth/2/cam.z,cy=-cam.y/cam.z+board.clientHeight/2/cam.z;
+  if(it.dataset.lib==="flow"){shapes.push({id:seq++,type:"rectangle",x:cx-160,y:cy-30,x2:cx-40,y2:cy+30,color:stroke,bg:"transparent",sw,text:"Start"},{id:seq++,type:"arrow",x:cx-40,y:cy,x2:cx+40,y:cy,color:stroke,sw},{id:seq++,type:"ellipse",x:cx+40,y:cy-30,x2:cx+160,y2:cy+30,color:stroke,bg:"transparent",sw,text:"End"})}
+  else if(it.dataset.lib==="mind"){shapes.push({id:seq++,type:"ellipse",x:cx-60,y:cy-30,x2:cx+60,y2:cy+30,color:stroke,bg:"#6c5ce7",sw,text:"Idea"},{id:seq++,type:"ellipse",x:cx-220,y:cy-90,x2:cx-120,y2:cy-40,color:stroke,bg:"transparent",sw},{id:seq++,type:"ellipse",x:cx+120,y:cy+40,x2:cx+220,y2:cy+90,color:stroke,bg:"transparent",sw})}
+  else{shapes.push({id:seq++,type:"rectangle",x:cx-140,y:cy-60,x2:cx-20,y2:cy+60,color:stroke,bg:"transparent",sw},{id:seq++,type:"rectangle",x:cx,y:cy-60,x2:cx+120,y2:cy+60,color:stroke,bg:"transparent",sw})}
+  save();draw();syncBtns();$("#libPanel").classList.add("hidden")});
+
+/* ---------- modal / palette ---------- */
+const modal=$("#wbModal");
+function openModal(t,d,html){$("#mTitle").textContent=t;$("#mDesc").innerHTML=d;$("#mBody").innerHTML=html||"";modal.classList.remove("hidden")}
+$("#mClose").onclick=()=>modal.classList.add("hidden");
+modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.add("hidden")});
+function openPalette(){
+  const cmds=[["Open","open"],["Save JSON","save"],["Export PNG","png"],["Export SVG","svg"],["Toggle grid","grid"],["Zen mode","zen"],["Reset canvas","reset"],["Help","help"]];
+  openModal("Command palette — Ctrl+/",'<input id="palIn" placeholder="Type a command..." /> <div id="palList" style="margin-top:8px"></div>', "");
+  const inp=$("#palIn"),list=$("#palList");
+  const render=q=>{list.innerHTML="";cmds.filter(c=>c[0].toLowerCase().includes((q||"").toLowerCase())).forEach(c=>{const b=document.createElement("button");b.className="btn-tool";b.style.cssText="width:100%;margin-bottom:6px";b.textContent=c[0];b.onclick=()=>{modal.classList.add("hidden");menuAction(c[1])};list.appendChild(b)})};
+  render("");inp.oninput=()=>render(inp.value);setTimeout(()=>inp.focus(),50);
+}
+
+/* ---------- context menu ---------- */
+const ctxMenu=$("#ctxMenu");
+function hideCtx(){ctxMenu.classList.add("hidden")}
+board.addEventListener("contextmenu",e=>{e.preventDefault();ctxMenu.style.left=(e.clientX-board.getBoundingClientRect().left)+"px";ctxMenu.style.top=(e.clientY-board.getBoundingClientRect().top)+"px";ctxMenu.classList.remove("hidden")});
+ctxMenu.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;hideCtx();const c=b.dataset.c;
+  if(c==="all")selectAll();
+  else if(c==="dup")duplicateSel();
+  else if(c==="delete")deleteSel();
+  else if(c==="grid")toggleGrid();
+  else if(c==="zen")toggleZen();
+  else if(c==="view"){viewOnly=!viewOnly;alert(viewOnly?"View mode ON — العرض فقط":"View mode OFF")}
+  else if(c==="stats"){openModal("Canvas & Shape properties",shapes.length+" shapes • zoom "+Math.round(cam.z*100)+"% • bg "+canvasBg,'<div style="font-size:13px">'+(shapes.slice(-8).reverse().map(s=>"<div>#"+s.id+" — "+s.type+" — "+escXml((s.text||"").slice(0,30))+"</div>").join("")||"No shapes yet")+"</div>")}
+});
+
+/* ---------- keyboard ---------- */
+const KEYMAP={v:"selection",h:"hand",r:"rectangle",d:"diamond",o:"ellipse",a:"arrow",l:"line",p:"freedraw",t:"text",n:"sticky",e:"eraser"};
+addEventListener("keydown",e=>{
+  const inInput=/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName||"");
+  if(e.key===" "&&!inInput){e.preventDefault();spaceDown=true;canvas.style.cursor="grab";return}
+  if(inInput)return;
+  /* layout-independent key: uses physical key code so shortcuts work with Arabic keyboard too */
+  const codeKey=(e.code&&e.code.indexOf("Key")===0&&e.code.length===4)?e.code.slice(3).toLowerCase():null;
+  const k=codeKey||e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==="z"&&!e.shiftKey){e.preventDefault();undo();return}
+  if((e.ctrlKey||e.metaKey)&&(k==="y"||(k==="z"&&e.shiftKey))){e.preventDefault();redo();return}
+  if((e.ctrlKey||e.metaKey)&&k==="d"){e.preventDefault();duplicateSel();return}
+  if((e.ctrlKey||e.metaKey)&&k==="a"){e.preventDefault();selectAll();return}
+  if((e.key==="Delete"||e.key==="Backspace")&&sel.size){e.preventDefault();deleteSel();return}
+  if((e.ctrlKey||e.metaKey)&&k==="o"){e.preventDefault();$("#fileOpen").click();return}
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&k==="e"){e.preventDefault();exportPNG();return}
+  if((e.ctrlKey||e.metaKey)&&e.key==="/"){e.preventDefault();openPalette();return}
+  if(e.key==="Escape"){closePops();hideCtx();modal.classList.add("hidden");if(tool!=="selection")setTool("selection");return}
+  if(e.altKey&&k==="z"){e.preventDefault();toggleZen();return}
+  if(k==="q"&&!e.ctrlKey&&!e.metaKey&&!e.altKey){setTool("lock");return}
+  if(KEYMAP[k]&&!e.ctrlKey&&!e.metaKey&&!e.altKey){setTool(KEYMAP[k])}
+  if(e.key==="?"){openHelp()}
+});
+addEventListener("keyup",e=>{if(e.key===" "){spaceDown=false;canvas.style.cursor=tool==="hand"?"grab":"crosshair"}});
+
+/* ---------- init ---------- */
+load();resize();syncBtns();syncStrokeUI();syncFillUI();syncBgUI();syncWidthUI(sw);syncGridBtn();draw();refreshSelUI();
+if(!shapes.length){shapes.push({id:seq++,type:"text",x:60,y:80,x2:60,y2:80,color:dark?"#ffffff":"#1a1a1a",bg:"transparent",sw,text:"Welcome to Whiteboard ✏️"},{id:seq++,type:"rectangle",x:60,y:140,x2:300,y2:230,color:"#70a1ff",bg:"transparent",sw:2.5},{id:seq++,type:"arrow",x:310,y:185,x2:430,y2:185,color:"#f6e58d",sw:2.5},{id:seq++,type:"ellipse",x:440,y:140,x2:640,y2:230,color:"#7bed9f",bg:"transparent",sw:2.5});draw()}
+})();
+</script>
+</body>
+</html>
