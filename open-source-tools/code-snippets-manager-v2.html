@@ -12134,7 +12134,18 @@ function hello() {
   function navAllTools(){ return NAV_TOOLS.flatMap(g => g.items.map(t => ({ ...t, g:g.g }))); }
   function navToolActive(t){ const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls)); }
 
-  function navSetView(v){ navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync(); }
+  function navSetView(v){
+    if(v === 'tools'){
+      // زر "الأدوات" العلوي: افتح قائمة الأدوات + حوّل فوراً على تاب الأدوات (devDashBtn)
+      navView = 'tools'; navLastHtml = '';
+      const dev = (typeof navAllTools === 'function') ? navAllTools().find(x => x.id === 'devDashBtn') : null;
+      if(dev && !navToolActive(dev)){ navOpenTool('devDashBtn'); return; }
+      navLastDash = currentDashId(); navSync();
+      document.getElementById('mainBody')?.scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
+    navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync();
+  }
 
   function navOpenTool(id){
     const t = navAllTools().find(x => x.id === id);
