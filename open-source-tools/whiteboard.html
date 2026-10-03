@@ -157,6 +157,7 @@
             <button class="wb-tool" id="moreBtn" title="More actions">⋮</button>
           </div>
           <div class="wb-top-right">
+            <button class="wb-icon-btn" id="codeBtn" title="الأكواد">💻</button>
             <button class="wb-pill-btn share" id="shareBtn">Share</button>
             <button class="wb-icon-btn" id="libBtn" title="Library">📚</button>
           </div>
@@ -678,6 +679,14 @@ function addRow(){const t=selTable();if(!t||t.rows>=20)return;pushUndo();for(let
 function delRow(){const t=selTable();if(!t||t.rows<=1)return;pushUndo();t.cells.splice(t.cells.length-t.cols,t.cols);t.rows--;if(t.active&&t.active.r>=t.rows)t.active={r:t.rows-1,c:Math.min(t.active.c,t.cols-1)};normTable(t);save();draw()}
 function addCol(){const t=selTable();if(!t||t.cols>=20)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++){for(let c=0;c<t.cols;c++)nu.push(t.cells[r*t.cols+c]||"");nu.push("")}t.cells=nu;t.cols++;normTable(t);save();draw()}
 function delCol(){const t=selTable();if(!t||t.cols<=1)return;pushUndo();const nu=[];for(let r=0;r<t.rows;r++)for(let c=0;c<t.cols-1;c++)nu.push(t.cells[r*t.cols+c]||"");t.cells=nu;t.cols--;if(t.active&&t.active.c>=t.cols)t.active={r:Math.min(t.active.r,t.rows-1),c:t.cols-1};normTable(t);save();draw()}
+let cellEditSession=null;
+function insertRefAtCursor(inp,ref){
+  const s=(inp.selectionStart==null?inp.value.length:inp.selectionStart);
+  const en=(inp.selectionEnd==null?s:inp.selectionEnd);
+  inp.value=inp.value.slice(0,s)+ref+inp.value.slice(en);
+  const np=s+ref.length;
+  try{inp.focus();inp.setSelectionRange(np,np)}catch(_){}
+}
 function openCellEditor(t,cell){
   closePops();hideCtx();
   const g=tableGeom(t);
@@ -686,18 +695,23 @@ function openCellEditor(t,cell){
   inp.style.left=sc.x+"px";inp.style.top=sc.y+"px";
   inp.style.width=Math.max(40,g.cw*cam.z-6)+"px";inp.style.height=Math.max(24,g.rh*cam.z-6)+"px";
   inp.value=tableCellRaw(t,cell.r,cell.c);
-  inp.title=colLetters(cell.c)+(cell.r+1)+" — ابدأ بـ = لكتابة معادلة";
+  inp.title=colLetters(cell.c)+(cell.r+1)+" — ابدأ بـ = لكتابة معادلة، واضغط على أي خلية لإدراج مرجعها";
   board.appendChild(inp);inp.focus();inp.select();
+  t.active={r:cell.r,c:cell.c};draw();
   let done=false;
-  inp.onkeydown=ev=>{if(ev.key==="Escape"){ev.preventDefault();done=true;if(inp.isConnected)inp.remove()}else if(ev.key==="Enter"){ev.preventDefault();commit()}};
+  inp.onkeydown=ev=>{if(ev.key==="Escape"){ev.preventDefault();cancelCell()}else if(ev.key==="Enter"){ev.preventDefault();commit()}};
   inp.onblur=()=>{if(!done)commit()};
+  function clearSess(){if(cellEditSession&&cellEditSession.input===inp)cellEditSession=null}
+  function cancelCell(){if(done)return;done=true;clearSess();if(inp.isConnected)inp.remove()}
   function commit(){
-    if(done)return;done=true;
+    if(done)return;done=true;clearSess();
     const v=inp.value;if(inp.isConnected)inp.remove();
-    pushUndo();
-    t.cells[cell.r*t.cols+cell.c]=v.trim();t.active={r:cell.r,c:cell.c};
-    save();draw();refreshSelUI();
+    const nv=v.trim(), idx=cell.r*t.cols+cell.c;
+    t.active={r:cell.r,c:cell.c};
+    if(nv!==(t.cells[idx]||"")){pushUndo();t.cells[idx]=nv;save();draw()}
+    refreshSelUI();
   }
+  cellEditSession={input:inp,table:t,commit:commit};
 }
 function paintTable(g,s,interactive){
   const gx=Math.min(s.x,s.x2),gy=Math.min(s.y,s.y2);
@@ -730,7 +744,9 @@ $("#rowPlus").onclick=addRow;$("#rowMinus").onclick=delRow;
 $("#colPlus").onclick=addCol;$("#colMinus").onclick=delCol;
 $("#cellEdit").onclick=()=>{const t=selTable();if(t)openCellEditor(t,t.active||{r:0,c:0})};
 canvas.addEventListener("dblclick",e=>{
+  e.preventDefault();
   if(viewOnly||tool!=="selection")return;
+  if(cellEditSession&&cellEditSession.input.isConnected)return;
   const p=pos(e),hit=hitTest(p);
   if(hit&&hit.type==="table"){
     const cell=tableCellAt(hit,p);
@@ -749,25 +765,48 @@ function wrapFill(g,t,x,y,mw){const ls=wrapLines(g,t,mw);let yy=y-(ls.length-1)*
 
 /* ---------- pointer ---------- */
 function pos(e){return toWorld(e.clientX,e.clientY)}
+function selectionDown(e,p,hit){
+  const wasSel=sel.has(hit.id);
+  if(!e.shiftKey&&!wasSel)sel.clear();
+  sel.add(hit.id);
+  if(hit.type==="table"){const cc=tableCellAt(hit,p);if(cc)hit.active=cc}
+  movingSel={sx:p.x,sy:p.y,moved:false,btn:e.button,wasSel:wasSel,before:JSON.stringify(shapes),
+    orig:shapes.filter(s=>sel.has(s.id)).map(s=>({id:s.id,dx:(s.x??0),dy:(s.y??0),x2:s.x2,y2:s.y2,pts:s.points?JSON.parse(JSON.stringify(s.points)):null}))};
+  draw(); refreshSelUI();
+}
 canvas.addEventListener("pointerdown",e=>{
   try{canvas.setPointerCapture(e.pointerId)}catch(_){}
   const p=pos(e);
   hideCtx(); closePops();
+  if(cellEditSession&&cellEditSession.input.isConnected){
+    e.preventDefault();
+    const sess=cellEditSession, hp=pos(e), hitSess=hitTest(hp);
+    if(hitSess&&hitSess.type==="table"&&hitSess.id===sess.table.id){
+      const rcell=tableCellAt(hitSess,hp);
+      if(rcell){
+        if(sess.input.value.trimStart().startsWith("=")){e.preventDefault();insertRefAtCursor(sess.input,colLetters(rcell.c)+(rcell.r+1));return}
+        sess.commit();
+        sel=new Set([hitSess.id]);hitSess.active=rcell;draw();refreshSelUI();
+        openCellEditor(hitSess,rcell);return;
+      }
+    }
+    sess.commit();
+    setTool("selection");
+  }
   if(viewOnly)return;
   if(spaceDown||tool==="hand"||e.button===1){panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y};return}
   if(tool==="selection"){
     const hit=hitTest(p);
-    if(hit){
-      if(!e.shiftKey&&!sel.has(hit.id))sel.clear();
-      sel.add(hit.id);
-      if(hit.type==="table"){const cc=tableCellAt(hit,p);if(cc)hit.active=cc}
-      movingSel={sx:p.x,sy:p.y,moved:false,before:JSON.stringify(shapes),
-        orig:shapes.filter(s=>sel.has(s.id)).map(s=>({id:s.id,dx:(s.x??0),dy:(s.y??0),x2:s.x2,y2:s.y2,pts:s.points?JSON.parse(JSON.stringify(s.points)):null}))};
-    }else{sel.clear()}
-    draw(); refreshSelUI(); return;
+    if(hit)selectionDown(e,p,hit);else{sel.clear();draw();refreshSelUI()}
+    return;
   }
   if(tool==="eraser"){erasing=true;erasingChanged=false;erasingBefore=JSON.stringify(shapes);eraseAt(p);return}
-  if(tool==="text"||tool==="sticky"){openTextEditor(p,tool==="sticky");return}
+  if(tool==="text"||tool==="sticky"){e.preventDefault();openTextEditor(p,tool==="sticky");return}
+  if(tool!=="freedraw"){
+    const hit0=hitTest(p);
+    if(hit0){selectionDown(e,p,hit0);return}
+    if(sel.size){sel.clear();draw();refreshSelUI()}
+  }
   drawing={id:seq++,type:tool,x:p.x,y:p.y,x2:p.x+1,y2:p.y+1,color:stroke,bg:tool==="sticky"?"#fff3a3":fill,sw,text:"",points:tool==="freedraw"?[p]:null};
   if(tool==="table"){drawing.rows=3;drawing.cols=3;drawing.rowH=36;drawing.colW=110;drawing.cells=Array(9).fill("");drawing.active=null}
 });
@@ -790,9 +829,14 @@ addEventListener("pointerup",()=>{
     if(erasingChanged){undoStack.push(erasingBefore);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save();syncBtns();}
     erasingBefore=null;draw();refreshSelUI();return;
   }
-  if(movingSel){if(movingSel.moved){undoStack.push(movingSel.before);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save()}movingSel=null;draw();syncBtns();return}
+  if(movingSel){
+    if(movingSel.moved){undoStack.push(movingSel.before);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save()}
+    const tapEdit=!movingSel.moved&&movingSel.btn===0&&movingSel.wasSel&&sel.size===1;
+    movingSel=null;draw();syncBtns();
+    if(tapEdit){const ts=selectedShapes()[0];if(ts&&ts.type==="table"&&!viewOnly)openCellEditor(ts,ts.active||{r:0,c:0})}
+    return;
+  }
   if(drawing){const d=drawing;drawing=null;
-    if(d.type==="table"&&(Math.abs(d.x2-d.x)<4&&Math.abs(d.y2-d.y)<4)){retable(d,3,3);d.x2=d.x+3*(d.colW||110);d.y2=d.y+3*(d.rowH||36)}
     if(d.type==="freedraw"&&(!d.points||d.points.length<2)){draw();return}
     if((d.type!=="freedraw")&&(Math.abs(d.x2-d.x)<4&&Math.abs(d.y2-d.y)<4)){draw();return}
     pushUndo();
@@ -839,7 +883,7 @@ function openTextEditor(p,isSticky){
 }
 
 /* ---------- toolbar ---------- */
-function setTool(t){if(t==="lock"){keepTool=!keepTool;document.querySelector('[data-tool="lock"]').classList.toggle("active",keepTool);return}tool=t;$$("#toolbar .wb-tool[data-tool]").forEach(b=>b.classList.toggle("active",b.dataset.tool===t));canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
+function setTool(t){if(t==="lock"){keepTool=!keepTool;document.querySelector('[data-tool="lock"]').classList.toggle("active",keepTool);return}tool=t;$$("#toolbar .wb-tool[data-tool]").forEach(b=>{if(b.dataset.tool!=="lock")b.classList.toggle("active",b.dataset.tool===t)});canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
 $("#toolbar").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(!b)return;setTool(b.dataset.tool)});
 
 /* ---------- menu ---------- */
@@ -978,6 +1022,7 @@ $("#shareBtn").onclick=()=>{
     };
   },0);
 };
+$("#codeBtn").onclick=()=>open("code-snippets-manager-v2.html#tool","_blank");
 $("#libBtn").onclick=e=>{e.stopPropagation();closePops();$("#libPanel").classList.toggle("hidden")};
 $("#libPanel").addEventListener("click",e=>{const it=e.target.closest("[data-lib]");if(!it)return;pushUndo();const cx=-cam.x/cam.z+board.clientWidth/2/cam.z,cy=-cam.y/cam.z+board.clientHeight/2/cam.z;
   if(it.dataset.lib==="flow"){shapes.push({id:seq++,type:"rectangle",x:cx-160,y:cy-30,x2:cx-40,y2:cy+30,color:stroke,bg:"transparent",sw,text:"Start"},{id:seq++,type:"arrow",x:cx-40,y:cy,x2:cx+40,y:cy,color:stroke,sw},{id:seq++,type:"ellipse",x:cx+40,y:cy-30,x2:cx+160,y2:cy+30,color:stroke,bg:"transparent",sw,text:"End"})}
