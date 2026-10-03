@@ -72,6 +72,7 @@
     .custom-row input[type=color]{ width:30px; height:26px; border:none; border-radius:6px; background:none; cursor:pointer; padding:0; }
     .mini-btn{ background:#2a2a33; color:var(--wb-text); border:1px solid var(--wb-border); border-radius:8px; padding:6px 10px; cursor:pointer; font-family:inherit; font-size:12px; }
     .mini-btn:hover{ border-color:var(--wb-accent); }
+    .mini-btn.on{ border-color:var(--wb-accent); background:#3a3a5e; color:#fff; }
     .mini-btn.danger{ color:#ff8a8a; border-color:rgba(255,90,90,.4); }
     #wVal{ min-width:32px; text-align:center; font-weight:700; color:var(--wb-text); }
 
@@ -162,6 +163,7 @@
             <button class="wb-tool" data-tool="table" title="Table — B">▤<span class="kbd">B</span></button>
             <button class="wb-tool" data-tool="todo" title="قائمة مهام — U">☑<span class="kbd">U</span></button>
             <button class="wb-tool" data-tool="idea" title="بطاقة فكرة — F">💡<span class="kbd">F</span></button>
+            <button class="wb-tool" data-tool="mindmap" title="خريطة ذهنية — M">🧠<span class="kbd">M</span></button>
             <button class="wb-tool" id="imgBtn" title="Insert image — I">🖼<span class="kbd">I</span></button>
             <button class="wb-tool" data-tool="eraser" title="Eraser — E">⌫<span class="kbd">E</span></button>
             <div class="wb-sep"></div>
@@ -222,6 +224,12 @@
             <button class="mini-btn" id="itemPlus" title="إضافة مهمة">+</button>
             <button class="mini-btn" id="itemEdit" title="تحرير المهمة">✎</button>
           </div>
+          <div class="sb-sep hidden" id="mindSep"></div>
+          <div class="sb-item hidden" id="mindActions">
+            <span class="sb-label">Mind</span>
+            <button class="mini-btn" id="mindEllipse" title="عقدة بيضاوية">○</button>
+            <button class="mini-btn" id="mindRect" title="عقدة مستطيلة">▢</button>
+          </div>
         </div>
 
         <div class="wb-more hidden" id="moreMenu">
@@ -230,6 +238,8 @@
           <div class="msep"></div>
           <button class="mi" data-m="front">↑ Bring to front</button>
           <button class="mi" data-m="back">↓ Send to back</button>
+          <div class="msep"></div>
+          <button class="mi" data-m="layout">🌳 ترتيب الخريطة الذهنية</button>
           <div class="msep"></div>
           <button class="mi danger" data-m="delete">🗑 Delete selection <span style="opacity:.5">Del</span></button>
         </div>
@@ -377,6 +387,7 @@ function moreAction(m){
   else if(m==="all") selectAll();
   else if(m==="front") bringFront();
   else if(m==="back") sendBack();
+  else if(m==="layout") autoLayoutMind();
 }
 
 /* ---------- selection actions ---------- */
@@ -392,6 +403,10 @@ function refreshSelUI(){
   const isTodo=!!(one&&one.type==="todo");
   $("#todoActions").classList.toggle("hidden",!isTodo);
   $("#todoSep").classList.toggle("hidden",!isTodo);
+  const isMind=!!(one&&one.type==="mind");
+  $("#mindActions").classList.toggle("hidden",!isMind);
+  $("#mindSep").classList.toggle("hidden",!isMind);
+  if(isMind){$("#mindEllipse").classList.toggle("on",one.shape!=="rect");$("#mindRect").classList.toggle("on",one.shape==="rect")}
   if(n===1){
     const s=selectedShapes()[0];
     if(s.color) { stroke=s.color; syncStrokeUI(); }
@@ -402,21 +417,22 @@ function refreshSelUI(){
 function selectAll(){ sel=new Set(shapes.map(s=>s.id)); draw(); refreshSelUI(); }
 function deleteSel(){
   if(viewOnly||!sel.size) return;
-  pushUndo(); shapes=shapes.filter(s=>!sel.has(s.id)); sel.clear();
+  pushUndo(); shapes=shapes.filter(s=>!sel.has(s.id)); pruneMindEdges(); sel.clear();
   save(); draw(); syncBtns(); refreshSelUI();
 }
 function duplicateSel(){
   if(viewOnly||!sel.size) return;
   pushUndo();
-  const clones=[];
+  const clones=[], idMap={};
   selectedShapes().forEach(s=>{
-    const c=JSON.parse(JSON.stringify(s)); c.id=seq++;
+    const c=JSON.parse(JSON.stringify(s)); const oldId=s.id; c.id=seq++; idMap[oldId]=c.id;
     const DX=24, DY=24;
     if(c.points) c.points=c.points.map(p=>({x:p.x+DX,y:p.y+DY}));
     if(c.x!==undefined){ c.x+=DX; c.y+=DY; }
     if(c.x2!==undefined){ c.x2+=DX; c.y2+=DY; }
     shapes.push(c); clones.push(c.id);
   });
+  shapes.forEach(s=>{if(s.type==="mindedge"&&clones.includes(s.id)){if(idMap[s.from])s.from=idMap[s.from];if(idMap[s.to])s.to=idMap[s.to]}});
   sel=new Set(clones);
   save(); draw(); syncBtns(); refreshSelUI();
 }
@@ -472,10 +488,12 @@ function draw(){
   shapes.forEach(s=>drawShape(s));
   if(drawing)drawShape(drawing);
   sel.forEach(id=>{const s=shapes.find(x=>x.id===id);if(!s)return;const b=bbox(s);ctx.save();ctx.strokeStyle="#6965db";ctx.setLineDash([6,4]);ctx.lineWidth=1.2/cam.z;ctx.strokeRect(b.x-8,b.y-8,b.w+16,b.h+16);ctx.restore()});
+  if(sel.size===1){const mhs=selectedShapes()[0];if(mhs&&mhs.type==="mind"&&!drawing)drawMindHandles(mhs)}
   ctx.restore();
   board.style.background=canvasBg;
 }
 function bbox(s){
+  if(s.type==="mindedge"){const ea=mindAnchorById(s.from,s.fromSide),eb=mindAnchorById(s.to,s.toSide);if(!ea||!eb)return{x:0,y:0,w:0,h:0};return{x:Math.min(ea.x,eb.x),y:Math.min(ea.y,eb.y),w:Math.abs(eb.x-ea.x)||4,h:Math.abs(eb.y-ea.y)||4}}
   if(s.type==="freedraw"&&s.points&&s.points.length){const xs=s.points.map(p=>p.x),ys=s.points.map(p=>p.y);const x=Math.min(...xs),y=Math.min(...ys);return{x,y,w:Math.max(...xs)-x||4,h:Math.max(...ys)-y||4}}
   if((s.type==="line"||s.type==="arrow")){return{x:Math.min(s.x,s.x2),y:Math.min(s.y,s.y2),w:Math.abs(s.x2-s.x)||4,h:Math.abs(s.y2-s.y)||4}}
   return{x:Math.min(s.x,s.x2??s.x+120),y:Math.min(s.y,s.y2??s.y+60),w:Math.abs((s.x2??s.x+120)-s.x)||4,h:Math.abs((s.y2??s.y+60)-s.y)||4};
@@ -488,6 +506,8 @@ function drawShape(s){
   else if(s.type==="table"){paintTable(ctx,s,true)}
   else if(s.type==="todo"){paintTodo(ctx,s,true)}
   else if(s.type==="idea"){paintIdea(ctx,s,true)}
+  else if(s.type==="mind"){paintMind(ctx,s,true)}
+  else if(s.type==="mindedge"){paintMindEdge(ctx,s)}
   else if(s.type==="rectangle"||s.type==="sticky"){const b=bbox(s);if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;roundRect(b.x,b.y,b.w,b.h,8);ctx.fill()}roundRect(b.x,b.y,b.w,b.h,8);ctx.stroke();if(s.text){if(s.color==="rainbow")writeRainbowText(ctx,s.text,b.x+b.w/2,b.y+b.h/2,Math.max(20,b.w-16));else writeText(s.text,b.x+b.w/2,b.y+b.h/2,b.w-16,s.type==="sticky"?"#1a1a1a":(s.color||"#fff"))}}
   else if(s.type==="diamond"){const b=bbox(s);const cx=b.x+b.w/2,cy=b.y+b.h/2;ctx.beginPath();ctx.moveTo(cx,b.y);ctx.lineTo(b.x+b.w,cy);ctx.lineTo(cx,b.y+b.h);ctx.lineTo(b.x,cy);ctx.closePath();if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;ctx.fill()}ctx.stroke();if(s.text){if(s.color==="rainbow")writeRainbowText(ctx,s.text,cx,cy,Math.max(20,b.w-20));else writeText(s.text,cx,cy,b.w-20,s.color)}}
   else if(s.type==="ellipse"){const b=bbox(s);ctx.beginPath();ctx.ellipse(b.x+b.w/2,b.y+b.h/2,Math.abs(b.w/2),Math.abs(b.h/2),0,0,7);if(s.bg&&s.bg!=="transparent"){ctx.fillStyle=s.bg;ctx.fill()}ctx.stroke();if(s.text){if(s.color==="rainbow")writeRainbowText(ctx,s.text,b.x+b.w/2,b.y+b.h/2,Math.max(20,b.w-16));else writeText(s.text,b.x+b.w/2,b.y+b.h/2,b.w-16,s.color)}}
@@ -587,6 +607,221 @@ addEventListener("paste",e=>{
   const files=e.clipboardData&&e.clipboardData.files;
   if(files&&files.length&&[...files].some(f=>f.type&&f.type.indexOf("image/")===0)){e.preventDefault();insertImages(files)}
 });
+/* ---------- mindmap (عقد + أسهم) ---------- */
+const MDIRS={top:{dx:0,dy:-1},bottom:{dx:0,dy:1},left:{dx:-1,dy:0},right:{dx:1,dy:0}};
+const MOPP={top:"bottom",bottom:"top",left:"right",right:"left"};
+function mindNode(id){return shapes.find(s=>s.id===id&&s.type==="mind")}
+function selMind(){if(sel.size!==1)return null;const s=selectedShapes()[0];return(s&&s.type==="mind")?s:null}
+function mindBox(s){return{x:Math.min(s.x,s.x2),y:Math.min(s.y,s.y2),w:Math.max(60,Math.abs(s.x2-s.x)),h:Math.max(60,Math.abs(s.y2-s.y))}}
+function sizeMind(t){
+  ctx.save();ctx.font="20px 'Segoe UI',Tahoma,sans-serif";
+  const lines=String(t.text||"").split("\n");
+  let tw=0;lines.forEach(l=>{tw=Math.max(tw,ctx.measureText(l||" ").width)});
+  ctx.restore();
+  const w=Math.max(110,tw+56),h=Math.max(64,lines.length*26+36);
+  const cx=(t.x+t.x2)/2,cy=(t.y+t.y2)/2;
+  t.x=cx-w/2;t.y=cy-h/2;t.x2=cx+w/2;t.y2=cy+h/2;
+}
+function mindAnchor(n,side){
+  const b=mindBox(n),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  if(n.shape==="rect"){
+    if(side==="top")return{x:cx,y:b.y};
+    if(side==="bottom")return{x:cx,y:b.y+b.h};
+    if(side==="left")return{x:b.x,y:cy};
+    return{x:b.x+b.w,y:cy};
+  }
+  const d=MDIRS[side]||MDIRS.right;
+  return{x:cx+d.dx*b.w/2,y:cy+d.dy*b.h/2};
+}
+function mindAnchorById(id,side){const n=mindNode(id);return n?mindAnchor(n,side):null}
+function mindEdgeGeom(s){
+  const a=mindAnchorById(s.from,s.fromSide||"right"),b=mindAnchorById(s.to,s.toSide||"left");
+  if(!a||!b)return null;
+  const n1=MDIRS[s.fromSide||"right"],n2=MDIRS[s.toSide||"left"];
+  const len=Math.max(40,Math.hypot(b.x-a.x,b.y-a.y)*0.45);
+  return{a,b,c1:{x:a.x+n1.dx*len,y:a.y+n1.dy*len},c2:{x:b.x+n2.dx*len,y:b.y+n2.dy*len}};
+}
+function paintMind(g,s,interactive){
+  const b=mindBox(s),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const outer=Math.min(6,Math.max(1.5,s.sw||2.5));
+  const cardBg=(s.bg&&s.bg!=="transparent")?s.bg:(dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)");
+  const inkc=s.color||"#fff";
+  g.fillStyle=cardBg;
+  if(s.shape==="rect"){rr(g,b.x,b.y,b.w,b.h,14);g.fill()}
+  else{g.beginPath();g.ellipse(cx,cy,b.w/2,b.h/2,0,0,7);g.fill()}
+  const tx=s.text||"";
+  if(tx){
+    if(s.color==="rainbow")writeRainbowText(g,tx,cx,cy,Math.max(20,b.w-28));
+    else{g.save();g.font="20px 'Segoe UI',Tahoma,sans-serif";g.fillStyle=inkc;g.textAlign="center";g.textBaseline="middle";wrapFill(g,tx,cx,cy,Math.max(20,b.w-28));g.restore()}
+  }else if(interactive){
+    g.save();g.font="13px 'Segoe UI',Tahoma,sans-serif";g.fillStyle="#8a8a96";g.textAlign="center";g.fillText("دبل كليك للكتابة",cx,cy+2);g.restore();
+  }
+  g.strokeStyle=strokeStyleFor(g,s.color||"#fff",b.x,b.y,b.w,b.h);g.lineWidth=outer;
+  if(s.shape==="rect"){rr(g,b.x,b.y,b.w,b.h,14);g.stroke()}
+  else{g.beginPath();g.ellipse(cx,cy,b.w/2,b.h/2,0,0,7);g.stroke()}
+}
+function paintMindEdge(g,s){
+  const gm=mindEdgeGeom(s);if(!gm)return;
+  const lw=s.sw||2.5;
+  g.save();g.lineJoin="round";g.lineCap="round";
+  const bb={x:Math.min(gm.a.x,gm.b.x),y:Math.min(gm.a.y,gm.b.y),w:Math.abs(gm.b.x-gm.a.x)||4,h:Math.abs(gm.b.y-gm.a.y)||4};
+  g.strokeStyle=strokeStyleFor(g,s.color||"#fff",bb.x,bb.y,bb.w,bb.h);g.lineWidth=lw;
+  g.beginPath();g.moveTo(gm.a.x,gm.a.y);g.bezierCurveTo(gm.c1.x,gm.c1.y,gm.c2.x,gm.c2.y,gm.b.x,gm.b.y);g.stroke();
+  strokeHead(g,gm.c2.x,gm.c2.y,gm.b.x,gm.b.y,g.strokeStyle,lw);
+  g.restore();
+}
+function mindHandlePts(s){
+  const b=mindBox(s),cx=b.x+b.w/2,cy=b.y+b.h/2;
+  return{top:[cx,b.y],bottom:[cx,b.y+b.h],left:[b.x,cy],right:[b.x+b.w,cy]};
+}
+function drawMindHandles(s){
+  const pts=mindHandlePts(s),r=16/cam.z;
+  ctx.save();ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font="700 "+Math.max(10,Math.round(15/cam.z))+"px 'Segoe UI',Tahoma,sans-serif";
+  Object.keys(pts).forEach(k=>{
+    ctx.beginPath();ctx.arc(pts[k][0],pts[k][1],r,0,7);
+    ctx.fillStyle="#6c5ce7";ctx.fill();
+    ctx.lineWidth=2/cam.z;ctx.strokeStyle="#fff";ctx.stroke();
+    ctx.fillStyle="#fff";ctx.fillText("+",pts[k][0],pts[k][1]+1/cam.z);
+  });
+  ctx.restore();
+}
+function handleHit(p){
+  if(sel.size!==1)return null;
+  const s=selectedShapes()[0];
+  if(!s||s.type!=="mind")return null;
+  const pts=mindHandlePts(s),r=20/cam.z;
+  const keys=Object.keys(pts);
+  for(let i=0;i<keys.length;i++){
+    const dx=p.x-pts[keys[i]][0],dy=p.y-pts[keys[i]][1];
+    if(dx*dx+dy*dy<=r*r)return{id:s.id,side:keys[i]};
+  }
+  return null;
+}
+function createMindNode(p){
+  pushUndo();
+  const node={id:seq++,type:"mind",shape:"ellipse",x:p.x-70,y:p.y-45,x2:p.x+70,y2:p.y+45,
+    color:stroke,bg:fill,sw,text:""};
+  shapes.push(node);sel=new Set([node.id]);
+  save();draw();syncBtns();refreshSelUI();
+  openMindEditor(node,true);
+}
+function removeMindNode(id){
+  shapes=shapes.filter(s=>s.id!==id);
+  pruneMindEdges();
+  sel.delete(id);
+}
+function pruneMindEdges(){
+  const ids={};shapes.forEach(s=>ids[s.id]=1);
+  shapes=shapes.filter(s=>s.type!=="mindedge"||(ids[s.from]&&ids[s.to]));
+}
+function mindCollides(x,y,r,selfId){
+  return shapes.some(s=>{
+    if(s.id===selfId||s.type==="mindedge")return false;
+    const b=bbox(s);
+    const cx=b.x+b.w/2,cy=b.y+b.h/2;
+    return Math.hypot(cx-x,cy-y)<Math.hypot(b.w,b.h)/2+r;
+  });
+}
+function findFreeMind(x,y,r){
+  if(!mindCollides(x,y,r))return{x,y};
+  for(let d=70;d<=700;d+=50){
+    for(let k=0;k<8;k++){
+      const a=k/8*Math.PI*2,nx=x+Math.cos(a)*d,ny=y+Math.sin(a)*d*0.8;
+      if(!mindCollides(nx,ny,r))return{x:nx,y:ny};
+    }
+  }
+  return{x,y:y+700};
+}
+function addMindChild(pid,side){
+  if(viewOnly)return;
+  const p=mindNode(pid);if(!p)return;
+  pushUndo();
+  const b=mindBox(p),d=MDIRS[side];
+  const cx0=(p.x+p.x2)/2,cy0=(p.y+p.y2)/2;
+  const pr=Math.max(b.w,b.h)/2,gap=120;
+  const spot=findFreeMind(cx0+d.dx*(pr+gap),cy0+d.dy*(pr+gap),70);
+  const node={id:seq++,type:"mind",shape:p.shape||"ellipse",
+    x:spot.x-70,y:spot.y-45,x2:spot.x+70,y2:spot.y+45,
+    color:p.color||stroke,bg:(p.bg!=null?p.bg:fill),sw:(p.sw||sw),text:""};
+  shapes.push(node);
+  shapes.push({id:seq++,type:"mindedge",from:pid,to:node.id,fromSide:side,toSide:MOPP[side],color:p.color||stroke,sw:2.5});
+  sel=new Set([node.id]);
+  save();draw();syncBtns();refreshSelUI();
+  openMindEditor(node,true);
+}
+function openMindEditor(t,isNew){
+  if(viewOnly)return;
+  closePops();hideCtx();
+  const b=mindBox(t);
+  const p1=toScreen(b.x,b.y);
+  const inp=document.createElement("textarea");
+  inp.className="wb-text-input";inp.setAttribute("dir","auto");
+  inp.style.left=(p1.x+6)+"px";inp.style.top=(p1.y+6)+"px";
+  inp.style.width=Math.max(80,b.w*cam.z-12)+"px";inp.style.height=Math.max(50,b.h*cam.z-12)+"px";
+  inp.style.border="1px dashed var(--wb-accent)";inp.style.borderRadius="10px";
+  inp.style.color=t.color==="rainbow"?"#fff":(t.color||"#fff");
+  inp.style.textAlign="center";inp.style.fontSize="18px";
+  inp.value=t.text||"";inp.placeholder="اكتب الفكرة...";
+  board.appendChild(inp);inp.focus();
+  let done=false,cancelled=false;
+  inp.onkeydown=ev=>{
+    if(ev.key==="Escape"){ev.preventDefault();cancel();return}
+    if(ev.key==="Enter"&&!ev.shiftKey){ev.preventDefault();commit()}
+  };
+  inp.onblur=()=>{if(done||cancelled)return;commit()};
+  function commit(){
+    if(done||cancelled)return;done=true;
+    const v=inp.value;if(inp.isConnected)inp.remove();
+    const nv=v.trim();
+    if(nv===""&&isNew){removeMindNode(t.id);save();draw();syncBtns();refreshSelUI();return}
+    if(nv!==t.text){pushUndo();t.text=nv;sizeMind(t);save();draw();syncBtns()}
+    refreshSelUI();
+  }
+  function cancel(){
+    if(done)return;done=true;cancelled=true;
+    if(inp.isConnected)inp.remove();
+    if(isNew&&!(t.text||"")){removeMindNode(t.id);save();draw();syncBtns();refreshSelUI()}
+  }
+}
+function setMindShape(shape){
+  if(viewOnly)return;
+  const t=selMind();if(!t||t.shape===shape)return;
+  pushUndo();t.shape=shape;save();draw();refreshSelUI();
+}
+$("#mindEllipse").onclick=()=>setMindShape("ellipse");
+$("#mindRect").onclick=()=>setMindShape("rect");
+function autoLayoutMind(){
+  if(viewOnly)return;
+  const minds=shapes.filter(s=>s.type==="mind");
+  if(!minds.length)return;
+  pushUndo();
+  const medges=shapes.filter(s=>s.type==="mindedge");
+  const kids={};minds.forEach(n=>kids[n.id]=[]);
+  medges.forEach(e=>{if(kids[e.from])kids[e.from].push(e.to)});
+  const hasIn={};medges.forEach(e=>{hasIn[e.to]=true});
+  let roots=minds.filter(n=>!hasIn[n.id]);
+  if(!roots.length)roots=[minds[0]];
+  const W=300,H=140,vis={};let slot=0;
+  function place(id,depth){
+    if(vis[id])return null;vis[id]=true;
+    const ch=(kids[id]||[]).filter(c=>!vis[c]);
+    const ys=ch.map(c=>place(c,depth+1)).filter(v=>v!==null);
+    const n=mindNode(id);
+    const y=ys.length?ys.reduce((a,b)=>a+b,0)/ys.length:(slot++*H);
+    const b=mindBox(n);
+    const cx=depth*W;
+    n.x=cx-b.w/2;n.y=y-b.h/2;n.x2=cx+b.w/2;n.y2=y+b.h/2;
+    return y;
+  }
+  roots.forEach((r,i)=>{if(i>0)slot+=1;place(r.id,0)});
+  shapes.forEach(s=>{if(s.type==="mindedge"){s.fromSide="right";s.toSide="left"}});
+  const b0=mindBox(roots[0]);
+  const dx=(b0.x+b0.w/2),dy=(b0.y+b0.h/2);
+  minds.forEach(n=>{n.x-=dx;n.y-=dy;n.x2-=dx;n.y2-=dy});
+  save();draw();syncBtns();
+}
+
 /* ---------- tables + Excel-like formulas ---------- */
 function tableGeom(s){return{gx:Math.min(s.x,s.x2),gy:Math.min(s.y,s.y2),cw:s.colW||110,rh:s.rowH||36}}
 function tableCellAt(s,p){
@@ -792,6 +1027,9 @@ canvas.addEventListener("dblclick",e=>{
   }
   else if(hit&&hit.type==="idea"){
     sel=new Set([hit.id]);draw();refreshSelUI();openIdeaEditor(hit);
+  }
+  else if(hit&&hit.type==="mind"){
+    sel=new Set([hit.id]);draw();refreshSelUI();openMindEditor(hit,false);
   }
 });
 /* ---------- rainbow stroke ---------- */
@@ -1030,12 +1268,23 @@ canvas.addEventListener("pointerdown",e=>{
   if(viewOnly)return;
   if(spaceDown||tool==="hand"||e.button===1){panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y};return}
   if(tool==="selection"){
+    const hchk=handleHit(p);
+    if(hchk){addMindChild(hchk.id,hchk.side);return}
     const hit=hitTest(p);
     if(hit)selectionDown(e,p,hit);else{sel.clear();draw();refreshSelUI()}
     return;
   }
   if(tool==="eraser"){erasing=true;erasingChanged=false;erasingBefore=JSON.stringify(shapes);eraseAt(p);return}
   if(tool==="text"||tool==="sticky"){e.preventDefault();openTextEditor(p,tool==="sticky");return}
+  if(tool==="mindmap"){
+    e.preventDefault();
+    const mhh=handleHit(p);
+    if(mhh){addMindChild(mhh.id,mhh.side);return}
+    const hitM=hitTest(p);
+    if(hitM){selectionDown(e,p,hitM);return}
+    if(sel.size){sel.clear();draw();refreshSelUI()}
+    createMindNode(p);return;
+  }
   if(tool!=="freedraw"){
     const hit0=hitTest(p);
     if(hit0){selectionDown(e,p,hit0);return}
@@ -1076,6 +1325,7 @@ addEventListener("pointerup",()=>{
         if(ts.type==="table")openCellEditor(ts,ts.active||{r:0,c:0});
         else if(ts.type==="todo")todoTapEdit(ts,{x:tx,y:ty});
         else if(ts.type==="idea")openIdeaEditor(ts);
+        else if(ts.type==="mind")openMindEditor(ts,false);
       }
     }
     return;
@@ -1093,7 +1343,7 @@ function eraseAt(p){
   const hit=hitTest(p);
   if(!hit) return;
   erasingChanged=true;
-  shapes=shapes.filter(s=>s.id!==hit.id);sel.delete(hit.id);
+  shapes=shapes.filter(s=>s.id!==hit.id);sel.delete(hit.id);pruneMindEdges();
   save();draw();
 }
 /* wheel zoom — plain wheel zooms, Ctrl/Cmd+wheel (or trackpad pinch) zooms smoothly */
@@ -1209,6 +1459,8 @@ function renderBoardToCanvas(){
     else if(s.type==="table"){paintTable(g,s,false)}
     else if(s.type==="todo"){paintTodo(g,s,false)}
     else if(s.type==="idea"){paintIdea(g,s,false)}
+    else if(s.type==="mind"){paintMind(g,s,false)}
+    else if(s.type==="mindedge"){paintMindEdge(g,s)}
     else if(s.type==="freedraw"&&s.points&&s.points.length>1){
       if(s.color==="rainbow"){let gdist=0;for(let i=1;i<s.points.length;i++){const pa=s.points[i-1],pb=s.points[i];gdist+=Math.hypot(pb.x-pa.x,pb.y-pa.y);g.strokeStyle="hsl("+Math.round(gdist*0.9%360)+",95%,60%)";g.beginPath();g.moveTo(pa.x,pa.y);g.lineTo(pb.x,pb.y);g.stroke()}}
       else{g.beginPath();g.moveTo(s.points[0].x,s.points[0].y);s.points.forEach(p=>g.lineTo(p.x,p.y));g.stroke()}
@@ -1281,6 +1533,24 @@ function exportSVG(){
         if(ln)s+='<text x="'+X(gx+W2/2)+'" y="'+Y(gy+68+li*22)+'" fill="'+ink2+'" font-size="15" text-anchor="middle" dominant-baseline="middle">'+escXml(ln)+'</text>';
       });
     }
+    else if(o.type==="mind"){
+      const gx=Math.min(o.x,o.x2),gy=Math.min(o.y,o.y2),W2=Math.max(60,Math.abs(o.x2-o.x)),H2=Math.max(60,Math.abs(o.y2-o.y));
+      const ink3=o.color==="rainbow"?"url(#wbrb)":escXml(o.color||"#fff");
+      const cardBg2=(o.bg&&o.bg!=="transparent")?escXml(o.bg):(dark?"rgba(255,255,255,.07)":"rgba(0,0,0,.05)");
+      const bst='stroke="'+(o.color==="rainbow"?"url(#wbrb)":escXml(o.color||"#fff"))+'" stroke-width="'+(o.sw||2.5)+'"';
+      if(o.shape==="rect")s+='<rect x="'+X(gx)+'" y="'+Y(gy)+'" width="'+W2+'" height="'+H2+'" rx="14" fill="'+cardBg2+'" '+bst+'/>';
+      else s+='<ellipse cx="'+X(gx+W2/2)+'" cy="'+Y(gy+H2/2)+'" rx="'+W2/2+'" ry="'+H2/2+'" fill="'+cardBg2+'" '+bst+'/>';
+      String(o.text||"").split("\n").forEach((ln,li,arr)=>{ if(ln)s+='<text x="'+X(gx+W2/2)+'" y="'+Y(gy+H2/2+(li-(arr.length-1)/2)*24)+'" fill="'+ink3+'" font-size="20" text-anchor="middle" dominant-baseline="middle">'+escXml(ln)+'</text>'; });
+    }
+    else if(o.type==="mindedge"){
+      const gm=mindEdgeGeom(o);
+      if(gm){
+        const stc=o.color==="rainbow"?"url(#wbrb)":escXml(o.color||"#fff");
+        s+='<path d="M '+X(gm.a.x)+' '+Y(gm.a.y)+' C '+X(gm.c1.x)+' '+Y(gm.c1.y)+' '+X(gm.c2.x)+' '+Y(gm.c2.y)+' '+X(gm.b.x)+' '+Y(gm.b.y)+'" fill="none" stroke="'+stc+'" stroke-width="'+(o.sw||2.5)+'" stroke-linecap="round"/>';
+        const ea2=Math.atan2(gm.b.y-gm.c2.y,gm.b.x-gm.c2.x),EL=14;
+        s+='<path d="M '+X(gm.b.x)+' '+Y(gm.b.y)+' L '+X(gm.b.x-EL*Math.cos(ea2-.42))+' '+Y(gm.b.y-EL*Math.sin(ea2-.42))+' M '+X(gm.b.x)+' '+Y(gm.b.y)+' L '+X(gm.b.x-EL*Math.cos(ea2+.42))+' '+Y(gm.b.y-EL*Math.sin(ea2+.42))+'" fill="none" stroke="'+stc+'" stroke-width="'+(o.sw||2.5)+'" stroke-linecap="round"/>';
+      }
+    }
     else if(o.type==="image"&&o.img)s+='<image x="'+X(b.x)+'" y="'+Y(b.y)+'" width="'+Math.round(b.w*100)/100+'" height="'+Math.round(b.h*100)/100+'" href="'+o.img+'" preserveAspectRatio="none"/>';
     else if(o.type==="table"){
       const gx=Math.min(o.x,o.x2),gy=Math.min(o.y,o.y2),cw=o.colW||110,rh=o.rowH||36,W2=o.cols*cw,H2=o.rows*rh;
@@ -1305,7 +1575,7 @@ $("#zoomLabel").onclick=()=>{cam.z=1;draw();syncBtns()};
 $("#undoBtn").onclick=undo;$("#redoBtn").onclick=redo;
 $("#gridBtn").onclick=toggleGrid;
 $("#helpBtn").onclick=openHelp;
-function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • B جدول • U تودو ☑ • F فكرة 💡 • I إدراج صورة • G قلم قوس قزح 🌈 • E ممحاة • H يد • Q قفل/فتح اللوحة • [ / ] حجم الفرشاة (ج / د)</div><div style='font-size:13px;line-height:2'>الجدول: حدده ثم دبل كليك على أي خلية للتحرير • التودو: ضغطة على ☐ للتعليم ✓ ودبل كليك على النص للكتابة • الفكرة 💡: دبل كليك للكتابة • المعادلات تبدأ بـ = مثل ‎=A1+B2‎ و ‎=SUM(A1:A5)‎ • الدوال: SUM AVG MIN MAX COUNT • العمليات: + - * / % ^ وأقواس</div> • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#mExport2");if(b)b.onclick=exportPNG},0)}
+function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • B جدول • U تودو ☑ • F فكرة 💡 • M خريطة ذهنية 🧠 • I إدراج صورة • G قلم قوس قزح 🌈 • E ممحاة • H يد • Q قفل/فتح اللوحة • [ / ] حجم الفرشاة (ج / د)</div><div style='font-size:13px;line-height:2'>الجدول: حدده ثم دبل كليك على أي خلية للتحرير • التودو: ضغطة على ☐ للتعليم ✓ ودبل كليك على النص للكتابة • الفكرة 💡: دبل كليك للكتابة • الخريطة 🧠: دوس + حول العقدة لفرع جديد • المعادلات تبدأ بـ = مثل ‎=A1+B2‎ و ‎=SUM(A1:A5)‎ • الدوال: SUM AVG MIN MAX COUNT • العمليات: + - * / % ^ وأقواس</div> • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#mExport2");if(b)b.onclick=exportPNG},0)}
 $("#shareBtn").onclick=()=>{
   openModal("Share","صدّر اللوحة بأي صيغة أو انسخها للحافظة:",'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-tool primary" id="shPng">PNG</button><button class="btn-tool" id="shSvg">SVG</button><button class="btn-tool" id="shJson">JSON</button><button class="btn-tool" id="shCopy">نسخ للحافظة</button></div>');
   setTimeout(()=>{
@@ -1357,7 +1627,7 @@ ctxMenu.addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)
 });
 
 /* ---------- keyboard ---------- */
-const KEYMAP={v:"selection",h:"hand",r:"rectangle",d:"diamond",o:"ellipse",a:"arrow",l:"line",p:"freedraw",t:"text",n:"sticky",b:"table",u:"todo",f:"idea",e:"eraser"};
+const KEYMAP={v:"selection",h:"hand",r:"rectangle",d:"diamond",o:"ellipse",a:"arrow",l:"line",p:"freedraw",t:"text",n:"sticky",b:"table",u:"todo",f:"idea",m:"mindmap",e:"eraser"};
 addEventListener("keydown",e=>{
   const inInput=/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName||"");
   if(e.key===" "&&!inInput){e.preventDefault();spaceDown=true;canvas.style.cursor="grab";return}
