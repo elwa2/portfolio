@@ -175,7 +175,7 @@
             <button class="wb-icon-btn" id="libBtn" title="Library">📚</button>
           </div>
         </div>
-        <div class="wb-hint" id="wbHint">Scroll = zoom • Ctrl+Scroll = fast zoom • hold <kbd>Space</kbd> while dragging, or use the hand tool to move</div>
+        <div class="wb-hint" id="wbHint">Drag on empty = multi-select • Scroll = zoom • hold <kbd>Space</kbd> while dragging, or use the hand tool to move</div>
         <div class="wb-lockbadge hidden" id="lockBadge">🔒 اللوحة مقفولة — اضغط 🔓 للتحرير</div>
 
         <div class="wb-stylebar" id="styleBar">
@@ -306,7 +306,7 @@ const LS="wb-whiteboard-v1";
 let shapes=[], sel=new Set(), tool="selection", keepTool=true, spaceDown=false, viewOnly=false;
 let cam={x:0,y:0,z:1}, showGrid=false, canvasBg="#121212", dark=true;
 let stroke="#ffffff", fill="transparent", sw=2.5;
-let undoStack=[], redoStack=[], drawing=null, panning=null, movingSel=null, erasing=false, erasingBefore=null, erasingChanged=false;
+let undoStack=[], redoStack=[], drawing=null, panning=null, movingSel=null, marquee=null, erasing=false, erasingBefore=null, erasingChanged=false;
 let seq=1;
 
 const STROKES=["#ffffff","#ff7979","#f6e58d","#7bed9f","#70a1ff","#e056fd"];
@@ -489,6 +489,16 @@ function draw(){
   if(drawing)drawShape(drawing);
   sel.forEach(id=>{const s=shapes.find(x=>x.id===id);if(!s)return;const b=bbox(s);ctx.save();ctx.strokeStyle="#6965db";ctx.setLineDash([6,4]);ctx.lineWidth=1.2/cam.z;ctx.strokeRect(b.x-8,b.y-8,b.w+16,b.h+16);ctx.restore()});
   if(sel.size===1){const mhs=selectedShapes()[0];if(mhs&&mhs.type==="mind"&&!drawing)drawMindHandles(mhs)}
+  if(marquee){
+    const mx=Math.min(marquee.x,marquee.x2),my=Math.min(marquee.y,marquee.y2);
+    const mw=Math.abs(marquee.x2-marquee.x),mh=Math.abs(marquee.y2-marquee.y);
+    ctx.save();
+    ctx.fillStyle="rgba(105,101,219,.12)";
+    ctx.fillRect(mx,my,mw,mh);
+    ctx.strokeStyle="#8f8aff";ctx.setLineDash([6/cam.z,4/cam.z]);ctx.lineWidth=1.4/cam.z;
+    ctx.strokeRect(mx,my,mw,mh);
+    ctx.restore();
+  }
   ctx.restore();
   board.style.background=canvasBg;
 }
@@ -1271,7 +1281,13 @@ canvas.addEventListener("pointerdown",e=>{
     const hchk=handleHit(p);
     if(hchk){addMindChild(hchk.id,hchk.side);return}
     const hit=hitTest(p);
-    if(hit)selectionDown(e,p,hit);else{sel.clear();draw();refreshSelUI()}
+    if(hit)selectionDown(e,p,hit);
+    else{
+      // marquee / rubber-band multi-select: اسحب بمربع لتحديد أكتر من عنصر
+      marquee={x:p.x,y:p.y,x2:p.x,y2:p.y,additive:!!e.shiftKey};
+      if(!e.shiftKey){sel.clear();refreshSelUI()}
+      draw();
+    }
     return;
   }
   if(tool==="eraser"){erasing=true;erasingChanged=false;erasingBefore=JSON.stringify(shapes);eraseAt(p);return}
@@ -1298,6 +1314,7 @@ canvas.addEventListener("pointermove",e=>{
   const p=pos(e);
   if(panning){cam.x=panning.cx+(e.clientX-panning.sx);cam.y=panning.cy+(e.clientY-panning.sy);draw();return}
   if(erasing){eraseAt(p);return}
+  if(marquee){marquee.x2=p.x;marquee.y2=p.y;draw();return}
   if(movingSel){const dx=p.x-movingSel.sx,dy=p.y-movingSel.sy;if(Math.abs(dx)+Math.abs(dy)>1)movingSel.moved=true;shapes.forEach(s=>{const o=movingSel.orig.find(o=>o.id===s.id);if(!o)return;if(s.points){s.points=o.pts.map(q=>({x:q.x+dx,y:q.y+dy}))}else{if(s.x!==undefined){s.x=o.dx+dx;s.y=o.dy+dy}if(s.x2!==undefined){s.x2=o.x2+dx;s.y2=o.y2+dy}}});draw();return}
   if(drawing){
     if(drawing.type==="freedraw")drawing.points.push(p);
@@ -1309,6 +1326,12 @@ canvas.addEventListener("pointermove",e=>{
 });
 addEventListener("pointerup",()=>{
   if(panning){panning=null;save();return}
+  if(marquee){
+    const ids=shapesInMarquee(marquee);
+    if(marquee.additive)ids.forEach(id=>sel.add(id));
+    else sel=new Set(ids);
+    marquee=null;draw();syncBtns();refreshSelUI();return;
+  }
   if(erasing){
     erasing=false;
     if(erasingChanged){undoStack.push(erasingBefore);if(undoStack.length>60)undoStack.shift();redoStack.length=0;save();syncBtns();}
@@ -1360,6 +1383,18 @@ function zoomAt(cx,cy,f){const before=toWorld(cx,cy);cam.z=Math.min(4,Math.max(.
 
 /* hit test */
 function hitTest(p){for(let i=shapes.length-1;i>=0;i--){const s=shapes[i],b=bbox(s);const pad=10/cam.z;if(p.x>=b.x-pad&&p.x<=b.x+b.w+pad&&p.y>=b.y-pad&&p.y<=b.y+b.h+pad)return s}return null}
+function shapesInMarquee(m){
+  const mx=Math.min(m.x,m.x2),my=Math.min(m.y,m.y2);
+  const mw=Math.abs(m.x2-m.x),mh=Math.abs(m.y2-m.y);
+  if(mw<4/cam.z&&mh<4/cam.z) return [];
+  const found=[];
+  shapes.forEach(s=>{
+    const b=bbox(s);
+    const hit=b.x<mx+mw&&b.x+b.w>mx&&b.y<my+mh&&b.y+b.h>my;
+    if(hit)found.push(s.id);
+  });
+  return found;
+}
 
 /* text editor */
 function openTextEditor(p,isSticky){
@@ -1414,7 +1449,7 @@ function setTheme(t){
   else{dark=matchMedia("(prefers-color-scheme: dark)").matches;canvasBg=dark?"#121212":"#ffffff";stroke=dark?"#ffffff":"#1a1a1a"}
   syncStrokeUI();syncBgUI();save();draw();
 }
-$("#langSel").onchange=e=>{$("#wbHint").innerHTML=e.target.value==="ar"?"عجلة الفأرة = تقريب • <kbd>Ctrl</kbd> + عجلة = تقريب سريع • اضغط <kbd>مسافة</kbd> أثناء السحب للتحريك":"Scroll = zoom • Ctrl+Scroll = fast zoom • hold <kbd>Space</kbd> while dragging, or use the hand tool to move"};
+$("#langSel").onchange=e=>{$("#wbHint").innerHTML=e.target.value==="ar"?"السحب على الفاضي = تحديد متعدد • عجلة الفأرة = تقريب • اضغط <kbd>مسافة</kbd> أثناء السحب للتحريك":"Drag on empty = multi-select • Scroll = zoom • hold <kbd>Space</kbd> while dragging, or use the hand tool to move"};
 
 function toggleZen(){document.body.classList.toggle("wb-zen");board.classList.toggle("zen");setTimeout(resize,50)}
 function toggleGrid(){showGrid=!showGrid;draw();syncGridBtn()}
@@ -1643,7 +1678,7 @@ addEventListener("keydown",e=>{
   if((e.ctrlKey||e.metaKey)&&k==="o"){e.preventDefault();$("#fileOpen").click();return}
   if((e.ctrlKey||e.metaKey)&&e.shiftKey&&k==="e"){e.preventDefault();exportPNG();return}
   if((e.ctrlKey||e.metaKey)&&e.key==="/"){e.preventDefault();openPalette();return}
-  if(e.key==="Escape"){closePops();hideCtx();modal.classList.add("hidden");if(tool!=="selection")setTool("selection");return}
+  if(e.key==="Escape"){closePops();hideCtx();modal.classList.add("hidden");if(marquee){marquee=null;draw()}if(tool!=="selection")setTool("selection");return}
   if(e.altKey&&k==="z"){e.preventDefault();toggleZen();return}
   if(k==="q"&&!e.ctrlKey&&!e.metaKey&&!e.altKey){setTool("lock");return}
   if(k==="i"&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();$("#imgOpen").click();return}
