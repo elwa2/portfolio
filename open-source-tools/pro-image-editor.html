@@ -137,6 +137,8 @@
     .tab.active{background:var(--pf-surface-hover);color:var(--pf-text);
       box-shadow:inset 0 2px 0 var(--pf-accent);}
     .tab-split .tab-name{font-weight:700;color:var(--pf-accent);}
+    .tab-wb .tab-name{font-weight:700;color:#b8a6ff;}
+    .tab-wb.active{box-shadow:inset 0 2px 0 #b8a6ff,inset 3px 0 0 #6965db;}
     .tab-split.active{box-shadow:inset 0 2px 0 var(--pf-accent),inset 3px 0 0 #8b5cf6;}
     .tab.dragging{opacity:0.45;}
     .tab .tab-name{overflow:hidden;text-overflow:ellipsis;flex-shrink:0;font-weight:600;}
@@ -2840,6 +2842,7 @@
     <div class="mb-item" data-menu="file">File<div class="menu-dropdown" id="menuFile">
       <div class="menu-dd-item" data-action="newCanvas">New Canvas...<span class="kbd">Ctrl+N</span></div>
       <div class="menu-dd-item" data-action="newA4">New A4 Print Canvas<span class="kbd">2480×3508</span></div>
+      <div class="menu-dd-item" data-action="whiteboard">Whiteboard...<span class="kbd">سبورة</span></div>
       <div class="menu-dd-sep"></div>
       <div class="menu-dd-item" data-action="open">Open...<span class="kbd">Ctrl+O</span></div>
       <div class="menu-dd-item" data-action="pasteImg">Paste from Clipboard<span class="kbd">Ctrl+V</span></div>
@@ -3445,8 +3448,7 @@
       <div class="tool-btn" data-tool="text" tabindex="0" role="button" aria-label="Type Tool — add editable text (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Type Tool <span class="kbd">T</span></span><span class="tt-desc">Add editable text</span></span></div>
       <div class="tool-btn" data-tool="shape" data-group="shape" tabindex="0" role="button" aria-label="Shape Tool (U)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Shape Tool <span class="kbd">U</span></span><span class="tt-desc">Rectangle / Ellipse / Polygon / Line / Custom</span></span></div>
       <div class="tool-btn" data-tool="artboard" tabindex="0" role="button" aria-label="Artboard Tool — create / move / resize artboards, export only the artboard content"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 7h4M3 17h4M17 7h4M17 17h4"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Artboard Tool <span class="kbd">A</span></span><span class="tt-desc">Draw to add an artboard · drag to move · corners to resize · only the artboard is exported</span></span></div>
-      <div class="tool-sep"></div>
-      <div class="tool-btn" data-tool="whiteboard" tabindex="0" role="button" aria-label="Whiteboard — diagrams, mind maps, tables (N)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="12" y1="16" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/><path d="M7 8h6M7 11.5h10"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Whiteboard <span class="kbd">N</span></span><span class="tt-desc">Diagrams · Mind maps · Tables · Stickies</span></span></div>
+
       <div class="tool-sep"></div>
       <div class="tool-btn" data-tool="hand" tabindex="0" role="button" aria-label="Hand Tool — pan the canvas (H)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0v1"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 0 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.8-2.4L3.2 14a1.5 1.5 0 0 1 2.1-2.1L8 14"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Hand Tool <span class="kbd">H</span></span><span class="tt-desc">Pan around the canvas</span></span></div>
       <div class="tool-btn" data-tool="zoom" tabindex="0" role="button" aria-label="Zoom Tool — zoom in and out (Z)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg><span class="tool-tip" role="tooltip"><span class="tt-title">Zoom Tool <span class="kbd">Z</span></span><span class="tt-desc">Zoom in and out</span></span></div>
@@ -3530,6 +3532,7 @@
             <div class="wb-top-right">
               <button class="wb-icon-btn" id="pfwb-codeBtn" title="الأكواد">💻</button>
               <button class="wb-pill-btn share" id="pfwb-shareBtn">Share</button>
+              <button class="wb-pill-btn" id="pfwb-exitBtn" title="Leave the board and return to photo editing">← Editor</button>
               <button class="wb-icon-btn" id="pfwb-libBtn" title="Library">📚</button>
             </div>
           </div>
@@ -4506,6 +4509,15 @@
           </svg>
           <span class="rail-tip" role="tooltip">Crop &amp; Merge &middot; قص ودمج</span>
         </div>
+        <div class="panel-tab" data-panel="whiteboard" role="button" tabindex="0" aria-label="Whiteboard diagrams and notes">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="12" rx="2"/>
+            <line x1="12" y1="16" x2="12" y2="20"/>
+            <line x1="8" y1="20" x2="16" y2="20"/>
+            <path d="M7 8h6M7 11.5h10"/>
+          </svg>
+          <span class="rail-tip" role="tooltip">Whiteboard &middot; سبورة</span>
+        </div>
         <div class="rail-spacer"></div>
 <button type="button" class="panel-tab rail-save" id="railSaveBtn" aria-label="Save as PNG (Alt/Ctrl/right-click for more formats)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -4891,6 +4903,31 @@
       </div>
 
         <!-- CROP & MERGE PANEL (ported from image-crop-merge.html) -->
+        <div class="panel-content" data-panel="whiteboard">
+          <div class="panel-savebar">
+            <button class="ib save-export-btn" id="pfwbPanelBack" title="Leave the board and return to photo editing">
+              <svg viewBox="0 0 24 24"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back to Editing
+            </button>
+          </div>
+          <div class="panel-section">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="12" y1="16" x2="12" y2="20"/></svg>Whiteboard · سبورة</h4></div>
+            <div class="panel-body">
+              <div class="ctrl-row"><div class="ctrl-label">Shapes on board<span class="val" id="pfwbPanelCount">0</span></div></div>
+              <div class="ctrl-row"><div class="ib-row">
+                <button class="ib" id="pfwbPanelSend" title="Send the board to the editor (new layer / new tab)" style="width:auto;padding:0 10px;font-size:10.5px;font-weight:600;">To editor</button>
+                <button class="ib" id="pfwbPanelPhoto" title="Place the current photo onto the board" style="width:auto;padding:0 10px;font-size:10.5px;font-weight:600;">Use photo</button>
+                <button class="ib" id="pfwbPanelGrid" title="Toggle board grid">▦</button>
+              </div></div>
+              <div class="ctrl-row"><div class="ib-row">
+                <button class="ib" id="pfwbPanelPng" title="Export board as PNG" style="width:auto;padding:0 10px;font-size:10.5px;">PNG</button>
+                <button class="ib" id="pfwbPanelSvg" title="Export board as SVG" style="width:auto;padding:0 10px;font-size:10.5px;">SVG</button>
+                <button class="ib" id="pfwbPanelJson" title="Save board as JSON" style="width:auto;padding:0 10px;font-size:10.5px;">JSON</button>
+              </div></div>
+              <div class="tiny-note">Paste or drop images anytime — they land on the board, never in a new tab. Use the left toolbar to draw, select and move board elements.</div>
+            </div>
+          </div>
+        </div>
         <div class="panel-content" data-panel="merge">
           <div class="panel-savebar">
             <button class="ib save-export-btn" id="cmOpenBtn" title="Open the Crop &amp; Merge workspace">
@@ -5348,7 +5385,10 @@
   /* Crop & Merge workspace tab (ported from image-crop-merge.html) */
   const isMergeTab=t=>!!(t&&t.kind==="merge");
   const activeIsMerge=()=>isMergeTab(activeTab());
-  const isWorkspaceTab=t=>isSplitTab(t)||isMergeTab(t);
+  /* Whiteboard workspace tab — infinite board for diagrams, mind maps, tables */
+  const isWhiteboardTab=t=>!!(t&&t.kind==="whiteboard");
+  const activeIsWhiteboard=()=>isWhiteboardTab(activeTab());
+  const isWorkspaceTab=t=>isSplitTab(t)||isMergeTab(t)||isWhiteboardTab(t);
   const activeIsWorkspace=()=>isWorkspaceTab(activeTab());
   function tabHasImage(t){if(!t)return false;if(isWorkspaceTab(t))return false;if(t.loading)return false;if(t.id===activeTabId)return !!originalImage;return !!(t.session&&t.session.originalImage);}
   function tabZoom(t){
@@ -5430,9 +5470,9 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     if(del)del.disabled=true;if(mg)mg.disabled=true;if(dn)dn.disabled=true;if(up)up.disabled=true;
   }
   function createTab(kind){
-    const isMerge=kind==="merge",isSpl=kind==="split";
-    const t={id:nextTabId++,kind:isSpl?"split":(isMerge?"merge":"doc"),
-      name:isSpl?"Split · تقطيع":(isMerge?"قص ودمج · Crop & Merge":"Untitled-"+(++untitledCounter)),
+    const isMerge=kind==="merge",isSpl=kind==="split",isWb=kind==="whiteboard";
+    const t={id:nextTabId++,kind:isSpl?"split":(isMerge?"merge":(isWb?"whiteboard":"doc")),
+      name:isSpl?"Split · تقطيع":(isMerge?"قص ودمج · Crop & Merge":(isWb?"Whiteboard · سبورة":"Untitled-"+(++untitledCounter))),
       session:null,dirty:false,loading:false};
     tabs.push(t);return t;
   }
@@ -5478,12 +5518,12 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     syncMoveOptionsBar();
   }
   function refreshAfterSwitch(){
-    if(state.whiteboardMode&&!activeIsMerge()&&!activeIsSplit()){applyWhiteboardView();return;}
+    if(activeIsWhiteboard()){applyWhiteboardView();return;}
     if(activeIsMerge()){applyMergeTabView();return;}
     if(activeIsSplit()){applySplitTabView();return;}
     leaveMergeMode();
     leaveSplitMode();
-    hideWhiteboardStage();
+    if(state.whiteboardMode){leaveWhiteboardView();}else{hideWhiteboardStage();}
     if(originalImage){emptyState.style.display="none";canvasWrapper.style.display="block";}
     else{emptyState.style.display="flex";canvasWrapper.style.display="none";}
     syncControlsFromState();updateValueLabels();updateToggleButtons();
@@ -5526,6 +5566,7 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
   }
   /* ---------- WHITEBOARD TOOL VIEW (integrated whiteboard stage) ---------- */
   function applyWhiteboardView(){
+    state.whiteboardMode=true;
     window.__pfWBActive=true;
     try{leaveSplitMode();}catch(e){}
     try{leaveMergeMode();}catch(e){}
@@ -5536,17 +5577,30 @@ pdfDoc=null;pdfCurrentPage=1;pdfTotalPages=1;
     var wbPdf=$("pdfNav");if(wbPdf)wbPdf.classList.remove("visible");
     try{hideLoupe();}catch(e){}
     try{overlayCanvas.style.pointerEvents="none";drawCanvas.style.pointerEvents="none";}catch(e){}
+    activatePanelTab("whiteboard");
     applyToolUi("whiteboard");
     try{updateStatusInfo();}catch(e){}
+    try{
+      $("statusFileName").textContent="Whiteboard";
+      var _wc=0;try{_wc=window.__pfWhiteboard?window.__pfWhiteboard.shapeCount():0;}catch(e){}
+      $("statusDimensions").textContent=_wc+" shapes";
+      $("statusSize").textContent="—";
+    }catch(e){}
     try{renderTabBar();}catch(e){}
     if(window.__pfWhiteboard&&window.__pfWhiteboard.show){try{window.__pfWhiteboard.show();}catch(e){}}
+  }
+  function leaveWhiteboardView(){
+    state.whiteboardMode=false;
+    window.__pfWBActive=false;
+    var wbStage=$("wbStage");if(wbStage)wbStage.classList.remove("on");
+    try{activatePanelTab(lastDocPanel);}catch(e){}
   }
   function hideWhiteboardStage(){
     window.__pfWBActive=false;
     var wbStage=$("wbStage");if(wbStage)wbStage.classList.remove("on");
   }
 function applySplitTabView(){
-  hideWhiteboardStage();
+  leaveWhiteboardView();
   const stage=$("splitStage");
   leaveMergeMode();
   document.body.classList.add("split-mode");
@@ -5585,6 +5639,15 @@ function applySplitTabView(){
     if(wasNew&&!suppressAutoSave)saveProject();
     return t;
   }
+  function openWhiteboardTab(){
+    let t=tabs.find(x=>x.kind==="whiteboard");
+    const wasNew=!t;
+    if(!t){captureActiveTab();t=createTab("whiteboard");}
+    activateTabState(t.id);
+    refreshAfterSwitch();
+    if(wasNew&&!suppressAutoSave)saveProject();
+    return t;
+  }
 
   /* ---------- CROP & MERGE WORKSPACE TAB VIEW ---------- */
   const mergeApi=()=>window.__mergeTool||null;
@@ -5601,7 +5664,7 @@ function applySplitTabView(){
     $("statusSize").textContent=m.hasSource()?"2-slot merge":"—";
   }
   function applyMergeTabView(){
-    hideWhiteboardStage();
+    leaveWhiteboardView();
     leaveSplitMode();
     const stage=$("cmStage");
     document.body.classList.add("merge-mode");
@@ -5670,8 +5733,8 @@ function applySplitTabView(){
     bar.innerHTML="";
     for(const t of tabs){
       const el=document.createElement("div");
-      const isSplit=isSplitTab(t),isMerge=isMergeTab(t);
-      el.className="tab"+(t.id===activeTabId?" active":"")+(isSplit?" tab-split":"")+(isMerge?" tab-merge":"");
+      const isSplit=isSplitTab(t),isMerge=isMergeTab(t),isWb=isWhiteboardTab(t);
+      el.className="tab"+(t.id===activeTabId?" active":"")+(isSplit?" tab-split":"")+(isMerge?" tab-merge":"")+(isWb?" tab-wb":"");
       el.dataset.id=t.id;el.draggable=true;
       const nm=document.createElement("span");nm.className="tab-name";nm.textContent=t.name;
       const meta=document.createElement("span");meta.className="tab-meta";
@@ -5682,6 +5745,10 @@ function applySplitTabView(){
       }else if(isMerge){
         const m=mergeApi();
         meta.textContent=m&&m.hasSource()?m.tabMeta():"no image";
+        el.title=t.name+"   "+meta.textContent;
+      }else if(isWb){
+        let _wc=0;try{_wc=window.__pfWhiteboard?window.__pfWhiteboard.shapeCount():0;}catch(e){}
+        meta.textContent=_wc+" shapes";
         el.title=t.name+"   "+meta.textContent;
       }else{
         const zo=(t.id===activeTabId)?state.zoom:tabZoom(t);
@@ -6561,6 +6628,13 @@ const dataUrl=src.toDataURL("image/png");
   }
   async function openManyFiles(files){
     if(!files||!files.length)return;
+    if(state.whiteboardMode){
+      const list=[...files].filter(f=>f&&f.type&&f.type.indexOf("image/")===0);
+      if(!list.length){toast("Only images can go on the board.","warning");return;}
+      const W=window.__pfWhiteboard;
+      if(W){try{W.insertFiles(files);toast(list.length>1?list.length+" images placed on the board.":"Image placed on the board.");}catch(e){}}
+      return;
+    }
     const imgs=[].slice.call(files);
     if(imgs.length===1){addImageFile(imgs[0]);return;}
     const cur=activeTab();
@@ -6797,6 +6871,7 @@ const dataUrl=src.toDataURL("image/png");
   function serializeTab(t){
     if(isSplitTab(t))return{name:t.name,kind:"split",dirty:false};
     if(isMergeTab(t))return{name:t.name,kind:"merge",dirty:false};
+    if(isWhiteboardTab(t))return{name:t.name,kind:"whiteboard",dirty:false};
     const s=t&&t.session;
     if(!s||!s.originalImage)return{name:t.name,dirty:!!t.dirty,empty:true};
     let src=s.originalImage;
@@ -6858,7 +6933,7 @@ const dataUrl=src.toDataURL("image/png");
   async function restoreTabsFromArray(arr){
     tabs=[];activeTabId=null;nextTabId=1;
     for(const td of arr){
-    if(td.kind==="split"||td.kind==="merge"){
+    if(td.kind==="split"||td.kind==="merge"||td.kind==="whiteboard"){
     const nt=createTab(td.kind);activeTabId=nt.id;nt.name=td.name||nt.name;
     continue; /* the document state is left untouched by tool workspaces */
     }
@@ -7314,7 +7389,38 @@ const dataUrl=src.toDataURL("image/png");
     });
   }
   function rgbToHex(r,g,b){return"#"+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,"0")).join("");}
+  /* Whiteboard tool routing: while the board tab is active, left-toolbar tools drive the board */
+  const WB_TOOL_ROUTE={move:"selection",marquee:"selection",emarquee:"selection",lasso:"selection",ploy:"selection",maglasso:"selection",artboard:"selection",hand:"hand",brush:"freedraw",pen:"freedraw",fpen:"freedraw",erase:"eraser",bgerase:"eraser",magerase:"eraser",text:"text",shape:"rectangle",shellipse:"ellipse",shline:"line",shpolygon:"diamond",shcustom:"sticky"};
+  function wbLeftKey(wbTool){
+    if(wbTool==="selection")return"move";
+    if(wbTool==="hand")return"hand";
+    if(wbTool==="freedraw")return"brush";
+    if(wbTool==="text"||wbTool==="sticky")return"text";
+    if(wbTool==="eraser"){try{return getDefaultActiveForGroup("eraser")||"erase";}catch(e){return"erase";}}
+    if(wbTool==="rectangle"||wbTool==="diamond"||wbTool==="ellipse"||wbTool==="arrow"||wbTool==="line"){try{return getDefaultActiveForGroup("shape")||"shape";}catch(e){return"shape";}}
+    return"whiteboard";
+  }
+  function routeBoardTool(key){
+    const mapped=WB_TOOL_ROUTE[key];
+    if(!mapped){
+      toast("That tool needs an image tab — staying on the board.","info",1800);
+      return;
+    }
+    const W=window.__pfWhiteboard;
+    if(W){try{W.setTool(mapped);}catch(e){activeToolKey=key;syncToolButtons();}}
+    $("toolNameLabel").textContent="Whiteboard Tool";
+    OPTION_GROUPS.forEach(id=>{const el=$(id);if(el)el.style.display=id==="whiteboardOptions"?"flex":"none";});
+    try{if(window.__pfWbRefreshOptions)window.__pfWbRefreshOptions();}catch(e){}
+  }
+  window.__pfWbToolEcho=function(wbTool){
+    try{
+      activeToolKey=wbLeftKey(wbTool);
+      syncToolButtons();
+      if(window.__pfWbRefreshOptions)window.__pfWbRefreshOptions();
+    }catch(e){}
+  };
   function selectTool(key){
+    if(state.whiteboardMode){routeBoardTool(key);return;}
     if(key!=="text"){const __te=document.getElementById("typeEditor");if(__te&&__te.style&&__te.style.display!=="none"){try{__te.blur();}catch(e){}}}
     const meta=TOOL_META[key];if(!meta){key="move";}
     const m=meta.m;
@@ -7361,7 +7467,6 @@ const dataUrl=src.toDataURL("image/png");
     else if(m==="fill"){state.fillToolMode=true;canvasViewport.style.cursor="crosshair";}
     else if(m==="text"){state.textMode=true;canvasViewport.style.cursor="text";if(typeof syncTextPanel!=="undefined"){try{syncTextPanel();}catch(e){}}}
     else if(m==="shape"){state.shapeMode=true;overlay=true;canvasViewport.style.cursor="crosshair";}
-    else if(m==="whiteboard"){state.whiteboardMode=true;overlayCanvas.style.pointerEvents="none";drawCanvas.style.pointerEvents="none";canvasViewport.style.cursor="default";applyWhiteboardView();}
     if(overlay&&originalImage)overlayCanvas.style.pointerEvents="auto";
     if(meta.apply)meta.apply();
     updateToggleButtons();
@@ -10253,6 +10358,7 @@ const dataUrl=src.toDataURL("image/png");
     ["dragleave","drop"].forEach(ev=>canvasViewport.addEventListener(ev,e=>{e.preventDefault();canvasViewport.classList.remove("dragover");}));
     canvasViewport.addEventListener("drop",async e=>{
       try{
+        if(state.whiteboardMode)return;
         e.preventDefault();
         const all=await collectDroppedFiles(e.dataTransfer);
         const good=all.filter(isImageLike);
@@ -10298,6 +10404,7 @@ const dataUrl=src.toDataURL("image/png");
       if(dt.files&&dt.files.length>0){for(let i=0;i<dt.files.length;i++){const ff=dt.files[i];if(ff&&ff.type&&(ff.type.startsWith("image/")||ff.type==="application/pdf")){f=ff;break;}}}
       if(!f&&dt.items){for(let i=0;i<dt.items.length;i++){const it=dt.items[i];if(it&&it.type&&(it.type.startsWith("image/")||it.type==="application/pdf")){f=it.getAsFile();break;}}}
       const wantNewTab=pasteNewTabPending;pasteNewTabPending=false;
+      if(state.whiteboardMode){if(f){e.preventDefault();boardInsertFile(f);}return;}
       if(f&&wantNewTab){e.preventDefault();openClipboardFileInNewTab(f);return;}
       if(f){e.preventDefault();addImageFile(f);}
     };
@@ -10380,7 +10487,7 @@ const dataUrl=src.toDataURL("image/png");
       if(k==="d"&&!editable&&!c){state.fgColor="#ffffff";state.bgColor="#000000";updateColorSwatches();toast("Colors reset to black & white.");return;}
       if(!editable&&!c&&(k==="["||k==="]")){e.preventDefault();changeBrushSize(k==="["?-1:1);return;}
       if(!editable&&!c){
-        const tm={v:"move",m:"marquee",l:"lasso",w:"wand",q:"qsel",c:"crop",i:"eyedropper",a:"artboard",j:"heal",b:"brush",s:"clone",e:"eraser",g:"gradient",r:"blur",o:"dodge",p:"pen",t:"text",u:"shape",n:"whiteboard",h:"hand",z:"zoom"};
+        const tm={v:"move",m:"marquee",l:"lasso",w:"wand",q:"qsel",c:"crop",i:"eyedropper",a:"artboard",j:"heal",b:"brush",s:"clone",e:"eraser",g:"gradient",r:"blur",o:"dodge",p:"pen",t:"text",u:"shape",h:"hand",z:"zoom"};
         const tool=tm[k];
         if(tool){if(TOOL_GROUPS[tool])selectGroupTool(tool);else selectTool(tool);}
       }
@@ -10417,6 +10524,7 @@ const dataUrl=src.toDataURL("image/png");
     document.querySelectorAll(".tool-btn[data-tool]").forEach(b=>{
       if(b.dataset.action){
         b.addEventListener("click",()=>{
+          if(state.whiteboardMode){toast("Switch to an image tab for layer actions — staying on the board.","info",1800);return;}
           if(!originalImage)return;
           if(b.dataset.action==="duplicate")duplicateLayer();
           else if(b.dataset.action==="newlayer")addLayer();
@@ -10432,7 +10540,7 @@ const dataUrl=src.toDataURL("image/png");
       ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>{if(longTimer){clearTimeout(longTimer);longTimer=null;}}));
       b.addEventListener("click",e=>{
         if(suppressClick){suppressClick=false;e.stopPropagation();return;}
-        if(b.dataset.tool==="whiteboard"){e.preventDefault();selectTool("whiteboard");return;}
+        if(state.whiteboardMode){e.preventDefault();const k=b.dataset.group?getDefaultActiveForGroup(b.dataset.group):b.dataset.tool;selectTool(k||b.dataset.tool);return;}
         if(!originalImage){e.preventDefault();showNewCanvasDialog();return;}
         if(b.dataset.group){
           const rect=b.getBoundingClientRect();
@@ -11404,6 +11512,7 @@ const dataUrl=src.toDataURL("image/png");
     document.querySelectorAll(".panel-tab[data-panel]").forEach(t=>{
       const activate=()=>{
         if(t.dataset.panel==="split"){openSplitTab();return;}
+        if(t.dataset.panel==="whiteboard"){openWhiteboardTab();return;}
         lastDocPanel=t.dataset.panel;
         activatePanelTab(t.dataset.panel);
       };
@@ -11438,6 +11547,7 @@ const dataUrl=src.toDataURL("image/png");
         else if(a==="clearPdfQueue")clearPdfQueue();
         else if(a==="openNewTab")openInNewTab();
         else if(a==="newArtboard")openArtboardDialog();
+        else if(a==="whiteboard")openWhiteboardTab();
         else if(a==="savePfx")saveProjectFile();
         else if(a==="openPfx"){const inp=document.createElement("input");inp.type="file";inp.accept=".pfx,application/octet-stream,application/json";inp.onchange=()=>{if(inp.files&&inp.files[0])openProjectFile(inp.files[0]);};inp.click();}
         else if(a==="copyImg"){(async()=>{const ok=await copyImage();toast(ok?"Copied.":"Failed.",ok?"success":"error");})();}
@@ -12688,6 +12798,17 @@ const dataUrl=src.toDataURL("image/png");
     if(typeof window.__splitPanelChanged==="function")window.__splitPanelChanged();
   })();
 
+  /* Whiteboard board-insert: pasted/dropped files land on the board while it is active */
+  function boardInsertFile(f){
+    const W=window.__pfWhiteboard;
+    if(!W||!f||!f.type||f.type.indexOf("image/")!==0){toast("Only images can go on the board.","warning");return;}
+    try{
+      const rd=new FileReader();
+      rd.onload=()=>{try{W.insertDataURL(rd.result);toast("Image placed on the board.");}catch(e){}};
+      rd.onerror=()=>toast("Could not read image.","error");
+      rd.readAsDataURL(f);
+    }catch(e){toast("Could not read image.","error");}
+  }
   /* Whiteboard bridge: lets the isolated whiteboard module exchange images with the editor */
   window.__pfEditorBridge={
     toast:function(m,t,d){try{toast(m,t,d);}catch(e){}},
@@ -12701,7 +12822,16 @@ const dataUrl=src.toDataURL("image/png");
         },"image/png");
       }catch(e){toast("Export failed.","error");}
     },
-    currentImageDataURL:function(){try{var c=saveTargetCanvas();return c?c.toDataURL("image/png"):null;}catch(e){return null;}}
+    currentImageDataURL:function(){try{var c=saveTargetCanvas();return c?c.toDataURL("image/png"):null;}catch(e){return null;}},
+    exitBoard:function(){
+      try{
+        const docs=tabs.filter(tabHasImage);
+        if(docs.length){focusTab(docs[docs.length-1].id);return;}
+        const ds=tabs.filter(t=>!isWorkspaceTab(t));
+        if(ds.length){focusTab(ds[ds.length-1].id);return;}
+        newEmptyTab();
+      }catch(e){}
+    }
   };
   applyToolUi(getToolMode());
   updateNetState();
@@ -13023,7 +13153,7 @@ board.addEventListener("drop",e=>{
   hideCtx();closePops();
   insertImages(e.dataTransfer.files,toWorld(e.clientX,e.clientY));
 });
-addEventListener("paste",e=>{if(!window.__pfWBActive)return;
+addEventListener("paste",e=>{if(!window.__pfWBActive||window.__pfEditorBridge)return;
   const inInput=/INPUT|TEXTAREA|SELECT/.test(document.activeElement&&document.activeElement.tagName||"");
   if(inInput||viewOnly) return;
   const files=e.clipboardData&&e.clipboardData.files;
@@ -13834,7 +13964,7 @@ function openTextEditor(p,isSticky){
 }
 
 /* ---------- toolbar ---------- */
-function setTool(t){if(t==="lock"){toggleCanvasLock();return}tool=t;$$("#pfwb-toolbar .wb-tool[data-tool]").forEach(b=>{if(b.dataset.tool!=="lock")b.classList.toggle("active",b.dataset.tool===t)});canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair"}
+function setTool(t){if(t==="lock"){toggleCanvasLock();return}tool=t;$$("#pfwb-toolbar .wb-tool[data-tool]").forEach(b=>{if(b.dataset.tool!=="lock")b.classList.toggle("active",b.dataset.tool===t)});canvas.style.cursor=t==="hand"?"grab":t==="selection"?"default":t==="eraser"?"cell":"crosshair";try{if(window.__pfWbToolEcho)window.__pfWbToolEcho(t);}catch(e){}}
 function toggleCanvasLock(){
   viewOnly=!viewOnly;
   const b=wbRoot.querySelector('[data-tool="lock"]');
@@ -14023,6 +14153,7 @@ $("#pfwb-undoBtn").onclick=undo;$("#pfwb-redoBtn").onclick=redo;
 $("#pfwb-gridBtn").onclick=toggleGrid;
 $("#pfwb-helpBtn").onclick=openHelp;
 function openHelp(){openModal("Help — اختصارات","<div style='font-size:13px;line-height:2'>V تحديد • R مستطيل • D معيّن • O دائرة • A سهم • L خط • P رسم حر • T نص • N ملاحظة • B جدول • U تودو ☑ • F فكرة 💡 • M خريطة ذهنية 🧠 • I إدراج صورة • G قلم قوس قزح 🌈 • E ممحاة • H يد • Q قفل/فتح اللوحة • [ / ] حجم الفرشاة (ج / د)</div><div style='font-size:13px;line-height:2'>الجدول: حدده ثم دبل كليك على أي خلية للتحرير • التودو: ضغطة على ☐ للتعليم ✓ ودبل كليك على النص للكتابة • الفكرة 💡: دبل كليك للكتابة • الخريطة 🧠: دوس + حول العقدة لفرع جديد • المعادلات تبدأ بـ = مثل ‎=A1+B2‎ و ‎=SUM(A1:A5)‎ • الدوال: SUM AVG MIN MAX COUNT • العمليات: + - * / % ^ وأقواس</div> • Ctrl+D تكرار • Ctrl+Z تراجع • Ctrl+Shift+Z إعادة • Delete حذف • Ctrl+A تحديد الكل • Space+سحب تحريك • عجلة الفأرة تقريب • كليك يمين قائمة السياق</div>",'<button class="btn-tool primary" id="pfwb-mExport2">Export PNG</button>');setTimeout(()=>{const b=$("#pfwb-mExport2");if(b)b.onclick=exportPNG},0)}
+$("#pfwb-exitBtn").onclick=()=>{try{if(window.__pfEditorBridge&&window.__pfEditorBridge.exitBoard)window.__pfEditorBridge.exitBoard();}catch(e){}};
 $("#pfwb-shareBtn").onclick=()=>{
   openModal("Share","صدّر اللوحة بأي صيغة أو انسخها للحافظة:",'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-tool primary" id="pfwb-shPng">PNG</button><button class="btn-tool" id="pfwb-shSvg">SVG</button><button class="btn-tool" id="pfwb-shJson">JSON</button><button class="btn-tool" id="pfwb-shCopy">نسخ للحافظة</button></div>');
   setTimeout(()=>{
@@ -14125,7 +14256,7 @@ function wbInsertDataURL(dataURL){
     probe.src=dataURL;
   }catch(e){}
 }
-window.__pfWhiteboard={show:wbShow,hide:function(){},setTool:setTool,getTool:function(){return tool;},setStroke:setStroke,getStroke:function(){return stroke;},setFill:setFill,getFill:function(){return fill;},setWidth:setWidth,getWidth:function(){return sw;},toggleGrid:toggleGrid,gridOn:function(){return showGrid;},setTheme:setTheme,exportPNG:exportPNG,exportSVG:exportSVG,exportJSON:downloadJSON,render:renderBoardToCanvas,insertDataURL:wbInsertDataURL,insertImageDialog:function(){var el=$("#pfwb-imgOpen");if(el)el.click();},undo:undo,redo:redo,shapeCount:function(){return shapes.length;}};
+window.__pfWhiteboard={show:wbShow,hide:function(){},setTool:setTool,getTool:function(){return tool;},setStroke:setStroke,getStroke:function(){return stroke;},setFill:setFill,getFill:function(){return fill;},setWidth:setWidth,getWidth:function(){return sw;},toggleGrid:toggleGrid,gridOn:function(){return showGrid;},setTheme:setTheme,exportPNG:exportPNG,exportSVG:exportSVG,exportJSON:downloadJSON,render:renderBoardToCanvas,insertFiles:insertImages,insertDataURL:wbInsertDataURL,insertImageDialog:function(){var el=$("#pfwb-imgOpen");if(el)el.click();},undo:undo,redo:redo,shapeCount:function(){return shapes.length;}};
 
 })();
 
@@ -14146,6 +14277,8 @@ window.__pfWhiteboard={show:wbShow,hide:function(){},setTool:setTool,getTool:fun
       var f=$("pfwbObFill");if(f){var fc=w.getFill();if(/^#[0-9a-f]{6}$/i.test(fc||""))f.value=fc;}
       var wd=$("pfwbObWidth");if(wd){wd.value=w.getWidth();}
       var g=$("pfwbObGrid");if(g)g.classList.toggle("active",!!w.gridOn());
+      var pc=$("pfwbPanelCount");if(pc){try{pc.textContent=w.shapeCount();}catch(e){}}
+      var pg2=$("pfwbPanelGrid");if(pg2)pg2.classList.toggle("active",!!w.gridOn());
     }catch(e){}
   }
   window.__pfWbRefreshOptions=refresh;
@@ -14178,6 +14311,13 @@ window.__pfWhiteboard={show:wbShow,hide:function(){},setTool:setTool,getTool:fun
     var png=$("pfwbObPng");if(png)png.addEventListener("click",function(){var w=W();if(w){try{w.exportPNG();}catch(err){}}});
     var svg=$("pfwbObSvg");if(svg)svg.addEventListener("click",function(){var w=W();if(w){try{w.exportSVG();}catch(err){}}});
     var jsn=$("pfwbObJson");if(jsn)jsn.addEventListener("click",function(){var w=W();if(w){try{w.exportJSON();}catch(err){}}});
+    var pb=$("pfwbPanelBack");if(pb)pb.addEventListener("click",function(){var b=B();if(b&&b.exitBoard){try{b.exitBoard();}catch(e){}}});
+    var ps=$("pfwbPanelSend");if(ps)ps.addEventListener("click",function(){var el=$("pfwbObToEditor");if(el)el.click();});
+    var pp=$("pfwbPanelPhoto");if(pp)pp.addEventListener("click",function(){var el=$("pfwbObUseCurrent");if(el)el.click();});
+    var pg3=$("pfwbPanelGrid");if(pg3)pg3.addEventListener("click",function(){var el=$("pfwbObGrid");if(el)el.click();});
+    var pnp=$("pfwbPanelPng");if(pnp)pnp.addEventListener("click",function(){var el=$("pfwbObPng");if(el)el.click();});
+    var psv=$("pfwbPanelSvg");if(psv)psv.addEventListener("click",function(){var el=$("pfwbObSvg");if(el)el.click();});
+    var pjs=$("pfwbPanelJson");if(pjs)pjs.addEventListener("click",function(){var el=$("pfwbObJson");if(el)el.click();});
     var st=$("wbStage");
     if(st){
       var raf=false;
