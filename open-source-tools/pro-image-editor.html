@@ -2838,6 +2838,9 @@
   <div class="menubar">
     <div class="mb-brand"><div class="mb-logo">PF</div><span>PhotoForge</span></div>
     <div class="mb-item" data-menu="file">File<div class="menu-dropdown" id="menuFile">
+      <div class="menu-dd-item" data-action="newCanvas">New Canvas...<span class="kbd">Ctrl+N</span></div>
+      <div class="menu-dd-item" data-action="newA4">New A4 Print Canvas<span class="kbd">2480×3508</span></div>
+      <div class="menu-dd-sep"></div>
       <div class="menu-dd-item" data-action="open">Open...<span class="kbd">Ctrl+O</span></div>
       <div class="menu-dd-item" data-action="pasteImg">Paste from Clipboard<span class="kbd">Ctrl+V</span></div>
       <div class="menu-dd-sep"></div>
@@ -10330,6 +10333,7 @@ const dataUrl=src.toDataURL("image/png");
       if(c&&k==="g"&&!editable){e.preventDefault();state.gridOverlay=!state.gridOverlay;drawCropOverlay();return;}
       if(c&&k==="d"&&!editable){e.preventDefault();clearSelection();return;}
       if(c&&k==="i"&&!editable){e.preventDefault();if(state.maskPaint&&activeHasMask())invertMask();else invertSelection();return;}
+      if(c&&k==="n"&&!editable){e.preventDefault();showNewCanvasDialog();return;}
       if(state.whiteboardMode&&!editable&&!(c&&(k==="tab"||k==="Tab"||k==="w"))){return;}
       if(!c&&e.key==="Alt"&&!editable){e.preventDefault();startAltPick();return;}
       if((e.key==="Delete"||e.key==="Backspace")&&!editable&&originalImage){
@@ -11418,7 +11422,9 @@ const dataUrl=src.toDataURL("image/png");
       item.addEventListener("click",()=>{
         const a=item.dataset.action;if(!a)return;
         document.querySelectorAll(".menu-dropdown").forEach(d=>d.classList.remove("open"));
-        if(a==="open"){fileInput.value="";fileInput.click();}
+        if(a==="newCanvas"){showNewCanvasDialog();}
+        else if(a==="newA4"){createBlankDocument(2480,3508,"A4 Print");}
+        else if(a==="open"){fileInput.value="";fileInput.click();}
         else if(a==="pasteImg"){pasteCatcher.focus();toast("Press Ctrl+V to paste.","info");}
         else if(a==="exportPng"){const c=saveTargetCanvas();if(c)downloadCanvas(c,exportFileName("png"),"image/png");}
         else if(a==="exportJpg"&&originalImage)openJpgQualityModal("current");
