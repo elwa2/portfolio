@@ -10710,6 +10710,9 @@ const dataUrl=src.toDataURL("image/png");
       if(cpDropActive){dropperPickFromEvent(e);return;}
       if(getToolMode()==="artboard"){artboardToolDown(e,p);return;}
       if(transformState){
+        /* Alt-drag duplicates and Ctrl+click selects+moves: bypass the box
+           (the move branch / Ctrl gesture apply the transform first) */
+        if(!e.altKey&&!e.ctrlKey&&!e.metaKey){
         const t=transformState;
         const hp=transformHitTest(p);
         if(hp!==null){
@@ -10720,6 +10723,7 @@ const dataUrl=src.toDataURL("image/png");
           transformDrag={type:hp,px:p.x,py:p.y,initPos:{x:t.pos.x,y:t.pos.y},initSch:{sx:t.sch.sx,sy:t.sch.sy},initRot:t.rot,initAnchors:corners,anchors,initRotPos:transformPt(t,t.bbox.w/2,-18)};
           e.preventDefault();return;
         }
+        }
       }
       if(state.cropMode){isDraggingCrop=true;cropStart=p;cropSelection={x:p.x,y:p.y,w:0,h:0};drawCropOverlay();return;}
       if(state.marqueeMode){isDraggingMarquee=true;marqueeStart=p;marqueeSelection={x:p.x,y:p.y,w:0,h:0};drawCropOverlay();return;}
@@ -10727,7 +10731,8 @@ const dataUrl=src.toDataURL("image/png");
       if(state.ployMode){ployPoints.push({x:p.x,y:p.y});drawCropOverlay();return;}
       /* Photoshop-style Ctrl+click: select the layer under the cursor and move it.
          Works from any tool without leaving it; Alt may join mid-drag to duplicate. */
-      if((e.ctrlKey||e.metaKey)&&!e.altKey&&!cpDropActive&&!transformState){
+      if((e.ctrlKey||e.metaKey)&&!e.altKey&&!cpDropActive){
+        if(transformState)applyTransform();
         const li=layerAtPoint(p.x,p.y);
         if(li>=0){
           autoselectAt(p.x,p.y);
