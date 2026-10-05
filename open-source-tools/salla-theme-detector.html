@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>استوديو بوستات كاشف الثيمات</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+<style>
+:root{
+  --bg:#EEF1EE;--surface:#FFFFFF;--ink:#14202B;--muted:#5B6773;--line:#D5DCD8;
+  --brand:#0B7A6E;--brand-ink:#FFFFFF;--mark:#FFC53D;--mark-ink:#3A2A00;--warn:#B45309;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0E161D;--surface:#16212B;--ink:#E8EFF5;--muted:#9FAEBB;--line:#2A3946;--brand:#2FD0BC;--brand-ink:#06201C;--warn:#FBBF24}
+}
+:root[data-theme="dark"]{--bg:#0E161D;--surface:#16212B;--ink:#E8EFF5;--muted:#9FAEBB;--line:#2A3946;--brand:#2FD0BC;--brand-ink:#06201C;--warn:#FBBF24}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.8;font-size:17px}
+:focus-visible{outline:3px solid var(--mark);outline-offset:2px}
+.wrap{max-width:800px;margin:0 auto;padding:0 16px 48px}
+header{padding:30px 0 14px}
+h1{font-size:clamp(25px,5vw,34px);line-height:1.3;margin:0 0 6px;font-weight:800}
+.sub{color:var(--muted);margin:0;font-size:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px}
+.lab{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;padding:4px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+input[type=text]{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.opt{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--brand)}
+.act{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-weight:700;padding:10px 22px;border-radius:10px;border:2px solid var(--brand);background:var(--brand);color:var(--brand-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand)}
+.btn.sm{padding:3px 14px;font-size:14px}
+.btn:disabled{opacity:.6;cursor:wait}
+.status{font-size:14px;color:var(--muted)}
+.mode{font-size:12px;font-weight:700;border-radius:6px;padding:0 8px;background:var(--mark);color:var(--mark-ink)}
+
+/* الثريد */
+.thread{margin-top:22px;position:relative}
+.tw{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tw.main{border-width:2px;border-color:var(--brand)}
+.tw + .tw{margin-top:12px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;flex:none}
+.hl{font-weight:800;font-size:15px;line-height:1.3}
+.hs{font-size:13px;color:var(--muted)}
+.head .btn{margin-inline-start:auto}
+.replies{position:relative;margin-top:12px;padding-inline-start:26px}
+.replies::before{content:"";position:absolute;inset-inline-start:10px;top:-12px;bottom:18px;width:2px;background:var(--line)}
+.replies .tw{position:relative}
+.replies .tw::before{content:"";position:absolute;inset-inline-start:-21px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--brand)}
+textarea{width:100%;font:inherit;font-size:17px;line-height:1.9;color:var(--ink);background:transparent;border:0;border-radius:8px;padding:4px;resize:none;min-height:60px;overflow:hidden}
+textarea:focus{background:var(--bg);outline:2px solid var(--line)}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+.ok{color:var(--brand);font-weight:700}.warn{color:var(--warn);font-weight:700}
+.empty{border:2px dashed var(--line);border-radius:14px;padding:28px 16px;text-align:center;color:var(--muted)}
+[hidden]{display:none!important}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:6px 0 20px;overflow-x:auto}
+.tab{font:inherit;font-weight:700;padding:10px 16px;border:0;border-bottom:3px solid transparent;background:none;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+a.btn{display:inline-block;text-decoration:none;text-align:center}
+.lead{color:var(--muted);margin:0 0 14px}
+.bar2{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.hlist{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.hi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;min-width:0}
+.hi.cur{border:2px solid var(--brand)}
+.hi .top{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.hi .top b{margin-inline-start:auto;color:var(--brand)}
+.hi .tx{margin:0;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;min-width:0;overflow-wrap:anywhere}
+.hi .acts{display:flex;gap:8px;flex-wrap:wrap}
+.xhero{display:grid;gap:30px;grid-template-columns:1.1fr .9fr;align-items:center;padding:6px 0 26px}
+.xhero h2{font-size:clamp(25px,4.5vw,36px);line-height:1.3;margin:0 0 10px;font-weight:800}
+.xhero p{color:var(--muted);margin:0 0 18px}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.mock{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
+.mock .b1{height:10px;width:40%;background:var(--line);border-radius:6px;margin-bottom:14px}
+.mock .b2{height:90px;border-radius:8px;background:repeating-linear-gradient(135deg,var(--line) 0 10px,transparent 10px 20px);margin-bottom:14px}
+.mock .b3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mock .b3 i{display:block;height:60px;border-radius:8px;border:1px dashed var(--line)}
+.badge{position:absolute;inset-inline-start:-8px;bottom:-16px;background:var(--mark);color:var(--mark-ink);padding:8px 14px;border-radius:10px;font-weight:800}
+.badge small{display:block;font-weight:500;font-size:13px}
+.xsec{padding:20px 0}
+.xsec h3{font-size:21px;margin:0 0 4px;font-weight:800}
+.pills{display:flex;flex-wrap:wrap;gap:10px}
+.pill{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 18px;font-weight:700}
+.xgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.xc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.xc h4{margin:0;font-size:17px}
+.xc p{margin:0 0 8px;color:var(--muted);font-size:15px;flex:1}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:500px}
+th,td{padding:10px 14px;text-align:start;border-bottom:1px solid var(--line);font-size:15px}
+th{background:color-mix(in srgb,var(--line) 45%,transparent)}
+tr:last-child td{border-bottom:0}
+.steps{margin:0;padding-inline-start:22px}
+.steps li{margin-bottom:4px}
+@media (max-width:640px){.xhero{grid-template-columns:1fr}.badge{inset-inline-start:8px}}
+.dots{display:inline-block;animation:bl 1.2s infinite}
+@keyframes bl{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.dots{animation:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <h1>استوديو بوستات كاشف الثيمات</h1>
+  <p class="sub">اختر الزاوية والأسلوب، ويكتب لك Claude بوست جديد كل مرة مع ثريد ردود جاهز.</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="أقسام الصفحة">
+  <button class="tab" role="tab" id="t-studio" aria-selected="true" aria-controls="p-studio">كتابة البوستات</button>
+  <button class="tab" role="tab" id="t-hist" aria-selected="false" aria-controls="p-hist" tabindex="-1">آخر البوستات <span id="hc"></span></button>
+  <button class="tab" role="tab" id="t-ext" aria-selected="false" aria-controls="p-ext" tabindex="-1">بيانات الإضافة</button>
+</div>
+
+<div id="p-studio" role="tabpanel" aria-labelledby="t-studio">
+<section class="panel" aria-label="إعدادات الكتابة">
+  <div><div class="lab">زاوية البوست</div><div class="chips" id="angles" role="group"></div></div>
+  <div><div class="lab">الأسلوب</div><div class="chips" id="tones" role="group"></div></div>
+  <div><label class="lab" for="idea">فكرة تبيها في البوست (اختياري)</label>
+  <input type="text" id="idea" placeholder="مثال: عميل أرسل لي رابط متجر وقال أبي نفس الثيم"></div>
+  <label class="opt"><input type="checkbox" id="mn" checked> منشن المنصات بجانب أسمائها: <bdi dir="ltr">@SallaApp @zidappcom @twsaaapp</bdi></label>
+  <div class="act">
+    <button class="btn" id="gen">اكتب بوست جديد</button>
+    <button class="btn ghost" id="stop" hidden>إيقاف</button>
+    <span class="status" id="status" aria-live="polite"></span>
+    <span class="mode" id="mode" hidden></span>
+  </div>
+</section>
+
+<div class="thread" id="thread"><div class="empty">اختر زاوية واضغط «اكتب بوست جديد» عشان يطلع لك بوست وردوده.</div></div>
+
+</div>
+
+<div id="p-hist" role="tabpanel" aria-labelledby="t-hist" hidden>
+  <div class="bar2"><p class="lead" style="margin:0">آخر ٨ بوستات كتبتها في هذه الجلسة، وتقدر ترجع لأي واحد منها. تختفي لو أعدت تحميل الصفحة.</p>
+  <button class="btn ghost sm" id="clr">مسح السجل</button></div>
+  <ul class="hlist" id="hist"></ul>
+</div>
+
+<div id="p-ext" role="tabpanel" aria-labelledby="t-ext" hidden>
+  <div class="xhero">
+    <div>
+      <h2>هل أعجبك تصميم متجر على سلة أو زد؟ 🤔</h2>
+      <p>الآن بضغطة زر واحدة، يمكنك معرفة اسم الثيم المستخدم مباشرةً! ثبّت إضافة «كاشف ثيمات متاجر سلة وزد» المجانية على جوجل كروم وابدأ بالاكتشاف.</p>
+      <div class="btns"><a class="btn" data-l="CHROME" target="_blank" rel="noopener">حمّل الإضافة لكروم</a><a class="btn ghost" href="#x-dl">كل روابط التحميل</a></div>
+    </div>
+    <div class="mock" aria-hidden="true"><div class="b1"></div><div class="b2"></div><div class="b3"><i></i><i></i><i></i></div>
+      <div class="badge"><small>الثيم المستخدم</small>اسم الثيم يظهر هنا</div></div>
+  </div>
+
+  <div class="xsec"><h3>المنصات المدعومة</h3>
+    <p class="lead">الإصدارات الأحدث تدعم المنصات التالية بشكل مثالي:</p>
+    <div class="pills"><span class="pill">سلة (Salla)</span><span class="pill">زد (Zid)</span><span class="pill">توسع</span></div></div>
+
+  <div class="xsec" id="x-dl"><h3>روابط التحميل</h3>
+    <p class="lead">الإضافة متاحة الآن على كل المتصفحات. اختر متصفحك:</p>
+    <div class="xgrid">
+      <div class="xc"><h4>جوجل كروم</h4><p>من متجر كروم الرسمي. الأنسب لكل متصفحات كروميوم.</p><a class="btn" data-l="CHROME" target="_blank" rel="noopener">تحميل من Chrome Web Store</a></div>
+      <div class="xc"><h4>مايكروسوفت إيدج</h4><p>من متجر إضافات إيدج.</p><a class="btn" data-l="EDGE" target="_blank" rel="noopener">تحميل من Edge Add-ons</a></div>
+      <div class="xc"><h4>فيرفوكس</h4><p>ملف التثبيت المباشر لفيرفوكس فقط.</p><a class="btn" data-l="FIREFOX" target="_blank" rel="noopener">تحميل ملف XPI</a></div>
+      <div class="xc"><h4>التحويل التلقائي</h4><p>صفحة تحوّلك تلقائيًا للرابط المناسب حسب متصفحك.</p><a class="btn ghost" data-l="AUTO" target="_blank" rel="noopener">افتح صفحة التحويل</a></div>
+    </div></div>
+
+  <div class="xsec"><h3>المتصفحات التي تدعم الإضافة</h3>
+    <p class="lead">أي متصفح مبني على نواة كروميوم يقبل إضافات جوجل كروم، ويمكنك تثبيت الإضافة عليه من متجر كروم.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>المتصفح</th><th>الدعم</th><th>طريقة التثبيت</th></tr></thead>
+      <tbody>
+        <tr><td>Google Chrome</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Microsoft Edge</td><td class="ok">مدعوم</td><td>متجر إضافات إيدج أو متجر كروم</td></tr>
+        <tr><td>Brave</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Vivaldi</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Arc</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Opera / Opera GX</td><td class="ok">مدعوم</td><td>متجر كروم بعد تثبيت إضافة «Install Chrome Extensions»</td></tr>
+        <tr><td>Yandex Browser</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Naver Whale</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Chromium</td><td class="ok">مدعوم</td><td>متجر كروم الويب</td></tr>
+        <tr><td>Mozilla Firefox</td><td class="ok">مدعوم</td><td>ملف XPI الخاص بفيرفوكس</td></tr>
+        <tr><td>Safari</td><td class="warn">غير مدعوم</td><td>لا يقبل إضافات كروم مباشرة</td></tr>
+      </tbody></table></div></div>
+
+  <div class="xsec"><h3>طريقة الاستخدام</h3>
+    <ol class="steps"><li>ثبّت الإضافة على متصفحك من الروابط أعلاه.</li><li>افتح أي متجر على سلة أو زد أو توسع.</li><li>اضغط أيقونة الإضافة لتعرف اسم الثيم المستخدم.</li></ol></div>
+</div>
+</main>
+
+<script>
+const L={
+ CHROME:"https://chromewebstore.google.com/detail/%D9%83%D8%A7%D8%B4%D9%81-%D8%AB%D9%8A%D9%85%D8%A7%D8%AA-%D9%85%D8%AA%D8%A7%D8%AC%D8%B1-%D8%B3%D9%84%D8%A9-%D9%88%D8%B2%D8%AF/gegmcpkdknaegpinpjioccdhidpkjpnh",
+ EDGE:"https://microsoftedge.microsoft.com/addons/detail/salla-theme-detector/ogeapoamjpobcldlkjabjgmifgokplld",
+ FIREFOX:"https://elwa2.github.io/portfolio/open-source-tools/salla-theme-detector-firefox.xpi",
+ AUTO:"https://elwa2.github.io/portfolio/form/redirect_salla.html"};
+const ANGLES=[
+ {id:"any",n:"أي زاوية",d:"اختر أنت أفضل زاوية مختلفة"},
+ {id:"designer",n:"للمصممين",d:"موقف يمر على مصمم متاجر: عميل يطلب نفس ثيم متجر، أو يدور إلهام، أو يشوف متجر منافس"},
+ {id:"owner",n:"لأصحاب المتاجر",d:"صاحب متجر عجبه متجر ثاني ويبي يعرف ثيمه قبل ما يقرر"},
+ {id:"update",n:"تحديث توسع",d:"إعلان إن الإضافة صارت تدعم منصة توسع مع سلة وزد"},
+ {id:"browsers",n:"كل المتصفحات",d:"الإضافة متاحة على كروم وإيدج وفيرفوكس وكل متصفحات كروميوم"},
+ {id:"curious",n:"فضول وسؤال",d:"سؤال مفتوح يثير الفضول ويدعو للتفاعل"},
+ {id:"list",n:"قائمة مزايا",d:"سطر افتتاحي ثم ٣ إلى ٥ نقاط قصيرة تبدأ بـ ـ"}];
+const TONES=[{id:"warm",n:"ودّي",d:"ودّي وقريب مثل كلام مع زميل"},{id:"hype",n:"حماسي",d:"حماسي ومبهج بدون مبالغة"},{id:"calm",n:"هادئ ومباشر",d:"هادئ ومباشر وقصير"}];
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let angle="any",tone="warm",sample=null,ctl=null,hist=[],cur=null;
+
+/* منشن المنصات */
+const H={"سلة":"@SallaApp","زد":"@zidappcom","توسع":"@twsaaapp"};
+const on=()=>$("mn").checked;
+const addM=t=>{const k=[];
+ t=t.replace(/كاشف ثيمات (متاجر )?سلة وزد/g,m=>{k.push(m);return "\u0001"+(k.length-1)+"\u0001"});
+ t=t.replace(/(?<![\p{L}@])(و?)(سلة|زد|توسع)(?![\p{L}])(?!\s*[(@])/gu,(m,w,n)=>w+n+" "+H[n]);
+ return t.replace(/\u0001(\d+)\u0001/g,(m,i)=>k[i])};
+const delM=t=>t.replace(/ @(SallaApp|zidappcom|twsaaapp)/g,"");
+const stats=t=>{const s=t.replace(/[\u{1F3FB}-\u{1F3FF}]/gu,"");
+ const em=(s.match(/\p{Extended_Pictographic}/gu)||[]).length;
+ const w=s.replace(/\p{Extended_Pictographic}|\uFE0F|\u200D/gu," ").split(/\s+/).filter(x=>!x.startsWith("@")&&!/^https?:/.test(x)&&/[\p{L}\p{N}]/u.test(x.replace(/ـ/g,""))).length;
+ return{w,em}};
+const fit=a=>{a.style.height="auto";a.style.height=Math.max(60,a.scrollHeight+4)+"px"};
+const fill=t=>t.replace(/\{(CHROME|EDGE|FIREFOX|AUTO)\}/g,(m,k)=>L[k]);
+
+/* ---------- التوليد الذكي عبر Claude ---------- */
+function buildPrompt(){
+ const A=ANGLES.find(a=>a.id===angle),T=TONES.find(t=>t.id===tone),idea=$("idea").value.trim();
+ const avoid=hist.slice(0,5).map((h,i)=>`${i+1}) ${h.post.replace(/\n+/g," | ")}`).join("\n");
+ return `أنت كاتب بوستات X بصوت خبير سعودي في تصميم متاجر سلة وزد، فريلانسر يشارك من شغله اليومي.
+اكتب بوست ترويجي واحد لإضافة المتصفح «كاشف ثيمات متاجر سلة وزد» مع ثريد ردود تسويقية تحته.
+
+حقائق الإضافة، لا تضف غيرها ولا تخترع أرقام أو ادعاءات:
+- تكشف اسم الثيم المستخدم في أي متجر بضغطة زر وحدة
+- مجانية
+- تدعم سلة وزد وتوسع
+- متوفرة على كروم وإيدج وفيرفوكس، وتشتغل على المتصفحات المبنية على كروميوم
+
+قواعد البوست:
+- لهجة سعودية بيضاء خفيفة مفهومة لكل العرب (تبي، وش، عشان، الحين، ما لك خلق...). بدون فصحى رسمية ولا لغة تنمية بشرية.
+- من ٣٥ إلى ٦٥ كلمة. سطر واحد لكل فكرة، وسطر فاضي بين المقاطع.
+- من ٢ إلى ٤ إيموجي فقط، في آخر السطر وليس وسطه. المسموح: 🔥 ✅ 🤍 ✨ 👀 👌 💪 🤝 ❌ 👇🏽 🤔
+- بدون هاشتاقات وبدون روابط وبدون منشن داخل البوست. اكتب أسماء المنصات عادي (سلة، زد، توسع) والأداة تضيف اليوزرات.
+- فكرة واحدة فقط، تنتهي بدرس أو سؤال أو دعوة للتجربة، مو بإعلان ثقيل.
+- ابدأ بافتتاحية مختلفة تشد الانتباه.
+
+الزاوية: ${A.d}
+الأسلوب: ${T.d}
+${idea?`فكرة من صاحب الحساب لازم تنعكس في البوست: ${idea}`:""}
+${avoid?`بوستات سابقة، لا تكرر افتتاحياتها ولا أفكارها:\n${avoid}`:""}
+
+الردود (٤ بالضبط، بنفس اللهجة، كل رد أقل من ٢٦٠ حرف، إيموجي واحد أو اثنين):
+1) label "ريبلاي الروابط": يحوي الروابط بالرموز {CHROME} و{EDGE} و{FIREFOX} و{AUTO} حسب ما يناسب الرد، كل رابط في سطر مستقل.
+2) label "منشن للمنصات": موجّه لحسابات المنصات نفسها، اكتب فيه حرفيًا @SallaApp @zidappcom @twsaaapp ولا تكتب أسماءهم بالعربي.
+3) label "رد على سؤال متوقع": جاوب على سؤال محتمل من قراء هذا البوست بالذات (مجانية؟ كيف أحمّلها؟ تدعم فيرفوكس؟ ...).
+4) label "رد دعوة للتجربة": رد ودّي يدعو القارئ يجرّب ويشارك رايه.
+
+أرجع JSON فقط بهذا الشكل بدون أي كلام قبله أو بعده:
+{"post":"...","replies":[{"label":"...","text":"..."}]}`}
+
+async function genAI(){
+ ctl=new AbortController();
+ const r=await sample.json(buildPrompt(),{signal:ctl.signal,cache:false});
+ if(!r||typeof r.post!=="string"||!Array.isArray(r.replies))throw{code:"invalid_json"};
+ return{post:r.post.trim(),replies:r.replies.filter(x=>x&&x.text).map(x=>({label:String(x.label||"رد"),text:String(x.text).trim()})),src:"claude"}}
+
+/* ---------- نسخة بسيطة بدون Claude ---------- */
+const LT=[
+()=>[pick(["عجبك تصميم متجر على سلة أو زد وتبي تعرف وش الثيم؟ 🤔","شفت متجر تصميمه يجنن وقلت وش الثيم هذا؟ 👀"]),
+ pick(["قبل كنت تفتش وتسأل وتخمّن بين المتاجر\nالحين بضغطة زر وحدة يطلع لك اسم الثيم ✅","لا تضيّع وقتك تدور بين الأكواد وتفتح الأدوات\nضغطة وحدة وتعرف اسم الثيم مباشرة ✅"]),
+ "جرّب إضافة «كاشف ثيمات متاجر سلة وزد» وقول لي رايك 🤍"],
+()=>[pick(["عميل يرسل لك رابط متجر ويقول أبي نفس الثيم 👀","تتصفح متاجر تدور إلهام وعجبك واحد منها 👀"]),
+ "والحل أبسط من ما تتوقع\nإضافة كاشف الثيمات تعطيك الاسم بضغطة وحدة ✅",
+ "وفّر وقتك واشتغل على الفكرة مو على التخمين 🤍"],
+()=>["خبر حلو لأصحاب المتاجر والمصممين 🔥",
+ "الإضافة صارت تدعم منصة توسع مع سلة وزد\nيعني تكشف الثيمات في المنصات الثلاث بضغطة وحدة ✅",
+ "حمّلها وجرّبها وقول لي رايك 🤍"],
+()=>["لا تضيّع وقتك تفتش في الكود ❌",
+ "إضافة كاشف الثيمات تعطيك الاسم بضغطة زر\nمجانية وسهلة الاستخدام ✅",
+ "وأنت كمّل شغلك مرتاح 🤍"]];
+const TAIL=["وهي مجانية وتشتغل على كروم وإيدج وفيرفوكس","مجانية وسهلة وما تحتاج خبرة تقنية","تدعم سلة وزد وتوسع بدون تعقيد"];
+function genLocal(){
+ let p=pick(LT)();let t=p.join("\n\n"),n=0;
+ while(stats(t).w<27&&n++<3){p.splice(p.length-1,0,pick(TAIL));t=p.join("\n\n")}
+ const rep=[
+  {label:"ريبلاي الروابط",text:pick([`التحميل من هنا 👇🏽\n\nكروم:\n{CHROME}\n\nإيدج:\n{EDGE}`,`الروابط حسب متصفحك ✅\n\nكروم: {CHROME}\nإيدج: {EDGE}\nفيرفوكس: {FIREFOX}`])},
+  {label:"منشن للمنصات",text:pick(["@SallaApp @zidappcom @twsaaapp\nإضافة كاشف الثيمات تدعم متاجر منصاتكم وتكشف اسم الثيم بضغطة وحدة 🤍","يا فريق @SallaApp و@zidappcom و@twsaaapp\nالإضافة صارت تدعم منصاتكم الثلاث ✅"])},
+  {label:"رد على سؤال متوقع",text:pick(["مجانية بالكامل ✅","أكيد تشتغل على فيرفوكس 🔥\n{FIREFOX}","تدعم سلة وزد وتوسع ✅"])},
+  {label:"رد دعوة للتجربة",text:pick(["جرّبتها؟ قول لي رايك أو أي ميزة تبيها فيها 🤍","جرّبها على أي متجر عجبك وشاركنا ملاحظاتك 🤍"])}];
+ return{post:t,replies:rep,src:"local"}}
+
+/* ---------- العرض ---------- */
+async function copy(t,b){
+ try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
+ const o=b.textContent;b.textContent="تم النسخ ✓";setTimeout(()=>b.textContent=o,1400)}
+function card(label,text,cls,isPost,ref){
+ const d=document.createElement("article");d.className="tw "+cls;
+ d.innerHTML=`<div class="head"><div class="av" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></div><div><div class="hl"></div><div class="hs"></div></div><button class="btn ghost sm">انسخ</button></div><textarea></textarea><div class="meta"></div>`;
+ d.querySelector(".hl").textContent=label;d.querySelector(".hs").textContent=isPost?"البوست":"ريبلاي";
+ const a=d.querySelector("textarea"),m=d.querySelector(".meta");a.value=text;a.setAttribute("aria-label",label);
+ const up=()=>{fit(a);const{w,em}=stats(a.value);
+  if(isPost){const ok=w>=25&&w<=70&&em>=2&&em<=4;m.innerHTML=`${w} كلمة · ${em} إيموجي · <span class="${ok?"ok":"warn"}">${ok?"مناسب لـ X":(w<25?"قصير":w>70?"طويل":"عدد الإيموجي خارج ٢-٤")}</span>`}
+  else m.textContent=`${a.value.length} حرف`};
+ a.oninput=()=>{if(isPost)cur.post=a.value;else if(ref)ref.text=a.value;up()};d.querySelector("button").onclick=e=>copy(a.value,e.target);
+ d._up=up;return d}
+const fx=t=>on()?addM(t):delM(t);
+function render(){
+ const th=$("thread");th.innerHTML="";
+ if(!cur){th.innerHTML='<div class="empty">اختر زاوية واضغط «اكتب بوست جديد» عشان يطلع لك بوست وردوده.</div>';return}
+ th.appendChild(card("البوست",fx(cur.post),"main",true));
+ const rb=document.createElement("div");rb.className="replies";
+ cur.replies.filter(r=>on()||r.label!=="منشن للمنصات").forEach(r=>rb.appendChild(card(r.label,fx(fill(r.text)),"",false,r)));
+ th.appendChild(rb);th.querySelectorAll(".tw").forEach(c=>c._up());
+ const gl=document.createElement("div");gl.className="act";gl.style.marginTop="14px";
+ gl.innerHTML='<button class="btn ghost sm" id="again">بوست آخر بنفس الإعدادات</button>';th.appendChild(gl);
+ $("again").onclick=gen}
+function renderHist(){
+ const ul=$("hist");ul.innerHTML="";$("hc").textContent=hist.length?"("+hist.length+")":"";
+ $("clr").hidden=!hist.length;
+ if(!hist.length){ul.innerHTML='<li class="empty">ما فيه بوستات لسا. اكتب أول بوست من تبويب الكتابة.</li>';return}
+ hist.forEach((h,i)=>{
+  const li=document.createElement("li");li.className="hi"+(h===cur?" cur":"");
+  li.innerHTML='<div class="top"><span class="mode"></span><span class="w"></span><b></b></div><p class="tx"></p><div class="acts"><button class="btn ghost sm o">افتح في الاستوديو</button><button class="btn ghost sm c">انسخ البوست</button><button class="btn ghost sm d">احذف</button></div>';
+  li.querySelector(".mode").textContent=h.angle||"";
+  const w=stats(h.post).w;
+  li.querySelector(".w").textContent=(h.at?h.at.toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"})+" · ":"")+w+" كلمة · "+(h.src==="claude"?"Claude":"بسيط");
+  li.querySelector("b").textContent=h===cur?"المفتوح الآن":(i===0?"الأحدث":"");
+  li.querySelector(".tx").textContent=fx(h.post);
+  li.querySelector(".o").onclick=()=>{cur=h;render();renderHist();show("studio")};
+  li.querySelector(".c").onclick=e=>copy(fx(h.post),e.target);
+  li.querySelector(".d").onclick=()=>{hist.splice(i,1);if(cur===h){cur=null;render()}renderHist()};
+  ul.appendChild(li)})}
+function setBusy(b,msg){$("gen").disabled=b;$("stop").hidden=!b||!sample;$("status").innerHTML=msg||""}
+const ERR={rate_limited:"وصلت للحد المسموح، جرّب بعد شوي.",invalid_json:"ما طلع الرد بالشكل المطلوب، اضغط اكتب مرة ثانية.",upstream_error:"صار خطأ مؤقت، اضغط اكتب مرة ثانية.",session_expired:"سجّل دخولك من جديد وحاول."};
+const OFF=["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
+function setMode(src){const m=$("mode");m.hidden=false;m.textContent=src==="claude"?"كتابة Claude":"نسخة بسيطة"}
+async function gen(){
+ setBusy(true,'Claude يكتب <span class="dots">...</span>');
+ try{
+  let r;
+  if(sample){try{r=await genAI()}catch(e){
+    if(e&&e.code==="cancelled"){setBusy(false,"");return}
+    if(OFF.includes(e&&e.code)){sample=null;r=genLocal()}else throw e}}
+  else r=genLocal();
+  r.at=new Date();r.angle=ANGLES.find(x=>x.id===angle).n;cur=r;hist.unshift(r);hist=hist.slice(0,8);setMode(r.src);render();renderHist();
+  setBusy(false,r.src==="local"?"التوليد الذكي غير متاح هنا، هذي نسخة بسيطة من قوالب جاهزة.":"")
+ }catch(e){setBusy(false,ERR[e&&e.code]||ERR.upstream_error)}}
+
+/* ---------- تشغيل ---------- */
+function chips(box,list,get,set){list.forEach(x=>{const b=document.createElement("button");b.className="chip";b.textContent=x.n;
+ b.setAttribute("aria-pressed",x.id===get());b.onclick=()=>{set(x.id);[...box.children].forEach(c=>c.setAttribute("aria-pressed",c===b))};box.appendChild(b)})}
+chips($("angles"),ANGLES,()=>angle,v=>angle=v);chips($("tones"),TONES,()=>tone,v=>tone=v);
+const TABS=["studio","hist","ext"];
+function show(id){TABS.forEach(t=>{const on_=t===id;$("t-"+t).setAttribute("aria-selected",on_);$("t-"+t).tabIndex=on_?0:-1;$("p-"+t).hidden=!on_})}
+TABS.forEach((t,i)=>{const b=$("t-"+t);b.onclick=()=>show(t);
+ b.onkeydown=e=>{const d=e.key==="ArrowLeft"?1:e.key==="ArrowRight"?-1:0;if(d){const n=TABS[(i+d+TABS.length)%TABS.length];show(n);$("t-"+n).focus()}}});
+document.querySelectorAll("[data-l]").forEach(a=>a.href=L[a.dataset.l]);
+$("clr").onclick=()=>{hist=[];cur=null;render();renderHist()};
+renderHist();
+$("gen").onclick=gen;$("stop").onclick=()=>ctl&&ctl.abort();$("mn").onchange=render;
+(async()=>{try{sample=await window.claude?.use("sample")||null}catch(e){sample=null}
+ if(!sample){$("status").textContent="التوليد الذكي غير متاح في هذا العرض، راح تُستخدم قوالب بسيطة."}})();
+</script>
+</body>
+</html>
