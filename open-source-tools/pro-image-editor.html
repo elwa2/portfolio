@@ -4954,7 +4954,7 @@
             </button>
           </div>
           <div class="panel-section">
-            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>Crop &amp; Merge</h4></div>
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>Crop &amp; Merge · قص ودمج</h4></div>
             <div class="panel-body">
               <p class="ms-hint" id="cmStageHint">Two image slots, drag to crop, merge side-by-side or stacked, apply filters, place on A4 or repeat in a grid &mdash; plus a full PDF toolbox.</p>
               <div class="ms-row" style="margin-top:7px;">
@@ -4962,7 +4962,103 @@
                   <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg>
                   Open Workspace Tab
                 </button>
+                <button class="ib" id="mpUseCurrent" title="Load the image you are editing into slot 1" onclick="mpUseCurrent()">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  Use Current
+                </button>
               </div>
+              <div class="ms-row">
+                <label class="ob-checkbox" style="font-size:10.5px;"><input type="checkbox" id="mpSingle" onchange="mpSingle(this.checked)" /> Single image only</label>
+              </div>
+              <div class="ms-hint" id="mpStatus" style="margin-top:6px;">No image yet — open the workspace, drop files, or use the current image.</div>
+            </div>
+          </div>
+          <div class="panel-section">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>Merge settings · إعدادات الدمج</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+            <div class="panel-body">
+              <div class="ctrl-row"><div class="ctrl-label">Arrangement</div><div class="ib-row">
+                <button class="ib" id="mpArrSide" title="Side by side" onclick="mpArr('side')" style="width:auto;padding:0 10px;font-size:10.5px;">Side</button>
+                <button class="ib active" id="mpArrStack" title="Stacked" onclick="mpArr('stack')" style="width:auto;padding:0 10px;font-size:10.5px;">Stack</button>
+              </div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Gap <span class="val" id="mpGapVal">10px</span></div><div class="range-wrap"><input id="mpGap" type="range" min="0" max="100" value="10" oninput="mpGap(this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Background</div><div class="color-pick-row"><div class="color-swatch"><input type="color" id="mpBg" value="#ffffff" oninput="mpBg(this.value)" /></div><label class="ob-checkbox" style="font-size:10px;"><input type="checkbox" id="mpTrans" onchange="mpTrans(this.checked)" /> Transparent</label></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Output size</div><div class="ib-row">
+                <button class="ib active" id="mpSize1" onclick="mpSize('1',this)" style="width:auto;padding:0 9px;font-size:10px;">1×</button>
+                <button class="ib" id="mpSize2" onclick="mpSize('2',this)" style="width:auto;padding:0 9px;font-size:10px;">2×</button>
+                <button class="ib" id="mpSizeH" onclick="mpSize('0.5',this)" style="width:auto;padding:0 9px;font-size:10px;">½×</button>
+              </div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Align</div><div class="ib-row">
+                <button class="ib active" id="mpAlignC" onclick="mpAlign('center',this)" style="width:auto;padding:0 9px;font-size:10px;">Center</button>
+                <button class="ib" id="mpAlignS" onclick="mpAlign('start',this)" style="width:auto;padding:0 9px;font-size:10px;">Start</button>
+                <button class="ib" id="mpAlignE" onclick="mpAlign('end',this)" style="width:auto;padding:0 9px;font-size:10px;">End</button>
+              </div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Normalize sizes</div><label class="ob-checkbox"><input type="checkbox" id="mpNorm" onchange="mpNorm(this.checked)" /> unify both</label></div>
+              <div class="ctrl-row"><div class="ctrl-label">Rounded corners <span class="val" id="mpCornerVal">0px</span></div><div class="range-wrap"><input id="mpCorner" type="range" min="0" max="60" value="0" oninput="mpCorner(this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Page scale <span class="val" id="mpPageScaleVal">100%</span></div><div class="range-wrap"><input id="mpPageScale" type="range" min="20" max="100" value="100" oninput="mpPageScale(this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Page position</div><div class="ib-row" id="mpPosGrid">
+                <button class="ib" data-pos="tl" onclick="mpPos('tl',this)" title="top-left" style="width:26px;">↖</button>
+                <button class="ib" data-pos="tc" onclick="mpPos('tc',this)" title="top-center" style="width:26px;">↑</button>
+                <button class="ib" data-pos="tr" onclick="mpPos('tr',this)" title="top-right" style="width:26px;">↗</button>
+                <button class="ib" data-pos="ml" onclick="mpPos('ml',this)" title="middle-left" style="width:26px;">←</button>
+                <button class="ib active" data-pos="mc" onclick="mpPos('mc',this)" title="center" style="width:26px;">⊙</button>
+                <button class="ib" data-pos="mr" onclick="mpPos('mr',this)" title="middle-right" style="width:26px;">→</button>
+                <button class="ib" data-pos="bl" onclick="mpPos('bl',this)" title="bottom-left" style="width:26px;">↙</button>
+                <button class="ib" data-pos="bc" onclick="mpPos('bc',this)" title="bottom-center" style="width:26px;">↓</button>
+                <button class="ib" data-pos="br" onclick="mpPos('br',this)" title="bottom-right" style="width:26px;">↘</button>
+              </div></div>
+            </div>
+          </div>
+          <div class="panel-section collapsed">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/></svg>Filters · فلاتر</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+            <div class="panel-body">
+              <div class="ctrl-row"><div class="ctrl-label">Brightness <span class="val" id="mpBrightVal">0</span></div><div class="range-wrap"><input id="mpBright" type="range" min="-100" max="100" value="0" oninput="mpFilter('cmBrightness','brightnessVal','mpBrightVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Contrast <span class="val" id="mpContrastVal">0</span></div><div class="range-wrap"><input id="mpContrast" type="range" min="-100" max="100" value="0" oninput="mpFilter('cmContrast','contrastVal','mpContrastVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Saturation <span class="val" id="mpSatVal">0</span></div><div class="range-wrap"><input id="mpSat" type="range" min="-100" max="100" value="0" oninput="mpFilter('cmSaturation','saturationVal','mpSatVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Sharpen <span class="val" id="mpSharpVal">0</span></div><div class="range-wrap"><input id="mpSharp" type="range" min="0" max="10" step="0.5" value="0" oninput="mpFilter('cmSharpen','sharpenVal','mpSharpVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Levels <span class="val" id="mpLevelsVal">0</span></div><div class="range-wrap"><input id="mpLevels" type="range" min="-100" max="100" value="0" oninput="mpFilter('levels','levelsVal','mpLevelsVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">Blur <span class="val" id="mpBlurVal">0</span></div><div class="range-wrap"><input id="mpBlur" type="range" min="0" max="10" step="0.5" value="0" oninput="mpFilter('blurAmount','blurVal','mpBlurVal',this.value)" /><span class="range-bubble"></span></div></div>
+              <div class="ctrl-row"><div class="ctrl-label">B&amp;W</div><label class="ob-checkbox"><input type="checkbox" id="mpBw" onchange="mpCheck('bwToggle',this.checked)" /></label><div class="ctrl-label" style="margin-inline-start:8px;">Invert</div><label class="ob-checkbox"><input type="checkbox" id="mpInv" onchange="mpCheck('invertToggle',this.checked)" /></label></div>
+              <div class="ib-row"><button class="ib" onclick="mpResetFilters()" style="width:auto;padding:0 10px;font-size:10.5px;">Reset filters</button></div>
+            </div>
+          </div>
+          <div class="panel-section collapsed">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>A4 · ورقة</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+            <div class="panel-body">
+              <div class="ctrl-row"><div class="ctrl-label">A4 mode</div><label class="ob-checkbox"><input type="checkbox" id="mpA4" onchange="mpA4(this.checked)" /> enable</label></div>
+              <div class="ctrl-row"><div class="ctrl-label">Orientation</div><div class="ib-row">
+                <button class="ib active" id="mpA4P" onclick="mpA4Orient('portrait',this)" style="width:auto;padding:0 9px;font-size:10px;">Portrait</button>
+                <button class="ib" id="mpA4L" onclick="mpA4Orient('landscape',this)" style="width:auto;padding:0 9px;font-size:10px;">Landscape</button>
+              </div></div>
+              <div class="ctrl-row"><div class="ctrl-label">DPI</div><div class="ib-row">
+                <button class="ib" onclick="mpA4Dpi(72,this)" style="width:auto;padding:0 8px;font-size:10px;">72</button>
+                <button class="ib active" onclick="mpA4Dpi(150,this)" style="width:auto;padding:0 8px;font-size:10px;">150</button>
+                <button class="ib" onclick="mpA4Dpi(300,this)" style="width:auto;padding:0 8px;font-size:10px;">300</button>
+              </div></div>
+            </div>
+          </div>
+          <div class="panel-section collapsed">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Grid repeat · تكرار</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+            <div class="panel-body">
+              <div class="ctrl-row"><div class="ctrl-label">Tile mode</div><label class="ob-checkbox"><input type="checkbox" id="mpTile" onchange="mpTile(this.checked)" /> enable</label></div>
+              <div class="ctrl-row"><div class="ctrl-label">Cols</div><input type="number" id="mpCols" class="color-input" min="1" max="10" value="2" style="width:64px;" oninput="mpTileNums()" /><div class="ctrl-label">Rows</div><input type="number" id="mpRows" class="color-input" min="1" max="10" value="1" style="width:64px;" oninput="mpTileNums()" /></div>
+              <div class="ctrl-row"><div class="ctrl-label">Spacing <span class="val" id="mpSpacingVal">10px</span></div><div class="range-wrap"><input id="mpSpacing" type="range" min="0" max="120" value="10" oninput="mpTileSpacing(this.value)" /><span class="range-bubble"></span></div></div>
+            </div>
+          </div>
+          <div class="panel-section">
+            <div class="panel-header"><h4><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Result · النتيجة</h4><div class="panel-toggle"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+            <div class="panel-body">
+              <div class="ib-row">
+                <button class="ib" onclick="mpRefresh()" title="Rebuild merge" style="width:auto;padding:0 10px;font-size:10.5px;">Refresh</button>
+                <button class="ib success" onclick="mpSaveToEditor()" title="Send result to editor" style="width:auto;padding:0 10px;font-size:10.5px;">To editor</button>
+              </div>
+              <div class="ib-row" style="margin-top:6px;">
+                <button class="ib" onclick="mpDownload('png')" style="width:auto;padding:0 9px;font-size:10px;">PNG</button>
+                <button class="ib" onclick="mpDownload('jpg')" style="width:auto;padding:0 9px;font-size:10px;">JPG</button>
+                <button class="ib" onclick="mpDownload('webp')" style="width:auto;padding:0 9px;font-size:10px;">WebP</button>
+                <button class="ib" onclick="mpCopy()" style="width:auto;padding:0 9px;font-size:10px;">Copy</button>
+                <button class="ib danger" onclick="mpResetAll()" style="width:auto;padding:0 9px;font-size:10px;">Reset</button>
+              </div>
+              <p class="tiny-note">Same engine as image-crop-merge.html — crop in the workspace, control everything from here.</p>
             </div>
           </div>
         </div>
@@ -12944,6 +13040,47 @@ const dataUrl=src.toDataURL("image/png");
      ported module itself, so they are deliberately NOT bound here. */
   $("cmOpenBtn")&&$("cmOpenBtn").addEventListener("click",()=>{if(window.openMergeTab)window.openMergeTab();});
   $("cmOpenTabBtn")&&$("cmOpenTabBtn").addEventListener("click",()=>{if(window.openMergeTab)window.openMergeTab();});
+  /* Merge side-panel (mp*) proxies — same engine as image-crop-merge.html, no duplicate IDs.
+     Every control writes into the stage inputs (gapSlider, cmBrightness, …) then calls the
+     existing global (setArrangement, updateFilter, mergeImages, …) so logic stays identical. */
+  (function(){
+    const G=(id)=>document.getElementById(id);
+    const call=(n,...a)=>{try{const f=window[n];if(typeof f==="function")return f(...a);}catch(e){}};
+    const stageVal=(id,v)=>{const s=G(id);if(s){s.value=v; s.dispatchEvent(new Event("input",{bubbles:true})); s.dispatchEvent(new Event("change",{bubbles:true}));}};
+    const stageCheck=(id,v)=>{const s=G(id);if(s&&s.checked!==!!v){s.checked=!!v; s.dispatchEvent(new Event("change",{bubbles:true}));}};
+    const setActive=(sel,btn)=>{try{document.querySelectorAll(sel).forEach(b=>b.classList.remove("active")); if(btn)btn.classList.add("active");}catch(e){}};
+    window.mpUseCurrent=()=>{if(window.__mergeUseCurrent)window.__mergeUseCurrent(); else if(window.openMergeTab)window.openMergeTab(); mpStatus();};
+    window.mpSingle=(v)=>{stageCheck("singleImageMode",v); call("toggleSingleMode"); mpStatus();};
+    window.mpArr=(m)=>{call("setArrangement",m); setActive("#mpArrSide,#mpArrStack",m==="side"?G("mpArrSide"):G("mpArrStack"));};
+    window.mpGap=(v)=>{try{if(typeof gapVal!=="undefined")gapVal=+v;}catch(e){try{window.gapVal=+v;}catch(_){}} const s=G("gapSlider"); if(s)s.value=v; const t=G("gapValTxt"); if(t)t.textContent=v+"px"; const m=G("mpGapVal"); if(m)m.textContent=v+"px"; call("mergeImages");};
+    window.mpBg=(v)=>{const s=G("bgColor"); if(s)s.value=v; call("mergeImages");};
+    window.mpTrans=(v)=>{stageCheck("transparentBg",v); call("mergeImages");};
+    window.mpSize=(v,btn)=>{call("setOutputSize",String(v)); setActive("#mpSize1,#mpSize2,#mpSizeH",btn);};
+    window.mpAlign=(v,btn)=>{call("setAlignment",v); setActive("#mpAlignC,#mpAlignS,#mpAlignE",btn);};
+    window.mpNorm=(v)=>{stageCheck("normalizeSizeToggle",v); call("toggleNormalize");};
+    window.mpCorner=(v)=>{const s=G("cornerRadius"); if(s)s.value=v; const t=G("cornerRadiusVal"); if(t)t.textContent=v+"px"; const m=G("mpCornerVal"); if(m)m.textContent=v+"px"; call("mergeImages");};
+    window.mpPageScale=(v)=>{call("onPageScaleChange",+v); const m=G("mpPageScaleVal"); if(m)m.textContent=v+"%";};
+    window.mpPos=(v,btn)=>{call("setPageAlign",v); try{document.querySelectorAll("#mpPosGrid .ib").forEach(b=>b.classList.remove("active")); if(btn)btn.classList.add("active");}catch(e){}};
+    window.mpFilter=(stageId,stageValId,mpValId,v)=>{stageVal(stageId,v); const t=G(stageValId); if(t)t.textContent=v; const m=G(mpValId); if(m)m.textContent=v; call("updateFilter");};
+    window.mpCheck=(stageId,v)=>{stageCheck(stageId,v); call("updateFilter");};
+    window.mpResetFilters=()=>{call("resetFilters"); mpSyncFilters();};
+    window.mpA4=(v)=>{stageCheck("a4ModeToggle",v); call("toggleA4Mode");};
+    window.mpA4Orient=(v,btn)=>{call("setA4Orientation",v); setActive("#mpA4P,#mpA4L",btn);};
+    window.mpA4Dpi=(v,btn)=>{call("setA4Dpi",+v); try{const grp=btn&&btn.parentElement; if(grp)grp.querySelectorAll(".ib").forEach(b=>b.classList.remove("active")); if(btn)btn.classList.add("active");}catch(e){}};
+    window.mpTile=(v)=>{stageCheck("tileModeToggle",v); call("toggleTileMode");};
+    window.mpTileNums=()=>{const c=G("tileColsInput"),r=G("tileRowsInput"),mc=G("mpCols"),mr=G("mpRows"); if(c&&mc)c.value=mc.value; if(r&&mr)r.value=mr.value; call("onTileSettingChange");};
+    window.mpTileSpacing=(v)=>{const s=G("tileSpacingSlider"); if(s)s.value=v; const t=G("tileSpacingVal"); if(t)t.textContent=v+"px"; const m=G("mpSpacingVal"); if(m)m.textContent=v+"px"; call("onTileSettingChange");};
+    window.mpRefresh=()=>call("mergeImages");
+    window.mpDownload=(f)=>call("downloadResult",f);
+    window.mpCopy=()=>call("copyToClipboard");
+    window.mpResetAll=()=>{call("resetAll"); setTimeout(()=>{mpSyncAll();},50);};
+    window.mpSaveToEditor=()=>{if(window.__mergeSaveResult)window.__mergeSaveResult();};
+    window.mpStatus=()=>{try{const m=window.__mergeTool; const el=G("mpStatus"); if(!el)return; if(!m){el.textContent="Open the workspace to start.";return;} el.textContent=m.hasSource()?("Ready — "+m.tabMeta()):"No image yet — open the workspace, drop files, or use the current image.";}catch(e){}};
+    window.mpSyncFilters=()=>{const map=[["cmBrightness","mpBright","mpBrightVal"],["cmContrast","mpContrast","mpContrastVal"],["cmSaturation","mpSat","mpSatVal"],["cmSharpen","mpSharp","mpSharpVal"],["levels","mpLevels","mpLevelsVal"],["blurAmount","mpBlur","mpBlurVal"]]; map.forEach(([s,mp,mpv])=>{const se=G(s),me=G(mp),mv=G(mpv); if(se&&me){me.value=se.value; if(mv)mv.textContent=se.value;}}); const bw=G("bwToggle"),mb=G("mpBw"); if(bw&&mb)mb.checked=bw.checked; const iv=G("invertToggle"),mi=G("mpInv"); if(iv&&mi)mi.checked=iv.checked;};
+    window.mpSyncAll=()=>{try{const gv=G("gapSlider"),mg=G("mpGap"); if(gv&&mg){mg.value=gv.value; const m=G("mpGapVal"); if(m)m.textContent=gv.value+"px";} const bg=G("bgColor"),mb=G("mpBg"); if(bg&&mb)mb.value=bg.value; const tb=G("transparentBg"),mt=G("mpTrans"); if(tb&&mt)mt.checked=tb.checked; const cr=G("cornerRadius"),mc=G("mpCorner"); if(cr&&mc){mc.value=cr.value; const m=G("mpCornerVal"); if(m)m.textContent=cr.value+"px";} const ps=G("pageScaleSlider"),mps=G("mpPageScale"); if(ps&&mps){mps.value=ps.value; const m=G("mpPageScaleVal"); if(m)m.textContent=ps.value+"%";} const sm=G("singleImageMode"),ms=G("mpSingle"); if(sm&&ms)ms.checked=sm.checked; const a4=G("a4ModeToggle"),ma=G("mpA4"); if(a4&&ma)ma.checked=a4.checked; const ti=G("tileModeToggle"),mti=G("mpTile"); if(ti&&mti)mti.checked=ti.checked; const tc=G("tileColsInput"),mc2=G("mpCols"); if(tc&&mc2)mc2.value=tc.value; const tr=G("tileRowsInput"),mr2=G("mpRows"); if(tr&&mr2)mr2.value=tr.value; const ts=G("tileSpacingSlider"),mts=G("mpSpacing"); if(ts&&mts){mts.value=ts.value; const m=G("mpSpacingVal"); if(m)m.textContent=ts.value+"px";} mpSyncFilters(); mpStatus();}catch(e){}};
+    document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{try{mpSyncAll();}catch(e){}},800);});
+    setInterval(()=>{try{if(document.querySelector('.panel-content[data-panel="merge"]'))mpStatus();}catch(e){}},4000);
+  })();
 
     /* Public surface for the tab bar / save pipeline. */
     window.__splitPanel={
