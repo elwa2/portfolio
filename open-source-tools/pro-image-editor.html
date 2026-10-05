@@ -1177,9 +1177,10 @@
     .cm-stage-title svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:#a78bfa;}
     .cm-stage-meta{font-size:10.5px;color:var(--pf-text-dim);font-family:var(--pf-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
     .cm-stage-acts,.cm-stage-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
-    .cm-stage-body{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+    .cm-stage-body{position:relative;flex:1;min-height:0;display:block;overflow-y:auto;overflow-x:hidden;
       background:var(--pf-bg-0);}
-    .cm-stage-body>*{flex:1;min-height:0;}
+    .cm-stage-body>*{flex:none;min-height:auto;}
+    .cm-stage-body>.cm-workspace{padding:14px 14px 60px;max-width:1180px;margin:0 auto;}
     /* the stage's own buttons (cm-sbtn) live in the ported markup, so they get
        the same treatment the Split stage bar buttons already have */
     .cm-sbtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:27px;padding:0 10px;
