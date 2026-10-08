@@ -1014,6 +1014,20 @@
     border-radius: var(--radius-sm); padding: 3px 8px;
   }
   .cv-replace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cv-quick-list { display: grid; gap: 10px; }
+  .cv-quick-row {
+    display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;
+    background: var(--bg-elevated); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+  }
+  .cv-row-del {
+    width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-sub); border-radius: 8px; background: transparent;
+    color: var(--text-3); cursor: pointer; transition: all 0.13s; flex-shrink: 0;
+  }
+  .cv-row-del:hover { color: var(--danger); border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); }
+  .cv-row-del i { font-size: 15px; }
+  @media (max-width: 820px) { .cv-quick-row { grid-template-columns: 1fr; } }
   .cv-field { display: flex; flex-direction: column; gap: 5px; }
   .cv-field > span { font-size: 11px; color: var(--text-3); }
   .cv-field > span i { color: var(--accent-warm); }
@@ -1029,9 +1043,32 @@
     margin-top: 12px; border: 1px solid var(--border-sub); border-radius: var(--radius-sm);
     background: var(--bg-elevated); padding: 10px 12px; font-family: 'JetBrains Mono', monospace;
     font-size: 11.5px; direction: ltr; text-align: left; color: var(--accent-cool);
-    white-space: pre-wrap; word-break: break-all; min-height: 22px; margin: 12px 0 0;
+    white-space: pre-wrap; word-break: break-all; min-height: 22px; margin: 8px 0 0;
   }
   .cv-rule-preview.idle { color: var(--text-3); }
+  .cv-rule-bar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .cv-rule-bar .copy-btn { margin-inline-start: auto; font-size: 10px; padding: 4px 12px; }
+  .cv-rule-bar .cv-target-seg { padding: 2px; }
+  .cv-rule-bar .cv-target-btn { padding: 4px 11px; font-size: 11px; }
+  .cv-target-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin: 14px 0 4px; padding: 10px 12px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+  }
+  .cv-target-label { font-size: 11.5px; font-weight: 700; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+  .cv-target-label i { color: var(--accent-warm); font-size: 15px; }
+  .cv-target-seg { display: flex; padding: 3px; gap: 2px; background: var(--bg-elevated); border: 1px solid var(--border-sub); border-radius: 9px; }
+  .cv-target-btn {
+    display: flex; align-items: center; gap: 5px; padding: 5px 13px; border: none; border-radius: 6px;
+    background: transparent; color: var(--text-2); font: 600 11.5px 'Cairo', sans-serif; cursor: pointer; transition: all 0.13s;
+  }
+  .cv-target-btn:hover { color: var(--text-1); }
+  .cv-target-btn.on { background: var(--accent-warm); color: #fff; }
+  .cv-target-hint { font-size: 10.5px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; direction: ltr; }
 
   .cv-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
@@ -2912,7 +2949,7 @@
     </button>
     <div class="tools-quick" id="toolsQuick" title="آخر أدوات استخدمتها — وصول بضغطة"></div>
     <div class="tools-menu" id="toolsMenu" hidden>
-      <input class="tm-search" id="toolsMenuSearch" type="text" placeholder="ابحث عن أداة... مثال: محول / QR / سكرول" oninput="filterToolsMenu(this.value)" autocomplete="off">
+      <input class="tm-search" id="toolsMenuSearch" type="text" placeholder="ابحث عن أداة... مثال: imgscr / QR / سكرول" oninput="filterToolsMenu(this.value)" autocomplete="off">
       <div class="tm-group" data-group="css">
         <div class="tm-group-t"><i class="ti ti-brush"></i> بناء وتنسيق CSS</div>
         <div class="tm-grid">
@@ -2926,7 +2963,7 @@
         <div class="tm-grid">
           <button class="tm-item" data-src="edDashBtn" onclick="toolsGo('edDashBtn')"><i class="ti ti-code-dots"></i><span>المحرر <span class="tm-sub">محرر بترقيم الأسطر</span></span><span class="tm-num">4</span></button>
           <button class="tm-item" data-src="vdDashBtn" onclick="toolsGo('vdDashBtn')"><i class="ti ti-versions"></i><span>النسخ <span class="tm-sub">نسخ ومقارنة Diff</span></span><span class="tm-num">5</span></button>
-          <button class="tm-item" data-src="cvDashBtn" onclick="toolsGo('cvDashBtn')"><i class="ti ti-arrows-shuffle"></i><span>محول <span class="tm-sub">HTML/CSS لكود صحيح</span></span><span class="tm-num">6</span></button>
+          <button class="tm-item" data-src="cvDashBtn" onclick="toolsGo('cvDashBtn')"><i class="ti ti-arrows-shuffle"></i><span>imgscr <span class="tm-sub">HTML/CSS لكود صحيح</span></span><span class="tm-num">6</span></button>
         </div>
       </div>
       <div class="tm-group" data-group="dev">
@@ -2949,7 +2986,7 @@
       <div hidden aria-hidden="true">
         <button class="filter-tag" id="hasDashBtn" onclick="toggleHasDash()" title="مُحددات :has()"><i class="ti ti-code"></i> :has()</button>
         <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار"><i class="ti ti-scroll"></i> Scrollbar</button>
-        <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="محول HTML/CSS إلى كود صحيح"><i class="ti ti-arrows-shuffle"></i> محول</button>
+        <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="imgscr HTML/CSS إلى كود صحيح"><i class="ti ti-arrows-shuffle"></i> imgscr</button>
         <button class="filter-tag" id="vdDashBtn" onclick="toggleVdDash()" title="نسخ ومقارنة الأكواد"><i class="ti ti-versions"></i> النسخ</button>
         <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر">المحرر</button>
         <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG"><i class="ti ti-tools"></i> أدوات</button>
@@ -4228,7 +4265,7 @@ function getFiltered(){
     const dashCards = [
       { id:'hasDashBtn', t:'لوحة :has()', s:'محددات حديثة', i:'ti-code', c:'c-purple' },
       { id:'sbDashBtn', t:'سكرول بار', s:'توليد CSS', i:'ti-scroll', c:'c-teal' },
-      { id:'cvDashBtn', t:'محول الأكواد', s:'HTML/CSS صحيح', i:'ti-arrows-shuffle', c:'c-blue' },
+      { id:'cvDashBtn', t:'imgscr الأكواد', s:'HTML/CSS صحيح', i:'ti-arrows-shuffle', c:'c-blue' },
       { id:'vdDashBtn', t:'مقارنة النسخ', s:'نسخ ومقارنة', i:'ti-versions', c:'c-gold' },
       { id:'edDashBtn', t:'المحرر', s:'أكواد بترقيم', i:'ti-code', c:'c-blue' },
       { id:'devDashBtn', t:'أدوات المطور', s:'Dev Tools', i:'ti-tool', c:'c-teal' },
@@ -4258,7 +4295,7 @@ function getFiltered(){
       { href:'useful-links.html',           t:'روابط مهمة',        i:'ti-link', c:'c-blue' },
       { href:'qr-generator.html',           t:'QR Generator',      i:'ti-qrcode', c:'c-green' },
       { href:'password-generator.html',     t:'مولد كلمات مرور',   i:'ti-lock', c:'c-red' },
-      { href:'webp-converter.html',         t:'WebP محول',         i:'ti-photo', c:'c-teal' },
+      { href:'webp-converter.html',         t:'WebP imgscr',         i:'ti-photo', c:'c-teal' },
       { href:'smart-image-compressor.html', t:'ضغط ذكي للصور',     i:'ti-brackets-contain', c:'c-purple' },
       { href:'css-optimizer.html',          t:'تحسين CSS',         i:'ti-brush', c:'c-blue' },
       { href:'text-case-converter.html',    t:'تحويل النصوص',      i:'ti-case-toggle', c:'c-gold' },
@@ -4646,9 +4683,11 @@ function getFiltered(){
   let showCvDash = false;
   let cvImgs = [];
   let cvManual = [];
-  let cvOldPick = '';
-  let cvNewPick = '';
+  let cvQuick = [{ old: '', new: '' }]; // صفوف الاستبدال السريع (قديمة → جديدة)
   let cvRuleNote = '';
+  let cvTarget = 'all'; // all | mobile | desktop
+  let cvHtmlText = '';
+  let cvCssText = '';
 
   function toggleCvDash(){
     showCvDash = !showCvDash;
@@ -4683,10 +4722,15 @@ function getFiltered(){
   function uniqueKey(url){
     if(!url) return '';
     const clean = url.replace(/^https?:\/\//i,'').split('?')[0].split('#')[0];
-    const uuid = clean.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-    if(uuid) return uuid[0];
-    const name = clean.split('/').pop() || clean;
-    const noExt = name.replace(/\.[a-z0-9]{2,6}$/i,'');
+    const uuidRe = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+    const parts = clean.split('/').filter(Boolean);
+    const file = parts.length ? parts[parts.length - 1] : clean;
+    // اسم الملف كاملاً بالامتداد (مثال: be6ea2df-...-543af8892b93.png) — وليس UUID المتجر المتكرر في كل الصور
+    if(uuidRe.test(file)) return file;
+    // روابط فيها أكثر من UUID في المسار (store-id + image-id) — خذ الأخير (الصورة)
+    const all = clean.match(new RegExp(uuidRe.source, 'gi'));
+    if(all && all.length) return all[all.length - 1];
+    const noExt = file.replace(/\.[a-z0-9]{2,6}$/i,'');
     if(noExt && noExt.length > 2) return noExt;
     return clean;
   }
@@ -4704,34 +4748,63 @@ function getFiltered(){
     return imgs;
   }
 
+  // يلتقط قواعد img حتى لو مغلفة داخل @media (عكس التقسيم الساذج بالأقواس)
   function parseCssRule(css){
     const out = [];
-    const re = /([^{}]+)\{([^}]*)\}/g;
+    const re = /img\[[^\]]+\][^{]*\{[^}]*content\s*:\s*url\(\s*["']?([^"')\s]*)["']?\s*\)[^}]*\}/gi;
     let m;
     while((m = re.exec(css)) !== null){
-      const sel = m[1].trim();
-      const body = m[2];
-      const urlM = body.match(/content\s*:\s*url\(\s*["']?([^"')]*)["']?\s*\)/i);
-      if(urlM && /img/i.test(sel)){
-        const srcM = sel.match(/img\[src\*=\s*["']([^"']*)["']\]/i);
-        const dsM  = sel.match(/img\[data-src\*=\s*["']([^"']*)["']\]/i);
-        out.push({
-          src: srcM ? srcM[1] : '',
-          dataSrc: dsM ? dsM[1] : '',
-          newUrl: urlM[1] || '',
-          enabled: true
-        });
+      const rule = m[0];
+      const sel = rule.slice(0, rule.indexOf('{')).trim();
+      const newUrl = m[1] || '';
+      const srcM = sel.match(/img\[src\*=\s*["']([^"']*)["']\]/i);
+      const dsM  = sel.match(/img\[data-src\*=\s*["']([^"']*)["']\]/i);
+      if(srcM || dsM){
+        out.push({ src: srcM ? srcM[1] : '', dataSrc: dsM ? dsM[1] : '', newUrl, enabled: true });
       }
     }
     return out;
   }
 
+  // ── هدف الجهاز (الكل / موبايل / كمبيوتر) ──
+  function cvMediaOpen(){
+    if(cvTarget === 'mobile') return '@media (max-width: 768px) {';
+    if(cvTarget === 'desktop') return '@media (min-width: 769px) {';
+    return '';
+  }
+  function cvWrapMedia(body){
+    const open = cvMediaOpen();
+    if(!open) return body;
+    const indented = body.split('\n').map(l => l ? '  ' + l : l).join('\n');
+    return open + '\n' + indented + '\n}';
+  }
+  function setCvTarget(t){
+    cvSnapshotInputs();
+    cvTarget = t;
+    renderCvDash();
+  }
+  // لو المستخدم لصق CSS جاهز فيه @media نلتقط هدفه تلقائياً
+  function cvDetectTarget(css){
+    if(!css) return;
+    if(/max-width/i.test(css)) cvTarget = 'mobile';
+    else if(/min-width/i.test(css)) cvTarget = 'desktop';
+  }
+
+  function cvSnapshotInputs(){
+    const h = document.getElementById('cvHtmlInput');
+    const c = document.getElementById('cvCssInput');
+    if(h) cvHtmlText = h.value;
+    if(c) cvCssText = c.value;
+  }
+
   function analyzeCv(){
-    const html = document.getElementById('cvHtmlInput').value;
-    const css  = document.getElementById('cvCssInput').value;
+    cvSnapshotInputs();
+    const html = cvHtmlText;
+    const css  = cvCssText;
 
     const htmlImgs = html.trim() ? extractImgsFromHtml(html) : [];
     const cssImgs  = css.trim()  ? parseCssRule(css) : [];
+    if(css.trim()) cvDetectTarget(css);
 
     if(!htmlImgs.length && !cssImgs.length){
       showToast('لم يتم العثور على صور — تحقق من الكود');
@@ -4793,47 +4866,89 @@ function getFiltered(){
   }
 
   function cvBuildRule(){
-    const key = cvKeyFromInput(cvOldPick);
-    const nu = (cvNewPick || '').trim();
-    if(!key || !nu) return '';
-    return 'img[src*="' + key + '"] {\n  content: url("' + nu + '");\n}';
+    const rules = [];
+    cvQuick.forEach(function(row){
+      const key = cvKeyFromInput(row.old);
+      const nu = (row.new || '').trim();
+      if(!key || !nu) return;
+      rules.push('img[src*="' + key + '"] {\n  content: url("' + nu + '");\n}');
+    });
+    if(!rules.length) return '';
+    return cvWrapMedia(rules.join('\n\n'));
+  }
+
+  function cvQuickBadge(){
+    const keys = cvQuick.map(r => cvKeyFromInput(r.old)).filter(k => k);
+    if(keys.length > 1) return keys.length + ' صور';
+    return keys[0] || 'old → new';
   }
 
   function cvRulePreview(){
     const pre = document.getElementById('cvRulePreview');
     if(!pre) return;
     const rule = cvBuildRule();
-    pre.textContent = rule || '/* املأ الحقلين لعرض القاعدة — وتقدر تلصق الـ selector جاهز */';
+    pre.textContent = rule || '/* املأ روابط الصور لعرض القواعد — وتقدر تلصق الـ selector جاهز */';
     pre.classList.toggle('idle', !rule);
     const badge = document.querySelector('.cv-replace-badge');
-    if(badge) badge.textContent = cvKeyFromInput(cvOldPick) || 'old → new';
+    if(badge) badge.textContent = cvQuickBadge();
   }
 
-  function cvPickFromList(v){
+  function copyCvRule(){
+    const rule = cvBuildRule();
+    if(!rule){ showToast('املأ رابطي الصورة القديمة والجديدة أولاً'); return; }
+    navigator.clipboard.writeText(rule).then(() => {
+      const btn = document.getElementById('cvRuleCopyBtn');
+      if(btn) btn.innerHTML = '<i class="ti ti-check"></i> تم النسخ';
+      showToast('تم نسخ القاعدة!');
+      setTimeout(() => {
+        const b = document.getElementById('cvRuleCopyBtn');
+        if(b) b.innerHTML = '<i class="ti ti-copy"></i> نسخ القاعدة';
+      }, 2000);
+    }).catch(() => showToast('تعذّر النسخ'));
+  }
+
+  function cvQuickPick(v, i){
     if(!v) return;
-    cvOldPick = v;
-    const el = document.getElementById('cvOldPick');
+    cvQuick[i].old = v;
+    const el = document.getElementById('cvQuickOld_' + i);
     if(el) el.value = v;
     cvRulePreview();
   }
 
-  function cvApplyReplace(){
-    const key = cvKeyFromInput(cvOldPick);
-    const nu = (cvNewPick || '').trim();
-    if(!key){ showToast('اكتب الصورة القديمة أولاً'); return; }
-    if(!nu){ showToast('اكتب رابط الصورة الجديدة'); return; }
-    const existing = cvManual.findIndex(r => r.key === key);
-    if(existing > -1) cvManual[existing].newUrl = nu;
-    else cvManual.push({ key: key, newUrl: nu });
-    const hits = cvApplyRule(key, nu);
-    cvRuleNote = hits ? 'تم تحديث ' + hits + ' صورة في القائمة' : 'تمت إضافة قاعدة جديدة للقائمة';
+  function cvQuickAdd(){
+    cvSnapshotInputs();
+    cvQuick.push({ old: '', new: '' });
     renderCvDash();
-    showToast(hits ? 'تم استبدال ' + hits + ' صورة' : 'تمت إضافة القاعدة');
+  }
+
+  function cvQuickDel(i){
+    if(cvQuick.length <= 1) cvQuick = [{ old: '', new: '' }];
+    else cvQuick.splice(i, 1);
+    cvRuleNote = '';
+    renderCvDash();
+  }
+
+  function cvApplyReplace(){
+    cvSnapshotInputs();
+    let applied = 0, totalHits = 0;
+    cvQuick.forEach(function(row){
+      const key = cvKeyFromInput(row.old);
+      const nu = (row.new || '').trim();
+      if(!key || !nu) return;
+      const existing = cvManual.findIndex(r => r.key === key);
+      if(existing > -1) cvManual[existing].newUrl = nu;
+      else cvManual.push({ key: key, newUrl: nu });
+      totalHits += cvApplyRule(key, nu);
+      applied++;
+    });
+    if(!applied){ showToast('املأ رابط صورة قديمة وجديدة أولاً'); return; }
+    cvRuleNote = 'تم تطبيق ' + applied + ' قاعدة' + (totalHits ? ' — حدّثت ' + totalHits + ' صورة في القائمة' : ' — أُضيفت للقائمة');
+    renderCvDash();
+    showToast('تم تطبيق ' + applied + ' قاعدة');
   }
 
   function cvClearPick(){
-    cvOldPick = '';
-    cvNewPick = '';
+    cvQuick = [{ old: '', new: '' }];
     cvRuleNote = '';
     renderCvDash();
   }
@@ -4857,13 +4972,10 @@ function getFiltered(){
   function clearCv(){
     cvImgs = [];
     cvManual = [];
-    cvOldPick = '';
-    cvNewPick = '';
+    cvQuick = [{ old: '', new: '' }];
     cvRuleNote = '';
-    const h = document.getElementById('cvHtmlInput');
-    const c = document.getElementById('cvCssInput');
-    if(h) h.value = '';
-    if(c) c.value = '';
+    cvHtmlText = '';
+    cvCssText = '';
     renderCvDash();
   }
 
@@ -4880,12 +4992,20 @@ function getFiltered(){
       const sel = sels.length ? sels.join(',\n') : 'img[src*="' + key + '"]';
       rules.push('/* استبدال الصورة ' + (i + 1) + ' */\n' + sel + ' {\n  content: url("' + newUrl + '");\n}');
     });
-    return rules.join('\n\n');
+    if(!rules.length) return '';
+    const body = rules.join('\n\n');
+    return cvWrapMedia(body);
+  }
+
+  function cvPreviewHtml(css){
+    if(!css.trim()) return '<span class="sb-css-cmt">/* الصق كود HTML أو CSS واضغط "تحليل" — ثم أدخل روابط الصور الجديدة */</span>';
+    return highlightCvCSS(css);
   }
 
   function highlightCvCSS(css){
     let s = escHtml(css);
     s = s.replace(/(\/\*[\s\S]*?\*\/)/g, m => '<span class="sb-css-cmt">' + m + '</span>');
+    s = s.replace(/(@media[^{]*\{)/g, m => '<span style="color:#c084fc">' + m + '</span>');
     s = s.replace(/(img\[(?:src|data-src)\*=[^\n\]]*\](\s*,\s*\n\s*img\[(?:src|data-src)\*=[^\n\]]*\])*)/g, m => '<span class="sb-css-sel">' + m + '</span>');
     s = s.replace(/(content)\s*:/g, (m, p) => '<span class="sb-css-prop">' + p + '</span> :');
     s = s.replace(/:\s*([^;{}\n]+)(?=[;}\n])/g, (m, val) => {
@@ -4897,7 +5017,7 @@ function getFiltered(){
 
   function renderCvPreview(){
     const pre = document.getElementById('cvPreview');
-    if(pre) pre.innerHTML = highlightCvCSS(generateCvCSS());
+    if(pre) pre.innerHTML = cvPreviewHtml(generateCvCSS());
   }
 
   function copyCvCSS(){
@@ -4912,7 +5032,7 @@ function getFiltered(){
   }
 
   function renderCvDash(){
-    document.getElementById('countBadge').textContent = 'محول الأكواد';
+    document.getElementById('countBadge').textContent = 'imgscr الأكواد';
 
     let resultsHtml = '';
     if(cvImgs.length){
@@ -4942,7 +5062,7 @@ function getFiltered(){
         <div class="cv-title-box">
           <span class="cv-title-ic"><i class="ti ti-arrows-shuffle"></i></span>
           <div>
-            <h3>محول HTML/CSS إلى كود صحيح — استبدال الصور</h3>
+            <h3>imgscr HTML/CSS إلى كود صحيح — استبدال الصور</h3>
             <p>الصق كود الصفحة، ثم اربط كل صورة قديمة برابط الصورة الجديدة — والـ CSS يتولّد لوحده</p>
           </div>
           <code class="cv-title-code">img[src*="old.webp"]{content:url("new.webp")}</code>
@@ -4951,30 +5071,43 @@ function getFiltered(){
         <div class="cv-replace-card">
           <div class="cv-replace-head">
             <i class="ti ti-swap"></i> استبدال صورة سريعة
-            <span class="cv-replace-badge">${escHtml(cvKeyFromInput(cvOldPick) || 'old → new')}</span>
+            <span class="cv-replace-badge">${escHtml(cvQuickBadge())}</span>
           </div>
-          <div class="cv-replace-grid">
-            <label class="cv-field">
-              <span><i class="ti ti-photo-off"></i> الصورة القديمة — رابط كامل أو جزء منه</span>
-              <input class="cv-input" id="cvOldPick" dir="ltr" value="${escHtml(cvOldPick)}" spellcheck="false"
-                placeholder='https://old.com/6-91e1-493e-94d5-7c55c2537ff1-original.webp'
-                oninput="cvOldPick=this.value; cvRulePreview()">
-              <select class="cv-pick-sel" id="cvPickSel" onchange="cvPickFromList(this.value)">
-                <option value="">— اختر من الصور المستخرجة —</option>
-                ${cvPickOptions()}
-              </select>
-            </label>
-            <label class="cv-field">
-              <span><i class="ti ti-photo-plus"></i> الصورة الجديدة — رابطها</span>
-              <input class="cv-input" id="cvNewPick" dir="ltr" value="${escHtml(cvNewPick)}" spellcheck="false"
-                placeholder="https://cdn.files.salla.network/other/944338005/8d8541e1-6765-4b32-8fb0-b2025e15cf47-original.webp"
-                oninput="cvNewPick=this.value; cvRulePreview()">
-            </label>
+          <div class="cv-quick-list">
+            ${cvQuick.map((row, i) => `
+            <div class="cv-quick-row">
+              <label class="cv-field">
+                <span><i class="ti ti-photo-off"></i> الصورة القديمة ${cvQuick.length > 1 ? (i + 1) : ''} — رابط كامل أو جزء منه</span>
+                <input class="cv-input" id="cvQuickOld_${i}" dir="ltr" value="${escHtml(row.old)}" spellcheck="false"
+                  placeholder='https://old.com/6-91e1-493e-94d5-7c55c2537ff1-original.webp'
+                  oninput="cvQuick[${i}].old=this.value; cvRulePreview()">
+                <select class="cv-pick-sel" onchange="cvQuickPick(this.value, ${i})">
+                  <option value="">— اختر من الصور المستخرجة —</option>
+                  ${cvPickOptions()}
+                </select>
+              </label>
+              <label class="cv-field">
+                <span><i class="ti ti-photo-plus"></i> الصورة الجديدة ${cvQuick.length > 1 ? (i + 1) : ''} — رابطها</span>
+                <input class="cv-input" dir="ltr" value="${escHtml(row.new)}" spellcheck="false"
+                  placeholder="https://cdn.files.salla.network/other/944338005/8d8541e1-6765-4b32-8fb0-b2025e15cf47-original.webp"
+                  oninput="cvQuick[${i}].new=this.value; cvRulePreview()">
+              </label>
+              <button class="cv-row-del" title="حذف هذا السطر" onclick="cvQuickDel(${i})"><i class="ti ti-trash"></i></button>
+            </div>`).join('')}
           </div>
           <div class="cv-replace-actions">
             <button class="btn-primary" onclick="cvApplyReplace()"><i class="ti ti-refresh"></i> تطبيق الاستبدال</button>
+            <button class="btn-cancel" onclick="cvQuickAdd()"><i class="ti ti-plus"></i> إضافة صورة</button>
             <button class="btn-cancel" onclick="cvClearPick()"><i class="ti ti-eraser"></i> مسح الحقول</button>
             <span class="cv-replace-note${cvRuleNote ? ' ok' : ''}">${escHtml(cvRuleNote)}</span>
+          </div>
+          <div class="cv-rule-bar">
+            <div class="cv-target-seg">
+              <button class="cv-target-btn${cvTarget === 'all' ? ' on' : ''}" onclick="setCvTarget('all')"><i class="ti ti-devices"></i> الكل</button>
+              <button class="cv-target-btn${cvTarget === 'mobile' ? ' on' : ''}" onclick="setCvTarget('mobile')"><i class="ti ti-device-mobile"></i> موبايل</button>
+              <button class="cv-target-btn${cvTarget === 'desktop' ? ' on' : ''}" onclick="setCvTarget('desktop')"><i class="ti ti-device-desktop"></i> كمبيوتر</button>
+            </div>
+            <button class="copy-btn" id="cvRuleCopyBtn" onclick="copyCvRule()"><i class="ti ti-copy"></i> نسخ القاعدة</button>
           </div>
           <pre class="cv-rule-preview idle" id="cvRulePreview"></pre>
         </div>
@@ -4982,11 +5115,11 @@ function getFiltered(){
         <div class="cv-grid">
           <div class="form-group">
             <label class="form-label" for="cvHtmlInput">كود HTML <code style="color:var(--accent-cool)">&lt;img&gt;</code></label>
-            <textarea class="cv-input" id="cvHtmlInput" placeholder='<div slot="items"><a href="..."><img src="https://old-url.com/741fba3d-b989-4f4d-8cb2-3cf4ba290b6d-original.webp" data-src="..." alt="Banner"></a></div>'></textarea>
+            <textarea class="cv-input" id="cvHtmlInput" oninput="cvHtmlText=this.value" placeholder='<div slot="items"><a href="..."><img src="https://old-url.com/741fba3d-b989-4f4d-8cb2-3cf4ba290b6d-original.webp" data-src="..." alt="Banner"></a></div>'>${escHtml(cvHtmlText)}</textarea>
           </div>
           <div class="form-group">
             <label class="form-label" for="cvCssInput">كود CSS موجود <code style="color:var(--accent-cool)">اختياري</code></label>
-            <textarea class="cv-input" id="cvCssInput" placeholder='img[src*="741fba3d-b989-4f4d-8cb2-3cf4ba290b6d"] { content: url("https://cdn.salla.sa/.../new.jpg"); }'></textarea>
+            <textarea class="cv-input" id="cvCssInput" oninput="cvCssText=this.value" placeholder='img[src*="741fba3d-b989-4f4d-8cb2-3cf4ba290b6d"] { content: url("https://cdn.salla.sa/.../new.jpg"); }'>${escHtml(cvCssText)}</textarea>
           </div>
         </div>
 
@@ -5002,12 +5135,22 @@ function getFiltered(){
         </div>
         ${resultsHtml}
 
+        <div class="cv-target-row">
+          <span class="cv-target-label"><i class="ti ti-devices"></i> يطبق على</span>
+          <div class="cv-target-seg">
+            <button class="cv-target-btn${cvTarget === 'all' ? ' on' : ''}" onclick="setCvTarget('all')"><i class="ti ti-devices"></i> الكل</button>
+            <button class="cv-target-btn${cvTarget === 'mobile' ? ' on' : ''}" onclick="setCvTarget('mobile')"><i class="ti ti-device-mobile"></i> موبايل فقط</button>
+            <button class="cv-target-btn${cvTarget === 'desktop' ? ' on' : ''}" onclick="setCvTarget('desktop')"><i class="ti ti-device-desktop"></i> كمبيوتر فقط</button>
+          </div>
+          <span class="cv-target-hint">${cvTarget === 'mobile' ? '@media (max-width: 768px)' : cvTarget === 'desktop' ? '@media (min-width: 769px)' : 'بدون @media — كل الأجهزة'}</span>
+        </div>
+
         <div class="sb-preview-wrap">
           <div class="sb-preview-label">
             <span>كود CSS الناتج</span>
             <button class="copy-btn" onclick="copyCvCSS()" id="cvCopyBtn" style="font-size:10px;padding:3px 10px"><i class="ti ti-copy"></i> نسخ الكود</button>
           </div>
-          <pre class="sb-preview" id="cvPreview">${highlightCvCSS(css)}</pre>
+          <pre class="sb-preview" id="cvPreview">${cvPreviewHtml(css)}</pre>
         </div>
       </div>
     </div>`;
@@ -12009,7 +12152,7 @@ function hello() {
     { src: 'cpDashBtn',  name: 'الألوان',    icon: 'ti ti-palette',                 key: '3' },
     { src: 'edDashBtn',  name: 'المحرر',     icon: 'ti ti-code-dots',               key: '4' },
     { src: 'vdDashBtn',  name: 'النسخ',      icon: 'ti ti-versions',                key: '5' },
-    { src: 'cvDashBtn',  name: 'محول',       icon: 'ti ti-arrows-shuffle',          key: '6' },
+    { src: 'cvDashBtn',  name: 'imgscr',       icon: 'ti ti-arrows-shuffle',          key: '6' },
     { src: 'devDashBtn', name: 'أدوات',      icon: 'ti ti-tools',                   key: '7' },
     { src: 'b64DashBtn', name: 'Base64',     icon: 'ti ti-binary',                  key: '8' },
     { src: 'qrDashBtn',  name: 'QR',         icon: 'ti ti-qrcode',                  key: '9' },
@@ -12116,7 +12259,7 @@ function hello() {
     { g:'كود', items:[
       { id:'edDashBtn',  cls:'ed-active',  label:'المحرر',  ic:'ti-terminal-2',     k:'editor محرر' },
       { id:'vdDashBtn',  cls:'vd-active',  label:'النسخ',   ic:'ti-versions',       k:'diff versions compare مقارنة نسخ' },
-      { id:'cvDashBtn',  cls:'cv-active',  label:'محول',    ic:'ti-arrows-shuffle', k:'convert image صور استبدال' },
+      { id:'cvDashBtn',  cls:'cv-active',  label:'imgscr',    ic:'ti-arrows-shuffle', k:'convert image صور استبدال' },
       { id:'hasDashBtn', cls:'has-active', label:':has()',  ic:'ti-code',           k:'has selector محدد' } ]},
     { g:'أدوات', items:[
       { id:'devDashBtn', cls:'dev-active', label:'أدوات',  ic:'ti-tools',  k:'minify css js svg encode ضغط' },
