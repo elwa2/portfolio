@@ -2726,12 +2726,12 @@ html[data-tab="forms"] #root>div,html[data-tab="dashboard"] #root>div,html[data-
     <div class="xhero">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:4px">
         <h1>استايلات <span class="grad">لوحة التحكم</span></h1>
-        <span class="glass" style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--text)"><span style="width:8px;height:8px;border-radius:50%;background:#06b6d4;display:inline-block"></span> 8 أمثلة حية + برومبت</span>
+        <span class="glass" style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--text)"><span style="width:8px;height:8px;border-radius:50%;background:#06b6d4;display:inline-block"></span> 140 مثال حي + برومبت</span>
       </div>
-      <p>كل قطع اللوحة جاهزة للنسخ بنفس هوية الصفحة (Aurora + Glass): سايدبار، توبار، كروت إحصائيات، رسوم CSS بدون مكتبات، جدول حالات، وفلاتر — ومعها برومبت يولّد نفس اللوحة لأي AI.</p>
+      <p>60 ستايل لوحة تحكم بست عائلات مختلفة (داكنة، فاتحة، جريئة، حادة، مرحة، نيو) + قطع اللوحة الأساسية — كل ستايل بألوانه وشكله الخاص وزر نسخ، ومعها برومبت يولّد نفس اللوحة لأي AI.</p>
       <div style="margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:640px">
-        <div class="stat"><b>🧩 6</b><small>أقسام للوحة</small></div>
-        <div class="stat"><b>⚡ 8</b><small>مثال جاهز للنسخ</small></div>
+        <div class="stat"><b>🧩 15</b><small>قسم للوحة</small></div>
+        <div class="stat"><b>⚡ 140</b><small>مثال جاهز للنسخ</small></div>
         <div class="stat"><b>📋 1</b><small>برومبت يولّد نفس اللوحة</small></div>
       </div>
       <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
@@ -2739,7 +2739,31 @@ html[data-tab="forms"] #root>div,html[data-tab="dashboard"] #root>div,html[data-
         <button id="dashViewToggle" class="pill-btn" type="button">🔀 شبكة / عمود</button>
       </div>
     </div>
-    <div class="xsubnav glass"><a href="#dash-side">السايدبار والبوبار</a><a href="#dash-stats">الإحصائيات</a><a href="#dash-charts">الرسوم</a><a href="#dash-tables">الجداول</a><a href="#dash-forms">فلاتر اللوحة</a><a href="#dash-prompt">برومبت اللوحة</a></div>
+    <div class="xsubnav glass"><a href="#gal-dark">🎨 داكنة</a><a href="#gal-light">☀️ فاتحة</a><a href="#gal-bold">🔥 جريئة</a><a href="#gal-sharp">📐 حادة</a><a href="#gal-pill">🍬 مرحة</a><a href="#gal-neu">🧽 نيو</a><a href="#dash-side">السايدبار والبوبار</a><a href="#dash-stats">الإحصائيات</a><a href="#dash-charts">الرسوم</a><a href="#dash-tables">الجداول</a><a href="#dash-forms">فلاتر اللوحة</a><a href="#dash-prompt">برومبت اللوحة</a></div>
+
+    <h2 id="gal-dark">🎨 ستايلات داكنة فاخرة</h2>
+    <p class="hint">10 ثيمات داكنة بلمسة Glass — كل بطاقة بلوحتها الخاصة وزر نسخ.</p>
+    <div class="xgrid" id="grid-dark"></div>
+
+    <h2 id="gal-light">☀️ ستايلات فاتحة نظيفة</h2>
+    <p class="hint">10 ثيمات فاتحة مريحة للعين — مناسبة للشغل الصباحي والتقارير.</p>
+    <div class="xgrid" id="grid-light"></div>
+
+    <h2 id="gal-bold">🔥 ستايلات جريئة ملونة</h2>
+    <p class="hint">10 ثيمات مشبعة شخصيتها قوية — للمنتجات الجريئة والشبابية.</p>
+    <div class="xgrid" id="grid-bold"></div>
+
+    <h2 id="gal-sharp">📐 ستايلات حادة Brutal</h2>
+    <p class="hint">10 ثيمات بزوايا حادة وظل صلب — ستايل Neo-Brutalism.</p>
+    <div class="xgrid" id="grid-sharp"></div>
+
+    <h2 id="gal-pill">🍬 ستايلات مرحة مستديرة</h2>
+    <p class="hint">10 ثيمات سكرية ronde ومبهجة — لتطبيقات الأطفال والكاجوال.</p>
+    <div class="xgrid" id="grid-pill"></div>
+
+    <h2 id="gal-neu">🧽 ستايلات نيو Neumorphism</h2>
+    <p class="hint">10 ثيمات بارزة وناعمة — إحساس فيزيائي هادئ.</p>
+    <div class="xgrid" id="grid-neu"></div>
 
     <h2 id="dash-side">السايدبار والبوبار — Sidebar & Topbar</h2>
     <p class="hint">سايدبار RTL starting من اليمين + توبار ببحث وتنبيهات وأفاتار.</p>
@@ -2933,6 +2957,7 @@ html[data-tab="forms"] #root>div,html[data-tab="dashboard"] #root>div,html[data-
 4. رسم أعمدة أسبوعي بـ CSS فقط (7 أعمدة متدرجة من #22d3ee إلى #7c3aed) + رسم دائري Donut بـ conic-gradient مع مفتاح.
 5. جدول عملاء: hover فاتح + شارات (نشط/معلق/محظور) بنفس ألوان الشارات أعلاه.
 6. شريط فلترة: بحث + select + سويتش إشعارات متدرج عند التفعيل.
+7. ملحق 60 ثيم جاهز بنفس التوكنز (--dbg/--dsf/--dtx/--dmt/--da1/--da2): عشر داكنة زجاجية، عشر فاتحة، عشر جريئة، عشر حادة Brutal، عشر مرحة، عشر نيو.
 
 ## قواعد
 - RTL كامل، متجاوب (سايدبار يتحول لأيقونات/قائمة علوية على الموبايل).
@@ -3164,6 +3189,151 @@ html[data-tab="forms"] #root>div,html[data-tab="dashboard"] #root>div,html[data-
   }
   if(document.readyState!=='loading')boot();
   else document.addEventListener('DOMContentLoaded',boot);
+})();
+
+</script>
+
+<script id="dash-gallery-logic">
+(function(){
+var FAMS=[
+{fam:'dark',shape:'glass',famT:'زجاجية داكنة',grid:'grid-dark',items:[
+['ليلي بنفسجي','#0b1020','#ffffff14','#f1f5ff','#9aa3b8','#7c3aed','#22d3ee'],
+['زمردي عميق','#071310','#ffffff10','#eafff3','#8fb3a6','#10b981','#a3e635'],
+['عنابي ليلي','#180a12','#ffffff10','#ffeef4','#c79aab','#f43f5e','#fb923c'],
+['محيطي','#081226','#ffffff12','#eaf2ff','#8ba3c9','#3b82f6','#22d3ee'],
+['فحمي ذهبي','#12100a','#ffffff10','#fdf6e3','#b3a482','#f59e0b','#fde047'],
+['نيون وردي','#180b20','#ffffff12','#ffe6f7','#d69bc4','#e879f9','#818cf8'],
+['غابي','#08140f','#ffffff10','#e8fff1','#90b69e','#14b8a6','#4ade80'],
+['بركاني','#190d07','#ffffff10','#ffefe2','#cfa488','#f97316','#ef4444'],
+['قطبي','#06121a','#ffffff10','#e2f4ff','#8dafc6','#06b6d4','#60a5fa'],
+['جرافيتي','#101014','#ffffff0f','#f4f4f5','#a1a1aa','#d4d4d8','#71717a']]},
+{fam:'light',shape:'soft',famT:'فاتحة نظيفة',grid:'grid-light',items:[
+['ثلجي','#eef1f7','#ffffff','#1e2433','#64748b','#6366f1','#06b6d4'],
+['ورقي دافئ','#f7f3ea','#ffffff','#3a3226','#8a7f68','#ea580c','#ca8a04'],
+['نعناعي','#edfaf3','#ffffff','#123f31','#5f8a78','#059669','#65a30d'],
+['حالم','#fbeef6','#ffffff','#4a1f3d','#a17994','#db2777','#7c3aed'],
+['صباحي','#eef7fd','#ffffff','#0c3a54','#5b87a2','#0284c7','#06b6d4'],
+['لافندر','#f1eefe','#ffffff','#2e2a5c','#7b77a6','#7c3aed','#a78bfa'],
+['ليموني','#fbf8dd','#ffffff','#3f3a12','#8a8455','#a16207','#4d7c0f'],
+['مرجاني','#fff1ec','#ffffff','#54241a','#a07f71','#f43f5e','#fb923c'],
+['زيتي','#f4f6ee','#ffffff','#2c3325','#747f69','#4d7c0f','#0d9488'],
+['ضبابي','#f1f5f9','#ffffff','#0f172a','#64748b','#0ea5e9','#8b5cf6']]},
+{fam:'bold',shape:'bold',famT:'جريئة ملونة',grid:'grid-bold',items:[
+['كهربائي','#6d28d9','#ffffff1f','#ffffff','#ddd0ff','#f0abfc','#22d3ee'],
+['ناري','#b91c1c','#ffffff1c','#ffffff','#fecaca','#fbbf24','#fed7aa'],
+['غابة','#14532d','#ffffff1a','#ffffff','#bbf7d0','#a3e635','#fde047'],
+['ملكي','#1e3a8a','#ffffff1c','#ffffff','#bfdbfe','#22d3ee','#f472b6'],
+['غروب','#c2410c','#ffffff1c','#ffffff','#fed7aa','#fde047','#4ade80'],
+['عميق','#0e7490','#ffffff1c','#ffffff','#a5f3fc','#fef08a','#f0abfc'],
+['فوشيا','#a21caf','#ffffff1f','#ffffff','#f5d0fe','#fde047','#67e8f9'],
+['زيتوني','#3f6212','#ffffff1c','#ffffff','#d9f99d','#fde047','#fdba74'],
+['فضائي','#111c33','#ffffff14','#ffffff','#b6c4e2','#f472b6','#38bdf8'],
+['توتي','#701a45','#ffffff1c','#ffffff','#fbcfe8','#f9a8d4','#fde68a']]},
+{fam:'sharp',shape:'sharp',famT:'حادة Brutal',grid:'grid-sharp',items:[
+['موزي','#ffd91a','#ffffff','#111111','#555555','#6d28d9','#111111'],
+['مونو','#ffffff','#ffffff','#000000','#555555','#000000','#ef4444'],
+['باستيل','#d8f3dc','#ffffff','#1b4332','#52796f','#2d6a4f','#f4a261'],
+['سكري','#ffc8dd','#ffffff','#590d22','#96536b','#590d22','#3a86ff'],
+['ثلجي حاد','#caf0f8','#ffffff','#03045e','#4a6fa5','#03045e','#ff006e'],
+['طاقي','#ffbf69','#ffffff','#222222','#6b6b6b','#222222','#2ec4b6'],
+['ليلكي','#e0aaff','#f8f4ff','#10002b','#6a5a8a','#5a189a','#ff9e00'],
+['سبانخ','#95d5b2','#f4fff8','#081c15','#45705c','#081c15','#e63946'],
+['رملي','#e9e5d6','#fffdf5','#22241f','#75705f','#bc6c25','#606c38'],
+['ليلي حاد','#1a1a2e','#22223a','#eeeeee','#9a9ab0','#ff2e63','#08d9d4']]},
+{fam:'pill',shape:'pill',famT:'مرحة مستديرة',grid:'grid-pill',items:[
+['غزل','#fff1f2','#ffffff','#881337','#c78aa0','#fb7185','#fbbf24'],
+['مرح','#ecfeff','#ffffff','#164e63','#68a2b8','#06b6d4','#a78bfa'],
+['خوخ','#fff7ed','#ffffff','#7c2d12','#b8947a','#fb923c','#f472b6'],
+['موز','#fef9c3','#ffffff','#713f12','#a3935c','#eab308','#34d399'],
+['عنب','#f5f3ff','#ffffff','#4c1d95','#998fc2','#8b5cf6','#ec4899'],
+['حلوى','#ecfdf5','#ffffff','#064e3b','#6fa893','#10b981','#f59e0b'],
+['كاكاو','#efe9df','#ffffff','#44403c','#a8a29e','#b45309','#0d9488'],
+['توت سكري','#fdf4ff','#ffffff','#701a45','#bb8dab','#e879f9','#818cf8'],
+['ليمون','#f7fee7','#ffffff','#365314','#92a66e','#65a30d','#2dd4bf'],
+['موج','#f0f9ff','#ffffff','#0c4a6e','#6d9bb8','#0284c7','#fb7185']]},
+{fam:'neu',shape:'neu',famT:'نيو Neumorphism',grid:'grid-neu',items:[
+['فضي','#e0e5ec','#e0e5ec','#5a6270','#9aa3b2','#6d5df1','#8a8fb5'],
+['رملي نيو','#e7dfd2','#e7dfd2','#6b6257','#a39a89','#b4654a','#8a8fa3'],
+['وردي نيو','#f1dde3','#f1dde3','#7a5a64','#b2959e','#c2487b','#9aa3b2'],
+['أزرق نيو','#dde7f1','#dde7f1','#54677d','#93a5b8','#3f74b5','#8a9bb5'],
+['أخضر نيو','#dce8dc','#dce8dc','#556b55','#93a893','#4f8f4f','#8a9b8a'],
+['ليلي نيو','#2b2e3a','#2b2e3a','#c9cede','#7d8296','#8b93f8','#5a5f78'],
+['بنفسجي نيو','#e0dbf0','#e0dbf0','#5c5478','#9c94b8','#7c5cd6','#9aa3b2'],
+['عسلي نيو','#efe7d3','#efe7d3','#6e6250','#aaa08a','#b98a2f','#8a8fa3'],
+['سماوي نيو','#d7e9ee','#d7e9ee','#4f6b75','#8fb0b8','#2f9db5','#8a9bb5'],
+['مشمشي','#f0e0d2','#f0e0d2','#6e5a4e','#ac9a89','#c97a4a','#8a8fa3']]}
+];
+var BASE=[
+'.ddash{background:var(--dbg);color:var(--dtx);border-radius:14px;padding:12px;display:flex;gap:10px;width:100%;min-height:196px;font:600 11px Cairo,Tahoma,sans-serif;direction:rtl}',
+'.ddash aside{width:62px;flex-shrink:0;border-radius:var(--dgr);background:color-mix(in srgb,var(--dtx) 9%,transparent);padding:8px;display:flex;flex-direction:column;gap:6px}',
+'.ddash aside span{display:block;height:10px;border-radius:99px;background:color-mix(in srgb,var(--dtx) 22%,transparent)}',
+'.ddash aside span.lg{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--da1),var(--da2))}',
+'.ddash aside span.on{background:linear-gradient(90deg,var(--da1),var(--da2))}',
+'.ddash aside em{margin-top:auto;display:block;height:22px;border-radius:99px;background:color-mix(in srgb,var(--da1) 35%,transparent)}',
+'.ddash .mn{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}',
+'.ddash .tp{display:flex;align-items:center;gap:8px;border-radius:var(--dgr);background:color-mix(in srgb,var(--dtx) 9%,transparent);padding:8px 10px}',
+'.ddash .tp strong{flex:1;height:10px;border-radius:99px;background:color-mix(in srgb,var(--dtx) 30%,transparent)}',
+'.ddash .tp .sr{width:70px;height:18px;border-radius:99px;background:color-mix(in srgb,var(--dtx) 14%,transparent)}',
+'.ddash .tp .bl{width:14px;height:14px;border-radius:50%;background:var(--da1)}',
+'.ddash .tp .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--da1),var(--da2));flex-shrink:0}',
+'.ddash .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}',
+'.ddash .kp i{display:block;height:34px;border-radius:var(--dgr);background:color-mix(in srgb,var(--dtx) 9%,transparent);border-inline-start:4px solid var(--da1)}',
+'.ddash .kp i:nth-child(2){border-color:var(--da2)}',
+'.ddash .kp i:nth-child(3){border-color:color-mix(in srgb,var(--da1) 55%,var(--da2))}',
+'.ddash .ch{flex:1;display:flex;align-items:flex-end;gap:6px;border-radius:var(--dgr);background:color-mix(in srgb,var(--dtx) 9%,transparent);padding:10px 10px 6px;min-height:56px}',
+'.ddash .ch b{flex:1;border-radius:4px 4px 2px 2px;background:linear-gradient(180deg,var(--da2),var(--da1));min-height:8px}',
+'.ddash .ch .e1{height:42%}.ddash .ch .e2{height:68%}.ddash .ch .e3{height:52%}.ddash .ch .e4{height:88%}.ddash .ch .e5{height:60%}.ddash .ch .e6{height:76%}.ddash .ch .e7{height:48%}',
+'.ddash .tb{display:flex;flex-direction:column;gap:5px}',
+'.ddash .tb u{display:block;height:12px;border-radius:99px;background:color-mix(in srgb,var(--dtx) 9%,transparent);text-decoration:none}'
+].join('\n');
+var SHAPE={
+glass:'.ddash[data-shape="glass"]{--dgr:18px;border:1px solid rgba(255,255,255,.16);box-shadow:0 8px 28px rgba(0,0,0,.35)}',
+soft:'.ddash[data-shape="soft"]{--dgr:14px;border:1px solid rgba(15,23,42,.12);box-shadow:0 8px 24px rgba(15,23,42,.10)}',
+bold:'.ddash[data-shape="bold"]{--dgr:12px;border:1px solid rgba(255,255,255,.28);box-shadow:0 10px 30px rgba(0,0,0,.35)}',
+sharp:'.ddash[data-shape="sharp"]{--dgr:5px;border:2px solid var(--dtx);box-shadow:5px 5px 0 rgba(0,0,0,.35)}',
+pill:'.ddash[data-shape="pill"]{--dgr:26px;border:1px solid rgba(0,0,0,.06);box-shadow:0 12px 30px rgba(0,0,0,.14)}',
+neu:'.ddash[data-shape="neu"]{--dgr:20px;border:0;box-shadow:7px 7px 18px rgba(0,0,0,.18),-7px -7px 18px rgba(255,255,255,.6)}'
+};
+var DEMO='<aside><span class="lg"></span><span class="on"></span><span></span><span></span><em></em></aside><div class="mn"><div class="tp"><strong></strong><span class="sr"></span><span class="bl"></span><span class="av"></span></div><div class="kp"><i></i><i></i><i></i></div><div class="ch"><b class="e1"></b><b class="e2"></b><b class="e3"></b><b class="e4"></b><b class="e5"></b><b class="e6"></b><b class="e7"></b></div><div class="tb"><u></u><u></u><u></u></div></div>';
+function tokens(it){return ':root{\n  --dbg:'+it[1]+'; /* الخلفية */\n  --dsf:'+it[2]+'; /* الأسطح */\n  --dtx:'+it[3]+'; /* النص */\n  --dmt:'+it[4]+'; /* نص ثانوي */\n  --da1:'+it[5]+'; /* أساسي */\n  --da2:'+it[6]+'; /* ثانوي */\n}';}
+function copyText(t,ok){function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();ok();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok).catch(fb);else fb();}
+function toast(m){var a=document.getElementById('forms-toast'),b=document.getElementById('forms-toast-txt');if(!a||!b)return;b.textContent=m;a.classList.add('show');setTimeout(function(){a.classList.remove('show')},1800);}
+function build(){
+  var st=document.createElement('style');st.id='ddash-theme-css';
+  st.textContent='#dashboard-page '+BASE.split('\n').join('\n#dashboard-page ')+'\n'+Object.keys(SHAPE).map(function(k){return '#dashboard-page '+SHAPE[k]}).join('\n');
+  document.head.appendChild(st);
+  var n=0;
+  FAMS.forEach(function(F){
+    var grid=document.getElementById(F.grid);if(!grid||grid.children.length>0)return;
+    F.items.forEach(function(it){
+      n++;
+      var vars='--dbg:'+it[1]+';--dsf:'+it[2]+';--dtx:'+it[3]+';--dmt:'+it[4]+';--da1:'+it[5]+';--da2:'+it[6];
+      var code='<!-- ستايل #'+n+': '+it[0]+' ('+F.famT+') -->\n<div class="ddash" data-shape="'+F.shape+'" style="'+vars+'">\n  '+DEMO.replace(/></g,'>\n  <')+'\n</div>\n\n/* CSS */\n'+tokens(it)+'\n'+BASE+'\n'+SHAPE[F.shape];
+      var card=document.createElement('article');card.className='card';
+      var h=document.createElement('h3');h.textContent='#'+n+' '+it[0]+' — '+F.famT;
+      var note=document.createElement('p');note.className='note';note.textContent='خلفية '+it[1]+' • أساسي '+it[5]+' • ثانوي '+it[6];
+      var demo=document.createElement('div');demo.className='demo';
+      var dd=document.createElement('div');dd.className='ddash';dd.setAttribute('data-shape',F.shape);dd.setAttribute('style',vars);dd.innerHTML=DEMO;
+      demo.appendChild(dd);
+      var cd=document.createElement('div');cd.className='code';
+      var btn=document.createElement('button');btn.textContent='نسخ الكود';
+      var pre=document.createElement('pre');pre.textContent=code;
+      btn.addEventListener('click',function(){copyText(code,function(){btn.textContent='تم النسخ!';toast('تم نسخ ستايل #'+n);setTimeout(function(){btn.textContent='نسخ الكود'},1500);});});
+      cd.appendChild(btn);cd.appendChild(pre);
+      card.appendChild(h);card.appendChild(note);card.appendChild(demo);card.appendChild(cd);
+      grid.appendChild(card);
+    });
+  });
+  var total=document.querySelectorAll('#dashboard-page .card').length;
+  var c=document.getElementById('dashCount');if(c)c.textContent=total+' مثال';
+}
+function gridsEmpty(){for(var i=0;i<FAMS.length;i++){var g=document.getElementById(FAMS[i].grid);if(g&&g.children.length===0)return true;}return false;}
+function showBuildErr(err){var msg='تعذر توليد الستايلات تلقائيا';try{if(err&&err.message)msg+=': '+err.message;}catch(e){}for(var i=0;i<FAMS.length;i++){var g=document.getElementById(FAMS[i].grid);if(g&&g.children.length===0){var d=document.createElement('div');d.className='card';var h=document.createElement('h3');h.textContent='⚠️ '+msg;d.appendChild(h);g.appendChild(d);}}}
+function safeBuild(){try{if(gridsEmpty())build();window.__dashGallery='ok';}catch(err){window.__dashGallery='fail';try{showBuildErr(err);}catch(e){}try{if(window.console&&console.error)console.error(err);}catch(e2){}}}
+try{safeBuild();}catch(e){}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',safeBuild);}
+if(window.addEventListener){window.addEventListener('load',safeBuild);}
+setTimeout(safeBuild,800);setTimeout(safeBuild,3000);
 })();
 
 </script>
