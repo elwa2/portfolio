@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدير الأكواد 🌶️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+   <link
+      rel="icon"
+      href="../../assets/images/logo ico.svg"
+      type="image/svg+xml"
+    />
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/codes.css">
+    <link rel="stylesheet" href="css/tools.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo-wrap">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="logo-text">مدير الأكواد</span>
+        <span class="logo-emoji">🌶️</span>
+      </div>
+      <div class="logo-sub">اضغط للفتح · انسخ بنقرة واحدة</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="ابحث عن كود... tag: -css" autocomplete="off" oninput="renderAll(); onSearchInput()">
+    <i class="ti ti-search search-icon" aria-hidden="true"></i>
+    <div class="search-sug" id="searchSug"></div>
+  </div>
+
+  <span class="count-badge" id="countBadge">منبه</span>
+
+  <div class="topbar-actions">
+    <!-- إجراء رئيسي -->
+    <button class="topbar-btn primary" onclick="openModal()" title="إضافة كود جديد">
+      <i class="ti ti-plus" aria-hidden="true"></i>
+      <span>إضافة</span>
+    </button>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- تنقل -->
+    <button class="topbar-btn" id="homeBtn" onclick="toggleHomeDash()" title="الصفحة الرئيسية">
+      <i class="ti ti-home-2" aria-hidden="true"></i>
+      <span>الرئيسية</span>
+    </button>
+    <button class="topbar-btn" id="alDashBtn" onclick="toggleAlDash()" title="المنبه — ساعة وتنبيه صوتي (يرن كل 5 دقائق حتى توقفه)">
+      <i class="ti ti-alarm" aria-hidden="true"></i>
+      <span>المنبه</span>
+    </button>
+    <button class="topbar-btn" onclick="window.open('whiteboard.html','_blank','noopener')" title="السبورة البيضاء — رسم وجداول ومعادلات">
+      <i class="ti ti-chalkboard" aria-hidden="true"></i>
+      <span>السبورة</span>
+    </button>
+    <button class="topbar-btn" onclick="window.open('React-Artifact.html','_blank','noopener')" title="مكتبة لغات البرمجة وستايلات التصميم — 61 ستايل + عناصر فورم + برومبتات جاهزة">
+      <i class="ti ti-palette" aria-hidden="true"></i>
+      <span>الستايلات</span>
+    </button>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- عرض -->
+    <button class="topbar-btn" onclick="toggleAll()" title="فتح الكل">
+      <i class="ti ti-arrows-maximize" aria-hidden="true"></i>
+      <span>فتح الكل</span>
+    </button>
+    <button class="topbar-btn" onclick="toggleAll(false)" title="إغلاق الكل">
+      <i class="ti ti-arrows-minimize" aria-hidden="true"></i>
+      <span>إغلاق الكل</span>
+    </button>
+    <button class="topbar-btn" id="wrapBtn" onclick="toggleWrap()" title="لف الكود الطويل">
+      <i class="ti ti-text-wrap" aria-hidden="true"></i>
+      <span>لف</span>
+    </button>
+    <button class="topbar-btn" onclick="openFindReplace()" title="البحث والاستبدال">
+      <i class="ti ti-find-replace" aria-hidden="true"></i>
+      <span>بحث/استبدال</span>
+    </button>
+    <span class="tb-sep" aria-hidden="true"></span>
+    <!-- بيانات (نادر) -->
+    <div class="tb-more-wrap">
+      <button class="topbar-btn" id="tbMoreBtn" onclick="toggleTbMenu(event)" title="تصدير / استيراد">
+        <i class="ti ti-dots" aria-hidden="true"></i>
+      </button>
+      <div class="tb-menu" id="tbMenu" hidden>
+        <div class="tb-menu-t">البيانات</div>
+        <button class="tb-menu-item" onclick="closeTbMenu();exportData()">
+          <i class="ti ti-download" aria-hidden="true"></i> تصدير JSON
+        </button>
+        <label class="tb-menu-item" style="cursor:pointer" onclick="closeTbMenu()">
+          <i class="ti ti-upload" aria-hidden="true"></i> استيراد JSON
+          <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+        </label>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FILTER BAR : تاجات الأكواد + استوديو الأدوات الموحد -->
+<div class="filter-bar legacy" id="filterBar">
+  <div class="fb-row fb-tags-row">
+    <span class="filter-label">فلتر الأكواد</span>
+    <button class="filter-tag active" data-tag="all" onclick="setTag(this)">الكل</button>
+    <button class="filter-tag" data-tag="css" onclick="setTag(this)">CSS</button>
+    <button class="filter-tag" data-tag="responsive" onclick="setTag(this)">Responsive</button>
+    <button class="filter-tag" data-tag="brand" onclick="setTag(this)">Brand</button>
+    <button class="filter-tag" data-tag="salla" onclick="setTag(this)">Salla</button>
+    <button class="filter-tag" data-tag="has" onclick="setTag(this)">:has()</button>
+    <button class="filter-tag" data-tag="javascript" onclick="setTag(this)">JavaScript</button>
+    <button class="filter-tag starred-btn" data-tag="starred" onclick="setTag(this)">
+      <i class="ti ti-star" aria-hidden="true"></i> محفوظ
+    </button>
+  </div>
+  <div class="fb-row fb-tools-row">
+    <span class="filter-label tools-label">الاستوديو</span>
+    <button class="tools-launcher" id="toolsLauncher" onclick="toggleToolsMenu(event)" title="كل الأدوات في مكان واحد — بحث + اختصارات">
+      <i class="ti ti-apps" aria-hidden="true"></i>
+      <span class="tl-name" id="toolsLauncherName">كل الأدوات</span>
+      <span class="tl-count">10</span>
+      <span class="tl-kbd">Alt+T</span>
+    </button>
+    <div class="tools-quick" id="toolsQuick" title="آخر أدوات استخدمتها — وصول بضغطة"></div>
+    <div class="tools-menu" id="toolsMenu" hidden>
+      <input class="tm-search" id="toolsMenuSearch" type="text" placeholder="ابحث عن أداة... مثال: imgscr / QR / سكرول" oninput="filterToolsMenu(this.value)" autocomplete="off">
+      <div class="tm-group" data-group="css">
+        <div class="tm-group-t"><i class="ti ti-brush"></i> بناء وتنسيق CSS</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="cssDashBtn" onclick="toolsGo('cssDashBtn')"><i class="ti ti-brand-css3"></i><span>استوديو CSS <span class="tm-sub">imgscr + :has()</span></span><span class="tm-num">1</span></button>
+          <button class="tm-item" data-src="sbDashBtn" onclick="toolsGo('sbDashBtn')"><i class="ti ti-scroll"></i><span>Scrollbar <span class="tm-sub">سكرول بار مخصص</span></span><span class="tm-num">2</span></button>
+          <button class="tm-item" data-src="cpDashBtn" onclick="toolsGo('cpDashBtn')"><i class="ti ti-palette"></i><span>الألوان <span class="tm-sub">باليت + تدرج + متغيرات</span></span><span class="tm-num">3</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="code">
+        <div class="tm-group-t"><i class="ti ti-braces"></i> كتابة ومقارنة الأكواد</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="edDashBtn" onclick="toolsGo('edDashBtn')"><i class="ti ti-code-dots"></i><span>المحرر <span class="tm-sub">محرر + مقارنة النسخ</span></span><span class="tm-num">4</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="dev">
+        <div class="tm-group-t"><i class="ti ti-tools"></i> معالجة وتحويل</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="devDashBtn" onclick="toolsGo('devDashBtn')"><i class="ti ti-tools"></i><span>أدوات <span class="tm-sub">ضغط + تعمية + SVG</span></span><span class="tm-num">7</span></button>
+          <button class="tm-item" data-src="b64DashBtn" onclick="toolsGo('b64DashBtn')"><i class="ti ti-binary"></i><span>Base64 <span class="tm-sub">ترميز + صور</span></span><span class="tm-num">8</span></button>
+          <button class="tm-item" data-src="qrDashBtn" onclick="toolsGo('qrDashBtn')"><i class="ti ti-qrcode"></i><span>QR <span class="tm-sub">مولد رموز</span></span><span class="tm-num">9</span></button>
+        </div>
+      </div>
+      <div class="tm-group" data-group="view">
+        <div class="tm-group-t"><i class="ti ti-layout-dashboard"></i> عرض وتحكم</div>
+        <div class="tm-grid">
+          <button class="tm-item" data-src="rtDashBtn" onclick="toolsGo('rtDashBtn')"><i class="ti ti-adjustments-horizontal"></i><span>التحكم <span class="tm-sub">باقة الثيم + بروت</span></span><span class="tm-num">0</span></button>
+          <button class="tm-item" data-src="__home" onclick="toolsGo('__home')"><i class="ti ti-home-2"></i><span>الرئيسية <span class="tm-sub">لوحاتي وأدواتي</span></span><span class="tm-num">H</span></button>
+        </div>
+      </div>
+      <!-- الأزرار الأصلية (مخفية — محفوظة للتوافق مع toggle/hash/persist) -->
+      <div hidden aria-hidden="true">
+        <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار"><i class="ti ti-scroll"></i> Scrollbar</button>
+        <button class="filter-tag" id="cssDashBtn" onclick="toggleCssDash()" title="استوديو CSS — imgscr وتوليد :has()"><i class="ti ti-brand-css3"></i> CSS</button>
+        <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر + النسخ والمقارنة">المحرر</button>
+        <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG"><i class="ti ti-tools"></i> أدوات</button>
+        <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64"><i class="ti ti-binary"></i> Base64</button>
+        <button class="filter-tag" id="qrDashBtn" onclick="toggleQrDash()" title="مولد رموز QR"><i class="ti ti-qrcode"></i> QR</button>
+        <button class="filter-tag" id="cpDashBtn" onclick="toggleCpDash()" title="مولد لوحة الألوان والتدرجات ومتغيرات CSS"><i class="ti ti-palette"></i> الألوان</button>
+        <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص"><i class="ti ti-adjustments-horizontal"></i> التحكم</button>
+      </div>
+      <div class="tm-foot"><span><kbd>Alt+T</kbd> فتح / إغلاق</span><span><kbd>Alt+1..0</kbd> فتح مباشر</span><span><kbd>Esc</kbd> إغلاق</span><span>الروابط العميقة مثل <b dir="ltr">#vd</b> ما زالت شغالة</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV HUB -->
+<nav class="nav-hub" id="navHub" aria-label="التنقل">
+  <div class="nav-seg" role="tablist">
+    <button class="nav-seg-btn" id="navSegCodes" role="tab" onclick="navSetView('codes')"><i class="ti ti-code"></i> الأكواد</button>
+    <button class="nav-seg-btn" id="navSegTools" role="tab" onclick="navSetView('tools')"><i class="ti ti-tools"></i> الأدوات</button>
+  </div>
+  <div class="nav-row" id="navRow"></div>
+  <button class="nav-k" onclick="openNavPalette()" title="بحث سريع (Alt+T)">
+    <i class="ti ti-command"></i><span>Alt+T</span>
+  </button>
+</nav>
+
+<!-- NAV PALETTE -->
+<div class="np-overlay" id="npOverlay" onclick="if(event.target===this)closeNavPalette()">
+  <div class="np-box" role="dialog" aria-modal="true" aria-label="بحث سريع">
+    <input class="np-input" id="npInput" type="text" placeholder="اكتب اسم أداة أو فلتر... (ألوان، QR، محرر، css)" autocomplete="off" spellcheck="false">
+    <div class="np-list" id="npList"></div>
+    <div class="np-foot"><span>↑↓ تنقل</span><span>Enter فتح</span><span>Esc إغلاق</span></div>
+  </div>
+</div>
+
+<!-- MAIN BODY -->
+<main class="main-body" id="mainBody"></main>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="إضافة كود جديد">
+    <div class="modal-title">إضافة كود جديد</div>
+
+    <div class="form-group">
+      <label class="form-label" for="inp-title">عنوان القسم</label>
+      <input class="form-input" id="inp-title" type="text" placeholder="مثال: Custom Logo - تغيير اللوجو">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="inp-desc">وصف مختصر</label>
+      <input class="form-input" id="inp-desc" type="text" placeholder="ما الذي يفعله هذا الكود؟">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="inp-tags">التاجات (مفصولة بفاصلة)</label>
+      <input class="form-input" id="inp-tags" type="text" placeholder="css, salla, brand">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="inp-lang">لغة الكود</label>
+      <select class="form-select" id="inp-lang">
+        <option value="CSS">CSS</option>
+        <option value="JS">JavaScript</option>
+        <option value="HTML">HTML</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="inp-code">الكود</label>
+      <textarea class="form-textarea" id="inp-code" placeholder="الصق الكود هنا..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="addSection()">حفظ الكود</button>
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="confirmOverlay" onclick="closeConfirmOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="تأكيد الحذف" style="max-width:400px">
+    <div class="modal-title" style="color:var(--danger)">حذف الكود</div>
+    <p class="confirm-text" id="confirmText">هل أنت متأكد من حذف هذا الكود؟</p>
+    <div class="modal-actions">
+      <button class="btn-danger" id="confirmDeleteBtn">حذف</button>
+      <button class="btn-cancel" onclick="closeConfirm()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="ti ti-check" aria-hidden="true"></i>
+  <span id="toastMsg">تم النسخ!</span>
+</div>
+
+<!-- FIND & REPLACE MODAL -->
+<div class="modal-overlay" id="findReplaceOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="البحث والاستبدال" style="max-width:520px">
+    <div class="modal-title">🔍 البحث والاستبدال</div>
+    
+    <div class="form-group">
+      <label class="form-label" for="frSearch">ابحث عن</label>
+      <input class="form-input" id="frSearch" type="text" placeholder="ادخل النص للبحث..." autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="frReplace">استبدل ب</label>
+      <input class="form-input" id="frReplace" type="text" placeholder="ادخل النص البديل..." autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-2)">
+        <input type="checkbox" id="frCaseSensitive" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+        <span>حساس لحالة الأحرف (Case Sensitive)</span>
+      </label>
+    </div>
+
+    <div id="frResults" style="margin:16px 0;padding:12px;background:var(--bg-overlay);border-radius:var(--radius-sm);display:none">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">النتائج:</div>
+      <div id="frResultsText" style="font-size:13px;color:var(--text-1);font-weight:600"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" id="frFindBtn" style="flex:1">البحث عن الكل</button>
+      <button class="btn-primary" id="frReplaceBtn" style="flex:1;background:var(--accent-warm)" onclick="performReplace()">استبدل الكل</button>
+      <button class="btn-cancel" onclick="closeFindReplace()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR COLOR PICKER -->
+<div class="ed-color-pop" id="edColorPop" role="dialog" aria-label="منتقي الألوان" aria-hidden="true">
+  <div class="ecp-head">
+    <span class="ecp-swatch" id="ecpSw"></span>
+    <span class="ecp-title">منتقي الألوان</span>
+  </div>
+  <input type="color" class="ecp-native" id="ecpNative" value="#38bdf8" aria-label="اختيار لون">
+  <div class="ecp-row">
+    <label>HEX</label>
+    <input class="ecp-input" id="ecpHex" spellcheck="false" autocomplete="off" aria-label="كود HEX">
+  </div>
+  <div class="ecp-row">
+    <label>R</label><input type="number" class="ecp-num" id="ecpR" min="0" max="255" step="1" aria-label="الأحمر">
+    <label>G</label><input type="number" class="ecp-num" id="ecpG" min="0" max="255" step="1" aria-label="الأخضر">
+    <label>B</label><input type="number" class="ecp-num" id="ecpB" min="0" max="255" step="1" aria-label="الأزرق">
+  </div>
+  <div class="ecp-row">
+    <label>A</label>
+    <input type="range" class="ecp-range" id="ecpA" min="0" max="100" value="100" aria-label="الشفافية">
+    <span class="ecp-aval" id="ecpAVal">100%</span>
+  </div>
+  <div class="ecp-actions">
+    <button class="btn-primary" id="ecpOk">تم</button>
+  </div>
+</div>
+
+    <script src="data/snippets.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/tools/scrollbar.js"></script>
+    <script src="js/tools/home.js"></script>
+    <script src="js/tools/has.js"></script>
+    <script src="js/tools/converter.js"></script>
+    <script src="js/tools/editor.js"></script>
+    <script src="js/tools/devtools.js"></script>
+    <script src="js/tools/base64.js"></script>
+    <script src="js/tools/colors.js"></script>
+    <script src="js/tools/qr.js"></script>
+    <script src="js/tools/route.js"></script>
+    <script src="js/tools/alarm.js"></script>
+    <script src="js/nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- ═════ Quick Nav Patch — فهرس جانبي سريع ═════ -->
+<div id="qn" aria-label="فهرس سريع">
+  <input id="qnQ" type="text" placeholder="فلتر الفهرس..." autocomplete="off">
+  <div id="qnList"></div>
+</div>
+</body>
+</html>
+

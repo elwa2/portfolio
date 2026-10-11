@@ -827,11 +827,6 @@
   .has-empty i { font-size: 28px; display: block; margin-bottom: 6px; color: var(--text-4); }
   .has-empty p { font-size: 13px; }
 
-  .filter-tag.has-active {
-    background: var(--accent-cool); color: #fff; border-color: var(--accent-cool);
-    box-shadow: 0 2px 12px rgba(107,155,210,0.3);
-  }
-
   .filter-tag.scrollbar-active {
     background: #8b5cf6; color: #fff; border-color: #8b5cf6;
     box-shadow: 0 2px 12px rgba(139,92,246,0.3);
@@ -1015,9 +1010,9 @@
   }
 
   /* ===== CODE CONVERTER DASHBOARD ===== */
-  .filter-tag.cv-active {
-    background: var(--accent-warm); color: #fff; border-color: var(--accent-warm);
-    box-shadow: 0 2px 12px rgba(212,168,67,0.3);
+  .filter-tag.css-active {
+    background: var(--accent-grad); color: #fff; border-color: transparent;
+    box-shadow: 0 2px 12px rgba(124,58,237,0.4);
   }
 
   .cv-builder {
@@ -2873,7 +2868,7 @@
     <button class="tools-launcher" id="toolsLauncher" onclick="toggleToolsMenu(event)" title="كل الأدوات في مكان واحد — بحث + اختصارات">
       <i class="ti ti-apps" aria-hidden="true"></i>
       <span class="tl-name" id="toolsLauncherName">كل الأدوات</span>
-      <span class="tl-count">12</span>
+      <span class="tl-count">10</span>
       <span class="tl-kbd">Alt+T</span>
     </button>
     <div class="tools-quick" id="toolsQuick" title="آخر أدوات استخدمتها — وصول بضغطة"></div>
@@ -2882,7 +2877,7 @@
       <div class="tm-group" data-group="css">
         <div class="tm-group-t"><i class="ti ti-brush"></i> بناء وتنسيق CSS</div>
         <div class="tm-grid">
-          <button class="tm-item" data-src="hasDashBtn" onclick="toolsGo('hasDashBtn')"><i class="ti ti-code"></i><span>:has() <span class="tm-sub">مولد المحددات</span></span><span class="tm-num">1</span></button>
+          <button class="tm-item" data-src="cssDashBtn" onclick="toolsGo('cssDashBtn')"><i class="ti ti-brand-css3"></i><span>استوديو CSS <span class="tm-sub">imgscr + :has()</span></span><span class="tm-num">1</span></button>
           <button class="tm-item" data-src="sbDashBtn" onclick="toolsGo('sbDashBtn')"><i class="ti ti-scroll"></i><span>Scrollbar <span class="tm-sub">سكرول بار مخصص</span></span><span class="tm-num">2</span></button>
           <button class="tm-item" data-src="cpDashBtn" onclick="toolsGo('cpDashBtn')"><i class="ti ti-palette"></i><span>الألوان <span class="tm-sub">باليت + تدرج + متغيرات</span></span><span class="tm-num">3</span></button>
         </div>
@@ -2891,7 +2886,6 @@
         <div class="tm-group-t"><i class="ti ti-braces"></i> كتابة ومقارنة الأكواد</div>
         <div class="tm-grid">
           <button class="tm-item" data-src="edDashBtn" onclick="toolsGo('edDashBtn')"><i class="ti ti-code-dots"></i><span>المحرر <span class="tm-sub">محرر + مقارنة النسخ</span></span><span class="tm-num">4</span></button>
-          <button class="tm-item" data-src="cvDashBtn" onclick="toolsGo('cvDashBtn')"><i class="ti ti-arrows-shuffle"></i><span>imgscr <span class="tm-sub">HTML/CSS لكود صحيح</span></span><span class="tm-num">6</span></button>
         </div>
       </div>
       <div class="tm-group" data-group="dev">
@@ -2911,9 +2905,8 @@
       </div>
       <!-- الأزرار الأصلية (مخفية — محفوظة للتوافق مع toggle/hash/persist) -->
       <div hidden aria-hidden="true">
-        <button class="filter-tag" id="hasDashBtn" onclick="toggleHasDash()" title="مُحددات :has()"><i class="ti ti-code"></i> :has()</button>
         <button class="filter-tag" id="sbDashBtn" onclick="toggleScrollbarDash()" title="لوحة تحكم السكرول بار"><i class="ti ti-scroll"></i> Scrollbar</button>
-        <button class="filter-tag" id="cvDashBtn" onclick="toggleCvDash()" title="imgscr HTML/CSS إلى كود صحيح"><i class="ti ti-arrows-shuffle"></i> imgscr</button>
+        <button class="filter-tag" id="cssDashBtn" onclick="toggleCssDash()" title="استوديو CSS — imgscr وتوليد :has()"><i class="ti ti-brand-css3"></i> CSS</button>
         <button class="filter-tag" id="edDashBtn" onclick="toggleEdDash()" title="محرر أكواد بترقيم الأسطر + النسخ والمقارنة">المحرر</button>
         <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG"><i class="ti ti-tools"></i> أدوات</button>
         <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64"><i class="ti ti-binary"></i> Base64</button>
@@ -3184,7 +3177,6 @@
   let _initDone = false;
   let varValues = new Map();
   let showHomeDash = false;
-  let showHasDash = false;
   let showEdDash = false;
   let showCpDash = false;
   let showRtDash = false;
@@ -3766,10 +3758,8 @@
       document.querySelectorAll('.filter-tag:not(#sbDashBtn)').forEach(b=>b.classList.remove('active'));
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showHasDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
-      showCvDash = false;
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
@@ -4026,17 +4016,9 @@
       const hb = document.getElementById('homeBtn');
       if (hb) hb.classList.remove('home-active');
     }
-    if(showHasDash){
-      showHasDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
-    }
     if(showScrollbarDash){
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-    }
-    if(showCvDash){
-      showCvDash = false;
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
     }
     if(showEdDash){
       showEdDash = false;
@@ -4061,6 +4043,10 @@
     if(showRtDash){
       showRtDash = false;
       document.getElementById('rtDashBtn').classList.remove('rt-active');
+    }
+    if(showCssDash){
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
     }
     activeTag = el.dataset.tag;
     document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
@@ -4341,10 +4327,10 @@ function getFiltered(){
     document.getElementById('homeBtn').classList.toggle('home-active', showHomeDash);
     if(showHomeDash){
       document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
-      showHasDash = false; showScrollbarDash = false; showCvDash = false;
+      showScrollbarDash = false; showCssDash = false;
       showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
       showCpDash = false; showRtDash = false;
-      const map = { hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+      const map = { cssDashBtn:'css-active', sbDashBtn:'scrollbar-active',
         edDashBtn:'ed-active', devDashBtn:'dev-active',
         b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
       Object.keys(map).forEach(id => {
@@ -4361,9 +4347,8 @@ function getFiltered(){
     const featured = DATA.filter(s => starredIds.has(s.id)).slice(0, 8);
 
     const dashCards = [
-      { id:'hasDashBtn', t:'لوحة :has()', s:'محددات حديثة', i:'ti-code', c:'c-purple' },
+      { id:'cssDashBtn', t:'استوديو CSS', s:'imgscr + :has()', i:'ti-brand-css3', c:'c-purple' },
       { id:'sbDashBtn', t:'سكرول بار', s:'توليد CSS', i:'ti-scroll', c:'c-teal' },
-      { id:'cvDashBtn', t:'imgscr الأكواد', s:'HTML/CSS صحيح', i:'ti-arrows-shuffle', c:'c-blue' },
       { id:'edDashBtn', t:'المحرر', s:'أكواد بترقيم', i:'ti-code', c:'c-blue' },
       { id:'devDashBtn', t:'أدوات المطور', s:'Dev Tools', i:'ti-tool', c:'c-teal' },
       { id:'b64DashBtn', t:'Base64', s:'ترميز وفك', i:'ti-database', c:'c-purple' },
@@ -4481,7 +4466,7 @@ function getFiltered(){
   }
 
   function toggleById(id){
-    const fn = { hasDashBtn:toggleHasDash, sbDashBtn:toggleScrollbarDash, cvDashBtn:toggleCvDash,
+    const fn = { cssDashBtn:toggleCssDash, sbDashBtn:toggleScrollbarDash,
       edDashBtn:toggleEdDash, devDashBtn:toggleDevDash,
       b64DashBtn:toggleB64Dash, qrDashBtn:toggleQrDash, cpDashBtn:toggleCpDash,
       rtDashBtn:toggleRtDash }[id];
@@ -4592,17 +4577,22 @@ function getFiltered(){
   }
 
   // ── HAS DASHBOARD ──
-  function toggleHasDash(){
-    showHasDash = !showHasDash;
-    document.getElementById('hasDashBtn').classList.toggle('has-active', showHasDash);
-    if(showHasDash){
-      document.querySelectorAll('.filter-tag:not(#hasDashBtn)').forEach(b=>b.classList.remove('active'));
+  // ── CSS STUDIO (imgscr + :has() — تبويب واحد بتبويبين داخليين) ──
+  let showCssDash = false;
+  let cssTab = 'cv';
+  function cssSetTab(t){
+    cssTab = (t === 'has') ? 'has' : 'cv';
+    renderAll();
+  }
+  function toggleCssDash(){
+    showCssDash = !showCssDash;
+    document.getElementById('cssDashBtn').classList.toggle('css-active', showCssDash);
+    if(showCssDash){
+      document.querySelectorAll('.filter-tag:not(#cssDashBtn)').forEach(b=>b.classList.remove('active'));
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      showCvDash = false;
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
       showEdDash = false;
       document.getElementById('edDashBtn').classList.remove('ed-active');
       showDevDash = false;
@@ -4617,6 +4607,24 @@ function getFiltered(){
       document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();
+  }
+  function renderCssDash(){
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+      <div class="has-builder">
+        <div class="has-builder-title"><i class="ti ti-brand-css3"></i> استوديو CSS
+          <span>imgscr وتوليد :has() في مكان واحد — بدّل بينهما من الأعلى</span></div>
+        <div class="cb-seg" style="margin-bottom:4px">
+          <button class="cb-btn${cssTab==='cv'?' on':''}" onclick="cssSetTab('cv')"><i class="ti ti-arrows-shuffle" aria-hidden="true"></i> imgscr</button>
+          <button class="cb-btn${cssTab==='has'?' on':''}" onclick="cssSetTab('has')"><i class="ti ti-code" aria-hidden="true"></i> :has()</button>
+        </div>
+        <div id="cssStudioBody"></div>
+      </div>
+    </div>`;
+    if(cssTab === 'has') renderHasDashboard('cssStudioBody');
+    else renderCvDash('cssStudioBody');
+    document.getElementById('countBadge').textContent = cssTab === 'has'
+      ? (DATA.filter(s=>s.tags.includes('has')).length + ' :has()')
+      : 'imgscr الأكواد';
   }
 
   function saveHasSnippet(){
@@ -4644,7 +4652,7 @@ function getFiltered(){
     document.getElementById('hasParent').value = '';
     document.getElementById('hasTarget').value = '';
     document.getElementById('hasCondition').value = '';
-    renderHasDashboard();
+    renderAll();
     showToast('تم حفظ المحدد!');
   }
 
@@ -4678,10 +4686,10 @@ function getFiltered(){
     preview.innerHTML = html || '<span style="color:var(--text-3)">... سيظهر المحدد هنا</span>';
   }
 
-  function renderHasDashboard(){
+  function renderHasDashboard(targetId){
     const hasItems = DATA.filter(s => s.tags.includes('has'));
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
-    document.getElementById('countBadge').textContent = hasItems.length + ' :has()';
+    if(!targetId) document.getElementById('countBadge').textContent = hasItems.length + ' :has()';
 
     const filtered = q ? hasItems.filter(s =>
       s.title.toLowerCase().includes(q) || s.tags.some(t=>t.includes(q)) || s.codes.some(c=>c.code.toLowerCase().includes(q))
@@ -4725,7 +4733,7 @@ function getFiltered(){
         }).join('')
       : `<div class="has-empty"><i class="ti ti-mood-empty"></i><p>لا توجد محددات :has() محفوظة</p></div>`;
 
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+    document.getElementById(targetId || 'mainBody').innerHTML = `<div class="has-dash">
       <div class="has-builder">
         <div class="has-builder-title"><i class="ti ti-code"></i> بناء مُحدد :has()</div>
         <div class="has-builder-grid">
@@ -4774,7 +4782,6 @@ function getFiltered(){
   }
 
   // ── CODE CONVERTER DASHBOARD ──
-  let showCvDash = false;
   let cvImgs = [];
   let cvManual = [];
   let cvQuick = [{ old: '', new: '' }]; // صفوف الاستبدال السريع (قديمة → جديدة)
@@ -4782,34 +4789,6 @@ function getFiltered(){
   let cvTarget = 'all'; // all | mobile | desktop
   let cvHtmlText = '';
   let cvCssText = '';
-
-  function toggleCvDash(){
-    showCvDash = !showCvDash;
-    document.getElementById('cvDashBtn').classList.toggle('cv-active', showCvDash);
-    if(showCvDash){
-      document.querySelectorAll('.filter-tag:not(#cvDashBtn)').forEach(b=>b.classList.remove('active'));
-      showHomeDash = false;
-      const __hb = document.getElementById('homeBtn');
-      if (__hb) __hb.classList.remove('home-active');
-      showHasDash = false;
-      showScrollbarDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
-      document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      showEdDash = false;
-      document.getElementById('edDashBtn').classList.remove('ed-active');
-      showDevDash = false;
-      document.getElementById('devDashBtn').classList.remove('dev-active');
-      showB64Dash = false;
-      document.getElementById('b64DashBtn').classList.remove('b64-active');
-      showQrDash = false;
-      document.getElementById('qrDashBtn').classList.remove('qr-active');
-      showCpDash = false;
-      document.getElementById('cpDashBtn').classList.remove('cp-active');
-      showRtDash = false;
-      document.getElementById('rtDashBtn').classList.remove('rt-active');
-    }
-    renderAll();
-  }
 
   function uniqueKey(url){
     if(!url) return '';
@@ -4873,7 +4852,7 @@ function getFiltered(){
   function setCvTarget(t){
     cvSnapshotInputs();
     cvTarget = t;
-    renderCvDash();
+    renderAll();
   }
   // لو المستخدم لصق CSS جاهز فيه @media نلتقط هدفه تلقائياً
   function cvDetectTarget(css){
@@ -4901,7 +4880,7 @@ function getFiltered(){
     if(!htmlImgs.length && !cssImgs.length){
       showToast('لم يتم العثور على صور — تحقق من الكود');
       cvImgs = [];
-      renderCvDash();
+      renderAll();
       return;
     }
 
@@ -4919,7 +4898,7 @@ function getFiltered(){
     }
     cvReapplyManual();
 
-    renderCvDash();
+    renderAll();
     showToast('تم استخراج ' + cvImgs.length + ' صورة');
   }
 
@@ -5010,14 +4989,14 @@ function getFiltered(){
   function cvQuickAdd(){
     cvSnapshotInputs();
     cvQuick.push({ old: '', new: '' });
-    renderCvDash();
+    renderAll();
   }
 
   function cvQuickDel(i){
     if(cvQuick.length <= 1) cvQuick = [{ old: '', new: '' }];
     else cvQuick.splice(i, 1);
     cvRuleNote = '';
-    renderCvDash();
+    renderAll();
   }
 
   function cvApplyReplace(){
@@ -5035,14 +5014,14 @@ function getFiltered(){
     });
     if(!applied){ showToast('املأ رابط صورة قديمة وجديدة أولاً'); return; }
     cvRuleNote = 'تم تطبيق ' + applied + ' قاعدة' + (totalHits ? ' — حدّثت ' + totalHits + ' صورة في القائمة' : ' — أُضيفت للقائمة');
-    renderCvDash();
+    renderAll();
     showToast('تم تطبيق ' + applied + ' قاعدة');
   }
 
   function cvClearPick(){
     cvQuick = [{ old: '', new: '' }];
     cvRuleNote = '';
-    renderCvDash();
+    renderAll();
   }
 
   function cvPickOptions(){
@@ -5068,7 +5047,7 @@ function getFiltered(){
     cvRuleNote = '';
     cvHtmlText = '';
     cvCssText = '';
-    renderCvDash();
+    renderAll();
   }
 
   function generateCvCSS(){
@@ -5123,8 +5102,8 @@ function getFiltered(){
     }).catch(() => showToast('تعذّر النسخ'));
   }
 
-  function renderCvDash(){
-    document.getElementById('countBadge').textContent = 'imgscr الأكواد';
+  function renderCvDash(targetId){
+    if(!targetId) document.getElementById('countBadge').textContent = 'imgscr الأكواد';
 
     let resultsHtml = '';
     if(cvImgs.length){
@@ -5149,7 +5128,7 @@ function getFiltered(){
 
     const css = generateCvCSS();
 
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+    document.getElementById(targetId || 'mainBody').innerHTML = `<div class="has-dash">
       <div class="cv-builder">
         <div class="cv-title-box">
           <span class="cv-title-ic"><i class="ti ti-arrows-shuffle"></i></span>
@@ -5573,12 +5552,14 @@ function getFiltered(){
     document.getElementById('edDashBtn').classList.toggle('ed-active', showEdDash);
     if(showEdDash){
       document.querySelectorAll('.filter-tag:not(#edDashBtn)').forEach(b => b.classList.remove('active'));
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showHasDash = false; showScrollbarDash = false; showCvDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false; showRtDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
+      showScrollbarDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false; showRtDash = false;
+
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+
 
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
@@ -7305,9 +7286,9 @@ function getFiltered(){
   }
   function alSyncDash(){
     if (!showAlDash) return;
-    const other = showHomeDash || showHasDash || showScrollbarDash || showCvDash ||
+    const other = showHomeDash || showScrollbarDash ||
                   showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash ||
-                  showRtDash;
+                  showRtDash || showCssDash;
     if (other){
       showAlDash = false;
       const b = document.getElementById('alDashBtn');
@@ -7322,7 +7303,7 @@ function getFiltered(){
       document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
       const home = document.getElementById('homeBtn');
       if (home) home.classList.remove('home-active');
-      showHomeDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
+      showHomeDash = false; showScrollbarDash = false; showCssDash = false;
       showEdDash = false; showDevDash = false; showB64Dash = false;
       showQrDash = false; showCpDash = false; showRtDash = false;
     }
@@ -7932,9 +7913,8 @@ function getFiltered(){
     setDashHash(currentDashId());
     if(showHomeDash) return renderHomeDash();
     if(showAlDash) return renderAlDash();
-    if(showHasDash) return renderHasDashboard();
     if(showScrollbarDash) return renderScrollbarDash();
-    if(showCvDash) return renderCvDash();
+    if(showCssDash) return renderCssDash();
     if(showEdDash) return renderEdDash();
     if(showDevDash) return renderDevDash();
     if(showB64Dash) return renderB64Dash();
@@ -8338,21 +8318,23 @@ function getFiltered(){
     document.getElementById('devDashBtn').classList.toggle('dev-active', showDevDash);
     if(showDevDash){
       document.querySelectorAll('.filter-tag:not(#devDashBtn)').forEach(b => b.classList.remove('active'));
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       const __hb = document.getElementById('homeBtn');
       if (__hb) __hb.classList.remove('home-active');
-      showHasDash = false;
+
       showScrollbarDash = false;
-      showCvDash = false;
+
 
       showEdDash = false;
       showB64Dash = false;
       showQrDash = false;
       showCpDash = false;
       showRtDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
+
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+
 
       document.getElementById('edDashBtn').classList.remove('ed-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
@@ -9180,20 +9162,22 @@ function hello() {
     document.getElementById('b64DashBtn').classList.toggle('b64-active', showB64Dash);
     if(showB64Dash){
       document.querySelectorAll('.filter-tag:not(#b64DashBtn)').forEach(b => b.classList.remove('active'));
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showHasDash = false;
+
       showScrollbarDash = false;
-      showCvDash = false;
+
 
       showEdDash = false;
       showDevDash = false;
       showQrDash = false;
       showCpDash = false;
       showRtDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
+
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+
 
       document.getElementById('edDashBtn').classList.remove('ed-active');
       document.getElementById('devDashBtn').classList.remove('dev-active');
@@ -9209,18 +9193,20 @@ function hello() {
     document.getElementById('qrDashBtn').classList.toggle('qr-active', showQrDash);
     if(showQrDash){
       document.querySelectorAll('.filter-tag:not(#qrDashBtn)').forEach(b => b.classList.remove('active'));
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showHasDash = false;
+
       showScrollbarDash = false;
-      showCvDash = false;
+
 
       showEdDash = false;
       showDevDash = false;
       showB64Dash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
+
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+
 
       document.getElementById('edDashBtn').classList.remove('ed-active');
       document.getElementById('devDashBtn').classList.remove('dev-active');
@@ -9238,20 +9224,22 @@ function hello() {
     document.getElementById('cpDashBtn').classList.toggle('cp-active', showCpDash);
     if(showCpDash){
       document.querySelectorAll('.filter-tag:not(#cpDashBtn)').forEach(b => b.classList.remove('active'));
+      showCssDash = false;
+      document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showHasDash = false;
+
       showScrollbarDash = false;
-      showCvDash = false;
+
 
       showEdDash = false;
       showDevDash = false;
       showB64Dash = false;
       showQrDash = false;
       showRtDash = false;
-      document.getElementById('hasDashBtn').classList.remove('has-active');
+
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
-      document.getElementById('cvDashBtn').classList.remove('cv-active');
+
 
       document.getElementById('edDashBtn').classList.remove('ed-active');
       document.getElementById('devDashBtn').classList.remove('dev-active');
@@ -11397,9 +11385,10 @@ function hello() {
       showHomeDash=false;
       const __hb=document.getElementById('homeBtn');
       if(__hb) __hb.classList.remove('home-active');
-      showHasDash=false; showScrollbarDash=false; showCvDash=false;
+      showScrollbarDash=false;
+      showCssDash=false;
       showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false;
-      [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
+      [['sbDashBtn','scrollbar-active'],['cssDashBtn','css-active'],
        ['edDashBtn','ed-active'],['devDashBtn','dev-active'],
        ['b64DashBtn','b64-active'],['qrDashBtn','qr-active'],['cpDashBtn','cp-active']
       ].forEach(p => { const el=document.getElementById(p[0]); if(el) el.classList.remove(p[1]); });
@@ -11652,9 +11641,8 @@ function hello() {
   function currentDashId(){
     if(showHomeDash) return 'home';
     if(showAlDash) return 'al';
-    if(showHasDash) return 'has';
     if(showScrollbarDash) return 'sb';
-    if(showCvDash) return 'cv';
+    if(showCssDash) return 'css';
     if(showEdDash) return 'ed';
     if(showDevDash) return 'dev';
     if(showB64Dash) return 'b64';
@@ -11682,9 +11670,8 @@ function hello() {
     } catch (e) {}
     showHomeDash = id === 'home';
     showAlDash = id === 'al';
-    showHasDash = id === 'has';
     showScrollbarDash = id === 'sb';
-    showCvDash = id === 'cv';
+    showCssDash = id === 'css';
     showEdDash = id === 'ed';
     showDevDash = id === 'dev';
     showB64Dash = id === 'b64';
@@ -11697,9 +11684,8 @@ function hello() {
     };
     mark('homeBtn', 'home-active', showHomeDash);
     mark('alDashBtn', 'al-active', showAlDash);
-    mark('hasDashBtn', 'has-active', showHasDash);
     mark('sbDashBtn', 'scrollbar-active', showScrollbarDash);
-    mark('cvDashBtn', 'cv-active', showCvDash);
+    mark('cssDashBtn', 'css-active', showCssDash);
     mark('edDashBtn', 'ed-active', showEdDash);
     mark('devDashBtn', 'dev-active', showDevDash);
     mark('b64DashBtn', 'b64-active', showB64Dash);
@@ -11715,10 +11701,10 @@ function hello() {
     } catch (e) { return ''; }
   }
   function clearDashFlags(){
-    showHomeDash = false; showAlDash = false; showHasDash = false; showScrollbarDash = false; showCvDash = false;
+    showHomeDash = false; showAlDash = false; showScrollbarDash = false; showCssDash = false;
     showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
     showCpDash = false; showRtDash = false;
-    const map = { homeBtn:'home-active', alDashBtn:'al-active', hasDashBtn:'has-active', sbDashBtn:'scrollbar-active', cvDashBtn:'cv-active',
+    const map = { homeBtn:'home-active', alDashBtn:'al-active', sbDashBtn:'scrollbar-active', cssDashBtn:'css-active',
       edDashBtn:'ed-active', devDashBtn:'dev-active',
       b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
     Object.keys(map).forEach(id => {
@@ -11742,7 +11728,7 @@ function hello() {
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['home','al','has','sb','cv','ed','dev','b64','qr','cp','rt'];
+    const ids = ['home','al','sb','css','ed','dev','b64','qr','cp','rt'];
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -11750,16 +11736,15 @@ function hello() {
     } catch (e) {}
     clearDashFlags();
     if (h && ids.includes(h)) {
-      const map = { home:['homeBtn','home-active'], al:['alDashBtn','al-active'], has:['hasDashBtn','has-active'], sb:['sbDashBtn','scrollbar-active'], cv:['cvDashBtn','cv-active'],
+      const map = { home:['homeBtn','home-active'], al:['alDashBtn','al-active'], sb:['sbDashBtn','scrollbar-active'], css:['cssDashBtn','css-active'],
         ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
         b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
         rt:['rtDashBtn','rt-active'] };
       const btn = map[h];
       if (h === 'home') showHomeDash = true;
       else if (h === 'al') showAlDash = true;
-      else if (h === 'has') showHasDash = true;
       else if (h === 'sb') showScrollbarDash = true;
-      else if (h === 'cv') showCvDash = true;
+      else if (h === 'css') showCssDash = true;
       else if (h === 'ed') showEdDash = true;
       else if (h === 'dev') showDevDash = true;
       else if (h === 'b64') showB64Dash = true;
@@ -11775,11 +11760,10 @@ function hello() {
 
   // ── TOOLS STUDIO (لانشر موحد: دمج كل الأدوات + وصول سريع) ──
   const TOOLS_META = [
-    { src: 'hasDashBtn', name: ':has()',     icon: 'ti ti-code',                    key: '1' },
+    { src: 'cssDashBtn', name: 'استوديو CSS', icon: 'ti ti-brand-css3',            key: '1' },
     { src: 'sbDashBtn',  name: 'Scrollbar',  icon: 'ti ti-scroll',                  key: '2' },
     { src: 'cpDashBtn',  name: 'الألوان',    icon: 'ti ti-palette',                 key: '3' },
     { src: 'edDashBtn',  name: 'المحرر',     icon: 'ti ti-code-dots',               key: '4' },
-    { src: 'cvDashBtn',  name: 'imgscr',       icon: 'ti ti-arrows-shuffle',          key: '6' },
     { src: 'devDashBtn', name: 'أدوات',      icon: 'ti ti-tools',                   key: '7' },
     { src: 'b64DashBtn', name: 'Base64',     icon: 'ti ti-binary',                  key: '8' },
     { src: 'qrDashBtn',  name: 'QR',         icon: 'ti ti-qrcode',                  key: '9' },
@@ -11829,7 +11813,7 @@ function hello() {
   }
   function syncToolsUI(){
     const dash = (typeof currentDashId === 'function') ? currentDashId() : 'main';
-    const map = { has:'hasDashBtn', sb:'sbDashBtn', cv:'cvDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
+    const map = { sb:'sbDashBtn', css:'cssDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
     const activeSrc = map[dash] || null;
     const meta = TOOLS_META.find(t => t.src === activeSrc);
     const nameEl = document.getElementById('toolsLauncherName');
@@ -11880,11 +11864,10 @@ function hello() {
     { g:'تصميم', items:[
       { id:'cpDashBtn',  cls:'cp-active',        label:'الألوان',   ic:'ti-palette',                k:'color colors gradient لون الوان تدرج' },
       { id:'sbDashBtn',  cls:'scrollbar-active', label:'Scrollbar', ic:'ti-scroll',                 k:'scroll سكرول' },
+      { id:'cssDashBtn', cls:'css-active',       label:'CSS',       ic:'ti-brand-css3',             k:'css imgscr has converter محدد استوديو' },
       { id:'rtDashBtn',  cls:'rt-active',        label:'التحكم',    ic:'ti-adjustments-horizontal', k:'route theme palette ثيم بالتة روت' } ]},
     { g:'كود', items:[
-      { id:'edDashBtn',  cls:'ed-active',  label:'المحرر',  ic:'ti-terminal-2',     k:'editor محرر' },
-      { id:'cvDashBtn',  cls:'cv-active',  label:'imgscr',    ic:'ti-arrows-shuffle', k:'convert image صور استبدال' },
-      { id:'hasDashBtn', cls:'has-active', label:':has()',  ic:'ti-code',           k:'has selector محدد' } ]},
+      { id:'edDashBtn',  cls:'ed-active',  label:'المحرر',  ic:'ti-terminal-2',     k:'editor محرر' } ]},
     { g:'أدوات', items:[
       { id:'devDashBtn', cls:'dev-active', label:'أدوات',  ic:'ti-tools',  k:'minify css js svg encode ضغط' },
       { id:'b64DashBtn', cls:'b64-active', label:'Base64', ic:'ti-binary', k:'base64 encode decode image' },
