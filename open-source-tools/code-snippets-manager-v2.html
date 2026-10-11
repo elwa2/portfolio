@@ -614,6 +614,37 @@
   .var-val { font-size: 11px; color: var(--text-2); min-width: 32px; text-align: center; font-family: 'JetBrains Mono', monospace; direction: ltr; }
   .color-swatch { display: inline-block; width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border-def); flex-shrink: 0; transition: background 0.15s; }
 
+  /* ===== FAVICON STUDIO (معاينة حية + تأثيرات + توليد باليت) ===== */
+  .fav-studio {
+    display: flex; gap: 14px; align-items: stretch;
+    padding: 12px 14px; margin-bottom: 10px;
+    background: var(--bg-overlay); border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+  }
+  .fav-prev-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .fav-prev-wrap canvas {
+    width: 84px; height: 84px; border-radius: 14px;
+    border: 1px solid var(--border-def); background: #0b1020;
+  }
+  .fav-prev-wrap span { font-size: 10.5px; color: var(--text-3); }
+  .fav-ctl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+  .fav-fx-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .fav-fx {
+    flex: 1; padding: 7px 10px; border-radius: 9px; white-space: nowrap;
+    border: 1px solid var(--border-sub); background: transparent;
+    color: var(--text-2); font: 600 12px 'Cairo', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .fav-fx:hover { color: var(--text-1); border-color: var(--border-str); }
+  .fav-fx.on { background: var(--accent-grad); color: #fff; border-color: transparent; box-shadow: 0 2px 12px rgba(124,58,237,0.4); }
+  .var-row.fx-row { display: none; }
+  .fav-shuffle {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 9px 14px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--border-acc); background: var(--accent-glow); color: var(--text-1);
+    font: 700 12.5px 'Cairo', sans-serif; transition: all 0.15s;
+  }
+  .fav-shuffle:hover { border-color: var(--accent); box-shadow: 0 2px 14px rgba(124,58,237,0.3); }
+
   .base-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-sub); margin-bottom: 8px; }
   .color-swatch-lg { display: inline-block; width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--border-def); flex-shrink: 0; }
   .picker-lg { width: 44px !important; height: 36px !important; flex: none !important; }
@@ -3259,7 +3290,7 @@
     {t:"Aspect Ratio - نسبة العرض إلى الارتفاع",c:":root{--1:#000}\n.card-img{border:2px solid var(--1);width:100%;aspect-ratio:1/1}\n.card-img{width:100%}\n.card-img.facebook{aspect-ratio:4/3}\n.card-img.instagram{aspect-ratio:1/1}\n.card-img.youtube{aspect-ratio:16/9}\n.card-img.tiktok{aspect-ratio:9/16}",g:["css","layout","modern"]},
     {t:"Scroll Behavior - تمرير سلس",c:"html{scroll-behavior:smooth}",g:["css","ui","modern"]},
     {t:"Clamp - تحجيم سائل متقدم",c:":root{--1:#ee82ee;--2:#fefefe}\n.clamp{border:2px solid var(--1);background-color:var(--2);margin:0 auto;padding:15px;width:clamp(500px,80%,1200px)}\n.clamp p{font-size:clamp(14px,1vw,1.2rem)}",g:["responsive","css","modern"]},
-    {t:"فافيكون متحرك - Animated Favicon",c:"<link id='favicon' rel='icon' type='image/png' href=''/>\n<canvas id='c' width='32' height='32' style='display:none'></canvas>\n<script>\n//<![CDATA[\n// الألوان والحرف من لوحة التحكم بالأعلى (c1..c4 + ink + letter)\nconst FAV = { c1:\"#064e3b\", c2:\"#10b981\", c3:\"#059669\", c4:\"#fbbf24\", ink:\"#ffffff\", letter:\"عـ\" };\nconst canvas = document.getElementById('c');\nconst ctx = canvas.getContext('2d');\nconst link = document.getElementById('favicon');\nif (link && canvas && ctx) {\n  function draw(t){\n    const pulse = (Math.sin(t*0.003)+1)/2;\n    const g = ctx.createLinearGradient(0,0,32,32);\n    g.addColorStop(0, FAV.c1);\n    g.addColorStop(0.5, pulse > 0.5 ? FAV.c2 : FAV.c3);\n    g.addColorStop(1, FAV.c4);\n    ctx.fillStyle=g;\n    ctx.beginPath();\n    if(ctx.roundRect){ ctx.roundRect(0,0,32,32,7); } else { ctx.rect(0,0,32,32); }\n    ctx.fill();\n    ctx.fillStyle = 'rgba(255,255,255,'+(0.12+pulse*0.18)+')';\n    ctx.beginPath();\n    ctx.arc(16,16,8+pulse*4,0,Math.PI*2);\n    ctx.fill();\n    ctx.fillStyle=FAV.ink;\n    ctx.font='bold 20px Cairo, sans-serif';\n    ctx.textAlign='center';\n    ctx.textBaseline='middle';\n    ctx.shadowColor='rgba(0,0,0,0.5)';\n    ctx.shadowBlur=4;\n    ctx.fillText(FAV.letter,16,17);\n    ctx.shadowBlur=0;\n    link.href = canvas.toDataURL('image/png');\n    setTimeout(function(){\n      if(!document.hidden) requestAnimationFrame(draw);\n      else setTimeout(function(){ requestAnimationFrame(draw); },1000);\n    },500);\n  }\n  requestAnimationFrame(draw);\n  document.addEventListener('visibilitychange', function(){ if(!document.hidden) requestAnimationFrame(draw); });\n}\n//]]>\n<\/script>",g:["javascript","brand","logo","favicon"]}
+    {t:"فافيكون متحرك - Animated Favicon",c:"<link id='favicon' rel='icon' type='image/png' href=''/>\n<canvas id='c' width='32' height='32' style='display:none'></canvas>\n<script>\n//<![CDATA[\n// لوحة التحكم: fx (pulse/glow/mono) + الألوان + الحرف\nconst FAV = { fx:\"pulse\", c1:\"#064e3b\", c2:\"#10b981\", c3:\"#059669\", c4:\"#fbbf24\", ink:\"#ffffff\", letter:\"عـ\" };\nconst canvas = document.getElementById('c');\nconst ctx = canvas.getContext('2d');\nconst link = document.getElementById('favicon');\nfunction favPaint(x, F, t){\n  const pulse = (Math.sin(t*0.003)+1)/2;\n  x.clearRect(0,0,32,32);\n  if(F.fx===\"glow\"){\n    const bg = x.createLinearGradient(0,0,32,32);\n    bg.addColorStop(0,F.c1); bg.addColorStop(1,F.c3);\n    x.fillStyle = bg;\n    x.beginPath();\n    if(x.roundRect){ x.roundRect(0,0,32,32,7); } else { x.rect(0,0,32,32); }\n    x.fill();\n    x.save();\n    x.shadowColor = F.c2; x.shadowBlur = 10;\n    x.strokeStyle = F.c4; x.lineWidth = 3;\n    x.beginPath(); x.arc(16,16,9+pulse*2,0,Math.PI*2); x.stroke();\n    x.restore();\n    x.fillStyle = F.ink;\n    x.font = 'bold 15px Cairo, sans-serif';\n    x.textAlign = 'center'; x.textBaseline = 'middle';\n    x.fillText(F.letter,16,17);\n  }else if(F.fx===\"mono\"){\n    x.fillStyle = F.c1;\n    x.beginPath();\n    if(x.roundRect){ x.roundRect(0,0,32,32,7); } else { x.rect(0,0,32,32); }\n    x.fill();\n    x.fillStyle = F.c4; x.fillRect(8,23,16,3);\n    x.fillStyle = F.c2;\n    x.font = 'bold 17px Cairo, sans-serif';\n    x.textAlign = 'center'; x.textBaseline = 'middle';\n    x.fillText(F.letter,16,14);\n  }else{\n    const g = x.createLinearGradient(0,0,32,32);\n    g.addColorStop(0,F.c1);\n    g.addColorStop(0.5,pulse>0.5?F.c2:F.c3);\n    g.addColorStop(1,F.c4);\n    x.fillStyle = g;\n    x.beginPath();\n    if(x.roundRect){ x.roundRect(0,0,32,32,7); } else { x.rect(0,0,32,32); }\n    x.fill();\n    x.fillStyle = 'rgba(255,255,255,'+(0.12+pulse*0.18)+')';\n    x.beginPath(); x.arc(16,16,8+pulse*4,0,Math.PI*2); x.fill();\n    x.fillStyle = F.ink;\n    x.font = 'bold 20px Cairo, sans-serif';\n    x.textAlign = 'center'; x.textBaseline = 'middle';\n    x.shadowColor = 'rgba(0,0,0,0.5)'; x.shadowBlur = 4;\n    x.fillText(F.letter,16,17); x.shadowBlur = 0;\n  }\n}\nif(link&&canvas&&ctx){\n  (function draw(t){\n    favPaint(ctx,FAV,t||0);\n    link.href = canvas.toDataURL('image/png');\n    setTimeout(function(){\n      if(!document.hidden) requestAnimationFrame(draw);\n      else setTimeout(function(){ requestAnimationFrame(draw); },1000);\n    },500);\n  })(0);\n  document.addEventListener('visibilitychange',function(){\n    if(!document.hidden) requestAnimationFrame(function(t){ favPaint(ctx,FAV,t); link.href = canvas.toDataURL('image/png'); });\n  });\n}\n//]]>\n<\/script>",g:["javascript","brand","logo","favicon"]}
   ];
 
   // ── HELPERS ──
@@ -3516,6 +3547,7 @@
       }
     });
     updateColorPreview(sectionId);
+    if(typeof favAnimKick === 'function'){ try { favAnimKick(); } catch(e){} }
   }
 
   function updateColorPreview(sectionId) {
@@ -3541,6 +3573,150 @@
       const mixed = mixColors(c1, v.secondColor, pct);
       swatch.style.background = mixed || 'var(--bg-elevated)';
     });
+  }
+
+  // ── FAVICON STUDIO (معاينة حية + تأثيرات + توليد باليت متناسقة) ──
+  const FAV_FX = [
+    { id:'pulse', name:'نبض متدرج' },
+    { id:'glow',  name:'توهج دائري' },
+    { id:'mono',  name:'أحادي أنيق' }
+  ];
+  const FAV_FXIDS = FAV_FX.map(f=>f.id);
+
+  function favFxKey(id){
+    const s = DATA.find(x=>x.id===id);
+    if(!s) return null;
+    const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+    const stored = varValues.get(id) || {};
+    const f = vars.find(v=>FAV_FXIDS.includes(stored[v.key]!==undefined?stored[v.key]:v.value));
+    return f ? f.key : null;
+  }
+
+  function favCurrent(id){
+    const s = DATA.find(x=>x.id===id);
+    if(!s) return null;
+    const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+    const stored = varValues.get(id) || {};
+    const F = { fx:'pulse', c1:'#064e3b', c2:'#10b981', c3:'#059669', c4:'#fbbf24', ink:'#ffffff', letter:'عـ' };
+    const order = [];
+    vars.forEach(v=>{
+      const val = stored[v.key]!==undefined ? stored[v.key] : v.value;
+      if(v.key.indexOf('__t')===0){
+        if(FAV_FXIDS.includes(val)) F.fx = val;
+        else F.letter = val;
+      }else if(v.key.indexOf('__c')===0){
+        if(['c1','c2','c3','c4','ink'].includes(v.label)) F[v.label] = val;
+        else order.push(val);
+      }
+    });
+    ['c1','c2','c3','c4'].forEach((f,i)=>{ if(order[i]) F[f] = order[i]; });
+    return F;
+  }
+
+  function paintFav(x, F, fx, t){
+    const pulse = (Math.sin(t*0.003)+1)/2;
+    x.clearRect(0,0,32,32);
+    const rr = (a,b,c,d,r)=>{ x.beginPath(); if(x.roundRect){ x.roundRect(a,b,c,d,r); }else{ x.rect(a,b,c,d); } };
+    if(fx==='glow'){
+      const bg = x.createLinearGradient(0,0,32,32);
+      bg.addColorStop(0,F.c1); bg.addColorStop(1,F.c3);
+      x.fillStyle = bg; rr(0,0,32,32,7); x.fill();
+      x.save();
+      x.shadowColor = F.c2; x.shadowBlur = 10;
+      x.strokeStyle = F.c4; x.lineWidth = 3;
+      x.beginPath(); x.arc(16,16,9+pulse*2,0,Math.PI*2); x.stroke();
+      x.restore();
+      x.fillStyle = F.ink; x.font = 'bold 15px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(F.letter,16,17);
+    }else if(fx==='mono'){
+      x.fillStyle = F.c1; rr(0,0,32,32,7); x.fill();
+      x.fillStyle = F.c4; x.fillRect(8,23,16,3);
+      x.fillStyle = F.c2; x.font = 'bold 17px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(F.letter,16,14);
+    }else{
+      const g = x.createLinearGradient(0,0,32,32);
+      g.addColorStop(0,F.c1);
+      g.addColorStop(0.5,pulse>0.5?F.c2:F.c3);
+      g.addColorStop(1,F.c4);
+      x.fillStyle = g; rr(0,0,32,32,7); x.fill();
+      x.fillStyle = 'rgba(255,255,255,'+(0.12+pulse*0.18)+')';
+      x.beginPath(); x.arc(16,16,8+pulse*4,0,Math.PI*2); x.fill();
+      x.fillStyle = F.ink; x.font = 'bold 20px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.shadowColor = 'rgba(0,0,0,0.5)'; x.shadowBlur = 4;
+      x.fillText(F.letter,16,17); x.shadowBlur = 0;
+    }
+  }
+
+  let _favRaf = 0;
+  function favAnimKick(){
+    if(_favRaf) return;
+    const step = (t)=>{
+      _favRaf = 0;
+      const cvs = document.querySelectorAll('canvas.fav-prev');
+      if(!cvs.length) return;
+      if(!document.hidden){
+        cvs.forEach(cv=>{
+          const F = favCurrent(cv.dataset.id);
+          if(!F) return;
+          const x = cv.getContext('2d');
+          if(x) paintFav(x, F, F.fx, t||0);
+        });
+      }
+      _favRaf = requestAnimationFrame(step);
+    };
+    _favRaf = requestAnimationFrame(step);
+  }
+
+  function hsl2hex(h,s,l){
+    s/=100; l/=100;
+    const k=n=>(n+h/30)%12;
+    const a=s*Math.min(l,1-l);
+    const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+    const to=x=>Math.round(255*x).toString(16).padStart(2,'0');
+    return '#'+to(f(0))+to(f(8))+to(f(4));
+  }
+
+  function setFavFx(id, fx){
+    const k = favFxKey(id);
+    if(!k) return;
+    if(!varValues.has(id)) varValues.set(id,{});
+    varValues.get(id)[k] = fx;
+    renderAll(); favAnimKick();
+  }
+
+  function favShuffle(id){
+    const s = DATA.find(x=>x.id===id);
+    if(!s) return;
+    const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+    if(!varValues.has(id)) varValues.set(id,{});
+    const vals = varValues.get(id);
+    const h = Math.floor(Math.random()*360);
+    const R = (a,b)=>a+Math.floor(Math.random()*(b-a+1));
+    const pal = {
+      c1: hsl2hex(h, R(45,65), R(12,20)),
+      c2: hsl2hex((h+8)%360, R(80,95), R(50,60)),
+      c3: hsl2hex((h+350)%360, R(60,78), R(28,38)),
+      c4: hsl2hex((h+35)%360, R(85,95), R(55,65))
+    };
+    Object.keys(pal).forEach(f=>{
+      const v = vars.find(x=>x.label===f);
+      if(v) vals[v.key] = pal[f];
+    });
+    renderAll(); favAnimKick();
+    showToast('تم توليد باليت متناسقة');
+  }
+
+  function favStudioHtml(s){
+    const F = favCurrent(s.id) || { fx:'pulse' };
+    const btns = FAV_FX.map(f=>`<button class="fav-fx${F.fx===f.id?' on':''}" onclick="setFavFx('${s.id}','${f.id}')">${f.name}</button>`).join('');
+    return `<div class="fav-studio">
+      <div class="fav-prev-wrap"><canvas class="fav-prev" data-id="${s.id}" width="32" height="32"></canvas><span>معاينة حية</span></div>
+      <div class="fav-ctl"><div class="fav-fx-row">${btns}</div>
+      <button class="fav-shuffle" onclick="favShuffle('${s.id}')">توليد ألوان متناسقة</button></div>
+    </div>`;
   }
 
   function selectPattern(sectionId, idx){
@@ -8017,7 +8193,7 @@ function getFiltered(){
   // ── RENDER ──
   function renderAll(){
     try { return renderAllInner(); }
-    finally { alOverlaySync(); if(typeof syncToolsUI === 'function'){ try { syncToolsUI(); } catch(e){} } if(typeof navSync === 'function'){ try { navSync(); } catch(e){} } }
+    finally { alOverlaySync(); if(typeof syncToolsUI === 'function'){ try { syncToolsUI(); } catch(e){} } if(typeof navSync === 'function'){ try { navSync(); } catch(e){} } if(typeof favAnimKick === 'function'){ try { favAnimKick(); } catch(e){} } }
   }
   function renderAllInner(){
     alSyncDash();
@@ -8068,6 +8244,7 @@ function getFiltered(){
       if(!openIds.has(s.id)) return '';
       const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
       const values = varValues.get(s.id) || {};
+      const favStudio = (typeof favStudioHtml === 'function' && s.codes.some(c=>c.code.indexOf('const FAV =')!==-1)) ? favStudioHtml(s) : '';
 
       let varPanelHtml = '';
       if (vars.length) {
@@ -8100,7 +8277,7 @@ function getFiltered(){
               <span class="color-swatch" id="swatch_${s.id}_${v.key}" style="background:${initMixed||'var(--bg-elevated)'}"></span>
             </div>`;
           } else {
-            varPanelHtml += `<div class="var-row">
+            varPanelHtml += `<div class="var-row${FAV_FXIDS.includes(val)?' fx-row':''}">
               <span class="var-label">${escHtml(v.label)}</span>
               <input class="var-input" type="${v.type === 'color' ? 'color' : 'text'}" value="${escHtml(val)}"
                 placeholder="${v.type === 'url' ? 'https://...' : ''}"
@@ -8138,6 +8315,7 @@ function getFiltered(){
       return `<div class="section-body open">
         <p class="section-desc">${escHtml(s.desc)}</p>
         ${patternBarHtml}
+        ${favStudio}
         ${varPanelHtml}
         ${codesHtml}
       </div>`;
@@ -12520,5 +12698,90 @@ function hello() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- ═════ Quick Nav Patch — فهرس جانبي سريع ═════ -->
+<style>
+  #qn{position:fixed;top:122px;inset-inline-start:0;width:250px;bottom:12px;z-index:60;display:none;flex-direction:column;
+    background:var(--bg-raised);border:1px solid var(--border-sub);border-radius:var(--radius-md);margin-inline-start:10px;overflow:hidden}
+  body.qn-on #qn{display:flex}
+  @media(min-width:1180px){body.qn-on .main-body{margin-inline-start:276px;margin-inline-end:auto;max-width:1000px}}
+  @media(max-width:1179px){#qn{display:none!important}}
+  #qn input{margin:8px;padding:7px 10px;border:1px solid var(--border-def);border-radius:8px;background:var(--bg-elevated);
+    color:var(--text-1);font:500 12px 'Cairo',sans-serif;outline:none;direction:rtl}
+  #qn input:focus{border-color:var(--accent)}
+  #qnList{flex:1;overflow:auto;padding:0 6px 8px;scrollbar-width:thin}
+  .qn-h{display:flex;align-items:center;gap:6px;margin:10px 6px 4px;font:700 10.5px 'Cairo',sans-serif;color:var(--text-3);letter-spacing:.04em}
+  .qn-h b{margin-inline-start:auto;font:500 9.5px 'JetBrains Mono',monospace}
+  .qn-i{display:block;padding:5px 9px;border-radius:7px;font:500 11.5px/1.5 'Cairo',sans-serif;color:var(--text-2);cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-start:2px solid transparent}
+  .qn-i:hover{background:var(--glass-mod);color:var(--text-1)}
+  .qn-i.on{background:var(--accent-glow);color:var(--text-1);border-inline-start-color:var(--accent);font-weight:700}
+  .qn-i small{font:500 9px 'JetBrains Mono',monospace;color:var(--text-3);margin-inline-end:6px}
+</style>
+<div id="qn" aria-label="فهرس سريع">
+  <input id="qnQ" type="text" placeholder="فلتر الفهرس..." autocomplete="off">
+  <div id="qnList"></div>
+</div>
+<script>
+(function(){
+  const KEY='csman_qn_usage_v1';
+  let use={}; try{use=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+  let q='';
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(use))}catch(e){}};
+  function rec(id){ if(!id) return; const u=use[id]||(use[id]={n:0,t:0}); u.n++; u.t=Date.now(); save(); }
+
+  // تسجيل الاستخدام (نسخ / فتح)
+  const _ts=window.toggleSection; window.toggleSection=function(id){rec(id);return _ts.apply(this,arguments)};
+  const _qc=window.quickCopy;     window.quickCopy=function(id){rec(id);return _qc.apply(this,arguments)};
+  const _cc=window.copyCode;      window.copyCode=function(btn){
+    const h=btn&&btn.closest&&btn.closest('[data-id]'); if(h) rec(h.dataset.id); return _cc.apply(this,arguments)};
+
+  const title=id=>(DATA.find(s=>s.id===id)||{}).title||'';
+  const item=(s,n,extra)=>`<a class="qn-i" data-qid="${s.id}" title="${escHtml(s.title)}" onclick="idxJump('${s.id}')"><small>${n||''}</small>${escHtml(s.title)}${extra||''}</a>`;
+
+  function build(){
+    const box=document.getElementById('qn'); if(!box) return;
+    const on=currentDashId()==='main'; document.body.classList.toggle('qn-on',on);
+    if(!on) return;
+    const list=getFiltered().filter(s=>!q||s.title.toLowerCase().includes(q)||s.tags.some(t=>t.toLowerCase().includes(q)));
+    const byId=Object.fromEntries(list.map(s=>[s.id,s]));
+    const pick=arr=>arr.map(id=>byId[id]).filter(Boolean);
+    const stars=list.filter(s=>starredIds.has(s.id)).slice(0,8);
+    const top=pick(Object.keys(use).filter(id=>use[id].n>1).sort((a,b)=>use[b].n-use[a].n)).slice(0,5);
+    const recent=pick(Object.keys(use).sort((a,b)=>use[b].t-use[a].t)).slice(0,5);
+    let h='';
+    const sec=(t,arr,badge)=>arr.length?`<div class="qn-h">${t}<b>${arr.length}</b></div>`+arr.map(s=>item(s,'',badge?` <small>×${use[s.id]?use[s.id].n:0}</small>`:'')).join(''):'';
+    h+=sec('⭐ المحفوظة',stars)+sec('🔥 الأكثر استخداماً',top,true)+sec('🕘 آخر ما استخدمت',recent);
+    let n=0;
+    GROUP_LIST.forEach(g=>{
+      const items=list.filter(s=>sectionGroup(s)===g.key); if(!items.length) return;
+      h+=`<div class="qn-h"><i class="ti ${g.icon}"></i>${g.label}<b>${items.length}</b></div>`+items.map(s=>item(s,++n)).join('');
+    });
+    document.getElementById('qnList').innerHTML=h||'<div class="qn-h">لا نتائج</div>';
+    spy();
+  }
+
+  // scroll-spy: يلوّن العنصر الحالي
+  let raf=0;
+  function spy(){
+    const cards=[...document.querySelectorAll('#mainBody .crow[data-id],#mainBody .section[data-id]')];
+    let cur=null; for(const c of cards){ if(c.getBoundingClientRect().top<=170) cur=c.dataset.id; else break; }
+    const L=document.getElementById('qnList'); if(!L) return;
+    L.querySelectorAll('.qn-i.on').forEach(e=>e.classList.remove('on'));
+    if(!cur) return;
+    const hit=[...L.querySelectorAll('.qn-i[data-qid="'+cur+'"]')];
+    hit.forEach(e=>e.classList.add('on'));
+    const e=hit[hit.length-1]; if(e){ const r=e.getBoundingClientRect(),lr=L.getBoundingClientRect();
+      if(r.top<lr.top||r.bottom>lr.bottom) L.scrollTop+=r.top-lr.top-lr.height/2; }
+  }
+  window.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(spy)},{passive:true});
+  document.getElementById('qnQ').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();build()});
+
+  // ربط بإعادة الرسم
+  const _ra=window.renderAll; window.renderAll=function(){const r=_ra.apply(this,arguments);try{build()}catch(e){}return r};
+
+  // ابدأ مطوي بدل ما كل الأكواد تتفتح
+  openIds.clear(); renderAll();
+})();
+</script>
 </body>
 </html>
