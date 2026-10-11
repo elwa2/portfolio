@@ -234,7 +234,7 @@
     const section = DATA.find(s => s.id === sectionId);
     if (!section) return;
     const values = varValues.get(sectionId) || {};
-    const card = document.querySelector(`.section[data-id="${sectionId}"]`);
+    const card = document.querySelector(`.section[data-id="${sectionId}"],.crow[data-id="${sectionId}"]`);
     if (!card) return;
     card.querySelectorAll('.code-block').forEach((block, i) => {
       const pre = block.querySelector('.code-pre');
@@ -242,6 +242,7 @@
       if (pre && i < section.codes.length) {
         const liveCode = getLiveCode(section.codes[i].code, values);
         pre.innerHTML = syntaxHL(liveCode);
+        if(typeof addLn === 'function'){ try{ delete pre.dataset.ln; addLn(pre); }catch(e){} }
         if (btn) {
           const enc = encodeURIComponent(liveCode).replace(/'/g,"\\'");
           btn.setAttribute('onclick', "copyCode(this,'" + enc + "')");
@@ -279,9 +280,15 @@
 
   // ── FAVICON STUDIO (معاينة حية + تأثيرات + توليد باليت متناسقة) ──
   const FAV_FX = [
-    { id:'pulse', name:'نبض متدرج' },
-    { id:'glow',  name:'توهج دائري' },
-    { id:'mono',  name:'أحادي أنيق' }
+    { id:'pulse',  name:'نبض',   desc:'تدرج متحرك مع هالة نابضة' },
+    { id:'glow',   name:'توهج',  desc:'قوس مضيء نابض مع تدرج' },
+    { id:'mono',   name:'أحادي', desc:'خلفية سادة وشريط سفلي' },
+    { id:'spin',   name:'دوران', desc:'حرف يدور مع حلقة دوارة' },
+    { id:'bounce', name:'ارتداد', desc:'الحرف يرتد مع ظل أرضي' },
+    { id:'glitch', name:'خلل',   desc:'تشويش ألوان RGB متقطع' },
+    { id:'wave',   name:'موجة',  desc:'خطوط متموجة خلف الحرف' },
+    { id:'neon',   name:'نيون',  desc:'إطار نيون وامض' },
+    { id:'liquid', name:'سائل',  desc:'فقاعات سائلة تتشكل' }
   ];
   const FAV_FXIDS = FAV_FX.map(f=>f.id);
 
@@ -299,19 +306,20 @@
     if(!s) return null;
     const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
     const stored = varValues.get(id) || {};
-    const F = { fx:'pulse', c1:'#064e3b', c2:'#10b981', c3:'#059669', c4:'#fbbf24', ink:'#ffffff', letter:'عـ' };
+    const F = { fx:'pulse', c1:'#064e3b', c2:'#10b981', c3:'#059669', c4:'#fbbf24', ink:'#ffffff', bg:'#0e0e1a', letter:'عـ' };
     const order = [];
+    const got = {};
     vars.forEach(v=>{
       const val = stored[v.key]!==undefined ? stored[v.key] : v.value;
       if(v.key.indexOf('__t')===0){
         if(FAV_FXIDS.includes(val)) F.fx = val;
         else F.letter = val;
       }else if(v.key.indexOf('__c')===0){
-        if(['c1','c2','c3','c4','ink'].includes(v.label)) F[v.label] = val;
+        if(['c1','c2','c3','c4','ink','bg'].includes(v.label)){ F[v.label] = val; got[v.label] = 1; }
         else order.push(val);
       }
     });
-    ['c1','c2','c3','c4'].forEach((f,i)=>{ if(order[i]) F[f] = order[i]; });
+    ['c1','c2','c3','c4'].forEach((f,i)=>{ if(!got[f] && order[i]) F[f] = order[i]; });
     return F;
   }
 
@@ -334,9 +342,91 @@
     }else if(fx==='mono'){
       x.fillStyle = F.c1; rr(0,0,32,32,7); x.fill();
       x.fillStyle = F.c4; x.fillRect(8,23,16,3);
-      x.fillStyle = F.c2; x.font = 'bold 17px Cairo, sans-serif';
+    x.fillStyle = F.c2; x.font = 'bold 17px Cairo, sans-serif';
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(F.letter,16,14);
+    }else if(fx==='spin'){
+      const g = x.createLinearGradient(0,0,32,32);
+      g.addColorStop(0,F.c1); g.addColorStop(1,F.c3);
+      x.fillStyle = g; rr(0,0,32,32,7); x.fill();
+      x.save(); x.translate(16,16); x.rotate(t*0.003);
+      x.strokeStyle = F.c2; x.lineWidth = 2;
+      x.beginPath(); x.arc(0,0,11,0,Math.PI*1.5); x.stroke(); x.restore();
+      x.save(); x.translate(16,16); x.rotate(t*0.0025);
+      x.fillStyle = F.ink; x.font = 'bold 19px Cairo, sans-serif';
       x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillText(F.letter,16,14);
+      x.fillText(F.letter,0,1); x.restore();
+    }else if(fx==='bounce'){
+      const g = x.createLinearGradient(0,0,32,32);
+      g.addColorStop(0,F.c1); g.addColorStop(1,F.c3);
+      x.fillStyle = g; rr(0,0,32,32,7); x.fill();
+      const yo = (1-Math.abs(Math.sin(t*0.004)))*6;
+      x.fillStyle = 'rgba(0,0,0,0.35)';
+      x.beginPath(); x.ellipse(16,26,6,2,0,0,Math.PI*2); x.fill();
+      x.save(); x.translate(0,-yo);
+      x.fillStyle = F.ink; x.font = 'bold 20px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(F.letter,16,17); x.restore();
+    }else if(fx==='glitch'){
+      x.fillStyle = F.c1; rr(0,0,32,32,7); x.fill();
+      const gl = Math.random()<0.15 || Math.sin(t*0.02)>0.8;
+      const off = gl ? (Math.random()*2.5) : 0;
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.font = 'bold 19px Cairo, sans-serif';
+      if(gl){
+        x.fillStyle = F.c2; x.fillText(F.letter,16+off,16);
+        x.fillStyle = F.c4; x.fillText(F.letter,16-off,16.6);
+        x.fillStyle = F.ink; x.fillText(F.letter,16,16);
+        x.fillStyle = 'rgba(255,255,255,0.08)';
+        for(let i=0;i<32;i+=4){ x.fillRect(0,i,32,1); }
+      }else{
+        x.fillStyle = F.ink; x.fillText(F.letter,16,16);
+      }
+    }else if(fx==='wave'){
+      x.save(); x.beginPath(); rr(0,0,32,32,7); x.clip();
+      x.fillStyle = F.c1; x.fillRect(0,0,32,32);
+      const cols = [F.c2,F.c3,F.c4];
+      for(let j=0;j<3;j++){
+        x.strokeStyle = cols[j]; x.lineWidth = 1.3; x.beginPath();
+        for(let X=0;X<=32;X+=1){
+          const Y = 16+Math.sin(X*0.1+t*0.005+j)*3.8+j*2.5-3;
+          if(X===0) x.moveTo(X,Y); else x.lineTo(X,Y);
+        }
+        x.stroke();
+      }
+      x.restore();
+      x.fillStyle = F.ink; x.font = 'bold 19px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.shadowColor = 'rgba(0,0,0,0.4)'; x.shadowBlur = 3;
+      x.fillText(F.letter,16,16); x.shadowBlur = 0;
+    }else if(fx==='neon'){
+      x.fillStyle = F.bg; rr(0,0,32,32,7); x.fill();
+      const flick = 0.7+Math.sin(t*0.01)*0.15+Math.sin(t*0.023)*0.15;
+      x.save();
+      x.shadowColor = F.c2; x.shadowBlur = 8*flick;
+      x.strokeStyle = F.c2; x.lineWidth = 1.8; x.globalAlpha = flick;
+      x.beginPath(); rr(2.5,2.5,27,27,5); x.stroke();
+      x.restore();
+      x.fillStyle = F.ink; x.font = 'bold 19px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.shadowColor = F.c2; x.shadowBlur = 5;
+      x.fillText(F.letter,16,16.5); x.shadowBlur = 0;
+    }else if(fx==='liquid'){
+      x.fillStyle = F.c1; rr(0,0,32,32,7); x.fill();
+      const blobs = [{col:F.c2,amp:6,s:0.002,p:0},{col:F.c3,amp:4.5,s:0.003,p:2},{col:F.c4,amp:3.8,s:0.0025,p:4}];
+      for(const b of blobs){
+        x.fillStyle = b.col; x.globalAlpha = 0.85; x.beginPath();
+        for(let a=0;a<Math.PI*2;a+=0.2){
+          const rad = b.amp+Math.sin(a*3+t*b.s+b.p)*1.9;
+          const X = 16+Math.cos(a)*rad, Y = 16+Math.sin(a)*rad;
+          if(a===0) x.moveTo(X,Y); else x.lineTo(X,Y);
+        }
+        x.closePath(); x.fill();
+      }
+      x.globalAlpha = 1;
+      x.fillStyle = F.ink; x.font = 'bold 20px Cairo, sans-serif';
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(F.letter,16,17);
     }else{
       const g = x.createLinearGradient(0,0,32,32);
       g.addColorStop(0,F.c1);
@@ -413,7 +503,7 @@
 
   function favStudioHtml(s){
     const F = favCurrent(s.id) || { fx:'pulse' };
-    const btns = FAV_FX.map(f=>`<button class="fav-fx${F.fx===f.id?' on':''}" onclick="setFavFx('${s.id}','${f.id}')">${f.name}</button>`).join('');
+    const btns = FAV_FX.map(f=>`<button class="fav-fx${F.fx===f.id?' on':''}" title="${f.desc}" onclick="setFavFx('${s.id}','${f.id}')">${f.name}</button>`).join('');
     return `<div class="fav-studio">
       <div class="fav-prev-wrap"><canvas class="fav-prev" data-id="${s.id}" width="32" height="32"></canvas><span>معاينة حية</span></div>
       <div class="fav-ctl"><div class="fav-fx-row">${btns}</div>
