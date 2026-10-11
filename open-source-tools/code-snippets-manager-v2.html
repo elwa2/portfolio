@@ -7867,7 +7867,7 @@ function getFiltered(){
           <span id="edCount">0 حرف</span>
           <span style="margin-inline-start:auto;color:var(--text-3)"><span style="display:inline-flex">${svgIcon('clipboard', 13)}</span> لصق = نسخة تلقائيًا · Ctrl+S = حفظ</span>
         </div>
-      </div>` : ''}
+      </div>`}
     </div>`;
 
     const input = document.getElementById('edInput');
@@ -7916,6 +7916,7 @@ function getFiltered(){
     edFindMatches = [];
     edFindIndex = -1;
     edInitFindBox();
+    if(edSub === 'compare') fillVdCompareSelects(sn);
     document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
   }
 
@@ -11396,7 +11397,7 @@ function hello() {
       showHomeDash=false;
       const __hb=document.getElementById('homeBtn');
       if(__hb) __hb.classList.remove('home-active');
-      showHasDash=false; showScrollbarDash=false; showCvDash=false; showVdDash=false;
+      showHasDash=false; showScrollbarDash=false; showCvDash=false;
       showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false;
       [['hasDashBtn','has-active'],['sbDashBtn','scrollbar-active'],['cvDashBtn','cv-active'],
        ['edDashBtn','ed-active'],['devDashBtn','dev-active'],
