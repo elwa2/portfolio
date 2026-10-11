@@ -16,25 +16,26 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg-base:      #0e0e10;
-    --bg-raised:    #141417;
-    --bg-elevated:  #1a1a1f;
-    --bg-overlay:   #202026;
+    --bg-base:      #0b1020;
+    --bg-raised:    #0f1830;
+    --bg-elevated:  #16213d;
+    --bg-overlay:   #1d2c4e;
     --glass-sub:    rgba(255,255,255,0.03);
     --glass-mod:    rgba(255,255,255,0.055);
     --glass-str:    rgba(255,255,255,0.09);
-    --border-sub:   rgba(255,255,255,0.06);
-    --border-def:   rgba(255,255,255,0.10);
-    --border-str:   rgba(255,255,255,0.17);
-    --border-acc:   rgba(232,115,74,0.32);
-    --text-1:       #f0ede8;
-    --text-2:       #9b9693;
-    --text-3:       #5c5855;
-    --text-4:       #3a3835;
-    --accent:       #e8734a;
+    --border-sub:   rgba(255,255,255,0.08);
+    --border-def:   rgba(255,255,255,0.14);
+    --border-str:   rgba(255,255,255,0.22);
+    --border-acc:   rgba(139,92,246,0.38);
+    --text-1:       #f1f5ff;
+    --text-2:       #9aa5bd;
+    --text-3:       #5f6b87;
+    --text-4:       #39435c;
+    --accent:       #8b5cf6;
+    --accent-grad:  linear-gradient(90deg,#7c3aed,#06b6d4);
     --accent-warm:  #d4a843;
-    --accent-cool:  #6b9bd2;
-    --accent-glow:  rgba(232,115,74,0.14);
+    --accent-cool:  #06b6d4;
+    --accent-glow:  rgba(139,92,246,0.16);
     --shadow-sm:    0 2px 8px rgba(0,0,0,0.4);
     --shadow-md:    0 4px 20px rgba(0,0,0,0.5);
     --shadow-lg:    0 8px 40px rgba(0,0,0,0.6);
@@ -50,11 +51,27 @@
 
   body {
     font-family: 'Cairo', sans-serif;
-    background: var(--bg-base);
+    background:
+      radial-gradient(52vmax 52vmax at 88% -8%, rgba(124,58,237,0.28), transparent 65%),
+      radial-gradient(46vmax 46vmax at 6% 4%, rgba(6,182,212,0.20), transparent 65%),
+      radial-gradient(58vmax 58vmax at 50% 115%, rgba(16,185,129,0.14), transparent 65%),
+      var(--bg-base);
+    background-attachment: fixed;
     color: var(--text-1);
     min-height: 100vh;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: rgba(6,182,212,0.35); color: #fff; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent), var(--accent-cool));
+    border-radius: 8px; border: 2px solid var(--bg-base);
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent-cool); outline-offset: 2px;
   }
 
   /* ===== TOPBAR ===== */
@@ -62,7 +79,7 @@
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; gap: 16px;
     padding: 0 28px; height: 60px;
-    background: rgba(14,14,16,0.85);
+    background: rgba(11,16,32,0.72);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     border-bottom: 1px solid var(--border-sub);
@@ -71,7 +88,9 @@
 
   .logo-wrap { display: flex; align-items: center; gap: 10px; }
   .logo-text {
-    font-size: 18px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-1);
+    font-size: 18px; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(90deg,#c4b5fd,#67e8f9);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .logo-emoji { font-size: 20px; }
   .logo-sub { font-size: 11px; color: var(--text-3); font-weight: 400; margin-top: 1px; }
@@ -195,9 +214,10 @@
   .tb-sep { width: 1px; height: 22px; background: var(--border-def); flex-shrink: 0; }
   /* الإجراء الرئيسي: إضافة كود */
   .topbar-btn.primary {
-    background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700;
+    background: var(--accent-grad); border-color: transparent; color: #fff; font-weight: 700;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.35);
   }
-  .topbar-btn.primary:hover { filter: brightness(1.1); box-shadow: 0 4px 16px rgba(232,115,74,0.4); color: #fff; }
+  .topbar-btn.primary:hover { filter: brightness(1.12); box-shadow: 0 6px 22px rgba(6,182,212,0.45); color: #fff; }
   /* قائمة ⋯ للإجراءات النادرة (تصدير/استيراد) */
   .tb-more-wrap { position: relative; flex-shrink: 0; }
   .tb-menu {
@@ -237,8 +257,8 @@
   }
   .filter-tag:hover { border-color: var(--border-def); color: var(--text-1); }
   .filter-tag.active {
-    background: var(--accent); color: #fff; border-color: var(--accent);
-    box-shadow: 0 2px 12px rgba(232,115,74,0.3);
+    background: var(--accent-grad); color: #fff; border-color: transparent;
+    box-shadow: 0 2px 12px rgba(124,58,237,0.4);
   }
   .filter-tag.starred-btn { display: flex; align-items: center; gap: 5px; }
   .filter-tag svg { vertical-align: -2px; margin-inline-end: 5px; }
@@ -251,7 +271,7 @@
     border: 1px solid var(--border-acc); background: var(--accent-glow); color: var(--text-1);
     transition: all 0.15s; white-space: nowrap;
   }
-  .tools-launcher:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(232,115,74,0.25); }
+  .tools-launcher:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(139,92,246,0.25); }
   .tools-launcher.tool-on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .tools-launcher .tl-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tools-launcher .tl-count { font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.14); border-radius: 20px; padding: 1px 8px; }
@@ -370,7 +390,7 @@
     background: transparent; color: var(--text-2); font: 600 11px 'Cairo', sans-serif; cursor: pointer; transition: all 0.13s;
   }
   .cb-btn:hover { color: var(--text-1); }
-  .cb-btn.on { background: var(--accent); color: #fff; }
+  .cb-btn.on { background: var(--accent-grad); color: #fff; }
   .cb-mini {
     display: flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 8px;
     border: 1px solid var(--border-sub); background: transparent;
@@ -451,7 +471,7 @@
     overflow: hidden;
     transition: border-color 0.2s;
   }
-  .section:hover { border-color: var(--border-def); }
+  .section:hover { border-color: rgba(6,182,212,0.4); box-shadow: 0 8px 30px rgba(124,58,237,0.14); }
 
   .section-head {
     display: flex; align-items: center; gap: 8px;
@@ -615,9 +635,12 @@
   .modal-overlay.open { display: flex; }
 
   .modal {
-    background: var(--bg-elevated); border: 1px solid var(--border-def);
+    background: rgba(22,33,61,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-def);
     border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 560px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(124,58,237,0.08);
     animation: scaleIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
     direction: rtl;
   }
@@ -646,10 +669,11 @@
   .modal-actions { display: flex; gap: 10px; justify-content: flex-start; margin-top: 20px; }
   .btn-primary {
     padding: 9px 22px; border-radius: var(--radius-sm); border: none;
-    background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+    background: var(--accent-grad); color: #fff; font-size: 13px; font-weight: 600;
     cursor: pointer; font-family: 'Cairo', sans-serif; transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.35);
   }
-  .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 4px 16px rgba(232,115,74,0.4); }
+  .btn-primary:hover { filter: brightness(1.12); box-shadow: 0 6px 22px rgba(6,182,212,0.45); }
   .btn-cancel {
     padding: 9px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border-def);
     background: transparent; color: var(--text-2); font-size: 13px; font-weight: 500;
@@ -954,9 +978,9 @@
     border-color: var(--border-def);
   }
   .pattern-tab.active {
-    background: var(--accent);
+    background: var(--accent-grad);
     color: #fff;
-    border-color: var(--accent);
+    border-color: transparent;
   }
 
   /* ===== CODE CONVERTER DASHBOARD ===== */
@@ -2131,10 +2155,10 @@
 
   /* ===== COLOR PALETTE DASHBOARD ===== */
   .filter-tag.cp-active {
-    background: #e8734a; color: #fff; border-color: #e8734a;
-    box-shadow: 0 2px 12px rgba(232,115,74,0.35);
+    background: var(--accent-grad); color: #fff; border-color: transparent;
+    box-shadow: 0 2px 12px rgba(139,92,246,0.35);
   }
-  .dt-builder.cp .dt-builder-title i { color: #e8734a; }
+  .dt-builder.cp .dt-builder-title i { color: var(--accent); }
 
   /* aliases used by the palette markup */
   .has-dash {
@@ -2781,7 +2805,9 @@
   .nav-hub{
     position:sticky; top:60px; z-index:90;
     display:flex; align-items:center; gap:12px;
-    padding:10px 28px; background:var(--bg-raised);
+    padding:10px 28px; background:rgba(11,16,32,0.72);
+    backdrop-filter:blur(16px) saturate(150%);
+    -webkit-backdrop-filter:blur(16px) saturate(150%);
     border-bottom:1px solid var(--border-sub);
   }
   .nav-seg{display:flex; padding:3px; gap:2px; flex-shrink:0;
@@ -2791,7 +2817,7 @@
     background:transparent; color:var(--text-2); font:600 12px 'Cairo',sans-serif; cursor:pointer; transition:.15s;
   }
   .nav-seg-btn:hover{color:var(--text-1)}
-  .nav-seg-btn.on{background:var(--accent); color:#fff; box-shadow:0 2px 10px rgba(232,115,74,.3)}
+  .nav-seg-btn.on{background:var(--accent-grad); color:#fff; box-shadow:0 2px 10px rgba(124,58,237,.45)}
   .nav-row{flex:1; min-width:0; display:flex; align-items:center; gap:6px;
     overflow-x:auto; scrollbar-width:none}
   .nav-row::-webkit-scrollbar{display:none}
@@ -2802,7 +2828,7 @@
     cursor:pointer; transition:.15s; white-space:nowrap;
   }
   .nav-chip:hover, .nav-tool:hover{border-color:var(--border-def); color:var(--text-1); background:var(--glass-sub)}
-  .nav-chip.on{background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 2px 12px rgba(232,115,74,.3)}
+  .nav-chip.on{background:var(--accent-grad); color:#fff; border-color:transparent; box-shadow:0 2px 12px rgba(124,58,237,.45)}
   .nav-chip .n{font:500 10px 'JetBrains Mono',monospace; opacity:.7}
   .nav-chip.star i{color:var(--accent-warm)} .nav-chip.on.star i{color:#fff}
   .nav-sep{width:1px; height:20px; background:var(--border-def); flex-shrink:0; margin:0 4px}
@@ -4261,6 +4287,7 @@ function getFiltered(){
   function sectionGroup(s){
     const tags = s.tags || [];
     if(tags.some(t=>['responsive','media','layout','respons'].includes(t.toLowerCase()))) return 'responsive';
+    if(tags.some(t=>t.toLowerCase()==='javascript' || t.toLowerCase()==='js')) return 'javascript';
     if(tags.some(t=>['brand','logo','identity'].includes(t.toLowerCase()))) return 'brand';
     if(tags.some(t=>t.toLowerCase()==='has')) return 'has';
     if(tags.some(t=>['salla','zid','cart','product','footer','button','store'].includes(t.toLowerCase()))) return 'salla';
@@ -8523,14 +8550,14 @@ greet('Ali');"></textarea>
         </div>
 
         <div class="dt-panel${active === 'jsenc' ? '' : ' dt-hidden'}" id="dtJsEnc">
-          <div class="dt-head"><i class="ti ti-lock" style="color:#e8734a"></i> تعمية / فك تعمية JavaScript</div>
+          <div class="dt-head"><i class="ti ti-lock" style="color:#8b5cf6"></i> تعمية / فك تعمية JavaScript</div>
           <div class="dt-mode">
             <button class="dt-mode-btn active" id="dtModeEncodeBtn" onclick="dtSwitchJsMode('encode')"><i class="ti ti-lock"></i> تعمية</button>
             <button class="dt-mode-btn" id="dtModeDecodeBtn" onclick="dtSwitchJsMode('decode')"><i class="ti ti-unlock"></i> فك التعمية</button>
           </div>
 
           <div id="dtJsEncodeMode">
-            <div class="dt-head"><i class="ti ti-code" style="color:#e8734a"></i> أدخل كود JavaScript للتعمية</div>
+            <div class="dt-head"><i class="ti ti-code" style="color:#8b5cf6"></i> أدخل كود JavaScript للتعمية</div>
             <textarea class="dt-textarea" id="dtJsEncodeInput" spellcheck="false" placeholder="// اكتب كودك هنا...
 function hello() {
   console.log('Hello, World!');
@@ -8539,7 +8566,7 @@ function hello() {
               <button class="btn-primary" onclick="dtEncodeJS()"><i class="ti ti-lock"></i> تعمية الكود</button>
               <button class="btn-cancel" onclick="dtClear('dtJsEncodeInput','dtJsEncodeOutput')"><i class="ti ti-eraser"></i> مسح</button>
             </div>
-            <div class="dt-head"><i class="ti ti-code" style="color:#e8734a"></i> النتيجة المعماة</div>
+            <div class="dt-head"><i class="ti ti-code" style="color:#8b5cf6"></i> النتيجة المعماة</div>
             <textarea class="dt-textarea" id="dtJsEncodeOutput" spellcheck="false" readonly onclick="dtCopy('dtJsEncodeOutput')" placeholder="النتيجة ستظهر هنا..."></textarea>
           </div>
 
