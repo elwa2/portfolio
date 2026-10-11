@@ -2661,5 +2661,511 @@ active: رجوع للمكان الأصلي مع تقليل الظل
   if(f)f.addEventListener('click',cp);
 })();
 </script>
+<style id="extra-tabs-style">
+/* ===== Unified extra tabs: authority layer (wins over old inline styles) + new pages chrome ===== */
+#tabBtnForms{display:none!important}
+#forms-page,#dashboard-page,#prompts-page{display:none!important}
+html[data-tab="forms"] #forms-page{display:block!important}
+html[data-tab="forms"] #root main{display:none!important}
+html[data-tab="dashboard"] #dashboard-page{display:block!important}
+html[data-tab="dashboard"] #root main{display:none!important}
+html[data-tab="prompts"] #prompts-page{display:block!important}
+html[data-tab="prompts"] #root main{display:none!important}
+#dashboard-page,#prompts-page{scroll-padding-top:170px}
+#dashboard-page .xinner,#prompts-page .xinner{max-width:1320px;width:100%;margin:0 auto;padding:32px 12px 96px}
+@media(min-width:640px){#dashboard-page .xinner,#prompts-page .xinner{padding:40px 24px 96px}}
+#dashboard-page .xhero h1,#prompts-page .xhero h1{font-size:28px;font-weight:800;line-height:1.4;letter-spacing:-.02em;color:var(--text);margin:0}
+@media(min-width:640px){#dashboard-page .xhero h1,#prompts-page .xhero h1{font-size:40px}}
+#dashboard-page .grad,#prompts-page .grad{background:linear-gradient(to left,#7c3aed,#d946ef,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+#dashboard-page .xhero p,#prompts-page .xhero p{color:var(--muted);font-size:14px;line-height:1.9;max-width:740px;margin:12px 0 0}
+#dashboard-page .stat,#prompts-page .stat{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--card-border);border-radius:16px;padding:12px 16px;display:flex;flex-direction:column}
+#dashboard-page .stat b,#prompts-page .stat b{font-size:20px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px}
+#dashboard-page .stat small,#prompts-page .stat small{color:var(--muted);font-size:11.5px;margin-top:2px}
+#dashboard-page .hero-search,#prompts-page .hero-search{display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);border-radius:999px;padding:0 16px;height:46px;flex:1;min-width:0}
+#dashboard-page .hero-search:focus-within,#prompts-page .hero-search:focus-within{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
+#dashboard-page .hero-search input,#prompts-page .hero-search input{background:transparent;border:0;outline:0;flex:1;min-width:0;font-size:13.5px;color:var(--text);font-family:inherit}
+#dashboard-page .hero-search input::placeholder,#prompts-page .hero-search input::placeholder{color:var(--muted)}
+#dashboard-page .pill-btn,#prompts-page .pill-btn{background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);border-radius:999px;padding:0 20px;height:46px;font:700 13.5px Cairo,Tahoma,sans-serif;color:var(--text);cursor:pointer;white-space:nowrap;transition:.2s}
+#dashboard-page .pill-btn:hover,#prompts-page .pill-btn:hover{border-color:#7c3aed;color:#7c3aed}
+#dashboard-page .xsubnav,#prompts-page .xsubnav{position:sticky;top:84px;z-index:20;display:flex;gap:8px;align-items:center;padding:10px 12px;margin-top:22px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-border);border-radius:999px;overflow-x:auto;scrollbar-width:thin}
+#dashboard-page .xsubnav a,#prompts-page .xsubnav a{padding:8px 18px;border-radius:30px;text-decoration:none;color:var(--text);font-weight:700;transition:.2s;white-space:nowrap;font-size:13.5px;flex-shrink:0}
+#dashboard-page .xsubnav a:hover,#prompts-page .xsubnav a:hover{background:#111;color:#fff}
+#dashboard-page h2,#prompts-page h2{margin:44px 0 6px;font-size:23px;font-weight:800;padding-inline-start:14px;border-inline-start:6px solid #7c3aed;color:var(--text);scroll-margin-top:160px}
+#dashboard-page .hint,#prompts-page .hint{color:var(--muted);font-size:13.5px;margin:0 0 18px;padding-inline-start:20px}
+#dashboard-page .xgrid,#prompts-page .xgrid{display:grid;grid-template-columns:1fr;gap:16px}
+#dashboard-page.net .xgrid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+#dashboard-page .card,#prompts-page .card{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--card-border);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;color:var(--text);transition:transform .3s,box-shadow .3s}
+#dashboard-page .card:hover,#prompts-page .card:hover{transform:translateY(-4px)}
+#dashboard-page .card h3,#prompts-page .card h3{margin:0;font-size:16px;font-weight:700;color:var(--text)}
+#dashboard-page .card p.note,#prompts-page .card p.note{margin:0;color:var(--muted);font-size:13px}
+#dashboard-page .demo,#prompts-page .demo{min-height:110px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--text) 5%,transparent);border:1px dashed var(--card-border);color:var(--text)}
+#dashboard-page .demo.tall{min-height:230px}
+#dashboard-page .code,#prompts-page .code{position:relative}
+#dashboard-page .code button,#prompts-page .code button{position:absolute;top:8px;inset-inline-end:8px;border:0;border-radius:8px;padding:5px 12px;background:#6c5ce7;color:#fff;font:600 12px Cairo,Tahoma,sans-serif;cursor:pointer;z-index:2}
+#dashboard-page .code button:hover,#prompts-page .code button:hover{filter:brightness(1.1)}
+#dashboard-page pre,#prompts-page pre{margin:0;direction:ltr;text-align:left;background:#0b0e16;color:#cdd3f5;padding:40px 14px 14px;border-radius:12px;font:12px/1.6 Consolas,monospace;max-height:190px;overflow:auto;white-space:pre}
+#dashboard-page .xfoot,#prompts-page .xfoot{text-align:center;color:var(--muted);padding:34px 12px 8px;font-size:13px}
+#dashboard-page .promptbox,#prompts-page .promptbox{width:100%;background:#10152b;color:#e8ecff;border:1px solid #ffffff1c;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+#dashboard-page .promptbox .prow,#prompts-page .promptbox .prow{display:flex;align-items:center;gap:10px;font:800 15px Cairo,Tahoma,sans-serif}
+#dashboard-page .promptbox .pdot,#prompts-page .promptbox .pdot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#22d3ee);flex-shrink:0}
+#dashboard-page .promptbox p,#prompts-page .promptbox p{margin:0;color:#aeb6d4;font-size:13.5px;line-height:1.9}
+#dashboard-page .promptbox .pbtns,#prompts-page .promptbox .pbtns{display:flex;gap:10px;flex-wrap:wrap}
+#dashboard-page .promptbox button,#prompts-page .promptbox button{border:0;border-radius:12px;padding:12px 22px;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff;font:800 13.5px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+#dashboard-page .promptbox button:hover,#prompts-page .promptbox button:hover{filter:brightness(1.1);transform:translateY(-2px)}
+#dashboard-page .promptbox button.ghost,#prompts-page .promptbox button.ghost{background:#ffffff12;border:1px solid #ffffff2e}
+#prompts-page .idealist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;width:100%}
+#prompts-page .idealist li{background:#10152b;border:1px solid #ffffff14;border-radius:12px;padding:12px 14px;color:#e8ecff;font-size:13px;line-height:1.9}
+#prompts-page .idealist b{color:#fff}
+#prompts-page .idealist code{direction:ltr;display:inline-block;background:#00000055;border:1px solid #ffffff22;border-radius:8px;padding:2px 10px;color:#7dd3fc;font:12px Consolas,monospace;margin-top:6px}
+#root header div.glass.rounded-full.p-1 button{white-space:nowrap;flex-shrink:0}
+html[data-tab="forms"] #root>div,html[data-tab="dashboard"] #root>div,html[data-tab="prompts"] #root>div{min-height:0!important}
+</style>
+
+<div id="dashboard-page" dir="rtl" style="display:none">
+  <div class="xinner">
+    <div class="xhero">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:4px">
+        <h1>استايلات <span class="grad">لوحة التحكم</span></h1>
+        <span class="glass" style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--text)"><span style="width:8px;height:8px;border-radius:50%;background:#06b6d4;display:inline-block"></span> 8 أمثلة حية + برومبت</span>
+      </div>
+      <p>كل قطع اللوحة جاهزة للنسخ بنفس هوية الصفحة (Aurora + Glass): سايدبار، توبار، كروت إحصائيات، رسوم CSS بدون مكتبات، جدول حالات، وفلاتر — ومعها برومبت يولّد نفس اللوحة لأي AI.</p>
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:640px">
+        <div class="stat"><b>🧩 6</b><small>أقسام للوحة</small></div>
+        <div class="stat"><b>⚡ 8</b><small>مثال جاهز للنسخ</small></div>
+        <div class="stat"><b>📋 1</b><small>برومبت يولّد نفس اللوحة</small></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <div class="hero-search"><span style="opacity:.55">🔍</span><input id="dashSearch" type="search" placeholder="ابحث في قطع اللوحة... (مثال: جدول، رسم، سايدبار)"><span id="dashCount" style="font-size:11px;color:var(--muted);white-space:nowrap"></span></div>
+        <button id="dashViewToggle" class="pill-btn" type="button">🔀 شبكة / عمود</button>
+      </div>
+    </div>
+    <div class="xsubnav glass"><a href="#dash-side">السايدبار والبوبار</a><a href="#dash-stats">الإحصائيات</a><a href="#dash-charts">الرسوم</a><a href="#dash-tables">الجداول</a><a href="#dash-forms">فلاتر اللوحة</a><a href="#dash-prompt">برومبت اللوحة</a></div>
+
+    <h2 id="dash-side">السايدبار والبوبار — Sidebar & Topbar</h2>
+    <p class="hint">سايدبار RTL starting من اليمين + توبار ببحث وتنبيهات وأفاتار.</p>
+    <div class="xgrid">
+      <article class="card"><h3>1. سايدبار داكن بعنصر نشط متدرج</h3>
+        <div class="demo"><aside class="dside"><div class="dlogo">🟣 لوحتي</div><a class="on">📊 الرئيسية</a><a>🛒 الطلبات</a><a>👥 العملاء</a><a>⚙️ الإعدادات</a><div class="duser"><b>أ</b><span>أحمد — مدير</span></div></aside></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.dside{width:220px;max-width:100%;background:#10152b;color:#e8ecff;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;min-height:270px}
+.dside .dlogo{font:800 15px Cairo,Tahoma,sans-serif;padding:10px;background:#ffffff14;border-radius:10px}
+.dside a{padding:10px 12px;border-radius:10px;color:#aeb6d4;text-decoration:none;font:700 13px Cairo,Tahoma,sans-serif;transition:.2s;cursor:pointer}
+.dside a:hover{background:#ffffff12;color:#fff}
+.dside a.on{background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff}
+.dside .duser{margin-top:auto;display:flex;gap:8px;align-items:center;background:#ffffff0d;padding:8px 10px;border-radius:10px;font:700 12px Cairo,Tahoma,sans-serif}
+.dside .duser b{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#22d3ee);display:grid;place-items:center;color:#fff;flex-shrink:0}
+        </style></article>
+      <article class="card"><h3>2. توبار: عنوان + بحث + جرس + أفاتار</h3>
+        <div class="demo"><div class="dtop"><strong>نظرة عامة 👋</strong><label class="dsearch">🔍<input placeholder="ابحث في اللوحة..."></label><span class="dbell">🔔<i></i></span><span class="davatar">أ</span></div></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.dtop{width:100%;display:flex;align-items:center;gap:10px;background:#10152b;color:#fff;border-radius:14px;padding:12px 14px;flex-wrap:wrap}
+.dtop strong{font:800 14px Cairo,Tahoma,sans-serif;white-space:nowrap}
+.dtop .dsearch{flex:1;display:flex;align-items:center;gap:8px;background:#ffffff10;border:1px solid #ffffff22;border-radius:999px;padding:8px 14px;min-width:140px}
+.dtop .dsearch input{flex:1;background:transparent;border:0;outline:0;color:#fff;font:13px Cairo,Tahoma,sans-serif;min-width:0}
+.dtop .dbell{position:relative;font-size:18px}
+.dtop .dbell i{position:absolute;top:0;inset-inline-end:0;width:9px;height:9px;border-radius:50%;background:#f43f5e;border:2px solid #10152b}
+.dtop .davatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#22d3ee);display:grid;place-items:center;font:800 14px Cairo,Tahoma,sans-serif;flex-shrink:0}
+        </style></article>
+    </div>
+
+    <h2 id="dash-stats">كروت الإحصائيات — KPI Cards</h2>
+    <p class="hint">أرقام كبيرة + شارات نمو ملوّنة حسب الحالة.</p>
+    <div class="xgrid">
+      <article class="card"><h3>3. شبكة مؤشرات KPI</h3>
+        <div class="demo"><div class="kpis"><div class="kpi"><small>💰 الإيراد</small><b>48.2K</b><em class="up">▲ 12%</em></div><div class="kpi"><small>🛒 الطلبات</small><b>1,240</b><em class="up">▲ 8%</em></div><div class="kpi"><small>👥 العملاء</small><b>860</b><em class="dn">▼ 2%</em></div><div class="kpi"><small>📦 المخزون</small><b>96%</b><em class="up">▲ 4%</em></div></div></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;width:100%}
+.kpi{background:#10152b;color:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;border:1px solid #ffffff14}
+.kpi small{color:#9aa3b8;font:700 12px Cairo,Tahoma,sans-serif}
+.kpi b{font:800 22px Cairo,Tahoma,sans-serif}
+.kpi em{font:800 11px Cairo,Tahoma,sans-serif;font-style:normal;border-radius:99px;padding:2px 8px;width:fit-content}
+.kpi .up{background:#10b98122;color:#34d399}
+.kpi .dn{background:#f43f5e22;color:#fb7185}
+        </style></article>
+    </div>
+
+    <h2 id="dash-charts">الرسوم البيانية — CSS Charts</h2>
+    <p class="hint">رسوم خالصة بـ CSS بدون أي مكتبة.</p>
+    <div class="xgrid">
+      <article class="card"><h3>4. رسم أعمدة أسبوعي</h3>
+        <div class="demo tall"><div class="bars"><span class="b1"><i>سبت</i></span><span class="b2"><i>أحد</i></span><span class="b3"><i>اثنين</i></span><span class="b4"><i>ثلاثاء</i></span><span class="b5"><i>أربعاء</i></span><span class="b6"><i>خميس</i></span><span class="b7"><i>جمعة</i></span></div></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.bars{display:flex;align-items:flex-end;gap:10px;height:160px;width:100%;background:#10152b;border-radius:14px;padding:16px 16px 30px}
+.bars span{flex:1;min-height:12px;background:linear-gradient(180deg,#22d3ee,#7c3aed);border-radius:8px 8px 4px 4px;position:relative;transition:.2s}
+.bars span:hover{filter:brightness(1.25)}
+.bars .b1{height:45%}.bars .b2{height:70%}.bars .b3{height:55%}.bars .b4{height:92%}.bars .b5{height:65%}.bars .b6{height:80%}.bars .b7{height:50%}
+.bars i{position:absolute;bottom:-22px;right:50%;transform:translateX(50%);font:700 10px Cairo,Tahoma,sans-serif;font-style:normal;color:#9aa3b8;white-space:nowrap}
+        </style></article>
+      <article class="card"><h3>5. رسم دائري Donut + مفتاح</h3>
+        <div class="demo"><div class="dwrap"><div class="donut"><b>68%</b><small>إنجاز</small></div><ul class="legend"><li><i class="c1"></i>مبيعات 45%</li><li><i class="c2"></i>اشتراكات 30%</li><li><i class="c3"></i>أخرى 25%</li></ul></div></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.dwrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;background:#10152b;border-radius:14px;padding:18px;width:100%}
+.donut{width:130px;height:130px;border-radius:50%;background:conic-gradient(#7c3aed 0 45%,#06b6d4 45% 75%,#10b981 75% 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.donut::before{content:"";position:absolute;inset:14px;background:#10152b;border-radius:50%}
+.donut b,.donut small{position:relative;color:#fff;line-height:1.3}
+.donut b{font:800 20px Cairo,Tahoma,sans-serif}
+.donut small{font:700 11px Cairo,Tahoma,sans-serif;color:#9aa3b8}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;color:#e8ecff;font:700 13px Cairo,Tahoma,sans-serif}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-inline-end:8px}
+.legend .c1{background:#7c3aed}.legend .c2{background:#06b6d4}.legend .c3{background:#10b981}
+        </style></article>
+    </div>
+
+    <h2 id="dash-tables">الجداول — Tables</h2>
+    <p class="hint">صفوف hover + شارات حالة ملوّنة.</p>
+    <div class="xgrid">
+      <article class="card"><h3>6. جدول عملاء بحالات</h3>
+        <div class="demo"><table class="dtable"><thead><tr><th>العميل</th><th>الحالة</th><th>المبلغ</th></tr></thead><tbody><tr><td>سارة م.</td><td><i class="ok">نشط</i></td><td>1,200 ج</td></tr><tr><td>كريم ع.</td><td><i class="wait">معلق</i></td><td>850 ج</td></tr><tr><td>منى س.</td><td><i class="ok">نشط</i></td><td>2,300 ج</td></tr><tr><td>عمر خ.</td><td><i class="ban">محظور</i></td><td>0 ج</td></tr></tbody></table></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.dtable{width:100%;border-collapse:collapse;background:#10152b;color:#e8ecff;border-radius:14px;overflow:hidden;font:600 13px Cairo,Tahoma,sans-serif}
+.dtable th{color:#9aa3b8;font-size:12px;text-align:right;padding:12px}
+.dtable td{padding:12px;border-top:1px solid #ffffff12}
+.dtable tbody tr:hover td{background:#ffffff08}
+.dtable i{font-style:normal;font-size:11px;font-weight:800;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.dtable .ok{background:#10b98122;color:#34d399}
+.dtable .wait{background:#f59e0b22;color:#fbbf24}
+.dtable .ban{background:#f43f5e22;color:#fb7185}
+        </style></article>
+    </div>
+
+    <h2 id="dash-forms">فلاتر اللوحة — Filters</h2>
+    <p class="hint">بحث + قائمة منسدلة + سويتش إشعارات.</p>
+    <div class="xgrid">
+      <article class="card"><h3>7. شريط فلترة</h3>
+        <div class="demo"><div class="dform"><label class="ftxt">🔍<input placeholder="فلترة العملاء..."></label><select><option>الكل</option><option>نشط</option><option>معلق</option></select><label class="sw"><input type="checkbox" checked><span></span>إشعارات</label></div></div>
+        <div class="code"><button>نسخ الكود</button><pre></pre></div>
+        <style>
+.dform{display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;background:#10152b;border-radius:14px;padding:14px}
+.dform .ftxt{flex:1;display:flex;gap:8px;align-items:center;background:#ffffff10;border:1px solid #ffffff22;border-radius:10px;padding:9px 12px;color:#9aa3b8;min-width:140px}
+.dform .ftxt input{flex:1;background:transparent;border:0;outline:0;color:#fff;font:13px Cairo,Tahoma,sans-serif;min-width:0}
+.dform select{background:#ffffff10;color:#fff;border:1px solid #ffffff22;border-radius:10px;padding:9px 12px;font:700 13px Cairo,Tahoma,sans-serif}
+.dform select option{color:#111}
+.sw{display:flex;align-items:center;gap:8px;color:#e8ecff;font:700 13px Cairo,Tahoma,sans-serif;cursor:pointer}
+.sw input{display:none}
+.sw span{width:42px;height:24px;border-radius:99px;background:#ffffff22;position:relative;transition:.2s;flex-shrink:0}
+.sw span::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+span{background:linear-gradient(90deg,#7c3aed,#06b6d4)}
+.sw input:checked+span::after{transform:translateX(-18px)}
+        </style></article>
+    </div>
+
+    <h2 id="dash-prompt">برومبت اللوحة — Dashboard Prompt</h2>
+    <p class="hint">انسخ البرومبت والصقه لأي AI ليولّد نفس اللوحة بنفس التوكنز.</p>
+    <div class="xgrid">
+      <article class="card no-auto"><h3>8. 🧠 برومبت إنشاء نفس اللوحة</h3>
+        <div class="demo" style="min-height:0"><div class="promptbox"><div class="prow"><span class="pdot"></span><b>يولّد لوحة تحكم عربية RTL بنفس الاستايل</b></div><p>يشمل: سايدبار يمين + توبار + 4 كروت KPI + رسم أعمدة ودائري بـ CSS فقط + جدول حالات + شريط فلترة — بنفس ألوان Aurora وتوكنز هذه الصفحة.</p><div class="pbtns"><button data-copy-src="dashboard-prompt-text">📋 نسخ برومبت اللوحة</button><button data-copy-src="style-prompt-text" class="ghost">🎨 نسخ برومبت الاستايل العام</button></div></div></div>
+        <style>
+.promptbox{width:100%;background:#10152b;color:#e8ecff;border:1px solid #ffffff1c;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.promptbox .prow{display:flex;align-items:center;gap:10px;font:800 15px Cairo,Tahoma,sans-serif}
+.promptbox .pdot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#22d3ee);flex-shrink:0}
+.promptbox p{margin:0;color:#aeb6d4;font-size:13.5px;line-height:1.9}
+.promptbox .pbtns{display:flex;gap:10px;flex-wrap:wrap}
+.promptbox button{border:0;border-radius:12px;padding:12px 22px;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff;font:800 13.5px Cairo,Tahoma,sans-serif;cursor:pointer;transition:.2s}
+.promptbox button:hover{filter:brightness(1.1);transform:translateY(-2px)}
+.promptbox button.ghost{background:#ffffff12;border:1px solid #ffffff2e}
+        </style></article>
+    </div>
+    <div class="xfoot">انسخ أي قطعة واستخدمها — وولّد لوحة كاملة بالبرومبت 👆</div>
+  </div>
+</div>
+
+<div id="prompts-page" dir="rtl" style="display:none">
+  <div class="xinner">
+    <div class="xhero">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:4px">
+        <h1>مكتبة <span class="grad">البرومبتات</span></h1>
+        <span class="glass" style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--text)"><span style="width:8px;height:8px;border-radius:50%;background:#d946ef;display:inline-block"></span> 3 برومبتات + أفكار</span>
+      </div>
+      <p>كل برومبت يولّد نفس ما تراه في التبويبات: الاستايل العام، لوحة التحكم، ومكتبة الفورم — انسخ والصق لأي AI. وفي الأسفل أفكار تبويبات إضافية تفيدك في التصميم.</p>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <div class="hero-search"><span style="opacity:.55">🔍</span><input id="promptsSearch" type="search" placeholder="ابحث في البرومبتات..."><span id="promptsCount" style="font-size:11px;color:var(--muted);white-space:nowrap"></span></div>
+      </div>
+    </div>
+    <div class="xsubnav glass"><a href="#prm-style">برومبت الاستايل</a><a href="#prm-dash">برومبت اللوحة</a><a href="#prm-forms">برومبت الفورم</a><a href="#prm-ideas">أفكار تبويبات</a></div>
+    <div class="xgrid" style="margin-top:26px">
+      <article class="card no-auto" id="prm-style"><h3>🎨 برومبت الاستايل العام (Aurora + Glass)</h3>
+        <p class="note">يولّد أي صفحة بنفس هوية الموقع: باليت Aurora، Glassmorphism، عربي RTL، ملف واحد جاهز.</p>
+        <div class="demo" style="min-height:0"><div class="promptbox"><div class="prow"><span class="pdot"></span><b>جاهز للنسخ</b></div><p>نفس البرومبت الموجود في الزر العائم — من هنا داخل التبويب.</p><div class="pbtns"><button data-copy-src="style-prompt-text">📋 نسخ برومبت الاستايل</button></div></div></div></article>
+      <article class="card no-auto" id="prm-dash"><h3>📊 برومبت لوحة التحكم</h3>
+        <p class="note">يولّد نفس لوحة تبويب «لوحة التحكم»: سايدبار + KPIs + رسوم CSS + جدول + فلاتر.</p>
+        <div class="demo" style="min-height:0"><div class="promptbox"><div class="prow"><span class="pdot"></span><b>جاهز للنسخ</b></div><p>يشمل التوكنز والألوان والمقاسات حرفياً من هذه الصفحة.</p><div class="pbtns"><button data-copy-src="dashboard-prompt-text">📋 نسخ برومبت اللوحة</button></div></div></div></article>
+      <article class="card no-auto" id="prm-forms"><h3>🧩 برومبت مكتبة الفورم</h3>
+        <p class="note">يولّد صفحة مكتبة عناصر مثل تبويب «عناصر الفورم»: كل مثال = عرض حي + زر نسخ.</p>
+        <div class="demo" style="min-height:0"><div class="promptbox"><div class="prow"><span class="pdot"></span><b>جاهز للنسخ</b></div><p>انسخه واطلب أي مكتبة عناصر جديدة بنفس النظام.</p><div class="pbtns"><button data-copy-src="forms-prompt-text">📋 نسخ برومبت الفورم</button></div></div></div></article>
+      <article class="card no-auto" id="prm-ideas"><h3>💡 تبويبات إضافية تفيدك في التصميم</h3>
+        <p class="note">انسخ السطر الجاهز والصقه بعد أي برومبت من الأعلى لتوليد تبويب جديد بنفس الهوية.</p>
+        <div class="demo" style="min-height:0;justify-content:stretch"><ul class="idealist">
+          <li><b>📋 كانبان:</b> أعمدة سحب وإفلات للمهام ببطاقات ملوّنة حسب الأولوية.<br><code>انسخ برومبت اللوحة ثم أضف: "add Kanban tab: 3 columns, draggable cards, priority colors"</code></li>
+          <li><b>📅 تقويم:</b> شبكة شهر تفاعلية بأحداث ونقاط ملوّنة.<br><code>انسخ برومبت اللوحة ثم أضف: "add Calendar tab: month grid, event dots, today highlight"</code></li>
+          <li><b>📥 صندوق وارد:</b> قائمة رسائل بحالات مقروء/غير مقروء وبحث فوري.<br><code>انسخ برومبت اللوحة ثم أضف: "add Inbox tab: message list, unread badges, live filter"</code></li>
+          <li><b>⚙️ إعدادات:</b> تبويبات فرعية + سويتشات وتخزين localStorage.<br><code>انسخ برومبت اللوحة ثم أضف: "add Settings tab: sections, toggles, save to localStorage"</code></li>
+          <li><b>👤 بروفايل:</b> غلاف + أفاتار + إحصائيات وتايم لاين.<br><code>انسخ برومبت اللوحة ثم أضف: "add Profile tab: cover, avatar, stats, timeline"</code></li>
+          <li><b>💳 تسعير:</b> 3 خطط مع خطة مميزة متدرجة وزر CTA.<br><code>انسخ برومبت اللوحة ثم أضف: "add Pricing tab: 3 plans, highlighted middle, CTA buttons"</code></li>
+        </ul></div></article>
+    </div>
+    <div class="xfoot">طرفية: انسخ أي برومبت من الأعلى والصق السطر الجاهز بعده لتوليد تبويب جديد 😉</div>
+  </div>
+</div>
+
+<script type="text/plain" id="dashboard-prompt-text">
+## الدور
+أنت مصمم UI/UX ومطور واجهات بخبرة +15 سنة في لوحات التحكم العربية.
+
+## المهمة
+ولّد لوحة تحكم عربية كاملة (dir="rtl") بنفس استايل صفحة "لوحة التحكم" في موقعي: Aurora + Glass فوق خلفية داكنة، ملف HTML واحد جاهز للتشغيل.
+
+## نفس التوكنز حرفياً
+--bg:#0b1020; --violet:#7c3aed; --cyan:#06b6d4; --emerald:#10b981 (للحالات الإيجابية فقط);
+--text:#f1f5ff; --text-mute:rgba(241,245,255,.68);
+أسطح اللوحة الداكنة: #10152b; حدود: rgba(255,255,255,.08);
+الخط: Cairo/Tajawal; الزوايا: 14-16px للقطع، 99px للشارات.
+
+## الأقسام المطلوبة (بنفس ترتيب صفحتي)
+1. سايدبار يمين: شعار + 4 روابط (واحد نشط متدرج 90deg من #7c3aed إلى #06b6d4) + بطاقة مستخدم سفلية بأفاتار متدرج.
+2. توبار: عنوان ترحيبي + بحث pill + جرس بنقطة حمراء + أفاتار.
+3. 4 كروت KPI: رقم كبير + شارة نمو (أخضر #34d399 للصعود / أحمر #fb7185 للهبوط).
+4. رسم أعمدة أسبوعي بـ CSS فقط (7 أعمدة متدرجة من #22d3ee إلى #7c3aed) + رسم دائري Donut بـ conic-gradient مع مفتاح.
+5. جدول عملاء: hover فاتح + شارات (نشط/معلق/محظور) بنفس ألوان الشارات أعلاه.
+6. شريط فلترة: بحث + select + سويتش إشعارات متدرج عند التفعيل.
+
+## قواعد
+- RTL كامل، متجاوب (سايدبار يتحول لأيقونات/قائمة علوية على الموبايل).
+- كل الألوان CSS variables على :root، تعليقات مختصرة، بدون مكتبات رسوم.
+- حالات hover/focus/disabled + تباين 4.5:1 + semantic HTML.
+- ممنوع: خلفية فاتحة، ألوان خارج الباليت، Lorem Ipsum (محتوى عربي واقعي).
+
+## التسليم
+1. سطر: الباليت النهائي بالـ HEX. 2. 3 أسطر فكرة التصميم. 3. الكود كاملاً. 4. 3 تحسينات مقترحة.
+</script>
+
+<script type="text/plain" id="forms-prompt-text">
+## الدور
+أنت مصمم UI/UX ومطور واجهات بخبرة +15 سنة.
+
+## المهمة
+ولّد صفحة "مكتبة عناصر فورم وCSS" عربية (dir="rtl") بنفس نظام موقعي: كل مثال = بطاقة فيها (عنوان + عرض حي + زر "نسخ الكود" ينسخ HTML+CSS+JS + كتلة style داخل البطاقة)، ملف واحد، Aurora + Glass فوق #0b1020، خط Cairo.
+
+## الأقسام (14 قسماً مثل صفحتي)
+الأزرار (12 نمطاً)، البنرات، Checkbox، Toggles، Radio، ToDo تفاعلية، Toasts/Skeleton/Progress/Accordion، الشارات، الكروت، حقول الإدخال، الأشكال، اللودرات، التريندات (Sticky Nav، بحث فوري، :has()، Patterns)، أفكار وSnippets.
+
+## قواعد النسخ
+زر النسخ لكل بطاقة + اختصار Ctrl/Cmd+K ينسخ المكتبة كلها + بحث فوري يفلتر البطاقات + عدّاد نتائج + تبديل عرض شبكة/عمود + Sticky Subnav للأقسام + Toast تأكيد.
+
+## التسليم
+الكود كاملاً بدون اختصار، متجاوب، semantic HTML، تباين 4.5:1، محتوى عربي واقعي (ممنوع Lorem Ipsum).
+</script>
+
+<script id="unified-tabs-fix">
+(function(){
+  var KEY='unified-tab';
+  var PAGES=['forms','dashboard','prompts'];
+  var PAGE_EL={forms:'forms-page',dashboard:'dashboard-page',prompts:'prompts-page'};
+  var BTNS=[
+    {id:'tabBtnFormsV2',tab:'forms',html:'<span>\uD83E\uDDE9</span> \u0639\u0646\u0627\u0635\u0631 \u0627\u0644\u0641\u0648\u0631\u0645'},
+    {id:'tabBtnDash',tab:'dashboard',html:'<span>\uD83D\uDCCA</span> \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645'},
+    {id:'tabBtnPrompts',tab:'prompts',html:'<span>\uD83D\uDCAC</span> \u0627\u0644\u0628\u0631\u0648\u0645\u0628\u062A\u0627\u062A'}
+  ];
+  var BASE='px-4 sm:px-6 py-2.5 rounded-full text-[13px] sm:text-[14px] font-bold transition-all flex items-center gap-2 ';
+  var ACTIVE=BASE+'bg-[#111] text-white shadow-lg dark:bg-white dark:text-black';
+  var IDLE=BASE+'text-[var(--text)] hover:bg-white/10';
+  var toastTimer=null;
+  function toast(msg){
+    var t=document.getElementById('forms-toast'),x=document.getElementById('forms-toast-txt');
+    if(!t||!x)return;
+    x.textContent=msg;t.classList.add('show');
+    clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},1800);
+  }
+  function save(n){try{localStorage.setItem(KEY,n)}catch(e){}}
+  function load(){try{return localStorage.getItem(KEY)||''}catch(e){return ''}}
+  function bar(){return document.querySelector('#root header div.glass.rounded-full.p-1');}
+  function setState(b,on){if(b)b.className=on?ACTIVE:IDLE;}
+  function refreshBtns(){
+    var cur=document.documentElement.getAttribute('data-tab')||'langs';
+    var c=bar();if(!c)return;
+    BTNS.forEach(function(d){setState(document.getElementById(d.id),cur===d.tab);});
+    var list=c.querySelectorAll('button'),react=[];
+    for(var i=0;i<list.length;i++){if(!list[i].id)react.push(list[i]);}
+    if(react[0])setState(react[0],cur==='langs');
+    if(react[1])setState(react[1],cur==='styles');
+  }
+  function setTab(name,opts){
+    opts=opts||{};
+    var isExtra=PAGES.indexOf(name)>-1;
+    document.documentElement.setAttribute('data-tab',name);
+    var main=document.querySelector('#root main');
+    Object.keys(PAGE_EL).forEach(function(k){
+      var el=document.getElementById(PAGE_EL[k]);
+      if(el)el.style.display=(k===name)?'block':'none';
+    });
+    if(main)main.style.display=isExtra?'none':'';
+    save(name);
+    if(!opts.keepHash){
+      try{
+        if(isExtra)history.replaceState(null,'','#'+name);
+        else if(location.hash==='#forms'||location.hash==='#dashboard'||location.hash==='#prompts')history.replaceState(null,'',location.pathname+(location.search||''));
+      }catch(e){}
+    }
+    refreshBtns();
+    if(!opts.silent){
+      var labels={forms:'\uD83E\uDDE9 \u0639\u0646\u0627\u0635\u0631 \u0627\u0644\u0641\u0648\u0631\u0645',dashboard:'\uD83D\uDCCA \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645',prompts:'\uD83D\uDCAC \u0645\u0643\u062A\u0628\u0629 \u0627\u0644\u0628\u0631\u0648\u0645\u0628\u062A\u0627\u062A'};
+      if(labels[name])toast(labels[name]);
+      window.scrollTo({top:0,behavior:opts.instant?'auto':'smooth'});
+    }
+  }
+  function ensureButtons(){
+    var c=bar();if(!c)return false;
+    BTNS.forEach(function(d){
+      if(!document.getElementById(d.id)){
+        var b=document.createElement('button');
+        b.id=d.id;b.type='button';b.className=IDLE;b.innerHTML=d.html;
+        c.appendChild(b);
+      }
+    });
+    var legacy=document.getElementById('tabBtnForms');
+    if(legacy)legacy.style.display='none';
+    refreshBtns();
+    return true;
+  }
+  document.addEventListener('click',function(e){
+    if(!e.target||!e.target.closest)return;
+    if(e.target.closest('#tabBtnFormsV2')){setTab('forms');return;}
+    if(e.target.closest('#tabBtnDash')){setTab('dashboard');return;}
+    if(e.target.closest('#tabBtnPrompts')){setTab('prompts');return;}
+    var rb=e.target.closest('#root header div.glass.rounded-full.p-1 > button');
+    if(rb&&!rb.id){
+      var t=rb.textContent||'';
+      setTab(t.indexOf('\u0633\u062A\u0627\u064A\u0644')>-1?'styles':'langs');
+    }
+  });
+  function pageOf(id){
+    var el=document.getElementById(id);
+    if(!el||!el.closest)return null;
+    var pg=el.closest('#forms-page,#dashboard-page,#prompts-page');
+    if(!pg)return null;
+    return pg.id==='forms-page'?'forms':(pg.id==='dashboard-page'?'dashboard':'prompts');
+  }
+  window.addEventListener('hashchange',function(){
+    var h=(location.hash||'').replace('#','');
+    if(PAGES.indexOf(h)>-1){setTab(h,{silent:true});return;}
+    if(h){var w=pageOf(h);if(w)setTab(w,{silent:true,keepHash:true,instant:true});}
+  });
+  function restore(){
+    var h=(location.hash||'').replace('#','');
+    var s=load();
+    if(PAGES.indexOf(h)>-1){setTab(h,{silent:true,keepHash:true});return true;}
+    if(h){var w=pageOf(h);if(w){setTab(w,{silent:true,keepHash:true});setTimeout(function(){var el=document.getElementById(h);if(el&&el.scrollIntoView)el.scrollIntoView();},450);return true;}}
+    if(PAGES.indexOf(s)>-1){setTab(s,{silent:true});return true;}
+    if(s==='styles'){
+      document.documentElement.setAttribute('data-tab','styles');
+      var c=bar(),done=false;
+      if(c){var list=c.querySelectorAll('button');for(var i=0;i<list.length;i++){if(!list[i].id&&i===1){try{list[i].click()}catch(e){}done=true;break;}}}
+      refreshBtns();
+      return done;
+    }
+    document.documentElement.setAttribute('data-tab','langs');
+    refreshBtns();
+    return true;
+  }
+  function copyText(t,ok){
+    function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();ok();}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok).catch(fb);
+    else fb();
+  }
+  function filterCards(pageId,q){
+    q=(q||'').trim().toLowerCase();
+    var cards=Array.prototype.slice.call(document.querySelectorAll('#'+pageId+' .card'));
+    var shown=0;
+    cards.forEach(function(c){
+      var hit=!q||c.textContent.toLowerCase().indexOf(q)>-1;
+      c.style.display=hit?'':'none';
+      if(hit)shown++;
+    });
+    document.querySelectorAll('#'+pageId+' .xgrid').forEach(function(g){
+      var vis=Array.prototype.slice.call(g.querySelectorAll('.card')).filter(function(c){return c.style.display!=='none'}).length;
+      g.style.display=vis?'':'none';
+    });
+    var cnt=document.getElementById(pageId==='dashboard-page'?'dashCount':'promptsCount');
+    if(cnt)cnt.textContent=q?('\u0627\u0644\u0646\u062A\u0627\u0626\u062C: '+shown+' / '+cards.length):(cards.length+' \u0645\u062B\u0627\u0644');
+  }
+  function initExtra(){
+    document.querySelectorAll('#dashboard-page .card:not(.no-auto),#prompts-page .card:not(.no-auto)').forEach(function(card){
+      var demo=card.querySelector('.demo'),pre=card.querySelector('pre');
+      if(!demo||!pre)return;
+      var clean=function(t){return t.split('\n').map(function(l){return l.trim()}).filter(Boolean).join('\n')};
+      var html=clean(demo.innerHTML.replace(/\sstyle="[^"]*"/g,''));
+      var css='';
+      card.querySelectorAll('style').forEach(function(s){css+='\n'+s.textContent.trim()});
+      var text='<!-- HTML -->\n'+html+'\n\n/* CSS */'+css;
+      pre.textContent=text;
+      var btn=card.querySelector('.code button');
+      if(btn)btn.addEventListener('click',function(){
+        copyText(text,function(){
+          btn.textContent='\u2705 \u062A\u0645 \u0627\u0644\u0646\u0633\u062E!';
+          toast('\u062A\u0645 \u0646\u0633\u062E \u0627\u0644\u0643\u0648\u062F \uD83D\uDCCB');
+          setTimeout(function(){btn.textContent='\u0646\u0633\u062E \u0627\u0644\u0643\u0648\u062F'},1500);
+        });
+      });
+    });
+    document.querySelectorAll('[data-copy-src]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var src=document.getElementById(b.getAttribute('data-copy-src'));
+        var tx=src?src.textContent.replace(/^\s+|\s+$/g,''):'';
+        if(!tx)return;
+        copyText(tx,function(){
+          toast('\u062A\u0645 \u0646\u0633\u062E \u0627\u0644\u0628\u0631\u0648\u0645\u0628\u062A \uD83D\uDCCB \u0627\u0644\u0635\u0642\u0647 \u0644\u0623\u064A AI');
+          var o=b.textContent;b.textContent='\u2705 \u062A\u0645 \u0627\u0644\u0646\u0633\u062E!';
+          setTimeout(function(){b.textContent=o},1600);
+        });
+      });
+    });
+    var ds=document.getElementById('dashSearch');
+    if(ds)ds.addEventListener('input',function(){filterCards('dashboard-page',ds.value)});
+    var ps=document.getElementById('promptsSearch');
+    if(ps)ps.addEventListener('input',function(){filterCards('prompts-page',ps.value)});
+    var vt=document.getElementById('dashViewToggle');
+    if(vt)vt.addEventListener('click',function(){
+      document.getElementById('dashboard-page').classList.toggle('net');
+      toast(document.getElementById('dashboard-page').classList.contains('net')?'\uD83D\uDDC2\uFE0F \u0639\u0631\u0636 \u0634\u0628\u0643\u0629':'\uD83D\uDCC4 \u0639\u0631\u0636 \u0639\u0645\u0648\u062F');
+    });
+    filterCards('dashboard-page','');
+  }
+  (function early(){
+    var h=(location.hash||'').replace('#',''),s='';
+    try{s=localStorage.getItem(KEY)||''}catch(e){}
+    if(PAGES.indexOf(h)>-1)document.documentElement.setAttribute('data-tab',h);
+    else if(PAGES.indexOf(s)>-1)document.documentElement.setAttribute('data-tab',s);
+  })();
+  function boot(){
+    initExtra();
+    if(window.MutationObserver){
+      var root=document.getElementById('root');
+      if(root){
+        var mo=new MutationObserver(function(){ensureButtons();});
+        mo.observe(root,{childList:true,subtree:true});
+      }
+    }
+    var tries=0;
+    var iv=setInterval(function(){
+      tries++;
+      try{
+        var hasBar=ensureButtons();
+        var hasMain=!!document.querySelector('#root main');
+        if(hasBar&&hasMain){if(restore()){clearInterval(iv);}}
+      }catch(e){}
+      if(tries>400)clearInterval(iv);
+    },300);
+    setInterval(function(){try{ensureButtons()}catch(e){}},3000);
+  }
+  if(document.readyState!=='loading')boot();
+  else document.addEventListener('DOMContentLoaded',boot);
+})();
+
+</script>
 </body>
 </html>
