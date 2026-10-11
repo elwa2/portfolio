@@ -3232,7 +3232,8 @@
     {t:"@supports - اختبار دعم المتصفح",c:":root{--1:#fff9c4;--2:#333}\n@supports (accent-color:#fff){.notice{display:none}}\n.notice{background:var(--1);border-radius:6px;color:var(--2);margin:0 auto 1.5rem;padding:.5rem;text-align:center;width:clamp(300px,60%,850px)}",g:["css","modern","feature"]},
     {t:"Aspect Ratio - نسبة العرض إلى الارتفاع",c:":root{--1:#000}\n.card-img{border:2px solid var(--1);width:100%;aspect-ratio:1/1}\n.card-img{width:100%}\n.card-img.facebook{aspect-ratio:4/3}\n.card-img.instagram{aspect-ratio:1/1}\n.card-img.youtube{aspect-ratio:16/9}\n.card-img.tiktok{aspect-ratio:9/16}",g:["css","layout","modern"]},
     {t:"Scroll Behavior - تمرير سلس",c:"html{scroll-behavior:smooth}",g:["css","ui","modern"]},
-    {t:"Clamp - تحجيم سائل متقدم",c:":root{--1:#ee82ee;--2:#fefefe}\n.clamp{border:2px solid var(--1);background-color:var(--2);margin:0 auto;padding:15px;width:clamp(500px,80%,1200px)}\n.clamp p{font-size:clamp(14px,1vw,1.2rem)}",g:["responsive","css","modern"]}
+    {t:"Clamp - تحجيم سائل متقدم",c:":root{--1:#ee82ee;--2:#fefefe}\n.clamp{border:2px solid var(--1);background-color:var(--2);margin:0 auto;padding:15px;width:clamp(500px,80%,1200px)}\n.clamp p{font-size:clamp(14px,1vw,1.2rem)}",g:["responsive","css","modern"]},
+    {t:"فافيكون متحرك - Animated Favicon",c:"<link id='favicon' rel='icon' type='image/png' href=''/>\n<canvas id='c' width='32' height='32' style='display:none'></canvas>\n<script>\n//<![CDATA[\n// الألوان والحرف من لوحة التحكم بالأعلى (c1..c4 + ink + letter)\nconst FAV = { c1:\"#064e3b\", c2:\"#10b981\", c3:\"#059669\", c4:\"#fbbf24\", ink:\"#ffffff\", letter:\"عـ\" };\nconst canvas = document.getElementById('c');\nconst ctx = canvas.getContext('2d');\nconst link = document.getElementById('favicon');\nif (link && canvas && ctx) {\n  function draw(t){\n    const pulse = (Math.sin(t*0.003)+1)/2;\n    const g = ctx.createLinearGradient(0,0,32,32);\n    g.addColorStop(0, FAV.c1);\n    g.addColorStop(0.5, pulse > 0.5 ? FAV.c2 : FAV.c3);\n    g.addColorStop(1, FAV.c4);\n    ctx.fillStyle=g;\n    ctx.beginPath();\n    if(ctx.roundRect){ ctx.roundRect(0,0,32,32,7); } else { ctx.rect(0,0,32,32); }\n    ctx.fill();\n    ctx.fillStyle = 'rgba(255,255,255,'+(0.12+pulse*0.18)+')';\n    ctx.beginPath();\n    ctx.arc(16,16,8+pulse*4,0,Math.PI*2);\n    ctx.fill();\n    ctx.fillStyle=FAV.ink;\n    ctx.font='bold 20px Cairo, sans-serif';\n    ctx.textAlign='center';\n    ctx.textBaseline='middle';\n    ctx.shadowColor='rgba(0,0,0,0.5)';\n    ctx.shadowBlur=4;\n    ctx.fillText(FAV.letter,16,17);\n    ctx.shadowBlur=0;\n    link.href = canvas.toDataURL('image/png');\n    setTimeout(function(){\n      if(!document.hidden) requestAnimationFrame(draw);\n      else setTimeout(function(){ requestAnimationFrame(draw); },1000);\n    },500);\n  }\n  requestAnimationFrame(draw);\n  document.addEventListener('visibilitychange', function(){ if(!document.hidden) requestAnimationFrame(draw); });\n}\n//]]>\n<\/script>",g:["javascript","brand","logo","favicon"]}
   ];
 
   // ── HELPERS ──
@@ -3385,6 +3386,22 @@
         vars.push({ key, label: 'نص ' + textIdx, value: val, type: 'text' });
       }
     }
+
+    // ── JS colors: '#rrggbb' داخل الأكواد (مثل كود الفافيكون) — كل لون يظهر له منتقي في لوحة التحكم ──
+    const jsHexRe = /["'](#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3}))["']/g;
+    const jsHexSeen = new Set();
+    let jm;
+    while ((jm = jsHexRe.exec(code)) !== null) {
+      const hx = jm[1].toLowerCase();
+      const before = code.slice(Math.max(0, jm.index - 34), jm.index);
+      if (/--[\w-]+\s*:\s*["']?$/.test(before)) continue; // قيمة --var معالجة مسبقاً
+      if (jsHexSeen.has(hx)) continue;
+      jsHexSeen.add(hx);
+      let lbl = 'لون ' + jsHexSeen.size;
+      const nm = before.match(/([A-Za-z0-9_\u0600-\u06FF$-]+)\s*[:=]\s*["']?$/);
+      if (nm) lbl = nm[1];
+      vars.push({ key: '__c' + jsHexSeen.size, label: lbl, value: jm[1], type: 'color' });
+    }
     return vars;
   }
 
@@ -3424,8 +3441,27 @@
       return m;
     });
 
+    // ── JS colors: استبدال '#rrggbb' بالقيم المختارة من لوحة التحكم (نفس ترتيب detectVars) ──
+    const __hexList = [];
+    const __hexSeen = new Set();
+    const __hexScan = /["'](#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3}))["']/g;
+    let __hm;
+    while ((__hm = __hexScan.exec(code)) !== null) {
+      const __hx = __hm[1].toLowerCase();
+      const __before = code.slice(Math.max(0, __hm.index - 34), __hm.index);
+      if (/--[\w-]+\s*:\s*["']?$/.test(__before)) continue;
+      if (!__hexSeen.has(__hx)) { __hexSeen.add(__hx); __hexList.push(__hx); }
+    }
+    __hexList.forEach((__hx, __i) => {
+      const __k = '__c' + (__i + 1);
+      if (values[__k] !== undefined) {
+        const __esc = __hx.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        r = r.replace(new RegExp(__esc, 'gi'), values[__k]);
+      }
+    });
+
     for (const [key, val] of Object.entries(values)) {
-      if (key.startsWith('__url_') || key.startsWith('__txt_')) continue;
+      if (key.startsWith('__url_') || key.startsWith('__txt_') || key.startsWith('__c')) continue;
       const esc = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       r = r.replace(new RegExp('(' + esc + '\\s*:\\s*)[^;]+;', 'g'), (_, p) => p + val + ';');
       r = r.replace(new RegExp('var\\(\\s*' + esc + '\\s*\\)', 'g'), val);
