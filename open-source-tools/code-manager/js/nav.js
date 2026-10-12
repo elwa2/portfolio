@@ -92,7 +92,6 @@
   // ── NAV HUB ──
   const NAV_CATS = [
     { tag:'all',        label:'الكل',       ic:'ti-layout-grid' },
-    { tag:'starred',    label:'محفوظ',      ic:'ti-star', star:true },
     { tag:'css',        label:'CSS',        ic:'ti-brand-css3' },
     { tag:'responsive', label:'Responsive', ic:'ti-devices' },
     { tag:'brand',      label:'Brand',      ic:'ti-swatch' },
@@ -145,8 +144,14 @@
     b.click();
   }
   function navOpenCat(tag){
-    const b = document.querySelector('.filter-tag[data-tag="' + tag + '"]');
-    if(b){ navView = 'codes'; navLastDash = 'main'; setTag(b); }
+    navView = 'codes';
+    navLastDash = 'main';
+    if (typeof activeTag !== 'undefined') activeTag = tag;
+    else window.activeTag = tag;
+    document.querySelectorAll('.filter-tag').forEach(b => b.classList.toggle('active', b.dataset.tag === tag));
+    if (typeof renderAll === 'function') renderAll();
+    else if (typeof window.renderAll === 'function') window.renderAll();
+    document.getElementById('mainBody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function navSync(){
@@ -175,10 +180,10 @@
     let html = '';
     if(navView === 'codes'){
       html = NAV_CATS.map(c => {
-        const n = c.tag==='all' ? DATA.length : c.tag==='starred' ? starredIds.size
+        const n = c.tag==='all' ? DATA.length
                 : DATA.filter(s => s.tags.includes(c.tag)).length;
         const on = inCodes && activeTag === c.tag;
-        return `<button class="nav-chip${on?' on':''}${c.star?' star':''}" onclick="navOpenCat('${c.tag}')">
+        return `<button class="nav-chip${on?' on':''}" onclick="navOpenCat('${c.tag}')">
           <i class="ti ${c.ic}" aria-hidden="true"></i>${c.label}<span class="n">${n}</span></button>`;
       }).join('');
     } else {
@@ -306,12 +311,12 @@
     const list=getFiltered().filter(s=>!q||s.title.toLowerCase().includes(q)||s.tags.some(t=>t.toLowerCase().includes(q)));
     const byId=Object.fromEntries(list.map(s=>[s.id,s]));
     const pick=arr=>arr.map(id=>byId[id]).filter(Boolean);
-    const stars=list.filter(s=>starredIds.has(s.id)).slice(0,8);
+    const fresh=list.slice(0,8);
     const top=pick(Object.keys(use).filter(id=>use[id].n>1).sort((a,b)=>use[b].n-use[a].n)).slice(0,5);
     const recent=pick(Object.keys(use).sort((a,b)=>use[b].t-use[a].t)).slice(0,5);
     let h='';
     const sec=(t,arr,badge)=>arr.length?`<div class="qn-h">${t}<b>${arr.length}</b></div>`+arr.map(s=>item(s,'',badge?` <small>×${use[s.id]?use[s.id].n:0}</small>`:'')).join(''):'';
-    h+=sec('⭐ المحفوظة',stars)+sec('🔥 الأكثر استخداماً',top,true)+sec('🕘 آخر ما استخدمت',recent);
+    h+=sec('🆕 الأحدث',fresh)+sec('🔥 الأكثر استخداماً',top,true)+sec('🕘 آخر ما استخدمت',recent);
     let n=0;
     GROUP_LIST.forEach(g=>{
       const items=list.filter(s=>sectionGroup(s)===g.key); if(!items.length) return;

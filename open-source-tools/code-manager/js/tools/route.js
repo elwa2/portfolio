@@ -165,9 +165,9 @@
       title: name,
       desc: 'لوحة متغيرات الثيم على روت مخصص (' + rtConfig.route + ')',
       tags: ['variables','palette','css','brand'],
-      starred: false,
       codes: [{ lang: 'CSS', code: rtGenerateCSS() }]
     });
+    if (typeof saveUserOverlay === 'function') saveUserOverlay();
     showToast('تم حفظ البالتة في المكتبة!');
   }
 
@@ -181,13 +181,13 @@
       title: name,
       desc: 'حقن HTML على روت مخصص (' + rtConfig.route + ')',
       tags: ['html','javascript','route','salla'],
-      starred: false,
       codes: [
         { lang: 'HTML', code: html },
         { lang: 'JS', code: rtGenerateJS() }
       ]
     });
     openIds.add(DATA[0].id);
+    if (typeof saveUserOverlay === 'function') saveUserOverlay();
     showToast('تم حفظ كود الـHTML في المكتبة!');
   }
 

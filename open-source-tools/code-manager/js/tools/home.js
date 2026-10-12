@@ -21,7 +21,7 @@
   function renderHomeDash(){
     document.getElementById('countBadge').textContent = DATA.length + ' كود';
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
-    const featured = DATA.filter(s => starredIds.has(s.id)).slice(0, 8);
+    const latest = DATA.slice(0, 8);
 
     const dashCards = [
       { id:'cssDashBtn', t:'استوديو CSS', s:'imgscr + :has()', i:'ti-brand-css3', c:'c-purple' },
@@ -93,10 +93,10 @@
     const h = now.getHours();
     const greet = h < 12 ? 'صباح الخير' : (h < 18 ? 'مساء الخير' : 'مساءً سعيدًا');
 
-    const starredHtml = featured.length ? `
-      <div class="home-title"><i class="ti ti-star" aria-hidden="true"></i> محفوظاتي <span class="hln">${featured.length} عنصر</span></div>
+    const latestHtml = latest.length ? `
+      <div class="home-title"><i class="ti ti-sparkles" aria-hidden="true"></i> أحدث الأكواد <span class="hln">${latest.length} عنصر</span></div>
       <div class="home-grid">
-        ${featured.map(s=>`
+        ${latest.map(s=>`
           <div class="home-card c-gold" onclick="goHomeTo('${s.id}')" title="${escHtml(s.title)}" style="cursor:pointer">
             <div class="home-card-ic"><i class="ti ti-code" aria-hidden="true"></i></div>
             <div><div class="home-card-t">${escHtml(s.title)}</div><div class="home-card-s">${s.codes.length} أكواد</div></div>
@@ -116,7 +116,7 @@
         <div class="home-title"><i class="ti ti-home" aria-hidden="true"></i> لوحاتي <span class="hln">${dashCards.length} لوحة</span></div>
         <div class="home-grid">${dashHtml}</div>
 
-        ${starredHtml}
+        ${latestHtml}
 
         <div class="home-title"><i class="ti ti-layout-grid" aria-hidden="true"></i> أدواتي المفتوحة المصدر <span class="hln">${toolLinks.length} أداة</span></div>
         <div class="home-grid tools">${toolsHtml}</div>

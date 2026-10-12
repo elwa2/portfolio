@@ -9,15 +9,51 @@
       id: 's' + i,
       title: s.t,
       tags: s.g,
-      starred: false,
       desc: s.t.split(' - ')[1] || s.t.split(' - ')[0] || 'مقطع كود'
     };
     if (s.p) return { ...std, patterns: s.p, selectedPattern: 0, codes: [{ lang: isJS(s.p[0].code) ? 'JS' : 'CSS', code: s.p[0].code }] };
     return { ...std, codes: [{ lang: isJS(s.c) ? 'JS' : 'CSS', code: s.c }] };
   });
 
+  // ── PERSISTENCE (أكواد المستخدم + المحذوفات تبقى بعد التحديث) ──
+  const USER_KEY = 'csman_v2_user_data_v1';
+  const DEL_KEY  = 'csman_v2_deleted_v1';
+  function loadUserOverlay(){
+    try {
+      const del = JSON.parse(localStorage.getItem(DEL_KEY) || '[]');
+      if (Array.isArray(del) && del.length) {
+        const gone = new Set(del);
+        DATA = DATA.filter(s => !gone.has(s.id));
+      }
+    } catch(e){}
+    try {
+      const custom = JSON.parse(localStorage.getItem(USER_KEY) || '[]');
+      if (Array.isArray(custom) && custom.length) {
+        const ids = new Set(DATA.map(s => s.id));
+        custom.forEach(s => {
+          if (!s || !s.id || !s.title || !Array.isArray(s.codes) || !s.codes.length) return;
+          if (ids.has(s.id)) return;
+          ids.add(s.id);
+          DATA.unshift(s);
+        });
+      }
+    } catch(e){}
+  }
+  function saveUserOverlay(){
+    try {
+      const custom = DATA.filter(s => /^(sec_|imp_|has_|rt_|cv_)/.test(s.id));
+      localStorage.setItem(USER_KEY, JSON.stringify(custom));
+    } catch(e){}
+  }
+  function saveDeleted(id){
+    try {
+      const del = JSON.parse(localStorage.getItem(DEL_KEY) || '[]');
+      if (!del.includes(id)) localStorage.setItem(DEL_KEY, JSON.stringify([...del, id]));
+    } catch(e){}
+  }
+  loadUserOverlay();
+
   let openIds  = new Set();
-  let starredIds = new Set();
   let activeTag = 'all';
   let wrapMode = true;
   let _deleteTargetId = null;
@@ -526,10 +562,31 @@
     setTimeout(()=>t.classList.remove('show'), 2200);
   }
 
-  // ── COPY ──
+  // ── COPY (مع بديل يعمل على file:// والمتصفحات القديمة) ──
+  function fallbackCopy(text){
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return true;
+    } catch(e){ return false; }
+  }
+  function writeText(text, ok, fail){
+    if (navigator.clipboard && window.isSecureContext !== false && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok).catch(() => {
+        if (fallbackCopy(text)) ok(); else if (fail) fail();
+      });
+    } else {
+      if (fallbackCopy(text)) ok(); else if (fail) fail();
+    }
+  }
   function copyCode(btn, encodedCode){
     const code = decodeURIComponent(encodedCode);
-    navigator.clipboard.writeText(code).then(()=>{
+    writeText(code, ()=>{
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> تم النسخ';
       showToast('تم نسخ الكود!');
@@ -537,7 +594,7 @@
         btn.classList.remove('copied');
         btn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> نسخ';
       }, 2000);
-    }).catch(()=>showToast('تعذّر النسخ'));
+    }, ()=>showToast('تعذّر النسخ'));
   }
 
   // ── TOGGLE + COPY ON CLICK ──
@@ -547,9 +604,7 @@
       const values = varValues.get(id) || {};
       const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
       const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
-      navigator.clipboard.writeText(liveCode).then(() => {
-        showToast('تم نسخ الكود!');
-      }).catch(() => {});
+      writeText(liveCode, () => { showToast('تم نسخ الكود!'); }, () => {});
     }
     if(openIds.has(id)) openIds.delete(id); else openIds.add(id);
     renderAll();
@@ -577,7 +632,7 @@
     const values = varValues.get(id) || {};
     const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
     const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
-    navigator.clipboard.writeText(liveCode).then(()=>{
+    writeText(liveCode, ()=>{
       showToast('تم نسخ الكود!');
       if(btn){
         const old = btn.innerHTML;
@@ -585,7 +640,7 @@
         btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> تم';
         setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = old; }, 1500);
       }
-    }).catch(()=>showToast('تعذّر النسخ'));
+    }, ()=>showToast('تعذّر النسخ'));
   }
 
   // ── أرقام الأسطر داخل مربعات الكود ──
@@ -632,21 +687,6 @@
     document.querySelectorAll('.code-pre').forEach(el => el.classList.toggle('wrap', wrapMode));
   }
 
-  // ── STAR ──
-  function toggleStar(id, btn, e){
-    e.stopPropagation();
-    if(starredIds.has(id)){
-      starredIds.delete(id);
-      btn.classList.remove('starred');
-    } else {
-      starredIds.add(id);
-      btn.classList.add('starred');
-    }
-    const sec = DATA.find(s=>s.id===id);
-    if(sec) sec.starred = starredIds.has(id);
-    if(activeTag==='starred') renderAll();
-  }
-
   // ── DELETE ──
   function confirmDelete(id, e){
     e.stopPropagation();
@@ -664,8 +704,9 @@
     }
     if(_deleteTargetId !== null){
       DATA = DATA.filter(s => s.id !== _deleteTargetId);
-      starredIds.delete(_deleteTargetId);
       openIds.delete(_deleteTargetId);
+      saveDeleted(_deleteTargetId);
+      saveUserOverlay();
       _deleteTargetId = null;
       closeConfirm();
       renderAll();
@@ -726,8 +767,7 @@ function getFiltered(){
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
     const p = parseQuery(q);
     return DATA.filter(s=>{
-      if(activeTag==='starred' && !starredIds.has(s.id)) return false;
-      if(activeTag!=='all' && activeTag!=='starred' && !s.tags.includes(activeTag)) return false;
+      if(activeTag!=='all' && !s.tags.includes(activeTag)) return false;
       if(!q) return true;
       // عمليات tag: و -
       if(p.tags.length && !p.tags.every(t => s.tags.some(x => x.toLowerCase().includes(t)))) return false;
@@ -770,7 +810,6 @@ function getFiltered(){
       if(ci !== -1){ score += 25; if(!fav){ fav = findFavLine(s, wl); } }
     }
     // مطابقة fuzzy على العنوان حتى لو مش كلمة كاملة
-    if(score > 0 && starredIds.has(s.id)) score += 10;
     if(!p.words.length) score = 0;
     const max = p.words.length ? 100 : 1;
     return { score, max, fav, hay: hay + ' ' + codeAll };
@@ -806,8 +845,7 @@ function getFiltered(){
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
     const p = parseQuery(q);
     const base = DATA.filter(s=>{
-      if(activeTag==='starred' && !starredIds.has(s.id)) return false;
-      if(activeTag!=='all' && activeTag!=='starred' && !s.tags.includes(activeTag)) return false;
+      if(activeTag!=='all' && !s.tags.includes(activeTag)) return false;
       return true;
     });
     const rows = base.map(s => {
@@ -840,7 +878,6 @@ function getFiltered(){
     _sugSel = Math.min(_sugSel, _sugResults.length - 1);
     box.className = 'search-sug open';
     box.innerHTML = _sugResults.map((r, i) => {
-      const isStar = starredIds.has(r.s.id);
       const titleH = hlQuery(r.s.title, q);
       const tagsH = r.s.tags.slice(0, 3).map(t => `<span class="sug-tag">${escHtml(t)}</span>`).join('');
       const prev = r.fav
@@ -848,7 +885,7 @@ function getFiltered(){
         : '';
       return `<div class="sug-item${i === _sugSel ? ' active' : ''}" data-id="${r.s.id}"
         onmouseenter="sugHover(${i})" onclick="sugJump('${r.s.id}')">
-        <span class="sug-ic${isStar ? ' star' : ''}"><i class="ti ${isStar ? 'ti-star-filled' : 'ti-file-code'}" aria-hidden="true"></i></span>
+        <span class="sug-ic"><i class="ti ti-file-code" aria-hidden="true"></i></span>
         <div class="sug-body">
           <div class="sug-title">${titleH}</div>
           <div class="sug-sub">${tagsH}${prev}</div>
@@ -894,6 +931,14 @@ function getFiltered(){
     renderAll();
     if(_sugTimer) clearTimeout(_sugTimer);
     _sugTimer = setTimeout(renderSuggest, 120);
+  }
+
+  function clearSearch(){
+    const si = document.getElementById('searchInput');
+    if(si) si.value = '';
+    activeTag = 'all';
+    document.querySelectorAll('.filter-tag').forEach(b=>b.classList.toggle('active', b.dataset.tag === 'all'));
+    renderAll();
   }
 
   /* ── QUICK INDEX: قفز فوري لأي كود ── */
@@ -1026,7 +1071,8 @@ function getFiltered(){
     badge.textContent = list.length + ' كود';
 
     if(!list.length){
-      body.innerHTML = `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p></div>`;
+      body.innerHTML = `<div class="empty-state"><i class="ti ti-mood-empty" aria-hidden="true"></i><p>لا توجد أكواد مطابقة</p>
+        <button class="btn-cancel" style="margin-top:12px" onclick="clearSearch()">مسح البحث وعرض الكل</button></div>`;
       return;
     }
 
@@ -1111,12 +1157,9 @@ function getFiltered(){
       </div>`;
     }
 
-    function secHeadBtns(s, isStar){
+    function secHeadBtns(s){
       return `<div class="section-actions">
-        <button class="star-btn${isStar?' starred':''}" onclick="toggleStar('${s.id}',this,event)" title="${isStar?'تم الحفظ':'حفظ'}" aria-label="${isStar?'إزالة من المحفوظات':'حفظ'}">
-          <i class="ti ti-star" aria-hidden="true"></i>
-        </button>
-        <button class="delete-btn" onclick="confirmDelete('${s.id}',event)" title="حذف">
+        <button class="delete-btn" onclick="confirmDelete('${s.id}',event)" title="حذف" aria-label="حذف ${escHtml(s.title)}">
           <i class="ti ti-trash" aria-hidden="true"></i>
         </button>
       </div>`;
@@ -1124,7 +1167,6 @@ function getFiltered(){
 
     function cardHtml(s, q, searchWords){
       const isOpen  = openIds.has(s.id);
-      const isStar  = starredIds.has(s.id);
       const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
       const countLabel = s.codes.length > 1 ? `<span class="code-count">${s.codes.length} أكواد</span>` : '';
       return `<div class="section" data-id="${s.id}">
@@ -1133,7 +1175,7 @@ function getFiltered(){
           <span class="section-title">${hlQuery(s.title, q)}</span>
           ${countLabel}
           <div class="section-tags">${tagsHtml}</div>
-          ${secHeadBtns(s, isStar)}
+          ${secHeadBtns(s)}
         </div>
         ${secBodyHtml(s, searchWords)}
       </div>`;
@@ -1141,7 +1183,6 @@ function getFiltered(){
 
     function rowHtml(s, i, q, searchWords){
       const isOpen  = openIds.has(s.id);
-      const isStar  = starredIds.has(s.id);
       const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
       const countLabel = s.codes.length > 1 ? `<span class="code-count">${s.codes.length} أكواد</span>` : '';
       const firstLang = (s.codes[0] && s.codes[0].lang) || '';
@@ -1156,7 +1197,7 @@ function getFiltered(){
             <button class="crow-copy" onclick="quickCopy('${s.id}',this,event)" title="نسخ سريع">
               <i class="ti ti-copy" aria-hidden="true"></i> نسخ
             </button>
-            ${secHeadBtns(s, isStar)}
+            ${secHeadBtns(s)}
             <i class="ti ti-chevron-left chevron${isOpen?' open':''}" aria-hidden="true"></i>
           </div>
         </div>
@@ -1167,7 +1208,7 @@ function getFiltered(){
     const cardsHtml = list.map(s=>cardHtml(s, q, _searchWords));
     const useFlat = !!q || _searchWords.length || parseQuery((document.getElementById('searchInput')||{}).value||'').tags.length || parseQuery((document.getElementById('searchInput')||{}).value||'').excl.length;
     const idxHtml = `<div class="idx-bar"><span class="idx-label"><i class="ti ti-list" aria-hidden="true"></i> فهرس ${list.length}</span><div class="idx-list">${
-      list.map((s,i)=>`<button class="idx-chip${starredIds.has(s.id)?' star':''}" onclick="idxJump('${s.id}')" title="${escHtml(s.title)}"><span class="idx-n">${i+1}</span><span class="idx-t">${escHtml(s.title)}</span></button>`).join('')
+      list.map((s,i)=>`<button class="idx-chip" onclick="idxJump('${s.id}')" title="${escHtml(s.title)}"><span class="idx-n">${i+1}</span><span class="idx-t">${escHtml(s.title)}</span></button>`).join('')
     }</div><button class="idx-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="أعلى الصفحة (Alt+↑ للتنقل بين الأكواد)"><i class="ti ti-arrow-up" aria-hidden="true"></i></button></div>`;
     const view = getCodesView();
     const segHtml = `<div class="cb-seg" title="طريقة العرض">
@@ -1318,8 +1359,8 @@ function getFiltered(){
       const resultsText = document.getElementById('frResultsText');
       resultsText.innerHTML = `✅ تم استبدال <strong>${totalReplaced}</strong> نصوص بنجاح!`;
       resultsDiv.style.display = 'block';
-      
-      localStorage.setItem('codeSnippets', JSON.stringify(DATA));
+
+      saveUserOverlay();
       renderAll();
       showToast(`تم استبدال ${totalReplaced} نص!`);
       
@@ -1341,8 +1382,9 @@ function getFiltered(){
     const id = 'sec_' + Date.now();
     const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : ['css'];
 
-    DATA.unshift({ id, title, desc: desc||'لا يوجد وصف', tags, starred:false, codes:[{ lang, code }] });
+    DATA.unshift({ id, title, desc: desc||'لا يوجد وصف', tags, codes:[{ lang, code }] });
     openIds.add(id);
+    saveUserOverlay();
     closeModal();
     renderAll();
     if(wrapMode) document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
@@ -1351,7 +1393,7 @@ function getFiltered(){
 
   // ── EXPORT / IMPORT ──
   function exportData(){
-    const exportArr = DATA.map(s => ({ title:s.title, tags:s.tags, desc:s.desc, codes:s.codes, patterns:s.patterns, selectedPattern:s.selectedPattern, starred:starredIds.has(s.id) }));
+    const exportArr = DATA.map(s => ({ id:s.id, title:s.title, tags:s.tags, desc:s.desc, codes:s.codes, patterns:s.patterns, selectedPattern:s.selectedPattern }));
     const json = JSON.stringify(exportArr, null, 2);
     const blob = new Blob([json], { type:'application/json' });
     const url  = URL.createObjectURL(blob);
@@ -1370,11 +1412,14 @@ function getFiltered(){
         const imported = JSON.parse(ev.target.result);
         if(!Array.isArray(imported)) throw new Error();
         imported.forEach(item => {
+          if(!item || !item.title || !Array.isArray(item.codes) || !item.codes.length) return;
           if(!item.id) item.id = 'imp_' + Date.now() + Math.random().toString(36).slice(2,6);
-          if(item.starred) starredIds.add(item.id);
+          if(!Array.isArray(item.tags) || !item.tags.length) item.tags = ['css'];
           openIds.add(item.id);
         });
-        DATA = imported;
+        DATA = imported.filter(x => x && x.title && Array.isArray(x.codes) && x.codes.length);
+        try { localStorage.removeItem(DEL_KEY); } catch(e){}
+        saveUserOverlay();
         renderAll();
         if(wrapMode) document.querySelectorAll('.code-pre').forEach(el => el.classList.add('wrap'));
         showToast('تم الاستيراد بنجاح!');

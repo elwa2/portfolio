@@ -67,9 +67,10 @@
       id, title: name || full.substring(0, 55) + '...',
       tags: ['has', 'css'],
       desc: ':has() selector' + (parent ? ' — ' + parent : ''),
-      starred: false, codes: [{ lang: 'CSS', code: full }]
+      codes: [{ lang: 'CSS', code: full }]
     });
     openIds.add(id);
+    if (typeof saveUserOverlay === 'function') saveUserOverlay();
     document.getElementById('hasName').value = '';
     document.getElementById('hasParent').value = '';
     document.getElementById('hasTarget').value = '';
@@ -120,7 +121,6 @@
     const itemsHtml = filtered.length
       ? filtered.map(s => {
           const isOpen  = openIds.has(s.id);
-          const isStar  = starredIds.has(s.id);
           const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
           const values = varValues.get(s.id) || {};
           const liveCode = s.codes[0].code;
@@ -146,8 +146,7 @@
               <span class="section-title">${hlQuery(s.title, q)}</span>
               <div class="section-tags">${tagsHtml}</div>
               <div class="section-actions">
-                <button class="star-btn${isStar?' starred':''}" onclick="toggleStar('${s.id}',this,event)"><i class="ti ti-star"></i></button>
-                <button class="delete-btn" onclick="confirmDelete('${s.id}',event)"><i class="ti ti-trash"></i></button>
+                <button class="delete-btn" onclick="confirmDelete('${s.id}',event)" title="حذف" aria-label="حذف"><i class="ti ti-trash"></i></button>
               </div>
             </div>
             ${bodyHtml}

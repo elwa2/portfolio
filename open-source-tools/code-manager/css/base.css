@@ -132,7 +132,6 @@
     background: var(--bg-elevated); border: 1px solid var(--border-sub);
     color: var(--text-2); font-size: 14px;
   }
-  .sug-ic.star { color: var(--gold, var(--accent)); }
   .sug-body { flex: 1 1 auto; min-width: 0; }
   .sug-title { font-size: 12.5px; font-weight: 700; color: var(--text-1); }
   .sug-sub { display: flex; gap: 5px; align-items: center; margin-top: 3px; white-space: nowrap; overflow: hidden; }
@@ -245,7 +244,6 @@
     background: var(--accent-grad); color: #fff; border-color: transparent;
     box-shadow: 0 2px 12px rgba(124,58,237,0.4);
   }
-  .filter-tag.starred-btn { display: flex; align-items: center; gap: 5px; }
   .filter-tag svg { vertical-align: -2px; margin-inline-end: 5px; }
 
   /* زر استوديو الأدوات الموحد */
@@ -459,7 +457,6 @@
   .nav-chip:hover, .nav-tool:hover{border-color:var(--border-def); color:var(--text-1); background:var(--glass-sub)}
   .nav-chip.on{background:var(--accent-grad); color:#fff; border-color:transparent; box-shadow:0 2px 12px rgba(124,58,237,.45)}
   .nav-chip .n{font:500 10px 'JetBrains Mono',monospace; opacity:.7}
-  .nav-chip.star i{color:var(--accent-warm)} .nav-chip.on.star i{color:#fff}
   .nav-sep{width:1px; height:20px; background:var(--border-def); flex-shrink:0; margin:0 4px}
   .nav-group{display:flex; align-items:center; gap:6px; flex-shrink:0;
     padding-inline-end:12px; margin-inline-end:6px; border-inline-end:1px solid var(--border-sub)}

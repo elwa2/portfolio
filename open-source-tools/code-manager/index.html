@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="مدير الأكواد — مكتبة أكواد CSS وJavaScript مع بحث فوري ونسخ بنقرة واحدة وأدوات تطوير">
 <title>مدير الأكواد 🌶️</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +38,7 @@
     <div class="search-sug" id="searchSug"></div>
   </div>
 
-  <span class="count-badge" id="countBadge">منبه</span>
+  <span class="count-badge" id="countBadge" role="status" aria-live="polite">…</span>
 
   <div class="topbar-actions">
     <!-- إجراء رئيسي -->
@@ -112,9 +113,6 @@
     <button class="filter-tag" data-tag="salla" onclick="setTag(this)">Salla</button>
     <button class="filter-tag" data-tag="has" onclick="setTag(this)">:has()</button>
     <button class="filter-tag" data-tag="javascript" onclick="setTag(this)">JavaScript</button>
-    <button class="filter-tag starred-btn" data-tag="starred" onclick="setTag(this)">
-      <i class="ti ti-star" aria-hidden="true"></i> محفوظ
-    </button>
   </div>
   <div class="fb-row fb-tools-row">
     <span class="filter-label tools-label">الاستوديو</span>
