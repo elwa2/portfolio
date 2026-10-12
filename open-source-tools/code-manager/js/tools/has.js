@@ -156,7 +156,6 @@
           const tagsHtml = s.tags.map(t=>`<span class="stag">${escHtml(t)}</span>`).join('');
           const values = varValues.get(s.id) || {};
           const liveCode = s.codes[0].code;
-          const enc = encodeURIComponent(liveCode);
           let bodyHtml = '';
           if(isOpen){
             bodyHtml = `<div class="section-body open">
@@ -165,7 +164,7 @@
                 <div class="code-header">
                   <span class="lang-badge css">CSS</span>
                   <div class="code-actions">
-                    <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
+                    <button class="copy-btn" onclick="copyCodeId(this,'${s.id}',0)" title="نسخ"><i class="ti ti-copy"></i> نسخ</button>
                   </div>
                 </div>
 <pre class="code-pre${wrapMode?' wrap':''}">${hlCode(syntaxHL(liveCode), window._smartWords || [])}</pre>

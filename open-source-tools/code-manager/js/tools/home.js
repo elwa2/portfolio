@@ -220,9 +220,9 @@
         gsCacheSet(links);
         renderGSLinks(links);
       })
-      .catch(err => gsHandleError(err));
+      .catch(err => gsHandleError(err, force));
   }
-  function gsHandleError(err){
+  function gsHandleError(err, force){
     // fallback: JSONP (يعمل حتى من file:// ومن أي أصل)
     try {
       const cb = 'gsCallback' + Date.now();

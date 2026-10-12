@@ -280,8 +280,7 @@
         pre.innerHTML = syntaxHL(liveCode);
         if(typeof addLn === 'function'){ try{ delete pre.dataset.ln; addLn(pre); }catch(e){} }
         if (btn) {
-          const enc = encodeURIComponent(liveCode).replace(/'/g,"\\'");
-          btn.setAttribute('onclick', "copyCode(this,'" + enc + "')");
+          btn.setAttribute('onclick', "copyCodeId(this,'" + sectionId + "'," + i + ")");
         }
       }
     });
@@ -585,7 +584,9 @@
     }
   }
   function copyCode(btn, encodedCode){
-    const code = decodeURIComponent(encodedCode);
+    let code = '';
+    try { code = decodeURIComponent(String(encodedCode).replace(/&#39;/g, "'")); }
+    catch(e){ code = String(encodedCode || ''); }
     writeText(code, ()=>{
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> تم النسخ';
@@ -597,16 +598,45 @@
     }, ()=>showToast('تعذّر النسخ'));
   }
 
-  // ── TOGGLE + COPY ON CLICK ──
+  // ── COPY BY ID (بدون تمرير الكود في الـ attribute — آمن مع ' " < >) ──
+  function getLiveCodeById(sectionId, codeIdx){
+    const s = DATA.find(d => d.id === sectionId);
+    if(!s || !s.codes.length) return '';
+    const idx = Math.max(0, Math.min(codeIdx || 0, s.codes.length - 1));
+    const values = varValues.get(sectionId) || {};
+    const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+    return vars.length ? getLiveCode(s.codes[idx].code, values) : s.codes[idx].code;
+  }
+  function copyCodeId(btn, sectionId, codeIdx){
+    const code = getLiveCodeById(sectionId, codeIdx || 0);
+    if(!code && code !== ''){ showToast('تعذّر النسخ'); return; }
+    writeText(code, ()=>{
+      btn.classList.add('copied');
+      const old = btn.innerHTML;
+      btn.innerHTML = '<i class="ti ti-check" aria-hidden="true"></i> تم النسخ';
+      showToast('تم نسخ الكود!');
+      setTimeout(()=>{
+        btn.classList.remove('copied');
+        btn.innerHTML = old.indexOf('نسخ') > -1 ? old : '<i class="ti ti-copy" aria-hidden="true"></i> نسخ';
+      }, 2000);
+    }, ()=>showToast('تعذّر النسخ'));
+  }
+
+  // ── TOGGLE + COPY ON OPEN (النسخ فقط عند الفتح — مش عند القفل) ──
   function toggleSection(id){
-    const s = DATA.find(d => d.id === id);
-    if(s && s.codes.length) {
-      const values = varValues.get(id) || {};
-      const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
-      const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
-      writeText(liveCode, () => { showToast('تم نسخ الكود!'); }, () => {});
+    const willOpen = !openIds.has(id);
+    if(willOpen){
+      const s = DATA.find(d => d.id === id);
+      if(s && s.codes.length) {
+        const values = varValues.get(id) || {};
+        const vars = detectVars(s.codes.map(c=>c.code).join('\n'));
+        const liveCode = vars.length ? getLiveCode(s.codes[0].code, values) : s.codes[0].code;
+        writeText(liveCode, () => { showToast('تم نسخ الكود!'); }, () => {});
+      }
+      openIds.add(id);
+    } else {
+      openIds.delete(id);
     }
-    if(openIds.has(id)) openIds.delete(id); else openIds.add(id);
     renderAll();
   }
 
@@ -725,6 +755,11 @@
       const hb = document.getElementById('homeBtn');
       if (hb) hb.classList.remove('home-active');
     }
+    if(typeof showAlDash !== 'undefined' && showAlDash){
+      showAlDash = false;
+      const ab = document.getElementById('alDashBtn');
+      if (ab) ab.classList.remove('al-active');
+    }
     if(showScrollbarDash){
       showScrollbarDash = false;
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
@@ -767,10 +802,20 @@ function getFiltered(){
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
     const p = parseQuery(q);
     return DATA.filter(s=>{
-      if(activeTag!=='all' && !s.tags.includes(activeTag)) return false;
+      if(activeTag!=='all'){
+        const g = (typeof sectionGroup === 'function') ? sectionGroup(s) : null;
+        const rawHit = s.tags.some(x => String(x).toLowerCase() === String(activeTag).toLowerCase());
+        if(g){ if(g !== activeTag && !rawHit) return false; }
+        else if(!rawHit) return false;
+      }
       if(!q) return true;
       // عمليات tag: و -
-      if(p.tags.length && !p.tags.every(t => s.tags.some(x => x.toLowerCase().includes(t)))) return false;
+      if(p.tags.length && !p.tags.every(t => {
+        const tl = String(t).toLowerCase();
+        if(s.tags.some(x => String(x).toLowerCase().includes(tl))) return true;
+        try { if(typeof sectionGroup === 'function' && sectionGroup(s) === tl) return true; } catch(e){}
+        return false;
+      })) return false;
       const hay = s.title.toLowerCase() + ' ' + s.desc.toLowerCase() + ' ' + s.tags.join(' ').toLowerCase() + ' ' + s.codes.map(c=>c.code.toLowerCase()).join('\n');
       if(p.excl.length && p.excl.some(e => hay.includes(e))) return false;
       if(!p.words.length) return true;
@@ -845,7 +890,12 @@ function getFiltered(){
     const q = (document.getElementById('searchInput')||{}).value?.trim().toLowerCase()||'';
     const p = parseQuery(q);
     const base = DATA.filter(s=>{
-      if(activeTag!=='all' && !s.tags.includes(activeTag)) return false;
+      if(activeTag!=='all'){
+        const g = (typeof sectionGroup === 'function') ? sectionGroup(s) : null;
+        const rawHit = s.tags.some(x => String(x).toLowerCase() === String(activeTag).toLowerCase());
+        if(g){ if(g !== activeTag && !rawHit) return false; }
+        else if(!rawHit) return false;
+      }
       return true;
     });
     const rows = base.map(s => {
@@ -853,7 +903,12 @@ function getFiltered(){
       return { s, ...r };
     }).filter(r => {
       // فلتر العمليات: tag: و -
-      if(p.tags.length && !p.tags.every(t => r.s.tags.some(x => x.toLowerCase().includes(t)))) return false;
+      if(p.tags.length && !p.tags.every(t => {
+        const tl = String(t).toLowerCase();
+        if(r.s.tags.some(x => String(x).toLowerCase().includes(tl))) return true;
+        try { if(typeof sectionGroup === 'function' && sectionGroup(r.s) === tl) return true; } catch(e){}
+        return false;
+      })) return false;
       if(p.excl.length && p.excl.some(e => r.hay.includes(e))) return false;
       return r.score >= (p.words.length ? 5 : 0);
     });
@@ -1126,12 +1181,11 @@ function getFiltered(){
 
       const codesHtml = s.codes.map((c,i)=>{
         const liveCode = vars.length ? getLiveCode(c.code, values) : c.code;
-        const enc = encodeURIComponent(liveCode);
         return `<div class="code-block">
           <div class="code-header">
             <span class="lang-badge ${c.lang.toLowerCase()}">${escHtml(c.lang)}</span>
             <div class="code-actions">
-              <button class="copy-btn" onclick="copyCode(this,'${escHtml(enc)}')" title="نسخ الكود">
+              <button class="copy-btn" onclick="copyCodeId(this,'${s.id}',${i})" title="نسخ الكود">
                 <i class="ti ti-copy" aria-hidden="true"></i> نسخ
               </button>
             </div>

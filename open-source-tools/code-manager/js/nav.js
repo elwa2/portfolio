@@ -140,6 +140,16 @@
     navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync();
   }
 
+  // ── عرض الأكواد: تصفير أي داش مفتوح والرجوع للقائمة الرئيسية ──
+  function navShowCodes(){
+    navView = 'codes'; navLastHtml = '';
+    try { if(typeof clearDashFlags === 'function') clearDashFlags(); } catch(e){}
+    navLastDash = 'main';
+    if(typeof renderAll === 'function') renderAll();
+    else if(typeof window.renderAll === 'function') window.renderAll();
+    document.getElementById('mainBody')?.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
   // ── DESIGN STUDIO HERO (الألوان + Scrollbar + imgscr + :has() + التحكم في بطاقة واحدة) ──
   function designHero(active){
     try {
@@ -212,6 +222,7 @@
     const codesTab = document.getElementById('navSegCodes');
     if(codesTab){
       codesTab.classList.toggle('on', navView === 'codes');
+      codesTab.setAttribute('aria-pressed', String(navView === 'codes'));
       if(navView === 'codes') codesTab.setAttribute('aria-current', 'page');
       else codesTab.removeAttribute('aria-current');
     }
@@ -225,7 +236,12 @@
     if(navView === 'codes'){
       html = NAV_CATS.map(c => {
         const n = c.tag==='all' ? DATA.length
-                : DATA.filter(s => s.tags.includes(c.tag)).length;
+                : DATA.filter(s => {
+                    try {
+                      if(typeof sectionGroup === 'function' && sectionGroup(s) === c.tag) return true;
+                    } catch(e){}
+                    return s.tags.some(x => String(x).toLowerCase() === String(c.tag).toLowerCase());
+                  }).length;
         const on = inCodes && activeTag === c.tag;
         return `<button class="nav-chip${on?' on':''}" onclick="navOpenCat('${c.tag}')">
           <i class="ti ${c.ic}" aria-hidden="true"></i>${c.label}<span class="n">${n}</span></button>`;
@@ -344,6 +360,11 @@
   const _qc=window.quickCopy;     window.quickCopy=function(id){rec(id);return _qc.apply(this,arguments)};
   const _cc=window.copyCode;      window.copyCode=function(btn){
     const h=btn&&btn.closest&&btn.closest('[data-id]'); if(h) rec(h.dataset.id); return _cc.apply(this,arguments)};
+  const _cci=window.copyCodeId;
+  if(_cci) window.copyCodeId=function(btn, sid){
+    if(sid) rec(sid);
+    else { const h=btn&&btn.closest&&btn.closest('[data-id]'); if(h) rec(h.dataset.id); }
+    return _cci.apply(this,arguments)};
 
   const title=id=>(DATA.find(s=>s.id===id)||{}).title||'';
   const item=(s,n,extra)=>`<a class="qn-i" data-qid="${s.id}" title="${escHtml(s.title)}" onclick="idxJump('${s.id}')"><small>${n||''}</small>${escHtml(s.title)}${extra||''}</a>`;
