@@ -211,7 +211,7 @@
       `<button class="rt-chip" onclick="rtSet('route','${p[0]}'); document.getElementById('rtRoute').value='${p[0]}'">${escHtml(p[0])} · ${p[1]}</button>`
     ).join('');
 
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash"><div class="rt-builder">
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero('rt')}<div class="rt-builder">
       <div class="rt-builder-title"><i class="ti ti-adjustments-horizontal"></i> لوحة التحكم
         <span>عدّل باقة الثيم واختر الروت المخصص — ثم انسخ الكود أو احفظه في المكتبة</span>
       </div>

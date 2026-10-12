@@ -31,7 +31,7 @@
     renderAll();
   }
   function renderCssDash(){
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash">
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero('css')}
       <div class="has-builder">
         <div class="has-builder-title"><i class="ti ti-brand-css3"></i> استوديو CSS
           <span>imgscr وتوليد :has() في مكان واحد — بدّل بينهما من الأعلى</span></div>

@@ -1017,7 +1017,7 @@
     const badge = document.getElementById('countBadge');
     if (badge) badge.textContent = 'أداة الألوان';
 
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash"><div class="dt-builder cp">
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero('cp')}<div class="dt-builder cp">
       <div class="dt-builder-title"><i class="ti ti-palette"></i> مولّد لوحة الألوان
         <span>عجلة ألوان، تناسقات، وضع داكن/فاتح، محرر تدرجات، سحب لون من صورة مع فلتر CSS، ومولد متغيرات CSS</span>
       </div>

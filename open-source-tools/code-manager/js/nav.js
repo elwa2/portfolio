@@ -101,10 +101,8 @@
   ];
   const NAV_TOOLS = [
     { g:'تصميم', items:[
-      { id:'cpDashBtn',  cls:'cp-active',        label:'الألوان',   ic:'ti-palette',                k:'color colors gradient لون الوان تدرج' },
-      { id:'sbDashBtn',  cls:'scrollbar-active', label:'Scrollbar', ic:'ti-scroll',                 k:'scroll سكرول' },
-      { id:'cssDashBtn', cls:'css-active',       label:'CSS',       ic:'ti-brand-css3',             k:'css imgscr has converter محدد استوديو' },
-      { id:'rtDashBtn',  cls:'rt-active',        label:'التحكم',    ic:'ti-adjustments-horizontal', k:'route theme palette ثيم بالتة روت' } ]},
+      { id:'designStudio', cls:'design-active', label:'استوديو التصميم', ic:'ti-palette',
+        k:'design colors color colour gradient palette scrollbar scroll سكرول css imgscr has converter محدد استوديو route theme control تحكم الوان لون تدرج بالتة' } ]},
     { g:'كود', items:[
       { id:'edDashBtn',  cls:'ed-active',  label:'المحرر',  ic:'ti-terminal-2',     k:'editor محرر' } ]},
     { g:'أدوات', items:[
@@ -121,7 +119,13 @@
     try { localStorage.setItem(NAV_RECENT_KEY, JSON.stringify([id, ...navRecent().filter(x=>x!==id)].slice(0,6))); } catch(e){}
   }
   function navAllTools(){ return NAV_TOOLS.flatMap(g => g.items.map(t => ({ ...t, g:g.g }))); }
-  function navToolActive(t){ const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls)); }
+  function navToolActive(t){
+    if(t.id === 'designStudio'){
+      const did = (typeof currentDashId === 'function') ? currentDashId() : '';
+      return ['cp','sb','css','rt'].includes(did);
+    }
+    const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls));
+  }
 
   function navSetView(v){
     if(v === 'tools'){
@@ -136,7 +140,45 @@
     navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync();
   }
 
+  // ── DESIGN STUDIO HERO (الألوان + Scrollbar + CSS + التحكم في بطاقة واحدة) ──
+  function designHero(active){
+    try {
+      const btn = DESIGN_BTNS[active];
+      if(btn) localStorage.setItem(LAST_DESIGN_KEY, btn);
+    } catch(e){}
+    const t = (k, fn, icon, label, hint) =>
+      `<button class="dt-tab${k === active ? ' active' : ''}" role="tab" aria-selected="${k === active ? 'true' : 'false'}" title="${hint}" onclick="${fn}()"><i class="${icon}" aria-hidden="true"></i><span>${label}</span></button>`;
+    return `<div class="dt-hero design-hero">
+      <div class="dt-hero-top">
+        <span class="dt-hero-ic"><i class="ti ti-palette" aria-hidden="true"></i></span>
+        <span class="dt-hero-title">استوديو التصميم</span>
+        <span class="dt-hero-sub">الألوان و Scrollbar و CSS والتحكم — كل أدوات التصميم في مكان واحد</span>
+      </div>
+      <div class="dt-tabs" role="tablist" aria-label="استوديو التصميم">
+        ${t('rt', 'toggleRtDash', 'ti ti-adjustments-horizontal', 'التحكم', 'لوحة التحكم — باقة الثيم والروت المخصص')}
+        ${t('css', 'toggleCssDash', 'ti ti-brand-css3', 'CSS', 'استوديو CSS — imgscr وتوليد :has()')}
+        ${t('sb', 'toggleScrollbarDash', 'ti ti-scroll', 'Scrollbar', 'بناء سكرول بار مخصص')}
+        ${t('cp', 'toggleCpDash', 'ti ti-palette', 'الألوان', 'مولد لوحة الألوان والتدرجات')}
+      </div>
+    </div>`;
+  }
+
+  const DESIGN_BTNS = { cp:'cpDashBtn', sb:'sbDashBtn', css:'cssDashBtn', rt:'rtDashBtn' };
+  const DESIGN_DASH = ['cp','sb','css','rt'];
+  const LAST_DESIGN_KEY = 'csman_v2_last_design_btn';
+
+  function navOpenDesign(){
+    const did = (typeof currentDashId === 'function') ? currentDashId() : '';
+    if(DESIGN_DASH.includes(did)) return; // مفتوح بالفعل — التبويبات تحت هي المسؤولة
+    let last = 'cssDashBtn';
+    try { last = localStorage.getItem(LAST_DESIGN_KEY) || 'cssDashBtn'; } catch(e){}
+    if(!Object.values(DESIGN_BTNS).includes(last)) last = 'cssDashBtn';
+    const b = document.getElementById(last);
+    if(b) b.click();
+  }
+
   function navOpenTool(id){
+    if(id === 'designStudio'){ navPushRecent(id); navOpenDesign(); return; }
     const t = navAllTools().find(x => x.id === id);
     const b = document.getElementById(id);
     if(!t || !b) return;

@@ -152,7 +152,7 @@
       return `<div class="sb-live-item"><span class="sb-live-sel">${item.kw}</span> <span class="sb-live-str">${item.str}</span></div>`;
     }).join('');
 
-    document.getElementById('mainBody').innerHTML = `<div class="sb-builder">
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero('sb')}</div><div class="sb-builder">
       <div class="sb-builder-title"><i class="ti ti-scroll"></i> بناء سكرول بار مخصص</div>
 
       <div class="sb-live-wrap">
