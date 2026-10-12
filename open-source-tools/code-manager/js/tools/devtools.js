@@ -53,7 +53,7 @@
       const p = document.getElementById(map[k]);
       if (p) p.classList.toggle('dt-hidden', k !== tool);
       const b = document.getElementById(btns[k]);
-      if (b) b.classList.toggle('active', k === tool);
+      if (b) { b.classList.toggle('active', k === tool); b.setAttribute('aria-selected', k === tool ? 'true' : 'false'); }
     });
     persistDashState();
     if (tool === 'svg') dtSvgUpdate();
@@ -64,23 +64,28 @@
     if (badge) badge.textContent = 'أدوات المطورين';
     const valid = { css:1, jsmin:1, jsenc:1, svg:1 };
     const active = valid[dtActiveTool] ? dtActiveTool : 'css';
-    const tabCls = t => t === active ? 'dt-tab active' : 'dt-tab';
+    const tabBtn = (t, id, fn, icon, label, hint) =>
+      `<button class="dt-tab${t === active ? ' active' : ''}" id="${id}" role="tab" aria-selected="${t === active ? 'true' : 'false'}" title="${hint}" onclick="dtShow('${fn}')"><i class="${icon}" aria-hidden="true"></i><span>${label}</span></button>`;
 
     document.getElementById('mainBody').innerHTML = `<div class="has-dash">
       <div class="dt-builder">
-        <div class="dt-builder-title"><i class="ti ti-tools"></i> مجموعة أدوات المطورين
-          <span>ضغط CSS و JavaScript، تعمية JS، وتحويل SVG إلى URL — بضغطة واحدة</span>
-        </div>
+        <div class="dt-hero">
+          <div class="dt-hero-top">
+            <span class="dt-hero-ic"><i class="ti ti-tools" aria-hidden="true"></i></span>
+            <span class="dt-hero-title">مجموعة أدوات المطورين</span>
+            <span class="dt-hero-sub">ضغط CSS و JavaScript، تعمية JS، وتحويل SVG إلى URL — بضغطة واحدة</span>
+          </div>
 
-        <div class="dt-tabs">
-          <button class="${tabCls('css')}" id="dtTabCss" onclick="dtShow('css')"><i class="ti ti-file-css"></i> ضاغط CSS</button>
-          <button class="${tabCls('jsmin')}" id="dtTabJsMin" onclick="dtShow('jsmin')"><i class="ti ti-brand-javascript"></i> ضاغط JS</button>
-          <button class="${tabCls('jsenc')}" id="dtTabJsEnc" onclick="dtShow('jsenc')"><i class="ti ti-lock"></i> تعمية JS</button>
-          <button class="${tabCls('svg')}" id="dtTabSvg" onclick="dtShow('svg')"><i class="ti ti-vector-triangle"></i> تشفير SVG</button>
+          <div class="dt-tabs" role="tablist" aria-label="أدوات المطورين">
+            ${tabBtn('svg', 'dtTabSvg', 'svg', 'ti ti-vector-triangle', 'تشفير SVG', 'تحويل SVG إلى URL جاهز للاستخدام في CSS')}
+            ${tabBtn('jsenc', 'dtTabJsEnc', 'jsenc', 'ti ti-lock', 'تعمية JS', 'تعمية وفك تعمية أكواد JavaScript')}
+            ${tabBtn('jsmin', 'dtTabJsMin', 'jsmin', 'ti ti-bolt', 'ضاغط JS', 'تصغير وضغط أكواد JavaScript')}
+            ${tabBtn('css', 'dtTabCss', 'css', 'ti ti-file-css', 'ضاغط CSS', 'تصغير وضغط أكواد CSS')}
+          </div>
         </div>
 
         <div class="dt-panel${active === 'css' ? '' : ' dt-hidden'}" id="dtCss">
-          <div class="dt-head"><i class="ti ti-file-css" style="color:#8b5cf6"></i> الصق كود CSS هنا</div>
+          <div class="dt-head dt-sec"><i class="ti ti-file-css" aria-hidden="true"></i> ضغط CSS — الصق الكود هنا</div>
           <textarea class="dt-textarea" id="dtCssInput" spellcheck="false" placeholder="/* مثال */
 body {
   color: #333;
@@ -106,7 +111,7 @@ body {
         </div>
 
         <div class="dt-panel${active === 'jsmin' ? '' : ' dt-hidden'}" id="dtJsMin">
-          <div class="dt-head"><i class="ti ti-brand-javascript" style="color:#e7c23b"></i> الصق كود JavaScript هنا</div>
+          <div class="dt-head dt-sec"><i class="ti ti-bolt" aria-hidden="true"></i> ضغط JavaScript — الصق الكود هنا</div>
           <textarea class="dt-textarea" id="dtJsMinInput" spellcheck="false" placeholder="// مثال
 function greet(name) {
   console.log('Hello ' + name);
@@ -132,7 +137,7 @@ greet('Ali');"></textarea>
         </div>
 
         <div class="dt-panel${active === 'jsenc' ? '' : ' dt-hidden'}" id="dtJsEnc">
-          <div class="dt-head"><i class="ti ti-lock" style="color:#8b5cf6"></i> تعمية / فك تعمية JavaScript</div>
+          <div class="dt-head dt-sec"><i class="ti ti-lock" aria-hidden="true"></i> تعمية / فك تعمية JavaScript</div>
           <div class="dt-mode">
             <button class="dt-mode-btn active" id="dtModeEncodeBtn" onclick="dtSwitchJsMode('encode')"><i class="ti ti-lock"></i> تعمية</button>
             <button class="dt-mode-btn" id="dtModeDecodeBtn" onclick="dtSwitchJsMode('decode')"><i class="ti ti-unlock"></i> فك التعمية</button>
@@ -165,7 +170,7 @@ function hello() {
         </div>
 
         <div class="dt-panel${active === 'svg' ? '' : ' dt-hidden'}" id="dtSvg">
-          <div class="dt-head"><i class="ti ti-vector-triangle" style="color:#38bdf8"></i> تحويل SVG إلى URL جاهز للاستخدام في CSS</div>
+          <div class="dt-head dt-sec"><i class="ti ti-vector-triangle" aria-hidden="true"></i> تحويل SVG إلى URL جاهز للاستخدام في CSS</div>
 
           <div class="dt-svg-modes">
             <button class="dt-mode-btn active" id="dtSvgModeSolid" onclick="dtSvgSetMode('solid')"><i class="ti ti-palette"></i> لون واحد</button>
