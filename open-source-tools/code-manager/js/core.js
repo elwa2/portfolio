@@ -1439,7 +1439,7 @@ function getFiltered(){
     if(showHomeDash) return 'home';
     if(showAlDash) return 'al';
     if(showScrollbarDash) return 'sb';
-    if(showCssDash) return 'css';
+    if(showCssDash) return (typeof cssTab !== 'undefined' && cssTab === 'has') ? 'has' : 'cv';
     if(showEdDash) return 'ed';
     if(showDevDash) return 'dev';
     if(showB64Dash) return 'b64';
@@ -1459,16 +1459,21 @@ function getFiltered(){
   function restoreDashState(){
     let id = 'home';
     try { id = localStorage.getItem(DASH_KEY) || 'home'; } catch (e) {}
-    if (!['home','al','has','sb','cv','vd','ed','dev','b64','qr','cp','rt'].includes(id)) id = 'home';
+    if (!['home','al','has','sb','css','cv','vd','ed','dev','b64','qr','cp','rt'].includes(id)) id = 'home';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
       if (sub && sub.b64) b64ActiveTab = sub.b64;
     } catch (e) {}
+    if(typeof cssTab !== 'undefined'){
+      if(id === 'has') cssTab = 'has';
+      else if(id === 'cv') cssTab = 'cv';
+      // id === 'css' القديم: اترك cssTab المحفوظ في csman_v2_css_tab_v1 كما هو
+    }
     showHomeDash = id === 'home';
     showAlDash = id === 'al';
     showScrollbarDash = id === 'sb';
-    showCssDash = id === 'css';
+    showCssDash = (id === 'css' || id === 'cv' || id === 'has');
     showEdDash = id === 'ed';
     showDevDash = id === 'dev';
     showB64Dash = id === 'b64';
@@ -1525,7 +1530,7 @@ function getFiltered(){
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['home','al','sb','css','ed','dev','b64','qr','cp','rt'];
+    const ids = ['home','al','sb','css','cv','has','ed','dev','b64','qr','cp','rt'];
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -1534,6 +1539,7 @@ function getFiltered(){
     clearDashFlags();
     if (h && ids.includes(h)) {
       const map = { home:['homeBtn','home-active'], al:['alDashBtn','al-active'], sb:['sbDashBtn','scrollbar-active'], css:['cssDashBtn','css-active'],
+        cv:['cssDashBtn','css-active'], has:['cssDashBtn','css-active'],
         ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
         b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
         rt:['rtDashBtn','rt-active'] };
@@ -1542,6 +1548,8 @@ function getFiltered(){
       else if (h === 'al') showAlDash = true;
       else if (h === 'sb') showScrollbarDash = true;
       else if (h === 'css') showCssDash = true;
+      else if (h === 'cv'){ showCssDash = true; if(typeof cssTab !== 'undefined'){ cssTab = 'cv'; try{localStorage.setItem('csman_v2_css_tab_v1','cv');}catch(e){} } }
+      else if (h === 'has'){ showCssDash = true; if(typeof cssTab !== 'undefined'){ cssTab = 'has'; try{localStorage.setItem('csman_v2_css_tab_v1','has');}catch(e){} } }
       else if (h === 'ed') showEdDash = true;
       else if (h === 'dev') showDevDash = true;
       else if (h === 'b64') showB64Dash = true;

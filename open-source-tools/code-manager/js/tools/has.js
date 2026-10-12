@@ -1,11 +1,51 @@
-  // ── HAS DASHBOARD ──
-  // ── CSS STUDIO (imgscr + :has() — تبويب واحد بتبويبين داخليين) ──
+  // ── CSS STUDIO (imgscr + :has() — تبويبان علويان في استوديو التصميم) ──
   let showCssDash = false;
   let cssTab = 'cv';
+  try {
+    const savedTab = localStorage.getItem('csman_v2_css_tab_v1');
+    if(savedTab === 'has' || savedTab === 'cv') cssTab = savedTab;
+  } catch(e){}
+  function cssSaveTab(){ try { localStorage.setItem('csman_v2_css_tab_v1', cssTab); } catch(e){} }
   function cssSetTab(t){
     cssTab = (t === 'has') ? 'has' : 'cv';
+    cssSaveTab();
     renderAll();
   }
+  function cssActivate(tab){
+    cssTab = (tab === 'has') ? 'has' : 'cv';
+    cssSaveTab();
+    showCssDash = true;
+    const cb = document.getElementById('cssDashBtn');
+    if(cb) cb.classList.toggle('css-active', true);
+    document.querySelectorAll('.filter-tag:not(#cssDashBtn)').forEach(b=>b.classList.remove('active'));
+    showHomeDash = false;
+    const hb = document.getElementById('homeBtn');
+    if(hb) hb.classList.remove('home-active');
+    showScrollbarDash = false;
+    const sb = document.getElementById('sbDashBtn');
+    if(sb) sb.classList.remove('scrollbar-active');
+    showEdDash = false;
+    const ed = document.getElementById('edDashBtn');
+    if(ed) ed.classList.remove('ed-active');
+    showDevDash = false;
+    const dv = document.getElementById('devDashBtn');
+    if(dv) dv.classList.remove('dev-active');
+    showB64Dash = false;
+    const b6 = document.getElementById('b64DashBtn');
+    if(b6) b6.classList.remove('b64-active');
+    showQrDash = false;
+    const qr = document.getElementById('qrDashBtn');
+    if(qr) qr.classList.remove('qr-active');
+    showCpDash = false;
+    const cp = document.getElementById('cpDashBtn');
+    if(cp) cp.classList.remove('cp-active');
+    showRtDash = false;
+    const rt = document.getElementById('rtDashBtn');
+    if(rt) rt.classList.remove('rt-active');
+    renderAll();
+  }
+  function cssOpenCv(){ cssActivate('cv'); }
+  function cssOpenHas(){ cssActivate('has'); }
   function toggleCssDash(){
     showCssDash = !showCssDash;
     document.getElementById('cssDashBtn').classList.toggle('css-active', showCssDash);
@@ -31,16 +71,8 @@
     renderAll();
   }
   function renderCssDash(){
-    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero('css')}
-      <div class="has-builder">
-        <div class="has-builder-title"><i class="ti ti-brand-css3"></i> استوديو CSS
-          <span>imgscr وتوليد :has() في مكان واحد — بدّل بينهما من الأعلى</span></div>
-        <div class="cb-seg" style="margin-bottom:4px">
-          <button class="cb-btn${cssTab==='cv'?' on':''}" onclick="cssSetTab('cv')"><i class="ti ti-arrows-shuffle" aria-hidden="true"></i> imgscr</button>
-          <button class="cb-btn${cssTab==='has'?' on':''}" onclick="cssSetTab('has')"><i class="ti ti-code" aria-hidden="true"></i> :has()</button>
-        </div>
-        <div id="cssStudioBody"></div>
-      </div>
+    document.getElementById('mainBody').innerHTML = `<div class="has-dash">${designHero(cssTab)}
+      <div id="cssStudioBody"></div>
     </div>`;
     if(cssTab === 'has') renderHasDashboard('cssStudioBody');
     else renderCvDash('cssStudioBody');

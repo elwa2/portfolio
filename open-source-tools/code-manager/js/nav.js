@@ -53,7 +53,7 @@
   }
   function syncToolsUI(){
     const dash = (typeof currentDashId === 'function') ? currentDashId() : 'main';
-    const map = { sb:'sbDashBtn', css:'cssDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
+    const map = { sb:'sbDashBtn', css:'cssDashBtn', cv:'cssDashBtn', has:'cssDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
     const activeSrc = map[dash] || null;
     const meta = TOOLS_META.find(t => t.src === activeSrc);
     const nameEl = document.getElementById('toolsLauncherName');
@@ -122,7 +122,7 @@
   function navToolActive(t){
     if(t.id === 'designStudio'){
       const did = (typeof currentDashId === 'function') ? currentDashId() : '';
-      return ['cp','sb','css','rt'].includes(did);
+      return ['cp','sb','css','cv','has','rt'].includes(did);
     }
     const b = document.getElementById(t.id); return !!(b && b.classList.contains(t.cls));
   }
@@ -140,9 +140,10 @@
     navView = v; navLastHtml = ''; navLastDash = currentDashId(); navSync();
   }
 
-  // ── DESIGN STUDIO HERO (الألوان + Scrollbar + CSS + التحكم في بطاقة واحدة) ──
+  // ── DESIGN STUDIO HERO (الألوان + Scrollbar + imgscr + :has() + التحكم في بطاقة واحدة) ──
   function designHero(active){
     try {
+      if(active === 'css' && typeof cssTab !== 'undefined') active = cssTab;
       const btn = DESIGN_BTNS[active];
       if(btn) localStorage.setItem(LAST_DESIGN_KEY, btn);
     } catch(e){}
@@ -152,19 +153,20 @@
       <div class="dt-hero-top">
         <span class="dt-hero-ic"><i class="ti ti-palette" aria-hidden="true"></i></span>
         <span class="dt-hero-title">استوديو التصميم</span>
-        <span class="dt-hero-sub">الألوان و Scrollbar و CSS والتحكم — كل أدوات التصميم في مكان واحد</span>
+        <span class="dt-hero-sub">الألوان و Scrollbar و imgscr و :has() والتحكم — كل أدوات التصميم في مكان واحد</span>
       </div>
       <div class="dt-tabs" role="tablist" aria-label="استوديو التصميم">
         ${t('rt', 'toggleRtDash', 'ti ti-adjustments-horizontal', 'التحكم', 'لوحة التحكم — باقة الثيم والروت المخصص')}
-        ${t('css', 'toggleCssDash', 'ti ti-brand-css3', 'CSS', 'استوديو CSS — imgscr وتوليد :has()')}
+        ${t('cv', 'cssOpenCv', 'ti ti-arrows-shuffle', 'imgscr', 'استبدال الصور — imgscr HTML/CSS إلى كود صحيح')}
+        ${t('has', 'cssOpenHas', 'ti ti-code', ':has()', 'توليد محددات :has()')}
         ${t('sb', 'toggleScrollbarDash', 'ti ti-scroll', 'Scrollbar', 'بناء سكرول بار مخصص')}
         ${t('cp', 'toggleCpDash', 'ti ti-palette', 'الألوان', 'مولد لوحة الألوان والتدرجات')}
       </div>
     </div>`;
   }
 
-  const DESIGN_BTNS = { cp:'cpDashBtn', sb:'sbDashBtn', css:'cssDashBtn', rt:'rtDashBtn' };
-  const DESIGN_DASH = ['cp','sb','css','rt'];
+  const DESIGN_BTNS = { cp:'cpDashBtn', sb:'sbDashBtn', cv:'cssDashBtn', has:'cssDashBtn', css:'cssDashBtn', rt:'rtDashBtn' };
+  const DESIGN_DASH = ['cp','sb','css','cv','has','rt'];
   const LAST_DESIGN_KEY = 'csman_v2_last_design_btn';
 
   function navOpenDesign(){
