@@ -375,3 +375,31 @@
   }
   @media (max-width: 820px) { .group-body.open { grid-template-columns: 1fr; } }
 
+  /* The snippet workspace expands to the viewport; keep its card grid fluid. */
+  .main-body {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100vh - 114px);
+    min-height: calc(100dvh - 114px);
+    margin: 0;
+    padding: 18px clamp(16px, 2.2vw, 32px) 48px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .main-body > * { min-width: 0; }
+  @media (min-width: 1180px) {
+    body.qn-on .main-body {
+      width: auto;
+      max-width: none;
+      margin-inline-start: 276px;
+      margin-inline-end: 0;
+    }
+  }
+  @media (max-width: 960px) {
+    .main-body { min-height: calc(100vh - 100px); min-height: calc(100dvh - 100px); }
+  }
+  @media (max-width: 820px) {
+    .main-body { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .main-body { padding: 12px 12px 36px; }
+  }

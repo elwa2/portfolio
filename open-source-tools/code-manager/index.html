@@ -174,9 +174,9 @@
 
 <!-- NAV HUB -->
 <nav class="nav-hub" id="navHub" aria-label="التنقل">
-  <div class="nav-seg" role="tablist">
-    <button class="nav-seg-btn" id="navSegCodes" role="tab" onclick="navSetView('codes')"><i class="ti ti-code"></i> الأكواد</button>
-    <button class="nav-seg-btn" id="navSegTools" role="tab" onclick="navSetView('tools')"><i class="ti ti-tools"></i> الأدوات</button>
+  <div class="nav-seg" role="group" aria-label="أقسام مدير الأكواد">
+    <a class="nav-seg-btn" id="navSegCodes" href="index.html#tool" target="_blank" rel="noopener" aria-label="الأكواد — فتح في تبويب جديد" title="فتح الأكواد في تبويب جديد"><i class="ti ti-code" aria-hidden="true"></i> الأكواد</a>
+    <button class="nav-seg-btn" id="navSegTools" type="button" aria-controls="mainBody" aria-pressed="false" onclick="navSetView('tools')"><i class="ti ti-tools" aria-hidden="true"></i> الأدوات</button>
   </div>
   <div class="nav-row" id="navRow"></div>
   <button class="nav-k" onclick="openNavPalette()" title="بحث سريع (Alt+T)">
@@ -339,4 +339,3 @@
 <!-- ═════ Quick Nav Patch — فهرس جانبي سريع ═════ -->
 </body>
 </html>
-

@@ -160,8 +160,17 @@
     }
     const inCodes = (did === 'main');
 
-    document.getElementById('navSegCodes')?.classList.toggle('on', navView === 'codes');
-    document.getElementById('navSegTools')?.classList.toggle('on', navView === 'tools');
+    const codesTab = document.getElementById('navSegCodes');
+    if(codesTab){
+      codesTab.classList.toggle('on', navView === 'codes');
+      if(navView === 'codes') codesTab.setAttribute('aria-current', 'page');
+      else codesTab.removeAttribute('aria-current');
+    }
+    const toolsTab = document.getElementById('navSegTools');
+    if(toolsTab){
+      toolsTab.classList.toggle('on', navView === 'tools');
+      toolsTab.setAttribute('aria-pressed', String(navView === 'tools'));
+    }
 
     let html = '';
     if(navView === 'codes'){
@@ -332,5 +341,7 @@
   const _ra=window.renderAll; window.renderAll=function(){const r=_ra.apply(this,arguments);try{build()}catch(e){}return r};
 
   // ابدأ مطوي بدل ما كل الأكواد تتفتح
-  openIds.clear(); renderAll();
+  openIds.clear();
+  if(typeof currentHash === 'function' && currentHash() === 'tool') hashGo();
+  else renderAll();
 })();
