@@ -1917,3 +1917,85 @@
     .home-card { padding: 12px; }
   }
 
+  /* ═════════════════════════════════════════════════════════════
+     PANEL DESIGN SYSTEM — توحيد تصميم لوحات التحكم
+     غلاف واحد + عنوان بشارة أيقونة + عناوين أقسام موحدة
+     ═════════════════════════════════════════════════════════════ */
+
+  /* 1) الغلاف الموحد لكل اللوحات */
+  .has-builder, .sb-builder, .cv-builder, .vd-builder,
+  .ed-builder, .al-builder, .dt-builder, .rt-builder {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-def);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* 2) عنوان اللوحة: شارة أيقونة + اسم + وصف بسطر ثانٍ + خط فاصل */
+  .has-builder-title, .sb-builder-title, .cv-builder-title, .vd-builder-title,
+  .ed-builder-title, .al-builder-title, .dt-builder-title, .rt-builder-title {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    font-size: 15px; font-weight: 800; color: var(--text-1);
+    padding-bottom: 14px; margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-sub);
+  }
+  .has-builder-title > i, .sb-builder-title > i, .cv-builder-title > i, .vd-builder-title > i,
+  .al-builder-title > i, .dt-builder-title > i, .rt-builder-title > i,
+  .ed-builder-title > span:first-child {
+    width: 36px; height: 36px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 11px; font-size: 18px; line-height: 1;
+    border: 1px solid transparent;
+  }
+  .has-builder-title > span, .sb-builder-title > span, .cv-builder-title > span, .vd-builder-title > span,
+  .ed-builder-title > span:not(:first-child),
+  .al-builder-title > span, .dt-builder-title > span, .rt-builder-title > span {
+    flex: 1 1 100%;
+    font-size: 12px; font-weight: 400; color: var(--text-3); line-height: 1.7;
+  }
+  /* تلوين الشارات حسب هوية كل أداة */
+  .has-builder-title > i { color: #a78bfa; background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.35); }
+  .sb-builder-title > i { color: #a78bfa; background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.35); }
+  .cv-builder-title > i { color: var(--accent-warm); background: rgba(212,168,67,0.13); border-color: rgba(212,168,67,0.35); }
+  .vd-builder-title > i { color: #2dd4bf; background: rgba(20,184,166,0.13); border-color: rgba(20,184,166,0.35); }
+  .ed-builder-title > span:first-child { color: #38bdf8; background: rgba(56,189,248,0.13); border-color: rgba(56,189,248,0.35); }
+  .al-builder-title > i { color: #38bdf8; background: rgba(56,189,248,0.13); border-color: rgba(56,189,248,0.35); }
+  .dt-builder-title > i { color: #a78bfa; background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.35); }
+  .dt-builder.b64 .dt-builder-title > i { color: #34d399; background: rgba(16,185,129,0.13); border-color: rgba(16,185,129,0.35); }
+  .dt-builder.qr .dt-builder-title > i { color: #fb923c; background: rgba(249,115,22,0.13); border-color: rgba(249,115,22,0.35); }
+  .dt-builder.cp .dt-builder-title > i { color: #f9a8d4; background: rgba(244,114,182,0.13); border-color: rgba(244,114,182,0.35); }
+  .rt-builder-title > i { color: #f472b6; background: rgba(236,72,153,0.13); border-color: rgba(236,72,153,0.35); }
+
+  /* 3) عناوين الأقسام الداخلية — هرمية أوضح وإيقاع منتظم */
+  .has-section-title, .sb-section-title, .vd-section-title, .rt-section-title {
+    font-size: 13px; font-weight: 800; color: var(--text-1);
+    margin: 22px 0 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .has-section-title > span, .sb-section-title > span, .vd-section-title > span, .rt-section-title > span {
+    color: var(--text-3); font-weight: 400; font-size: 11.5px;
+  }
+  .has-section-title > i, .sb-section-title > i, .vd-section-title > i, .rt-section-title > i { font-size: 15px; }
+  .cp-section-title { font-size: 12.5px; font-weight: 800; color: var(--text-1); letter-spacing: 0.02em; }
+
+  /* 4) صناديق المعاينة والمخرجات — نفس السطح */
+  .has-preview-wrap, .sb-preview-wrap, .rt-preview-wrap, .vd-compare, .dt-demo {
+    border-radius: 12px;
+  }
+
+  /* 5) صفوف الأزرار — تباعد موحد */
+  .has-actions, .vd-actions {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px;
+  }
+
+  /* 6) بطاقة عنوان المحوّل (cv) بنفس روح النظام */
+  .cv-title-box { border-radius: 14px; }
+
+  @media (max-width: 640px) {
+    .has-builder, .sb-builder, .cv-builder, .vd-builder,
+    .ed-builder, .al-builder, .dt-builder, .rt-builder {
+      padding: 16px; border-radius: 14px;
+    }
+  }
+
