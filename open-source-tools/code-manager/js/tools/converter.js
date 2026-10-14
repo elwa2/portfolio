@@ -41,7 +41,8 @@
       const tag = m[0];
       const src = (tag.match(/\bsrc\s*=\s*["']([^"']*?)["']/i)||[])[1] || '';
       const dataSrc = (tag.match(/\bdata-src\s*=\s*["']([^"']*?)["']/i)||[])[1] || '';
-      if(src || dataSrc) imgs.push({ src, dataSrc, newUrl: '', enabled: true });
+      const alt = (tag.match(/\balt\s*=\s*(["'])(.*?)\1/i)||[])[2] || '';
+      if(src || dataSrc) imgs.push({ src, dataSrc, alt, newUrl: '', enabled: true });
     }
     return imgs;
   }
@@ -58,7 +59,7 @@
       const srcM = sel.match(/img\[src\*=\s*["']([^"']*)["']\]/i);
       const dsM  = sel.match(/img\[data-src\*=\s*["']([^"']*)["']\]/i);
       if(srcM || dsM){
-        out.push({ src: srcM ? srcM[1] : '', dataSrc: dsM ? dsM[1] : '', newUrl, enabled: true });
+        out.push({ src: srcM ? srcM[1] : '', dataSrc: dsM ? dsM[1] : '', alt: '', newUrl, enabled: true });
       }
     }
     return out;
@@ -166,7 +167,7 @@
       im.enabled = true;
       hits++;
     });
-    if(!hits) cvImgs.push({ src: key, dataSrc: '', key: key, newUrl: newUrl, enabled: true });
+    if(!hits) cvImgs.push({ src: key, dataSrc: '', alt: '', key: key, newUrl: newUrl, enabled: true });
     return hits;
   }
 
@@ -395,8 +396,12 @@
         const oldUrl = (src && cvIsPreviewable(src)) ? src.trim() : '';
         const newUrl = (img.newUrl || '').trim();
         const newOk = cvIsPreviewable(newUrl);
+        const alt = (img.alt || '').trim();
+        const altHtml = alt
+          ? `<span class="cv-alt" dir="auto" title="${escHtml(alt)}"><b>alt</b> ${escHtml(alt)}</span>`
+          : `<span class="cv-alt is-none">بدون alt</span>`;
         const oldThumb = oldUrl
-          ? `<a class="cv-thumb" href="${escHtml(oldUrl)}" target="_blank" rel="noopener" title="فتح الصورة القديمة في صفحة جديدة"><img src="${escHtml(oldUrl)}" alt="الصورة القديمة ${i + 1}" loading="lazy" onerror="this.parentElement.classList.add('is-broken')"><i class="ti ti-photo-off cv-thumb-fb"></i><span class="cv-thumb-open"><i class="ti ti-external-link"></i></span></a>`
+          ? `<a class="cv-thumb" href="${escHtml(oldUrl)}" target="_blank" rel="noopener" title="فتح الصورة القديمة في صفحة جديدة"><img src="${escHtml(oldUrl)}" alt="${escHtml(alt || ('الصورة القديمة ' + (i + 1)))}" loading="lazy" onerror="this.parentElement.classList.add('is-broken')"><i class="ti ti-photo-off cv-thumb-fb"></i><span class="cv-thumb-open"><i class="ti ti-external-link"></i></span></a>`
           : `<span class="cv-thumb is-empty" title="لا توجد معاينة — المفتاح نصي فقط"><i class="ti ti-photo-off"></i></span>`;
         const newThumb = `<a class="cv-thumb is-new${newOk ? '' : ' is-empty'}" id="cvNewLink_${i}"${newOk ? ` href="${escHtml(newUrl)}" target="_blank" rel="noopener" title="فتح الصورة الجديدة في صفحة جديدة"` : ' title="الصقي رابط الصورة الجديدة لعرض معاينتها"'} onclick="return cvThumbGo(event, ${i})"><img id="cvNewImg_${i}"${newOk ? ` src="${escHtml(newUrl)}"` : ''} alt="الصورة الجديدة ${i + 1}" loading="lazy"${newOk ? '' : ' hidden'} onerror="this.parentElement.classList.add('is-broken')"><i class="ti ti-photo-plus cv-thumb-ph" id="cvNewPh_${i}"${newOk ? ' hidden' : ''}></i><span class="cv-thumb-open"><i class="ti ti-external-link"></i></span></a>`;
         return `<div class="cv-item">
@@ -407,7 +412,7 @@
           </div>
           <div class="cv-item-main">
             <div class="cv-previews">
-              <div class="cv-prev"><span class="cv-prev-t">القديمة</span>${oldThumb}</div>
+              <div class="cv-prev"><span class="cv-prev-t">القديمة</span>${oldThumb}${altHtml}</div>
               <span class="cv-prev-arrow"><i class="ti ti-arrow-left"></i></span>
               <div class="cv-prev"><span class="cv-prev-t">الجديدة</span>${newThumb}</div>
             </div>
