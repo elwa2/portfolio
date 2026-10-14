@@ -9,18 +9,28 @@
 
   function uniqueKey(url){
     if(!url) return '';
-    const clean = url.replace(/^https?:\/\//i,'').split('?')[0].split('#')[0];
-    const uuidRe = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+    const s = (url || '').trim();
+    if(!s) return '';
+    // نظّف البروتوكول والكويري والهاش — واحتفظ بآخر جزء (اسم الملف بالامتداد)
+    const clean = s.replace(/^https?:\/\//i,'').split('?')[0].split('#')[0];
     const parts = clean.split('/').filter(Boolean);
-    const file = parts.length ? parts[parts.length - 1] : clean;
-    // اسم الملف كاملاً بالامتداد (مثال: be6ea2df-...-543af8892b93.png) — وليس UUID المتجر المتكرر في كل الصور
-    if(uuidRe.test(file)) return file;
-    // روابط فيها أكثر من UUID في المسار (store-id + image-id) — خذ الأخير (الصورة)
-    const all = clean.match(new RegExp(uuidRe.source, 'gi'));
-    if(all && all.length) return all[all.length - 1];
-    const noExt = file.replace(/\.[a-z0-9]{2,6}$/i,'');
-    if(noExt && noExt.length > 2) return noExt;
-    return clean;
+    let file = parts.length ? parts[parts.length - 1] : clean;
+    try{ file = decodeURIComponent(file); }catch(e){}
+    file = (file || '').trim();
+    if(!file) return clean;
+    // الاستهداف من الآخر: "/اسم-الملف.png" — بالامتداد لضمان عدم التكرار أبداً
+    if(file.charAt(0) !== '/') file = '/' + file;
+    return file;
+  }
+
+  // نواة المقارنة (بدون / وبدون امتداد) — للتوافق مع القواعد القديمة بدون امتداد
+  function uniqueCore(key){
+    if(!key) return '';
+    let k = (key || '').trim().split('?')[0].split('#')[0];
+    k = k.split('/').pop() || k;
+    try{ k = decodeURIComponent(k); }catch(e){}
+    k = k.replace(/\.[a-z0-9]{2,6}$/i,'');
+    return k.toLowerCase();
   }
 
   function extractImgsFromHtml(html){
@@ -105,7 +115,11 @@
     if(htmlImgs.length && cssImgs.length){
       htmlImgs.forEach(im => {
         const k = uniqueKey(im.src || im.dataSrc);
-        const match = cssImgs.find(c => uniqueKey(c.src || c.dataSrc) === k);
+        const kc = uniqueCore(k);
+        const match = cssImgs.find(c => {
+          const ck = uniqueKey(c.src || c.dataSrc);
+          return ck === k || (kc && uniqueCore(ck) === kc);
+        });
         if(match){
           if(!im.src && match.src) im.src = match.src;
           if(!im.dataSrc && match.dataSrc) im.dataSrc = match.dataSrc;
@@ -124,16 +138,23 @@
     const s = (v || '').trim();
     if(!s) return '';
     const sel = s.match(/img\[(?:src|data-src)\*=\s*["']([^"']+)["']\]/i);
-    if(sel) return sel[1];
+    if(sel) return sel[1].charAt(0) === '/' ? sel[1] : '/' + sel[1];
     if(/^https?:\/\//i.test(s) || s.indexOf('/') > -1) return uniqueKey(s);
-    return s;
+    // مفتاح عادي بدون / — وحّده لصيغة الاستهداف من الآخر
+    return s.charAt(0) === '/' ? s : '/' + s;
   }
 
   function cvMatchesKey(img, key){
+    if(!key) return false;
     const k = uniqueKey(img.src || img.dataSrc);
     if(k && k === key) return true;
-    if(img.src && img.src.indexOf(key) > -1) return true;
-    if(img.dataSrc && img.dataSrc.indexOf(key) > -1) return true;
+    // توافق مع القواعد القديمة (بدون / وبدون امتداد): قارن بالنواة
+    if(k && uniqueCore(k) && uniqueCore(k) === uniqueCore(key)) return true;
+    const normKey = key.charAt(0) === '/' ? key : '/' + key;
+    if(img.src && (img.src.indexOf(key) > -1 || img.src.indexOf(normKey) > -1)) return true;
+    if(img.dataSrc && (img.dataSrc.indexOf(key) > -1 || img.dataSrc.indexOf(normKey) > -1)) return true;
+    // الصور المضافة يدوياً كمفتاح فقط
+    if(img.key && (img.key === key || uniqueCore(img.key) === uniqueCore(key))) return true;
     return false;
   }
 
@@ -243,13 +264,20 @@
 
   function cvPickOptions(){
     const seen = [];
+    const seenCore = [];
+    function pushKey(k){
+      if(!k) return;
+      const c = uniqueCore(k);
+      if(seen.indexOf(k) > -1) return;
+      if(c && seenCore.indexOf(c) > -1) return;
+      seen.push(k);
+      if(c) seenCore.push(c);
+    }
     cvImgs.forEach(function(im){
-      const k = im.key || uniqueKey(im.src || im.dataSrc);
-      if(k && seen.indexOf(k) < 0) seen.push(k);
+      pushKey(im.key || uniqueKey(im.src || im.dataSrc));
     });
     cvManual.forEach(function(r){
-      const dup = seen.some(s => s === r.key || s.indexOf(r.key) === 0 || r.key.indexOf(s) === 0);
-      if(!dup) seen.push(r.key);
+      pushKey(r.key);
     });
     return seen.map(function(k){
       const short = k.length > 46 ? '…' + k.slice(-44) : k;
@@ -271,8 +299,10 @@
     const rules = [];
     cvImgs.forEach((img, i) => {
       if(!img.enabled) return;
-      const key = img.key || uniqueKey(img.src || img.dataSrc);
+      let key = img.key || uniqueKey(img.src || img.dataSrc);
       if(!key) return;
+      // توحيد الصيغة: "/اسم-الملف.png" — استهداف من الآخر بالامتداد
+      if(key.charAt(0) !== '/') key = '/' + key;
       const newUrl = img.newUrl.trim() || 'NEW_IMAGE_URL';
       const sels = [];
       if(img.src) sels.push('img[src*="' + key + '"]');
