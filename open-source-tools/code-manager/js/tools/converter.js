@@ -33,6 +33,49 @@
     return k.toLowerCase();
   }
 
+  // تنظيف روابط الصور الجديدة من بقايا النسخ (; " ' مسافات ومحارف اتجاه RTL)
+  function cvCleanUrl(u){
+    if(u == null) return '';
+    return String(u).trim()
+      .replace(/^[;"'\s\u200e\u200f\u202a-\u202e]+/, '')
+      .replace(/[;"'\s\u200e\u200f\u202a-\u202e]+$/, '');
+  }
+
+  function cvMergeImg(dst, src){
+    if(!dst.src && src.src) dst.src = src.src;
+    if(!dst.dataSrc && src.dataSrc) dst.dataSrc = src.dataSrc;
+    if(!dst.alt && src.alt) dst.alt = src.alt;
+    if(!cvCleanUrl(dst.newUrl) && cvCleanUrl(src.newUrl)) dst.newUrl = src.newUrl;
+    dst.enabled = dst.enabled || src.enabled;
+  }
+
+  // دمج الصور المكررة (نفس الملف يظهر مرتين في HTML — بانر متكرر/موبايل+كمبيوتر)
+  function cvDedupeImgs(list){
+    const full = new Map();
+    const bare = [];
+    (list || []).forEach(function(im){
+      const key = im.key || uniqueKey(im.src || im.dataSrc);
+      if(/\.[a-z0-9]{2,6}$/i.test(key)){
+        if(full.has(key)) cvMergeImg(full.get(key), im);
+        else { full.set(key, im); im._k = key; }
+      } else {
+        im._k = key;
+        bare.push(im);
+      }
+    });
+    bare.forEach(function(im){
+      const c = uniqueCore(im._k);
+      let target = null;
+      full.forEach(function(v){ if(!target && uniqueCore(v._k) === c) target = v; });
+      if(target) cvMergeImg(target, im);
+      else if(full.has(im._k)) cvMergeImg(full.get(im._k), im);
+      else full.set(im._k, im);
+    });
+    const out = Array.from(full.values());
+    out.forEach(function(im){ delete im._k; });
+    return out;
+  }
+
   function extractImgsFromHtml(html){
     const imgs = [];
     const re = /<img\b[^>]*>/gi;
@@ -112,7 +155,7 @@
       return;
     }
 
-    cvImgs = htmlImgs.length ? htmlImgs : cssImgs;
+    cvImgs = cvDedupeImgs(htmlImgs.length ? htmlImgs : cssImgs);
     if(htmlImgs.length && cssImgs.length){
       htmlImgs.forEach(im => {
         const k = uniqueKey(im.src || im.dataSrc);
@@ -124,9 +167,10 @@
         if(match){
           if(!im.src && match.src) im.src = match.src;
           if(!im.dataSrc && match.dataSrc) im.dataSrc = match.dataSrc;
-          if(match.newUrl) im.newUrl = match.newUrl;
+          if(cvCleanUrl(match.newUrl)) im.newUrl = cvCleanUrl(match.newUrl);
         }
       });
+      cvImgs = cvDedupeImgs(htmlImgs);
     }
     cvReapplyManual();
 
@@ -136,10 +180,10 @@
 
   // ── استبدال صورة سريعة (Old → New) ──
   function cvKeyFromInput(v){
-    const s = (v || '').trim();
+    const s = cvCleanUrl(v);
     if(!s) return '';
     const sel = s.match(/img\[(?:src|data-src)\*=\s*["']([^"']+)["']\]/i);
-    if(sel) return sel[1].charAt(0) === '/' ? sel[1] : '/' + sel[1];
+    if(sel){ const k = cvCleanUrl(sel[1]); return k.charAt(0) === '/' ? k : '/' + k; }
     if(/^https?:\/\//i.test(s) || s.indexOf('/') > -1) return uniqueKey(s);
     // مفتاح عادي بدون / — وحّده لصيغة الاستهداف من الآخر
     return s.charAt(0) === '/' ? s : '/' + s;
@@ -160,6 +204,7 @@
   }
 
   function cvApplyRule(key, newUrl){
+    newUrl = cvCleanUrl(newUrl);
     let hits = 0;
     cvImgs.forEach(function(im){
       if(!cvMatchesKey(im, key)) return;
@@ -179,7 +224,7 @@
     const rules = [];
     cvQuick.forEach(function(row){
       const key = cvKeyFromInput(row.old);
-      const nu = (row.new || '').trim();
+      const nu = cvCleanUrl(row.new);
       if(!key || !nu) return;
       rules.push('img[src*="' + key + '"] {\n  content: url("' + nu + '");\n}');
     });
@@ -243,7 +288,7 @@
     let applied = 0, totalHits = 0;
     cvQuick.forEach(function(row){
       const key = cvKeyFromInput(row.old);
-      const nu = (row.new || '').trim();
+      const nu = cvCleanUrl(row.new);
       if(!key || !nu) return;
       const existing = cvManual.findIndex(r => r.key === key);
       if(existing > -1) cvManual[existing].newUrl = nu;
@@ -297,19 +342,34 @@
   }
 
   function generateCvCSS(){
-    const rules = [];
-    cvImgs.forEach((img, i) => {
+    // دمج دفاعي: نفس المفتاح = قاعدة واحدة (الأولوية للرابط الحقيقي على NEW_IMAGE_URL)
+    const grouped = new Map();
+    cvImgs.forEach((img) => {
       if(!img.enabled) return;
       let key = img.key || uniqueKey(img.src || img.dataSrc);
       if(!key) return;
       // توحيد الصيغة: "/اسم-الملف.png" — استهداف من الآخر بالامتداد
       if(key.charAt(0) !== '/') key = '/' + key;
-      const newUrl = img.newUrl.trim() || 'NEW_IMAGE_URL';
+      const nu = cvCleanUrl(img.newUrl);
+      if(grouped.has(key)){
+        const g = grouped.get(key);
+        if(img.src) g.withSrc = true;
+        if(img.dataSrc) g.withDataSrc = true;
+        if(!g.newUrl && nu) g.newUrl = nu;
+      } else {
+        grouped.set(key, { key, withSrc: !!img.src, withDataSrc: !!img.dataSrc, newUrl: nu });
+      }
+    });
+    const rules = [];
+    let n = 0;
+    grouped.forEach((g) => {
+      n++;
+      const newUrl = g.newUrl || 'NEW_IMAGE_URL';
       const sels = [];
-      if(img.src) sels.push('img[src*="' + key + '"]');
-      if(img.dataSrc) sels.push('img[data-src*="' + key + '"]');
-      const sel = sels.length ? sels.join(',\n') : 'img[src*="' + key + '"]';
-      rules.push('/* استبدال الصورة ' + (i + 1) + ' */\n' + sel + ' {\n  content: url("' + newUrl + '");\n}');
+      if(g.withSrc) sels.push('img[src*="' + g.key + '"]');
+      if(g.withDataSrc) sels.push('img[data-src*="' + g.key + '"]');
+      const sel = sels.length ? sels.join(',\n') : 'img[src*="' + g.key + '"]';
+      rules.push('/* استبدال الصورة ' + n + ' */\n' + sel + ' {\n  content: url("' + newUrl + '");\n}');
     });
     if(!rules.length) return '';
     const body = rules.join('\n\n');
@@ -351,17 +411,17 @@
   }
 
   function cvIsPreviewable(u){
-    return /^(https?:\/\/|data:image\/|blob:|\/\/)/i.test((u || '').trim());
+    return /^(https?:\/\/|data:image\/|blob:|\/\/)/i.test(cvCleanUrl(u));
   }
   function cvThumbGo(e, i){
-    const u = (cvImgs[i] && cvImgs[i].newUrl || '').trim();
+    const u = cvCleanUrl(cvImgs[i] && cvImgs[i].newUrl);
     if(!cvIsPreviewable(u)){ e.preventDefault(); return false; }
     return true;
   }
   function cvUpdateNewPreview(i){
     const im = cvImgs[i];
     if(!im) return;
-    const u = (im.newUrl || '').trim();
+    const u = cvCleanUrl(im.newUrl);
     const ok = cvIsPreviewable(u);
     const link = document.getElementById('cvNewLink_' + i);
     const imEl = document.getElementById('cvNewImg_' + i);
@@ -394,7 +454,7 @@
         const src = img.src || img.dataSrc;
         const short = src ? src.replace(/^https?:\/\//i, '') : '—';
         const oldUrl = (src && cvIsPreviewable(src)) ? src.trim() : '';
-        const newUrl = (img.newUrl || '').trim();
+        const newUrl = cvCleanUrl(img.newUrl);
         const newOk = cvIsPreviewable(newUrl);
         const alt = (img.alt || '').trim();
         const altHtml = alt
