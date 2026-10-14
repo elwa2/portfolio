@@ -349,6 +349,41 @@
     }).catch(() => showToast('تعذّر النسخ'));
   }
 
+  function cvIsPreviewable(u){
+    return /^(https?:\/\/|data:image\/|blob:|\/\/)/i.test((u || '').trim());
+  }
+  function cvThumbGo(e, i){
+    const u = (cvImgs[i] && cvImgs[i].newUrl || '').trim();
+    if(!cvIsPreviewable(u)){ e.preventDefault(); return false; }
+    return true;
+  }
+  function cvUpdateNewPreview(i){
+    const im = cvImgs[i];
+    if(!im) return;
+    const u = (im.newUrl || '').trim();
+    const ok = cvIsPreviewable(u);
+    const link = document.getElementById('cvNewLink_' + i);
+    const imEl = document.getElementById('cvNewImg_' + i);
+    const ph = document.getElementById('cvNewPh_' + i);
+    if(!link) return;
+    link.classList.toggle('is-empty', !ok);
+    link.classList.remove('is-broken');
+    if(ok){
+      link.href = u;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.title = 'فتح الصورة الجديدة في صفحة جديدة';
+      if(imEl){ imEl.src = u; imEl.hidden = false; }
+      if(ph){ ph.hidden = true; }
+    } else {
+      link.removeAttribute('href');
+      link.removeAttribute('target');
+      link.title = u ? 'رابط غير صالح للمعاينة' : 'الصقي رابط الصورة الجديدة لعرض معاينتها';
+      if(imEl){ imEl.removeAttribute('src'); imEl.hidden = true; }
+      if(ph){ ph.hidden = false; }
+    }
+  }
+
   function renderCvDash(targetId){
     if(!targetId) document.getElementById('countBadge').textContent = 'imgscr الأكواد';
 
@@ -357,15 +392,29 @@
       resultsHtml = '<div class="cv-results">' + cvImgs.map((img, i) => {
         const src = img.src || img.dataSrc;
         const short = src ? src.replace(/^https?:\/\//i, '') : '—';
+        const oldUrl = (src && cvIsPreviewable(src)) ? src.trim() : '';
+        const newUrl = (img.newUrl || '').trim();
+        const newOk = cvIsPreviewable(newUrl);
+        const oldThumb = oldUrl
+          ? `<a class="cv-thumb" href="${escHtml(oldUrl)}" target="_blank" rel="noopener" title="فتح الصورة القديمة في صفحة جديدة"><img src="${escHtml(oldUrl)}" alt="الصورة القديمة ${i + 1}" loading="lazy" onerror="this.parentElement.classList.add('is-broken')"><i class="ti ti-photo-off cv-thumb-fb"></i><span class="cv-thumb-open"><i class="ti ti-external-link"></i></span></a>`
+          : `<span class="cv-thumb is-empty" title="لا توجد معاينة — المفتاح نصي فقط"><i class="ti ti-photo-off"></i></span>`;
+        const newThumb = `<a class="cv-thumb is-new${newOk ? '' : ' is-empty'}" id="cvNewLink_${i}"${newOk ? ` href="${escHtml(newUrl)}" target="_blank" rel="noopener" title="فتح الصورة الجديدة في صفحة جديدة"` : ' title="الصقي رابط الصورة الجديدة لعرض معاينتها"'} onclick="return cvThumbGo(event, ${i})"><img id="cvNewImg_${i}"${newOk ? ` src="${escHtml(newUrl)}"` : ''} alt="الصورة الجديدة ${i + 1}" loading="lazy"${newOk ? '' : ' hidden'} onerror="this.parentElement.classList.add('is-broken')"><i class="ti ti-photo-plus cv-thumb-ph" id="cvNewPh_${i}"${newOk ? ' hidden' : ''}></i><span class="cv-thumb-open"><i class="ti ti-external-link"></i></span></a>`;
         return `<div class="cv-item">
           <div class="cv-item-head">
             <input type="checkbox" class="cv-check" id="cvChk_${i}" ${img.enabled ? 'checked' : ''} onchange="cvImgs[${i}].enabled=this.checked; renderCvPreview()">
             <span>صورة ${i + 1}</span>
             <code title="${escHtml(src || '')}">${escHtml(short)}</code>
           </div>
-          <div class="cv-item-row">
-            <label>الصورة الجديدة</label>
-            <input class="cv-input" type="text" value="${escHtml(img.newUrl)}" placeholder="https://cdn.salla.sa/.../new-image.jpg" dir="ltr" oninput="cvImgs[${i}].newUrl=this.value; renderCvPreview()">
+          <div class="cv-item-main">
+            <div class="cv-previews">
+              <div class="cv-prev"><span class="cv-prev-t">القديمة</span>${oldThumb}</div>
+              <span class="cv-prev-arrow"><i class="ti ti-arrow-left"></i></span>
+              <div class="cv-prev"><span class="cv-prev-t">الجديدة</span>${newThumb}</div>
+            </div>
+            <div class="cv-item-row">
+              <label>الصورة الجديدة</label>
+              <input class="cv-input" type="text" value="${escHtml(img.newUrl)}" placeholder="https://cdn.salla.sa/.../new-image.jpg" dir="ltr" oninput="cvImgs[${i}].newUrl=this.value; cvUpdateNewPreview(${i}); renderCvPreview()">
+            </div>
           </div>
         </div>`;
       }).join('') + '</div>';
