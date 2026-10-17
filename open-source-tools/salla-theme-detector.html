@@ -98,6 +98,20 @@ th{background:color-mix(in srgb,var(--line) 45%,transparent)}
 tr:last-child td{border-bottom:0}
 .steps{margin:0;padding-inline-start:22px}
 .steps li{margin-bottom:4px}
+/* شريط الروابط واستيراد التغريدة */
+.xbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.ximport{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.xrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.xrow .grow{flex:1;min-width:210px}
+.ximport textarea{width:100%;font:inherit;font-size:16px;line-height:1.9;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;min-height:86px}
+.ximport textarea:focus{outline:2px solid var(--brand)}
+.ulist{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.ulist li{display:flex;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:0}
+.ulist .n{font-size:12px;font-weight:700;color:var(--muted);flex:none;min-width:1.7em}
+.ulist .u{flex:1;min-width:0;font-size:13.5px;overflow-wrap:anywhere;direction:ltr;text-align:left;unicode-bidi:plaintext}
+.ulist .btn{flex:none}
+.count{font-size:14px;color:var(--muted)}
+.note{font-size:14px;color:var(--warn);font-weight:700}
 @media (max-width:640px){.xhero{grid-template-columns:1fr}.badge{inset-inline-start:8px}}
 .dots{display:inline-block;animation:bl 1.2s infinite}
 @keyframes bl{50%{opacity:.3}}
@@ -165,6 +179,43 @@ tr:last-child td{border-bottom:0}
       <div class="xc"><h4>فيرفوكس</h4><p>ملف التثبيت المباشر لفيرفوكس فقط.</p><a class="btn" data-l="FIREFOX" target="_blank" rel="noopener">تحميل ملف XPI</a></div>
       <div class="xc"><h4>التحويل التلقائي</h4><p>صفحة تحوّلك تلقائيًا للرابط المناسب حسب متصفحك.</p><a class="btn ghost" data-l="AUTO" target="_blank" rel="noopener">افتح صفحة التحويل</a></div>
     </div></div>
+
+  <div class="xsec" id="x-links">
+    <h3>نسخ كل الروابط مرة واحدة</h3>
+    <p class="lead">بدل ما تنسخ رابط رابط، اضغط الزر ويلزقلك كل روابط التحميل كاملة جاهزة للريبلاي.</p>
+    <div class="xbar">
+      <button class="btn" id="copyLinks">انسخ كل الروابط كاملة</button>
+      <button class="btn ghost" id="copyPlain">انسخ الروابط بدون أسماء المتصفحات</button>
+      <span class="count" id="linkCount" aria-live="polite"></span>
+    </div>
+    <div class="xbar">
+      <button class="btn ghost" id="dlTxt">نزّل الروابط كملف نص</button>
+      <button class="btn ghost" id="dlJson">نزّلها كملف JSON</button>
+    </div>
+  </div>
+
+  <div class="xsec ximport" id="x-tw">
+    <h3>تحميل الروابط من تغريدة على X (تويتر)</h3>
+    <p class="lead">الصق رابط التغريدة واضغط «جلب التغريدة»، أو الصق نص التغريدة مباشرة. كل الروابط بتطلع في قائمة وتقدر تنسخها كلها بضغطة وحدة.</p>
+    <div class="xrow">
+      <input type="text" class="grow" id="twUrl" dir="ltr" inputmode="url" placeholder="https://x.com/salla1zid/status/2107068522736017855" value="https://x.com/salla1zid/status/2107068522736017855">
+      <button class="btn" id="twFetch">جلب التغريدة</button>
+      <a class="btn ghost" id="twOpen" target="_blank" rel="noopener">افتح التغريدة</a>
+    </div>
+    <div style="margin-top:14px">
+      <label class="lab" for="twText">أو الصق نص التغريدة / الريبلاي هنا</label>
+      <textarea id="twText" dir="auto" placeholder="الصق نص التغريدة هنا وكل الروابط بتظهر تحت في لحظات"></textarea>
+    </div>
+    <div class="xbar">
+      <label class="opt"><input type="checkbox" id="twOnly" checked> اعرض روابط المتاجر فقط (بدون روابط X و t.co)</label>
+    </div>
+    <div class="xbar">
+      <button class="btn" id="twCopyAll">انسخ كل الروابط دفعة واحدة</button>
+      <button class="btn ghost" id="twDownload">نزّل الروابط (.txt)</button>
+      <span class="count" id="twCount" aria-live="polite"></span>
+    </div>
+    <ul class="ulist" id="twList"></ul>
+  </div>
 
   <div class="xsec"><h3>المتصفحات التي تدعم الإضافة</h3>
     <p class="lead">أي متصفح مبني على نواة كروميوم يقبل إضافات جوجل كروم، ويمكنك تثبيت الإضافة عليه من متجر كروم.</p>
@@ -346,6 +397,72 @@ async function gen(){
   r.at=new Date();r.angle=ANGLES.find(x=>x.id===angle).n;cur=r;hist.unshift(r);hist=hist.slice(0,8);setMode(r.src);render();renderHist();
   setBusy(false,r.src==="local"?"التوليد الذكي غير متاح هنا، هذي نسخة بسيطة من قوالب جاهزة.":"")
  }catch(e){setBusy(false,ERR[e&&e.code]||ERR.upstream_error)}}
+
+/* ---------- نسخ وتصدير كل الروابط ---------- */
+const NAMED=[["Chrome",L.CHROME],["Edge",L.EDGE],["Firefox",L.FIREFOX],["AUTO",L.AUTO]];
+const txtOf=()=>NAMED.map(([n,u])=>n+":\n"+u).join("\n\n");
+const flatOf=()=>NAMED.map(([,u])=>u).join("\n");
+function save(name,body,mime){
+ const b=new Blob([body],{type:mime+";charset=utf-8"}),u=URL.createObjectURL(b);
+ const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();
+ setTimeout(()=>{a.remove();URL.revokeObjectURL(u)},4000)}
+$("copyLinks").onclick=e=>copy(txtOf(),e.target);
+$("copyPlain").onclick=e=>copy(flatOf(),e.target);
+$("dlTxt").onclick=()=>save("salla-theme-detector-links.txt",txtOf(),"text/plain");
+$("dlJson").onclick=()=>save("salla-theme-detector-links.json",JSON.stringify(Object.fromEntries(NAMED),null,2),"application/json");
+$("linkCount").textContent=NAMED.length+" روابط جاهزة";
+
+/* ---------- استخراج روابط التغريدة ---------- */
+let twCtl=null,twFound=[];
+const clean=u=>u.replace(/&amp;/g,"&").replace(/[.,;:!؟،…"'’”)\]}>\\]+$/,"");
+function extract(src){
+ const only=$("twOnly").checked,seen=new Set();
+ twFound=[...(src.match(/https?:\/\/[^\s<>"'`\\]+/gi)||[])]
+  .map(clean)
+  .filter(u=>/^https?:\/\/./i.test(u))
+  .filter(u=>!only||!/(?:^|\/\/)(?:www\.)?(?:x|twitter)\.com\//i.test(u))
+  .filter(u=>!/(?:^|\/\/)t\.co\//i.test(u))
+  .filter(u=>{const k=u.replace(/\/+$/,"").toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
+ drawTw()}
+function drawTw(){
+ const ul=$("twList");ul.innerHTML="";
+ $("twCount").textContent=twFound.length?twFound.length+" رابط جاهز للنسخ":"";
+ twFound.forEach((u,i)=>{
+  const li=document.createElement("li");
+  li.innerHTML='<span class="n">'+(i+1)+'</span><a class="u" target="_blank" rel="noopener"></a><button class="btn ghost sm">انسخ</button>';
+  const a=li.querySelector(".u");a.href=u;a.textContent=u;
+  li.querySelector("button").onclick=e=>copy(u,e.target);
+  ul.appendChild(li)})}
+function syncTwOpen(){const u=$("twUrl").value.trim();$("twOpen").href=u||"https://x.com/"}
+function fetchTw(){
+ const url=$("twUrl").value.trim();
+ if(!url){$("twCount").textContent="اكتب رابط التغريدة أول";return}
+ const b=$("twFetch"),old=b.textContent;b.disabled=true;b.textContent="جاري الجلب...";
+ twCtl=new AbortController();const to=setTimeout(()=>twCtl.abort(),25000);
+ const ask=async p=>{const r=await fetch(p,{signal:twCtl.signal});if(!r.ok)throw new Error("http "+r.status);return await r.text()};
+ const idOf=u=>{const m=u.match(/\/status(?:es)?\/(\d+)/);return m?m[1]:null};
+ (async()=>{
+  let text=null;
+  // 1) واجهة fxtwitter ترجع نص التغريدة بدون تسجيل دخول
+  const id=idOf(url);
+  if(id)try{
+   const j=JSON.parse(await ask("https://api.fxtwitter.com/status/"+id));
+   if(j&&j.tweet&&j.tweet.text){text=j.tweet.text;$("twText").value=text}
+  }catch(e){}
+  // 2) احتياطي: نسخ نص الصفحة عبر وسيط
+  if(!text)for(const p of ["https://r.jina.ai/"+url,"https://api.allorigins.win/raw?url="+encodeURIComponent(url)])
+   try{const h=await ask(p);const m=h.match(/(?:Markdown Content:|Markdown content:)\s*([\s\S]+)/);
+    if(m&&m[1]){text=m[1];$("twText").value=text.slice(0,4000);break}}catch(e){if(e.name==="AbortError")break}
+  clearTimeout(to);b.disabled=false;b.textContent=old;
+  if(text){extract(text);
+   $("twCount").textContent=twFound.length?twFound.length+" رابط جاهز للنسخ":"ما لقى روابط بالنص، جرّب لصق النص يدويًا"}
+  else{$("twCount").innerHTML='<span class="note">ما قدرنا نقرأ التغريدة تلقائيًا. افتحها وانسخ النص والصقه تحت.</span>';$("twText").focus()}})()}
+$("twFetch").onclick=fetchTw;
+$("twUrl").oninput=syncTwOpen;syncTwOpen();
+$("twText").oninput=e=>extract(e.target.value);
+$("twOnly").onchange=()=>extract($("twText").value);
+$("twCopyAll").onclick=e=>{if(!twFound.length){e.target.textContent="ما فيه روابط";setTimeout(()=>e.target.textContent="انسخ كل الروابط دفعة واحدة",1400);return}copy(twFound.join("\n"),e.target)};
+$("twDownload").onclick=()=>{if(twFound.length)save("tweet-links.txt",twFound.join("\n"),"text/plain")};
 
 /* ---------- تشغيل ---------- */
 function chips(box,list,get,set){list.forEach(x=>{const b=document.createElement("button");b.className="chip";b.textContent=x.n;
