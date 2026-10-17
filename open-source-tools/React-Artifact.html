@@ -3034,6 +3034,47 @@ html[data-tab="roles"] #root main{display:none!important}
 #roles-page .demo{font-size:13px}
 html[data-tab="roles"] #root>div{min-height:0!important}
 </style>
+<style id="banners-tab-style">
+#banners-page{display:none!important}
+html[data-tab="banners"] #banners-page{display:block!important}
+html[data-tab="banners"] #root main{display:none!important}
+#banners-page{scroll-padding-top:170px}
+#banners-page .xinner{max-width:1320px;width:100%;margin:0 auto;padding:32px 12px 96px}
+@media(min-width:640px){#banners-page .xinner{padding:40px 24px 96px}}
+#banners-page .xhero h1{font-size:28px;font-weight:800;line-height:1.4;letter-spacing:-.02em;color:var(--text);margin:0}
+@media(min-width:640px){#banners-page .xhero h1{font-size:40px}}
+#banners-page .grad{background:linear-gradient(to left,#7c3aed,#d946ef,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+#banners-page .xhero p{color:var(--muted);font-size:14px;line-height:1.9;max-width:760px;margin:12px 0 0}
+#banners-page .stat{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--card-border);border-radius:16px;padding:12px 16px;display:flex;flex-direction:column}
+#banners-page .stat b{font-size:20px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px}
+#banners-page .stat small{color:var(--muted);font-size:11.5px;margin-top:2px}
+#banners-page .hero-search{display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);border-radius:999px;padding:0 16px;height:46px;flex:1;min-width:0}
+#banners-page .hero-search:focus-within{box-shadow:0 0 0 3px rgba(124,58,237,.25)}
+#banners-page .hero-search input{background:transparent;border:0;outline:0;flex:1;min-width:0;font-size:13.5px;color:var(--text);font-family:inherit}
+#banners-page .hero-search input::placeholder{color:var(--muted)}
+#banners-page .pill-btn{background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);border-radius:999px;padding:0 20px;height:46px;font:700 13.5px Cairo,Tahoma,sans-serif;color:var(--text);cursor:pointer;white-space:nowrap;transition:.2s}
+#banners-page .pill-btn:hover{border-color:#7c3aed;color:#7c3aed}
+#banners-page .xsubnav{position:sticky;top:84px;z-index:20;display:flex;gap:8px;align-items:center;padding:10px 12px;margin-top:22px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-border);border-radius:999px;overflow-x:auto;scrollbar-width:thin}
+#banners-page .xsubnav a{padding:8px 18px;border-radius:30px;text-decoration:none;color:var(--text);font-weight:700;transition:.2s;white-space:nowrap;font-size:13.5px;flex-shrink:0}
+#banners-page .xsubnav a:hover{background:#111;color:#fff}
+#banners-page h2{margin:44px 0 6px;font-size:23px;font-weight:800;padding-inline-start:14px;border-inline-start:6px solid #7c3aed;color:var(--text);scroll-margin-top:160px}
+#banners-page .hint{color:var(--muted);font-size:13.5px;margin:0 0 18px;padding-inline-start:20px}
+#banners-page .xgrid{display:grid;grid-template-columns:1fr;gap:16px}
+#banners-page.net .xgrid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+#banners-page .card{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--card-border);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0;color:var(--text);transition:transform .3s,box-shadow .3s}
+#banners-page .card:hover{transform:translateY(-4px)}
+#banners-page .card h3{margin:0;font-size:16px;font-weight:700;color:var(--text);line-height:1.8}
+#banners-page .card p.note{margin:0;color:var(--muted);font-size:13px;line-height:1.9}
+#banners-page .code{position:relative}
+#banners-page .code button{position:absolute;top:8px;inset-inline-end:8px;border:0;border-radius:8px;padding:5px 12px;background:#6c5ce7;color:#fff;font:600 12px Cairo,Tahoma,sans-serif;cursor:pointer;z-index:2}
+#banners-page .code button:hover{filter:brightness(1.1)}
+#banners-page pre{margin:0;direction:rtl;text-align:right;background:#0b0e16;color:#dbe2ff;padding:40px 14px 14px;border-radius:12px;font:12.5px/2 Cairo,Tahoma,Consolas,monospace;max-height:340px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+#banners-page pre.ltr{direction:ltr;text-align:left;font:12px/1.7 Consolas,monospace}
+#banners-page .xfoot{text-align:center;color:var(--muted);padding:34px 12px 8px;font-size:13px}
+#banners-page .varbox{display:flex;flex-wrap:wrap;gap:8px}
+#banners-page .varbox code{direction:rtl;background:#00000055;border:1px solid #ffffff22;border-radius:8px;padding:4px 12px;color:#7dd3fc;font:12.5px Cairo,Tahoma,sans-serif}
+html[data-tab="banners"] #root>div{min-height:0!important}
+</style>
 <div id="roles-page" dir="rtl" style="display:none">
 <div class="xinner">
 <div class="xhero">
@@ -4087,6 +4128,213 @@ html[data-tab="roles"] #root>div{min-height:0!important}
 <div class="xfoot">💡 انسخ الدور المناسب والصقه أول رسالة لأي AI — وجرّب الدور الشامل رقم 1 للمتاجر والمواقع 😉</div>
 </div>
 </div>
+<div id="banners-page" dir="rtl" style="display:none">
+<div class="xinner">
+<div class="xhero">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:4px">
+<h1>مقسم <span class="grad">برومبت البانرات</span></h1>
+<span class="glass" style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--text)"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block"></span> 14 قسم للنسخ السريع</span>
+</div>
+<p>برومبت مصمم بانرات المتاجر مقسم لمتغيرات مستقلة: انسخ القسم اللي تحتاجه فقط والصقه لأي AI، أو انسخ البرومبت الكامل عربي / إنجليزي بضغطة واحدة. كل <b>pre</b> هو النص الجاهز للنسخ بدون شرح إضافي.</p>
+<div style="margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:640px">
+<div class="stat"><b>🧩 14</b><small>قسم قابل للنسخ</small></div>
+<div class="stat"><b>📋 2</b><small>نسخة كاملة (عربي + English)</small></div>
+<div class="stat"><b>⚡ 1</b><small>ضغطة لنسخ أي متغير</small></div>
+</div>
+<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+<div class="hero-search"><span style="opacity:.55">🔍</span><input id="bannersSearch" type="search" placeholder="ابحث في أقسام البرومبت... (مثال: الهوية، المقاس، ممنوعات)"><span id="bannersCount" style="font-size:11px;color:var(--muted);white-space:nowrap"></span></div>
+<button id="bannersViewToggle" class="pill-btn" type="button">🔀 شبكة / عمود</button>
+</div>
+</div>
+<div class="xsubnav glass"><a href="#bnr-full">📋 البرومبت الكامل</a><a href="#bnr-role">👔 الدور</a><a href="#bnr-inputs">📎 المرفقات</a><a href="#bnr-task">🎯 المهمة</a><a href="#bnr-size">📐 المقاس</a><a href="#bnr-extract">✂️ استخراج المنتجات</a><a href="#bnr-lock">🔒 قفل المنتج</a><a href="#bnr-layout">🧭 التوزيع</a><a href="#bnr-brand">🎨 لون الهوية</a><a href="#bnr-bg">🖼️ الخلفية</a><a href="#bnr-smart">🧠 الفهم الذكي</a><a href="#bnr-forbidden">⛔ الممنوعات</a><a href="#bnr-quality">✅ الجودة والإخراج</a><a href="#bnr-vars">⚙️ المتغيرات</a></div>
+<h2 id="bnr-full">📋 البرومبت الكامل — نسخة واحدة</h2>
+<p class="hint">انسخ كل شيء دفعة واحدة والصقه لأي AI مع صور المنتجات.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-full-ar"><h3>1. 📋 البرومبت الكامل (عربي)</h3>
+<p class="note">النسخة العربية الكاملة الجاهزة للصق مع المرفقات.</p>
+<div class="code"><button type="button" data-copy-src="banner-prompt-ar-text">نسخ البرومبت عربي</button><pre>انسخ من الزر بالأعلى — النص الكامل محفوظ في الصفحة</pre></div></article>
+<article class="card no-auto" id="bnr-full-en"><h3>2. 📋 Full Prompt (English)</h3>
+<p class="note">Same prompt in English — paste with product images.</p>
+<div class="code"><button type="button" data-copy-src="banner-prompt-en-text">Copy English Prompt</button><pre class="ltr">Copy via the button above — full text stored in page</pre></div></article>
+</div>
+<h2 id="bnr-role">👔 الدور</h2>
+<p class="hint">من هو الـ AI في هذه المهمة.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-role-1"><h3>3. 👔 الدور — Role</h3>
+<p class="note">الصقه في أول المحادثة لتثبيت شخصية المصمم.</p>
+<div class="code"><button type="button">نسخ القسم</button><pre>أنت مصمم بانرات متاجر إلكترونية محترف (Senior E-commerce Banner Designer) ومصوّر منتجات إديتوريال محترف، متخصص في بانرات واجهة المتجر عالية التحويل، بعقلية تصميم تعتمد على الهرمية البصرية والنسبة الذهبية (1.618).
+
+You are a Senior E-commerce Banner Designer and professional editorial product photographer, specialized in high-converting storefront hero banners. You work with a strong visual hierarchy and the golden ratio (1.618).</pre></div></article>
+</div>
+<h2 id="bnr-inputs">📎 المرفقات</h2>
+<p class="hint">ما الذي سترفقه مع البرومبت.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-inputs-1"><h3>4. 📎 المرفقات — Inputs</h3>
+<p class="note">غيّر [تركيز الفئة] حسب متجرك أو احذف السطر لو غير موجود.</p>
+<div class="code"><button type="button">نسخ القسم</button><pre># المرفقات
+1) هوية المتجر (شعار / ألوان / خطوط)، ولو الصور المرفقة (لقطة شاشة للمتجر أو أي صورة) فيها لون الهوية أو زر "أضف إلى السلة"، فاستخرج اللون منها.
+2) صور المنتجات الفعلية (3 أو 4 منتجات على الأقل، استخدمها كلها في نفس البانر).
+3) (اختياري) تركيز الفئة: [مثال: عود وبخور / ساعات / أجهزة تبريد]. لو مذكور، التزم به كطابع غالب للتصميم.</pre></div></article>
+</div>
+<h2 id="bnr-task">🎯 المهمة</h2>
+<p class="hint">المطلوب من الـ AI بجملة واحدة واضحة.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-task-1"><h3>5. 🎯 المهمة — Task</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># المهمة
+صمّم بانر أفقي ترويجي واحد متكامل واحترافي وبدون أي نص، عن طريق استخراج المنتجات من الصور المرفقة ودمجها كأنها صُوّرت معًا في جلسة تصوير استوديو واحدة. سأضيف النصوص يدويًا على الجهة اليسرى بعد استلام التصميم.</pre></div></article>
+</div>
+<h2 id="bnr-size">📐 المقاس</h2>
+<p class="hint">أبعاد صارمة بدون اقتصاص أو تمديد.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-size-1"><h3>6. 📐 المقاس — Canvas (صارم)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># المقاس (صارم)
+- الأبعاد: 2942 × 1167 بكسل بالضبط (نفس نسبة 1800 × 712 تقريبًا، فيبقى التصميم صالحًا لو احتجت تصغيره).
+- الحفاظ على النسبة تمامًا، بدون أي اقتصاص أو تمديد يُخل بالتكوين.</pre></div></article>
+</div>
+<h2 id="bnr-extract">✂️ استخراج المنتجات</h2>
+<p class="hint">عزل المنتج وحذف النصوص والكرتون الزائد.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-extract-1"><h3>7. ✂️ استخراج المنتجات</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># استخراج المنتجات
+- استخرج كل منتج من الصور المرفقة وافصله بالكامل: احذف الصناديق والإطارات والمربعات وأي حاويات مستطيلة تحيط به.
+- احذف كل النصوص المكتوبة فوق صور المنتجات (مثل "شحن مجاني"، الأسعار، الشارات، الملصقات) بحذف نظيف أو Generative Fill بدون أي ضرر للمنتج نفسه.
+- قاعدة العبوة الخارجية (عطور، بخور، عود، شموع معطرة، أطقم هدايا، أو أي منتج له كرتونة/غلاف خارجي منفصل):
+  - لو الصورة فيها المنتج الأساسي (الزجاجة/القطعة/العلبة الداخلية) + الكرتونة الخاصة به جنب بعض → يُؤخذ المنتج الأساسي فقط وتُحذف الكرتونة.
+  - استثناء 1: لو الكرتونة أو الغلاف وحدها في الصورة (المنتج الأساسي غير ظاهر منفصلًا) → تُؤخذ كما هي.
+  - استثناء 2: لو الكرتونة تضيف قيمة جمالية أو تسويقية للبانر → تُؤخذ كما هي.
+  - في الحالات الاستثنائية يكون القرار حسب ما يخدم التركيب البصري للبانر أكثر.</pre></div></article>
+</div>
+<h2 id="bnr-lock">🔒 قفل المنتج</h2>
+<p class="hint">ممنوع تغيير المنتج نهائيًا.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-lock-1"><h3>8. 🔒 قفل المنتج (صارم)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># قفل المنتج (صارم)
+- ممنوع نهائيًا تغيير أي تفصيلة في المنتج: الشكل، الألوان، الليبل، النصوص أو الشعارات المطبوعة عليه، الأبعاد، المواد، الغطاء، التعبئة، التغليف، التصميم الخارجي.
+- المسموح فقط: تحويل كل منتج من صورة مسطحة إلى منظور 3D واقعي بنفس زوايا وعمق وإضاءة البانر، مع ظلال وانعكاسات طبيعية.
+- احترام النسبة الحقيقية لحجم كل منتج مقارنة بالباقي (ابحث عن الأحجام الحقيقية): المنتج الأصغر فعليًا يظهر أصغر.
+- المنتجات تقف بشكل مستقيم، ويُسمح باستخدام بوديوم أو قاعدة أو سطح عرض لو ذلك يحسّن التكوين.</pre></div></article>
+</div>
+<h2 id="bnr-layout">🧭 التوزيع</h2>
+<p class="hint">المنتجات يمين + فراغ نصوص يسار بالنسبة الذهبية.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-layout-1"><h3>9. 🧭 توزيع التكوين (صارم)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># توزيع التكوين (صارم)
+- كل المنتجات (3-4 على الأقل) في الجهة اليمنى فقط، جنب بعضها بتوزيع احترافي غير مزدحم، وتشغل 60% إلى 65% من عرض البانر.
+- الجهة اليسرى فراغ بصري نظيف (Negative Space) يشغل 35% إلى 40% من العرض: بدون منتجات، بدون عناصر، بدون زخارف، بدون أي حرف. مخصص لنصوصي.
+- التوزيع يتبع الهرمية البصرية والنسبة الذهبية، وتكون نقطة الجذب (Focal Point) في الثلث الأيمن من الصورة.
+- ظلال ناعمة وطبيعية بين المنتجات، وظل تلامس واضح (Contact Shadow) أسفل كل منتج مباشرة ليعطي إحساس الثقل والوزن.</pre></div></article>
+</div>
+<h2 id="bnr-brand">🎨 لون الهوية</h2>
+<p class="hint">أولوية قصوى: استخرج اللون من زر السلة أو الشعار.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-brand-1"><h3>10. 🎨 استخراج لون الهوية (أولوية قصوى)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># استخراج لون الهوية (Brand Color Extraction) — أولوية قصوى
+قبل أي تصميم، افحص كل الملفات والصور المرفقة بدقة واستخرج لون هوية المتجر الأساسي، بهذا الترتيب من الأولوية:
+1) لون زر "أضف إلى السلة" (Add to Cart) أو أي زر رئيسي في المتجر لو ظاهر في الصور.
+2) لون الشعار الأساسي.
+3) اللون المتكرر في الهيدر أو الفوتر أو شريط الإعلانات أو الأزرار أو العناوين أو العناصر المميزة في أي صورة مرفقة (لقطة شاشة للمتجر، صورة موقع، تصميم سابق).
+4) لو تعذّر ذلك: اللون الغالب في الصور المرفقة غير المنتجات نفسها.
+
+قواعد التطبيق:
+- حدّد اللون الأساسي (Primary) ولو وُجد لون ثانوي (Secondary) فاستخرجه أيضًا، والتزم بدرجاتهما الحقيقية (Hex) كما تظهر في الملفات، بدون تغيير الدرجة أو استبدالها بلون "يشبهها".
+- اللون الأساسي يكون هو الطابع الغالب على الخلفية كلها (بدرجات أغمق وأفتح منه وتدرجات إضاءة طبيعية)، بحيث يشعر المشاهد فورًا أن البانر ينتمي لهذا المتجر.
+- ممنوع اختيار ألوان عشوائية أو ألوان مفضلة لديك بعيدة عن هوية المتجر، حتى لو بدت أجمل.
+- لو كان لون الهوية فاتحًا جدًا أو لا يعطي فخامة، استخدم درجة أغمق أو أعمق منه من نفس العائلة اللونية، مع بقاء اللون الأصلي واضحًا في الإضاءة أو الخامة.
+- لو تعارض لون الهوية مع ألوان المنتجات، اجعل الخلفية بلون الهوية بدرجة تُبرز المنتجات ولا تُغرقها.
+- قبل التنفيذ، حدّد داخليًا: ما لون الهوية الذي استخرجته ومن أي عنصر؟ ثم ابنِ عليه التصميم كله.</pre></div></article>
+</div>
+<h2 id="bnr-bg">🖼️ الخلفية</h2>
+<p class="hint">خلفية واحدة متصلة بلون الهوية وإضاءة سينمائية.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-bg-1"><h3>11. 🖼️ الخلفية (صارم)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># الخلفية (صارم)
+- خلفية واحدة متصلة (Seamless) تغطي 100% من الكانفاس، بدون أي تقسيم أو خط فاصل أو لون مختلف بين اليمين واليسار. مسموح فقط بتدرج لوني خفيف أو تغيّر إضاءة ناعم عبر كامل الخلفية، وكلها مبنية على لون الهوية المستخرج في القسم السابق.
+- تناسب فئة المنتج (مثلًا: إلكترونيات → بيئة تقنية أنيقة، عطور/إكسسوار فاخر → بيئة داكنة فخمة، عناية → بيئة ناعمة مائية).
+- أسلوب تصوير إديتوريال حقيقي:
+  - إضاءة سينمائية اتجاهية واحدة واضحة المصدر (Spotlight / Rim Light) بتباين قوي بين الضوء والظل (Chiaroscuro)، وليست إضاءة مسطحة متساوية.
+  - سطح/خلفية من خامة حقيقية تناسب فخامة المنتج (قماش حرير بتموّجات ناعمة، رخام داكن، خشب غامق، جلد) بدل لون فاضي أو تدرج مجرد.
+  - انعكاسات خفيفة وواقعية على السطح لو الخامة تسمح (رخام/زجاج) بدون مبالغة.
+- المزاج العام: هادئ، فاخر، درامي بإضاءة محسوبة، مثل إعلانات الساعات الفاخرة.</pre></div></article>
+</div>
+<h2 id="bnr-smart">🧠 الفهم الذكي</h2>
+<p class="hint">4 خطوات تلقائية لأي منتج + ضوابط التنفيذ.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-smart-1"><h3>12. 🧠 الفهم الذكي للمنتج (تلقائي لأي منتج)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># الفهم الذكي للمنتج (Smart Product Context) — تلقائي لأي منتج
+هذا القسم يعمل مع أي منتج في أي مجال، وليس مع فئات محددة. قبل التصميم، نفّذ الخطوات التالية:
+
+الخطوة 1 — تعرّف على المنتج:
+حدّد بدقة ما هو كل منتج في الصور المرفقة (النوع، الاسم، الفئة، البراند إن وُجد). لو لم تتعرف عليه بثقة، ابحث عنه (بالاسم الظاهر على العبوة أو بالشكل) لتفهم ماهيته الحقيقية.
+
+الخطوة 2 — افهم وظيفته الفعلية:
+ابحث وحلّل: ماذا يفعل هذا المنتج بالضبط؟ ما المشكلة التي يحلها؟ في أي سياق وبيئة يُستخدم؟ ما الإحساس الذي يعيشه المشتري عند استخدامه؟ ومن جمهوره (رجال، نساء، أسر، محترفون، إلخ)؟
+
+الخطوة 3 — استنتج الرمز البصري:
+من الوظيفة والإحساس، استنتج بنفسك عنصرًا أو عنصرين بصريين واقعيين يعبّران عن "جوهر" المنتج، بحيث لو نظر شخص للبانر دون أي نص يفهم فورًا ما هو المنتج وما فائدته. فكّر في: الحالة الفيزيائية (حرارة، برودة، حركة، ضوء، ماء، دخان، بخار)، المكوّنات الخام، البيئة الطبيعية للاستخدام، أو الإحساس العاطفي.
+
+الخطوة 4 — قرّر هل تضيفه أم لا:
+- لو العنصر يخدم التصميم ويزيد قوته البصرية ويدعم الفخامة → أضفه بحجم محسوب.
+- لو سيزاحم المنتجات أو يشتّت الانتباه أو يضعف الفخامة، أو كان المنتج لا يحتاج رمزًا (منتج بسيط وواضح بذاته) → لا تضفه وابقَ على التصوير النظيف.
+- لو المنتجات المرفقة من فئات مختلفة، اختر الطابع الغالب أو ابقَ على تصوير نظيف محايد، ولا تخلط عناصر متضاربة.
+- لو ذُكر "تركيز الفئة" في المرفقات، فالتزم به.
+
+أمثلة توضيحية فقط (لتوضيح طريقة التفكير، وليست قائمة تُحصر فيها، ولا يُشترط وجود المنتج ضمنها):
+- فرن ← النار والحرارة والتسوية. | مكيف ← الثلج والبرودة. | ساعة ← الوقت والتروس. | عطر ← الرائحة والمكوّنات الطبيعية. | عود ← الدخان والمبخرة. | سماعة ← الصوت والإيقاع. | مكنسة ← النظافة واللمعان. | أداة حلاقة ← الدقة والمعدن اللامع. | منتج أطفال ← النعومة والألوان الهادئة. | أدوات مطبخ ← مكونات الطعام الطازجة.
+نفس المنطق ينطبق على أي منتج آخر مهما كان غير مألوف.
+
+ضوابط التنفيذ:
+- العناصر الداعمة واقعية (ثلج حقيقي، دخان حقيقي، نار حقيقية، ماء حقيقي) وليست رسومات أو أيقونات أو مؤثرات رقمية مصطنعة.
+- تظهر خلف أو حول المنتجات وبحجم محسوب، ولا تغطي أي منتج ولا تخفي ليبله.
+- ممنوع تمامًا أن تدخل في الجهة اليسرى المخصصة للنص (تبقى نظيفة 100%)، ويجوز امتداد تأثير خفيف جدًا كالدخان أو الإضاءة إلى حدود الفراغ دون أن يشغله.
+- لا تتعارض مع لون هوية المتجر ولا تكسر وحدة الخلفية المتصلة.
+- لا تتعارض مع قاعدة منع الجزيئات العشوائية: العناصر المرتبطة بالمنتج (دخان، ثلج، بخار، ماء) ليست جزيئات ضوء زخرفية.
+- بدون أي أشخاص نهائيًا، حتى لو كان المنتج رجاليًا أو نسائيًا؛ عبّر عن الجمهور بالخامات والأجواء فقط (جلد وخشب ومعدن للرجالي، حرير وورد للنسائي).
+- الأولوية دائمًا: المنتج أولًا، ثم الإحساس العام، ثم العناصر الداعمة.</pre></div></article>
+</div>
+<h2 id="bnr-forbidden">⛔ الممنوعات</h2>
+<p class="hint">بدون استثناء — انسخها مع أي توليد.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-forbidden-1"><h3>13. ⛔ ممنوعات صارمة (بدون استثناء)</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># ممنوعات صارمة (بدون استثناء)
+- ❌ أي نص أو حرف أو رقم أو سعر على البانر.
+- ❌ أي صور أو رسومات لنساء أو أشخاص.
+- ❌ شعارات أو عناصر غير موجودة في الملفات المرفقة.
+- ❌ صناديق أو إطارات مربعة حول المنتجات.
+- ❌ جزيئات ضوء عشوائية (Bokeh Dust / Glitter) أو دوائر ضبابية طايرة.
+- ❌ عناصر زخرفية هندسية عشوائية (خطوط/دوائر) إلا لو كانت جزءًا موثّقًا من هوية المتجر.
+- ❌ تقسيم الخلفية لمناطق أو ألوان منفصلة.
+- ❌ استخدام ألوان للخلفية بعيدة عن لون هوية المتجر المستخرج من الملفات المرفقة.
+- ❌ وضع أي منتج على الجهة اليسرى.
+- ❌ أي مظهر 3D اصطناعي واضح، أو عناصر ديكورية مفروضة بدون مبرر من وظيفة المنتج أو هويته.</pre></div></article>
+</div>
+<h2 id="bnr-quality">✅ الجودة والإخراج</h2>
+<p class="hint">معيار التسليم النهائي + الجمل التسويقية.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-quality-1"><h3>14. ✅ معايير الجودة + الإخراج النهائي</h3>
+<div class="code"><button type="button">نسخ القسم</button><pre># معايير الجودة النهائية
+لازم يبان كأنه تصوير فوتوغرافي احترافي حقيقي (Studio / Editorial Shot) أُضيف عليه تحسين رقمي بسيط: Photorealistic وفاخر، جاهز للاستخدام التجاري المباشر، وجذاب بصريًا يحفّز الضغط فورًا.
+
+# الإخراج النهائي
+1) صورة بانر واحدة نهائية بدون أي نص عليها.
+2) تحتها مباشرة 4 أفكار مرقّمة لجمل تسويقية بالعربي لإضافتها لاحقًا في الفوتوشوب:
+   - كل فكرة = جملتان، وكل جملة 3 كلمات بالضبط.
+   - مرتبطة بهوية المتجر وفئة المنتجات المعروضة في هذا البانر تحديدًا (مش جمل عامة).
+3) بدون أي شرح أو تحليل إضافي.</pre></div></article>
+</div>
+<h2 id="bnr-vars">⚙️ المتغيرات</h2>
+<p class="hint">غيّر القيم دي فقط قبل النسخ الكامل.</p>
+<div class="xgrid">
+<article class="card no-auto" id="bnr-vars-1"><h3>15. ⚙️ المتغيرات السريعة — انسخ والصق</h3>
+<p class="note">انسخ أي سطر وعدّله حسب مشروعك الحالي.</p>
+<div class="code"><button type="button">نسخ المتغيرات</button><pre>تركيز الفئة: [عود وبخور / ساعات / أجهزة تبريد / عطور / عناية / إلكترونيات]
+عدد المنتجات: [3 / 4]
+المقاس: 2942 × 1167 بكسل (نسبة 1800 × 712)
+جهة النص: اليسرى 35%–40% فراغ نظيف | المنتجات يمين 60%–65%
+لون الهوية المستخرج: [Primary HEX: #____ / Secondary HEX: #____ من: زر السلة / الشعار / الهيدر]</pre></div></article>
+</div>
+<div class="xfoot">💡 انسخ أي قسم لوحده أو البرومبت الكامل من الأعلى — والصقه مع صور المنتجات لأي AI 🎨</div>
+</div>
+</div>
 <script id="roles-tab-logic">
 (function(){
   function toast(m){var a=document.getElementById('forms-toast'),b=document.getElementById('forms-toast-txt');if(!a||!b)return;b.textContent=m;a.classList.add('show');setTimeout(function(){a.classList.remove('show')},1800);}
@@ -4128,16 +4376,258 @@ html[data-tab="roles"] #root>div{min-height:0!important}
 })();
 </script>
 
+<script type="text/plain" id="banner-prompt-ar-text">
+أنت مصمم بانرات متاجر إلكترونية محترف (Senior E-commerce Banner Designer) ومصوّر منتجات إديتوريال محترف، متخصص في بانرات واجهة المتجر عالية التحويل، بعقلية تصميم تعتمد على الهرمية البصرية والنسبة الذهبية (1.618).
+
+# المرفقات
+1) هوية المتجر (شعار / ألوان / خطوط)، ولو الصور المرفقة (لقطة شاشة للمتجر أو أي صورة) فيها لون الهوية أو زر "أضف إلى السلة"، فاستخرج اللون منها.
+2) صور المنتجات الفعلية (3 أو 4 منتجات على الأقل، استخدمها كلها في نفس البانر).
+3) (اختياري) تركيز الفئة: [مثال: عود وبخور / ساعات / أجهزة تبريد]. لو مذكور، التزم به كطابع غالب للتصميم.
+
+# المهمة
+صمّم بانر أفقي ترويجي واحد متكامل واحترافي وبدون أي نص، عن طريق استخراج المنتجات من الصور المرفقة ودمجها كأنها صُوّرت معًا في جلسة تصوير استوديو واحدة. سأضيف النصوص يدويًا على الجهة اليسرى بعد استلام التصميم.
+
+# المقاس (صارم)
+- الأبعاد: 2942 × 1167 بكسل بالضبط (نفس نسبة 1800 × 712 تقريبًا، فيبقى التصميم صالحًا لو احتجت تصغيره).
+- الحفاظ على النسبة تمامًا، بدون أي اقتصاص أو تمديد يُخل بالتكوين.
+
+# استخراج المنتجات
+- استخرج كل منتج من الصور المرفقة وافصله بالكامل: احذف الصناديق والإطارات والمربعات وأي حاويات مستطيلة تحيط به.
+- احذف كل النصوص المكتوبة فوق صور المنتجات (مثل "شحن مجاني"، الأسعار، الشارات، الملصقات) بحذف نظيف أو Generative Fill بدون أي ضرر للمنتج نفسه.
+- قاعدة العبوة الخارجية (عطور، بخور، عود، شموع معطرة، أطقم هدايا، أو أي منتج له كرتونة/غلاف خارجي منفصل):
+  - لو الصورة فيها المنتج الأساسي (الزجاجة/القطعة/العلبة الداخلية) + الكرتونة الخاصة به جنب بعض → يُؤخذ المنتج الأساسي فقط وتُحذف الكرتونة.
+  - استثناء 1: لو الكرتونة أو الغلاف وحدها في الصورة (المنتج الأساسي غير ظاهر منفصلًا) → تُؤخذ كما هي.
+  - استثناء 2: لو الكرتونة تضيف قيمة جمالية أو تسويقية للبانر → تُؤخذ كما هي.
+  - في الحالات الاستثنائية يكون القرار حسب ما يخدم التركيب البصري للبانر أكثر.
+
+# قفل المنتج (صارم)
+- ممنوع نهائيًا تغيير أي تفصيلة في المنتج: الشكل، الألوان، الليبل، النصوص أو الشعارات المطبوعة عليه، الأبعاد، المواد، الغطاء، التعبئة، التغليف، التصميم الخارجي.
+- المسموح فقط: تحويل كل منتج من صورة مسطحة إلى منظور 3D واقعي بنفس زوايا وعمق وإضاءة البانر، مع ظلال وانعكاسات طبيعية.
+- احترام النسبة الحقيقية لحجم كل منتج مقارنة بالباقي (ابحث عن الأحجام الحقيقية): المنتج الأصغر فعليًا يظهر أصغر.
+- المنتجات تقف بشكل مستقيم، ويُسمح باستخدام بوديوم أو قاعدة أو سطح عرض لو ذلك يحسّن التكوين.
+
+# توزيع التكوين (صارم)
+- كل المنتجات (3-4 على الأقل) في الجهة اليمنى فقط، جنب بعضها بتوزيع احترافي غير مزدحم، وتشغل 60% إلى 65% من عرض البانر.
+- الجهة اليسرى فراغ بصري نظيف (Negative Space) يشغل 35% إلى 40% من العرض: بدون منتجات، بدون عناصر، بدون زخارف، بدون أي حرف. مخصص لنصوصي.
+- التوزيع يتبع الهرمية البصرية والنسبة الذهبية، وتكون نقطة الجذب (Focal Point) في الثلث الأيمن من الصورة.
+- ظلال ناعمة وطبيعية بين المنتجات، وظل تلامس واضح (Contact Shadow) أسفل كل منتج مباشرة ليعطي إحساس الثقل والوزن.
+
+# استخراج لون الهوية (Brand Color Extraction) — أولوية قصوى
+قبل أي تصميم، افحص كل الملفات والصور المرفقة بدقة واستخرج لون هوية المتجر الأساسي، بهذا الترتيب من الأولوية:
+1) لون زر "أضف إلى السلة" (Add to Cart) أو أي زر رئيسي في المتجر لو ظاهر في الصور.
+2) لون الشعار الأساسي.
+3) اللون المتكرر في الهيدر أو الفوتر أو شريط الإعلانات أو الأزرار أو العناوين أو العناصر المميزة في أي صورة مرفقة (لقطة شاشة للمتجر، صورة موقع، تصميم سابق).
+4) لو تعذّر ذلك: اللون الغالب في الصور المرفقة غير المنتجات نفسها.
+
+قواعد التطبيق:
+- حدّد اللون الأساسي (Primary) ولو وُجد لون ثانوي (Secondary) فاستخرجه أيضًا، والتزم بدرجاتهما الحقيقية (Hex) كما تظهر في الملفات، بدون تغيير الدرجة أو استبدالها بلون "يشبهها".
+- اللون الأساسي يكون هو الطابع الغالب على الخلفية كلها (بدرجات أغمق وأفتح منه وتدرجات إضاءة طبيعية)، بحيث يشعر المشاهد فورًا أن البانر ينتمي لهذا المتجر.
+- ممنوع اختيار ألوان عشوائية أو ألوان مفضلة لديك بعيدة عن هوية المتجر، حتى لو بدت أجمل.
+- لو كان لون الهوية فاتحًا جدًا أو لا يعطي فخامة، استخدم درجة أغمق أو أعمق منه من نفس العائلة اللونية، مع بقاء اللون الأصلي واضحًا في الإضاءة أو الخامة.
+- لو تعارض لون الهوية مع ألوان المنتجات، اجعل الخلفية بلون الهوية بدرجة تُبرز المنتجات ولا تُغرقها.
+- قبل التنفيذ، حدّد داخليًا: ما لون الهوية الذي استخرجته ومن أي عنصر؟ ثم ابنِ عليه التصميم كله.
+
+# الخلفية (صارم)
+- خلفية واحدة متصلة (Seamless) تغطي 100% من الكانفاس، بدون أي تقسيم أو خط فاصل أو لون مختلف بين اليمين واليسار. مسموح فقط بتدرج لوني خفيف أو تغيّر إضاءة ناعم عبر كامل الخلفية، وكلها مبنية على لون الهوية المستخرج في القسم السابق.
+- تناسب فئة المنتج (مثلًا: إلكترونيات → بيئة تقنية أنيقة، عطور/إكسسوار فاخر → بيئة داكنة فخمة، عناية → بيئة ناعمة مائية).
+- أسلوب تصوير إديتوريال حقيقي:
+  - إضاءة سينمائية اتجاهية واحدة واضحة المصدر (Spotlight / Rim Light) بتباين قوي بين الضوء والظل (Chiaroscuro)، وليست إضاءة مسطحة متساوية.
+  - سطح/خلفية من خامة حقيقية تناسب فخامة المنتج (قماش حرير بتموّجات ناعمة، رخام داكن، خشب غامق، جلد) بدل لون فاضي أو تدرج مجرد.
+  - انعكاسات خفيفة وواقعية على السطح لو الخامة تسمح (رخام/زجاج) بدون مبالغة.
+- المزاج العام: هادئ، فاخر، درامي بإضاءة محسوبة، مثل إعلانات الساعات الفاخرة.
+
+# الفهم الذكي للمنتج (Smart Product Context) — تلقائي لأي منتج
+هذا القسم يعمل مع أي منتج في أي مجال، وليس مع فئات محددة. قبل التصميم، نفّذ الخطوات التالية:
+
+الخطوة 1 — تعرّف على المنتج:
+حدّد بدقة ما هو كل منتج في الصور المرفقة (النوع، الاسم، الفئة، البراند إن وُجد). لو لم تتعرف عليه بثقة، ابحث عنه (بالاسم الظاهر على العبوة أو بالشكل) لتفهم ماهيته الحقيقية.
+
+الخطوة 2 — افهم وظيفته الفعلية:
+ابحث وحلّل: ماذا يفعل هذا المنتج بالضبط؟ ما المشكلة التي يحلها؟ في أي سياق وبيئة يُستخدم؟ ما الإحساس الذي يعيشه المشتري عند استخدامه؟ ومن جمهوره (رجال، نساء، أسر، محترفون، إلخ)؟
+
+الخطوة 3 — استنتج الرمز البصري:
+من الوظيفة والإحساس، استنتج بنفسك عنصرًا أو عنصرين بصريين واقعيين يعبّران عن "جوهر" المنتج، بحيث لو نظر شخص للبانر دون أي نص يفهم فورًا ما هو المنتج وما فائدته. فكّر في: الحالة الفيزيائية (حرارة، برودة، حركة، ضوء، ماء، دخان، بخار)، المكوّنات الخام، البيئة الطبيعية للاستخدام، أو الإحساس العاطفي.
+
+الخطوة 4 — قرّر هل تضيفه أم لا:
+- لو العنصر يخدم التصميم ويزيد قوته البصرية ويدعم الفخامة → أضفه بحجم محسوب.
+- لو سيزاحم المنتجات أو يشتّت الانتباه أو يضعف الفخامة، أو كان المنتج لا يحتاج رمزًا (منتج بسيط وواضح بذاته) → لا تضفه وابقَ على التصوير النظيف.
+- لو المنتجات المرفقة من فئات مختلفة، اختر الطابع الغالب أو ابقَ على تصوير نظيف محايد، ولا تخلط عناصر متضاربة.
+- لو ذُكر "تركيز الفئة" في المرفقات، فالتزم به.
+
+ضوابط التنفيذ:
+- العناصر الداعمة واقعية (ثلج حقيقي، دخان حقيقي، نار حقيقية، ماء حقيقي) وليست رسومات أو أيقونات أو مؤثرات رقمية مصطنعة.
+- تظهر خلف أو حول المنتجات وبحجم محسوب، ولا تغطي أي منتج ولا تخفي ليبله.
+- ممنوع تمامًا أن تدخل في الجهة اليسرى المخصصة للنص (تبقى نظيفة 100%)، ويجوز امتداد تأثير خفيف جدًا كالدخان أو الإضاءة إلى حدود الفراغ دون أن يشغله.
+- لا تتعارض مع لون هوية المتجر ولا تكسر وحدة الخلفية المتصلة.
+- لا تتعارض مع قاعدة منع الجزيئات العشوائية: العناصر المرتبطة بالمنتج (دخان، ثلج، بخار، ماء) ليست جزيئات ضوء زخرفية.
+- بدون أي أشخاص نهائيًا، حتى لو كان المنتج رجاليًا أو نسائيًا؛ عبّر عن الجمهور بالخامات والأجواء فقط (جلد وخشب ومعدن للرجالي، حرير وورد للنسائي).
+- الأولوية دائمًا: المنتج أولًا، ثم الإحساس العام، ثم العناصر الداعمة.
+
+# ممنوعات صارمة (بدون استثناء)
+- ❌ أي نص أو حرف أو رقم أو سعر على البانر.
+- ❌ أي صور أو رسومات لنساء أو أشخاص.
+- ❌ شعارات أو عناصر غير موجودة في الملفات المرفقة.
+- ❌ صناديق أو إطارات مربعة حول المنتجات.
+- ❌ جزيئات ضوء عشوائية (Bokeh Dust / Glitter) أو دوائر ضبابية طايرة.
+- ❌ عناصر زخرفية هندسية عشوائية (خطوط/دوائر) إلا لو كانت جزءًا موثّقًا من هوية المتجر.
+- ❌ تقسيم الخلفية لمناطق أو ألوان منفصلة.
+- ❌ استخدام ألوان للخلفية بعيدة عن لون هوية المتجر المستخرج من الملفات المرفقة.
+- ❌ وضع أي منتج على الجهة اليسرى.
+- ❌ أي مظهر 3D اصطناعي واضح، أو عناصر ديكورية مفروضة بدون مبرر من وظيفة المنتج أو هويته.
+
+# معايير الجودة النهائية
+لازم يبان كأنه تصوير فوتوغرافي احترافي حقيقي (Studio / Editorial Shot) أُضيف عليه تحسين رقمي بسيط: Photorealistic وفاخر، جاهز للاستخدام التجاري المباشر، وجذاب بصريًا يحفّز الضغط فورًا.
+
+# الإخراج النهائي
+1) صورة بانر واحدة نهائية بدون أي نص عليها.
+2) تحتها مباشرة 4 أفكار مرقّمة لجمل تسويقية بالعربي لإضافتها لاحقًا في الفوتوشوب:
+   - كل فكرة = جملتان، وكل جملة 3 كلمات بالضبط.
+   - مرتبطة بهوية المتجر وفئة المنتجات المعروضة في هذا البانر تحديدًا (مش جمل عامة).
+3) بدون أي شرح أو تحليل إضافي.
+</script>
+
+<script type="text/plain" id="banner-prompt-en-text">
+You are a Senior E-commerce Banner Designer and professional editorial product photographer, specialized in high-converting storefront hero banners. You work with a strong visual hierarchy and the golden ratio (1.618).
+
+# INPUTS I WILL ATTACH
+1) Store identity (logo / brand colors / fonts). If the attached images (a store screenshot or any other image) contain the brand color or the "Add to Cart" button, extract the color from them.
+2) Photos of the actual products (at least 3-4 products; use ALL of them in the same banner).
+3) (Optional) Product category focus: [e.g., oud & incense / watches / cooling appliances]. If provided, treat it as the dominant theme of the design.
+
+# TASK
+Design ONE complete, professional, text-free horizontal promotional banner by extracting the products from my photos and compositing them as if shot together in a single studio session. I will add my own text manually on the left side afterward.
+
+# CANVAS (STRICT)
+- Exactly 2942 x 1167 px (this is the same aspect ratio as 1800 x 712, so the design stays valid if I need to downscale).
+- Keep this ratio exactly: no cropping or stretching that harms the composition.
+
+# PRODUCT EXTRACTION
+- Extract every product from the attached images and isolate it completely: remove boxes, frames, squares, and any rectangular containers.
+- Remove ALL text written over the product images (e.g. free shipping, prices, badges, stickers) using clean removal / generative fill, without damaging the product itself.
+- Packaging rule (perfumes, incense, oud, scented candles, gift sets, or any product with a separate outer box/wrapper):
+  - If the photo shows the main product (bottle/piece/inner item) next to its outer carton, keep ONLY the main product and remove the carton.
+  - Exception 1: if the carton/wrapper appears alone (the main product is not shown separately), keep the carton as is.
+  - Exception 2: if the carton adds visual or marketing value to the composition, keep it as is.
+  - In exception cases, choose whatever serves the banner's visual composition best.
+
+# PRODUCT LOCK (STRICT)
+- Never alter the products: shape, colors, label, printed text/logos, proportions, materials, caps, packaging, and exterior design must stay identical.
+- Only allowed: converting each flat image into a realistic 3D perspective render matching the banner's angle, depth, and lighting, plus natural shadows and reflections.
+- Respect the real relative scale of each product (research real sizes): a physically smaller product must appear smaller.
+- Products stand upright; an optional podium, pedestal, or surface is allowed if it improves the composition.
+
+# COMPOSITION (STRICT)
+- ALL products (3-4 minimum) sit on the RIGHT side only, arranged side by side in a professional, uncluttered grouping, occupying 60-65% of the banner width.
+- The LEFT side is clean negative space, 35-40% of the width: no products, no elements, no decorations, no text. It is reserved for my text.
+- Follow visual hierarchy and the golden ratio: the focal point falls in the right third of the image.
+- Natural, soft shadows between products, and a clear contact shadow directly under each product to give weight.
+
+# BRAND COLOR EXTRACTION - TOP PRIORITY
+Before any design work, carefully inspect ALL attached files and images and extract the store's core brand color, using this order of priority:
+1) The color of the "Add to Cart" button (or any primary button) if visible in the images.
+2) The primary color of the logo.
+3) The recurring color in the header, footer, announcement bar, buttons, headings, or other signature elements in any attached image (store screenshot, website capture, previous design).
+4) If none of the above is possible: the dominant non-product color in the attached images.
+
+Application rules:
+- Identify the Primary color, and a Secondary color if one exists. Stay faithful to their real shades (hex values) as they appear in the files. Do not alter them or substitute a similar-looking color.
+- The Primary color must be the dominant tone of the entire background (in darker and lighter shades plus natural lighting gradients), so the viewer instantly feels the banner belongs to this store.
+- Never choose random colors or your own preferred palette that strays from the store's identity, even if it looks nicer.
+- If the brand color is too light or does not feel luxurious, use a deeper/darker shade from the same color family, while keeping the original hue clearly visible in the lighting or material.
+- If the brand color clashes with the products' colors, build the background in the brand color at a shade that makes the products stand out rather than get lost.
+- Before executing, decide internally: which brand color did I extract, and from which element? Then build the entire design around it.
+
+# BACKGROUND (STRICT)
+- One single seamless background covering 100% of the canvas: no split, no dividing line, no different colors left vs. right. Only a subtle gradient or soft lighting shift across the whole canvas is allowed, all built on the brand color extracted in the previous section.
+- Suited to the product category (e.g. electronics to sleek tech environment; luxury/fragrance to dark, opulent; skincare to soft, watery).
+- Editorial product photography look:
+  - A single, clearly sourced cinematic light (spotlight / rim light) with strong contrast between light and shadow (chiaroscuro), not flat even lighting.
+  - A real material surface/backdrop that fits the product's luxury level (soft silk folds, dark marble, dark wood, leather) instead of an empty color or abstract gradient.
+  - Subtle, realistic reflections on the surface where the material allows (marble/glass), without exaggeration.
+- Mood: calm, luxurious, dramatic with calculated lighting, like high-end watch advertising.
+
+# SMART PRODUCT CONTEXT - AUTOMATIC FOR ANY PRODUCT
+This section works for ANY product in ANY field, not just specific categories. Before designing, follow these steps:
+Step 1 - Identify the product. Step 2 - Understand its real function and audience. Step 3 - Derive one or two realistic visual elements expressing its essence. Step 4 - Add only if it serves luxury and does not crowd products, never covering labels, never entering the left text area, photorealistic only, no people.
+
+# FORBIDDEN (NO EXCEPTIONS)
+- No text, letters, numbers, or prices anywhere on the banner.
+- No images of women or people.
+- No logos or elements not present in the attached files.
+- No boxes or square frames around products.
+- No random light particles (Bokeh Dust / Glitter).
+- No random geometric decorations unless documented brand identity.
+- No splitting background into zones.
+- No background colors straying from extracted brand color.
+- No products on the left side.
+- No artificial 3D render look.
+
+# QUALITY STANDARD
+Must look like a real professional studio/editorial photograph with light digital enhancement: photorealistic, high-end, ready for direct commercial use, and visually compelling to drive clicks.
+
+# OUTPUT FORMAT
+1) One final banner image with no text on it.
+2) Directly below it, 4 numbered marketing-copy ideas in Arabic (each idea = 2 sentences, each sentence exactly 3 words, specific to store and category).
+3) No other explanation or analysis.
+</script>
+
+<script id="banners-tab-logic">
+(function(){
+  function toast(m){var a=document.getElementById('forms-toast'),b=document.getElementById('forms-toast-txt');if(!a||!b)return;b.textContent=m;a.classList.add('show');setTimeout(function(){a.classList.remove('show')},1800);}
+  function copyText(t,ok){function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();ok();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok).catch(fb);else fb();}
+  function init(){
+    var cards=Array.prototype.slice.call(document.querySelectorAll('#banners-page .card'));
+    var cnt=document.getElementById('bannersCount');
+    function paint(q){q=(q||'').trim();if(cnt)cnt.textContent=q?('النتائج: '+cards.filter(function(c){return c.style.display!=='none'}).length+' / '+cards.length):(cards.length+' قسم');}
+    paint('');
+    document.querySelectorAll('#banners-page .card').forEach(function(c){
+      var btn=c.querySelector('.code button'),pre=c.querySelector('pre');
+      if(!btn||!pre||btn.__bound)return;btn.__bound=true;
+      btn.addEventListener('click',function(){
+        var src=btn.getAttribute('data-copy-src');
+        var tx=src?(document.getElementById(src)?document.getElementById(src).textContent.replace(/^\s+|\s+$/g,''):pre.textContent):pre.textContent;
+        copyText(tx,function(){var o=btn.textContent;btn.textContent='✅ تم النسخ!';toast('تم نسخ القسم 📋 الصقه لأي AI');setTimeout(function(){btn.textContent=o},1500);});
+      });
+    });
+    document.querySelectorAll('#banners-page [data-copy-src]').forEach(function(b){
+      if(b.__bound2)return; /* card buttons already bound above */
+    });
+    var s=document.getElementById('bannersSearch');
+    if(s&&!s.__bound){s.__bound=true;s.addEventListener('input',function(){
+      var q=(s.value||'').trim().toLowerCase();
+      cards.forEach(function(c){var hit=!q||c.textContent.toLowerCase().indexOf(q)>-1;c.style.display=hit?'':'none';if(hit){}});
+      document.querySelectorAll('#banners-page .xgrid').forEach(function(g){
+        var vis=Array.prototype.slice.call(g.querySelectorAll('.card')).filter(function(c){return c.style.display!=='none'}).length;
+        g.style.display=vis?'':'none';
+      });
+      paint(s.value);
+    });}
+    var vt=document.getElementById('bannersViewToggle');
+    if(vt&&!vt.__bound){vt.__bound=true;vt.addEventListener('click',function(){
+      document.getElementById('banners-page').classList.toggle('net');
+      toast(document.getElementById('banners-page').classList.contains('net')?'🗂️ عرض شبكة':'📄 عرض عمود');
+    });}
+    document.querySelectorAll('#banners-page .xsubnav a').forEach(function(a){
+      if(!a.__bound){a.__bound=true;a.addEventListener('click',function(){toast(a.textContent.trim())});}
+    });
+  }
+  if(document.readyState!=='loading')setTimeout(init,500);
+  else document.addEventListener('DOMContentLoaded',function(){setTimeout(init,500)});
+  setTimeout(init,1500);setTimeout(init,3500);
+})();
+</script>
+
 <script id="unified-tabs-fix">
 (function(){
   var KEY='unified-tab';
-  var PAGES=['forms','dashboard','prompts','roles'];
-  var PAGE_EL={forms:'forms-page',dashboard:'dashboard-page',prompts:'prompts-page',roles:'roles-page'};
+  var PAGES=['forms','dashboard','prompts','roles','banners'];
+  var PAGE_EL={forms:'forms-page',dashboard:'dashboard-page',prompts:'prompts-page',roles:'roles-page',banners:'banners-page'};
   var BTNS=[
     {id:'tabBtnFormsV2',tab:'forms',html:'<span>\uD83E\uDDE9</span> \u0639\u0646\u0627\u0635\u0631 \u0627\u0644\u0641\u0648\u0631\u0645'},
     {id:'tabBtnDash',tab:'dashboard',html:'<span>\uD83D\uDCCA</span> \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645'},
     {id:'tabBtnPrompts',tab:'prompts',html:'<span>\uD83D\uDCAC</span> \u0627\u0644\u0628\u0631\u0648\u0645\u0628\u062A\u0627\u062A'},
-    {id:'tabBtnRoles',tab:'roles',html:'<span>🤖</span> أدوار AI'}
+    {id:'tabBtnRoles',tab:'roles',html:'<span>🤖</span> أدوار AI'},
+    {id:'tabBtnBanners',tab:'banners',html:'<span>🎨</span> برومبت البانرات'}
   ];
   var BASE='px-4 sm:px-6 py-2.5 rounded-full text-[13px] sm:text-[14px] font-bold transition-all flex items-center gap-2 ';
   var ACTIVE=BASE+'bg-[#111] text-white shadow-lg dark:bg-white dark:text-black';
@@ -4176,12 +4666,12 @@ html[data-tab="roles"] #root>div{min-height:0!important}
     if(!opts.keepHash){
       try{
         if(isExtra)history.replaceState(null,'','#'+name);
-        else if(location.hash==='#forms'||location.hash==='#dashboard'||location.hash==='#prompts'||location.hash==='#roles')history.replaceState(null,'',location.pathname+(location.search||''));
+        else if(location.hash==='#forms'||location.hash==='#dashboard'||location.hash==='#prompts'||location.hash==='#roles'||location.hash==='#banners')history.replaceState(null,'',location.pathname+(location.search||''));
       }catch(e){}
     }
     refreshBtns();
     if(!opts.silent){
-      var labels={forms:'\uD83E\uDDE9 \u0639\u0646\u0627\u0635\u0631 \u0627\u0644\u0641\u0648\u0631\u0645',dashboard:'\uD83D\uDCCA \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645',prompts:'\uD83D\uDCAC \u0645\u0643\u062A\u0628\u0629 \u0627\u0644\u0628\u0631\u0648\u0645\u0628\u062A\u0627\u062A',roles:'🤖 أدوار AI'};
+      var labels={forms:'🧩 عناصر الفورم',dashboard:'📊 لوحة التحكم',prompts:'💬 مكتبة البرومبتات',roles:'🤖 أدوار AI',banners:'🎨 برومبت البانرات'};
       if(labels[name])toast(labels[name]);
       window.scrollTo({top:0,behavior:opts.instant?'auto':'smooth'});
     }
@@ -4206,6 +4696,7 @@ html[data-tab="roles"] #root>div{min-height:0!important}
     if(e.target.closest('#tabBtnDash')){setTab('dashboard');return;}
     if(e.target.closest('#tabBtnPrompts')){setTab('prompts');return;}
     if(e.target.closest('#tabBtnRoles')){setTab('roles');return;}
+    if(e.target.closest('#tabBtnBanners')){setTab('banners');return;}
     var rb=e.target.closest('#root header div.glass.rounded-full.p-1 > button');
     if(rb&&!rb.id){
       var t=rb.textContent||'';
@@ -4215,9 +4706,13 @@ html[data-tab="roles"] #root>div{min-height:0!important}
   function pageOf(id){
     var el=document.getElementById(id);
     if(!el||!el.closest)return null;
-    var pg=el.closest('#forms-page,#dashboard-page,#prompts-page');
+    var pg=el.closest('#forms-page,#dashboard-page,#prompts-page,#roles-page,#banners-page');
     if(!pg)return null;
-    return pg.id==='forms-page'?'forms':(pg.id==='dashboard-page'?'dashboard':(pg.id==='roles-page'?'roles':'prompts'));
+    if(pg.id==='forms-page')return 'forms';
+    if(pg.id==='dashboard-page')return 'dashboard';
+    if(pg.id==='roles-page')return 'roles';
+    if(pg.id==='banners-page')return 'banners';
+    return 'prompts';
   }
   window.addEventListener('hashchange',function(){
     var h=(location.hash||'').replace('#','');
