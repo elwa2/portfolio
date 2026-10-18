@@ -161,7 +161,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .code.plain{background:none;border:0;border-radius:0;overflow:visible}
 .code.plain pre{margin:0}
 .code .cp svg.i{width:15px;height:15px}
-.code .ch .cp{padding:3px 6px}
+.code .ch .cp,.code .ch .cw{padding:3px 6px}
 .code.plain .cp{position:absolute;top:8px;right:8px;z-index:1;display:inline-flex;align-items:center;justify-content:center;padding:5px;border-radius:6px;background:var(--bg-active);color:var(--muted);cursor:pointer;opacity:.75;transition:opacity .12s,background .12s}
 .code.plain:hover .cp,.code.plain .cp:focus-visible,.code.plain .cp.ok{opacity:1}
 .code.plain .cp:hover{background:var(--bg-hover);color:var(--fg-strong)}
@@ -470,7 +470,7 @@ function render(md,meta){
       while(i<L.length&&!(L[i].indexOf(f)===0&&!L[i].slice(f.length).trim())){buf.push(L[i]);i++}
       i++;
       if(plain){out+='<div class="code plain" data-plain="1" data-lang="'+lang+'"><button class="cp" type="button" title="نسخ الكود" aria-label="نسخ الكود">'+ic('copy')+'</button><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue}
-      out+='<div class="code" data-lang="'+lang+'"><div class="ch">'+ic(ttl?'edit':'icode')+'<span class="cl">'+(ttl?esc(ttl):codeTitle(lang))+'</span><button class="cw" type="button" title="التفاف الأسطر">'+ic('wrap')+'التفاف</button><button class="cp" type="button" title="نسخ الكود" aria-label="نسخ الكود">'+ic('copy')+'</button><span class="chev">'+ic('chev')+'</span></div><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue;
+      out+='<div class="code" data-lang="'+lang+'"><div class="ch">'+ic(ttl?'edit':'icode')+'<span class="cl">'+(ttl?esc(ttl):codeTitle(lang))+'</span><button class="cw" type="button" title="التفاف الأسطر" aria-label="التفاف الأسطر">'+ic('wrap')+'</button><button class="cp" type="button" title="نسخ الكود" aria-label="نسخ الكود">'+ic('copy')+'</button><span class="chev">'+ic('chev')+'</span></div><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue;
     }
     if((m=l.match(/^(#{1,6})\s+(.*)$/))){out+='<h'+m[1].length+'>'+inline(m[2])+'</h'+m[1].length+'>';i++;continue}
     if(/^\s*([-*_])\1\1+\s*$/.test(l)){out+='<hr>';i++;continue}
