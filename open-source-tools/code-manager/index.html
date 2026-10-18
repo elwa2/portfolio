@@ -119,7 +119,7 @@
     <button class="tools-launcher" id="toolsLauncher" onclick="toggleToolsMenu(event)" title="كل الأدوات في مكان واحد — بحث + اختصارات">
       <i class="ti ti-apps" aria-hidden="true"></i>
       <span class="tl-name" id="toolsLauncherName">كل الأدوات</span>
-      <span class="tl-count">10</span>
+      <span class="tl-count">11</span>
       <span class="tl-kbd">Alt+T</span>
     </button>
     <div class="tools-quick" id="toolsQuick" title="آخر أدوات استخدمتها — وصول بضغطة"></div>
@@ -145,6 +145,7 @@
           <button class="tm-item" data-src="devDashBtn" onclick="toolsGo('devDashBtn')"><i class="ti ti-tools"></i><span>أدوات <span class="tm-sub">ضغط + تعمية + SVG</span></span><span class="tm-num">7</span></button>
           <button class="tm-item" data-src="b64DashBtn" onclick="toolsGo('b64DashBtn')"><i class="ti ti-binary"></i><span>Base64 <span class="tm-sub">ترميز + صور</span></span><span class="tm-num">8</span></button>
           <button class="tm-item" data-src="qrDashBtn" onclick="toolsGo('qrDashBtn')"><i class="ti ti-qrcode"></i><span>QR <span class="tm-sub">مولد رموز</span></span><span class="tm-num">9</span></button>
+          <button class="tm-item" data-src="favDashBtn" onclick="toolsGo('favDashBtn')"><i class="ti ti-icons"></i><span>فافيكون <span class="tm-sub">أيقونة متحركة</span></span><span class="tm-num">5</span></button>
         </div>
       </div>
       <div class="tm-group" data-group="view">
@@ -162,6 +163,7 @@
         <button class="filter-tag" id="devDashBtn" onclick="toggleDevDash()" title="ضاغط CSS وJS، تعمية JS، تشفير SVG"><i class="ti ti-tools"></i> أدوات</button>
         <button class="filter-tag" id="b64DashBtn" onclick="toggleB64Dash()" title="ترميز وفك ترميز Base64 وتحويل الصور إلى Base64"><i class="ti ti-binary"></i> Base64</button>
         <button class="filter-tag" id="qrDashBtn" onclick="toggleQrDash()" title="مولد رموز QR"><i class="ti ti-qrcode"></i> QR</button>
+        <button class="filter-tag" id="favDashBtn" onclick="toggleFavDash()" title="استوديو الفافيكون المتحرك"><i class="ti ti-icons"></i> فافيكون</button>
         <button class="filter-tag" id="cpDashBtn" onclick="toggleCpDash()" title="مولد لوحة الألوان والتدرجات ومتغيرات CSS"><i class="ti ti-palette"></i> الألوان</button>
         <button class="filter-tag" id="rtDashBtn" onclick="toggleRtDash()" title="لوحة التحكم - باقة الثيم وكود HTML بروت مخصص"><i class="ti ti-adjustments-horizontal"></i> التحكم</button>
       </div>
@@ -329,6 +331,7 @@
     <script src="js/tools/base64.js"></script>
     <script src="js/tools/colors.js"></script>
     <script src="js/tools/qr.js"></script>
+    <script src="js/tools/favicon.js"></script>
     <script src="js/tools/route.js"></script>
     <script src="js/tools/alarm.js"></script>
     <script src="js/nav.js"></script>

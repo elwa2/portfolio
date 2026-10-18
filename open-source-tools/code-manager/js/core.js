@@ -780,6 +780,12 @@
       showQrDash = false;
       document.getElementById('qrDashBtn').classList.remove('qr-active');
     }
+    if(typeof showFavDash !== 'undefined' && showFavDash){
+      showFavDash = false;
+      const fb = document.getElementById('favDashBtn');
+      if(fb) fb.classList.remove('fav-active');
+      if(typeof favdStopLoop === 'function'){ try{ favdStopLoop(); }catch(e){} }
+    }
     if(showCpDash){
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
@@ -1107,6 +1113,7 @@ function getFiltered(){
     if(showDevDash) return renderDevDash();
     if(showB64Dash) return renderB64Dash();
     if(showQrDash) return renderQrDash();
+    if(showFavDash) return renderFavDash();
     if(showCpDash) return renderCpDash();
     if(showRtDash) return renderRtDash();
     const body  = document.getElementById('mainBody');
@@ -1498,6 +1505,7 @@ function getFiltered(){
     if(showDevDash) return 'dev';
     if(showB64Dash) return 'b64';
     if(showQrDash) return 'qr';
+    if(showFavDash) return 'fav';
     if(showCpDash) return 'cp';
     if(showRtDash) return 'rt';
     return 'main';
@@ -1513,7 +1521,7 @@ function getFiltered(){
   function restoreDashState(){
     let id = 'home';
     try { id = localStorage.getItem(DASH_KEY) || 'home'; } catch (e) {}
-    if (!['home','al','has','sb','css','cv','vd','ed','dev','b64','qr','cp','rt'].includes(id)) id = 'home';
+    if (!['home','al','has','sb','css','cv','vd','ed','dev','b64','qr','fav','cp','rt'].includes(id)) id = 'home';
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -1532,6 +1540,7 @@ function getFiltered(){
     showDevDash = id === 'dev';
     showB64Dash = id === 'b64';
     showQrDash = id === 'qr';
+    showFavDash = id === 'fav';
     showCpDash = id === 'cp';
     showRtDash = id === 'rt';
     const mark = (btnId, cls, on) => {
@@ -1546,6 +1555,7 @@ function getFiltered(){
     mark('devDashBtn', 'dev-active', showDevDash);
     mark('b64DashBtn', 'b64-active', showB64Dash);
     mark('qrDashBtn', 'qr-active', showQrDash);
+    mark('favDashBtn', 'fav-active', showFavDash);
     mark('cpDashBtn', 'cp-active', showCpDash);
     mark('rtDashBtn', 'rt-active', showRtDash);
   }
@@ -1559,10 +1569,11 @@ function getFiltered(){
   function clearDashFlags(){
     showHomeDash = false; showAlDash = false; showScrollbarDash = false; showCssDash = false;
     showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
+    showFavDash = false;
     showCpDash = false; showRtDash = false;
     const map = { homeBtn:'home-active', alDashBtn:'al-active', sbDashBtn:'scrollbar-active', cssDashBtn:'css-active',
       edDashBtn:'ed-active', devDashBtn:'dev-active',
-      b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
+      b64DashBtn:'b64-active', qrDashBtn:'qr-active', favDashBtn:'fav-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
     Object.keys(map).forEach(id => {
       const b = document.getElementById(id);
       if (b) b.classList.remove(map[id]);
@@ -1584,7 +1595,7 @@ function getFiltered(){
   }
   function hashGo(){
     const h = currentHash();
-    const ids = ['home','al','sb','css','cv','has','ed','dev','b64','qr','cp','rt'];
+    const ids = ['home','al','sb','css','cv','has','ed','dev','b64','qr','fav','cp','rt'];
     try {
       const sub = JSON.parse(localStorage.getItem(DASH_SUB_KEY) || 'null');
       if (sub && sub.tool) dtActiveTool = sub.tool;
@@ -1595,7 +1606,7 @@ function getFiltered(){
       const map = { home:['homeBtn','home-active'], al:['alDashBtn','al-active'], sb:['sbDashBtn','scrollbar-active'], css:['cssDashBtn','css-active'],
         cv:['cssDashBtn','css-active'], has:['cssDashBtn','css-active'],
         ed:['edDashBtn','ed-active'], dev:['devDashBtn','dev-active'],
-        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], cp:['cpDashBtn','cp-active'],
+        b64:['b64DashBtn','b64-active'], qr:['qrDashBtn','qr-active'], fav:['favDashBtn','fav-active'], cp:['cpDashBtn','cp-active'],
         rt:['rtDashBtn','rt-active'] };
       const btn = map[h];
       if (h === 'home') showHomeDash = true;
@@ -1608,6 +1619,7 @@ function getFiltered(){
       else if (h === 'dev') showDevDash = true;
       else if (h === 'b64') showB64Dash = true;
       else if (h === 'qr') showQrDash = true;
+      else if (h === 'fav') showFavDash = true;
       else if (h === 'cp') showCpDash = true;
       else if (h === 'rt') showRtDash = true;
       const b = document.getElementById(btn[0]);

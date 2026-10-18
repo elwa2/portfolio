@@ -6,10 +6,10 @@
       document.querySelectorAll('.filter-tag').forEach(b=>b.classList.remove('active'));
       showScrollbarDash = false; showCssDash = false;
       showEdDash = false; showDevDash = false; showB64Dash = false; showQrDash = false;
-      showCpDash = false; showRtDash = false;
+      showFavDash = false; showCpDash = false; showRtDash = false;
       const map = { cssDashBtn:'css-active', sbDashBtn:'scrollbar-active',
         edDashBtn:'ed-active', devDashBtn:'dev-active',
-        b64DashBtn:'b64-active', qrDashBtn:'qr-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
+        b64DashBtn:'b64-active', qrDashBtn:'qr-active', favDashBtn:'fav-active', cpDashBtn:'cp-active', rtDashBtn:'rt-active' };
       Object.keys(map).forEach(id => {
         const b = document.getElementById(id);
         if (b) b.classList.remove(map[id]);
@@ -30,6 +30,7 @@
       { id:'devDashBtn', t:'أدوات المطور', s:'Dev Tools', i:'ti-tool', c:'c-teal' },
       { id:'b64DashBtn', t:'Base64', s:'ترميز وفك', i:'ti-database', c:'c-purple' },
       { id:'qrDashBtn', t:'QR Code', s:'مولد QR', i:'ti-qrcode', c:'c-green' },
+      { id:'favDashBtn', t:'فافيكون', s:'أيقونة متحركة', i:'ti-icons', c:'c-gold' },
       { id:'cpDashBtn', t:'لون CSS', s:'أدوات الألوان', i:'ti-color-swatch', c:'c-red' },
       { id:'rtDashBtn', t:'Real-Time', s:'نسخ مباشر', i:'ti-bolt', c:'c-gold' }
     ];
@@ -145,7 +146,7 @@
   function toggleById(id){
     const fn = { cssDashBtn:toggleCssDash, sbDashBtn:toggleScrollbarDash,
       edDashBtn:toggleEdDash, devDashBtn:toggleDevDash,
-      b64DashBtn:toggleB64Dash, qrDashBtn:toggleQrDash, cpDashBtn:toggleCpDash,
+      b64DashBtn:toggleB64Dash, qrDashBtn:toggleQrDash, favDashBtn:toggleFavDash, cpDashBtn:toggleCpDash,
       rtDashBtn:toggleRtDash }[id];
     if (fn) fn();
   }

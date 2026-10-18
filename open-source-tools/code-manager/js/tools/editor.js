@@ -325,7 +325,7 @@
       document.getElementById('cssDashBtn').classList.remove('css-active');
       showHomeDash = false;
       document.getElementById('homeBtn').classList.remove('home-active');
-      showScrollbarDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showCpDash = false; showRtDash = false;
+      showScrollbarDash = false; showDevDash = false; showB64Dash = false; showQrDash = false; showFavDash = false; showCpDash = false; showRtDash = false;
 
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
 
@@ -333,6 +333,8 @@
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      const __favEd = document.getElementById('favDashBtn');
+      if(__favEd) __favEd.classList.remove('fav-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
       document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
@@ -2056,7 +2058,7 @@
   function alSyncDash(){
     if (!showAlDash) return;
     const other = showHomeDash || showScrollbarDash ||
-                  showEdDash || showDevDash || showB64Dash || showQrDash || showCpDash ||
+                  showEdDash || showDevDash || showB64Dash || showQrDash || showFavDash || showCpDash ||
                   showRtDash || showCssDash;
     if (other){
       showAlDash = false;
@@ -2074,7 +2076,7 @@
       if (home) home.classList.remove('home-active');
       showHomeDash = false; showScrollbarDash = false; showCssDash = false;
       showEdDash = false; showDevDash = false; showB64Dash = false;
-      showQrDash = false; showCpDash = false; showRtDash = false;
+      showQrDash = false; showFavDash = false; showCpDash = false; showRtDash = false;
     }
     renderAll();
   }

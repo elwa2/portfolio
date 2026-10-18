@@ -7,6 +7,7 @@
     { src: 'devDashBtn', name: 'أدوات',      icon: 'ti ti-tools',                   key: '7' },
     { src: 'b64DashBtn', name: 'Base64',     icon: 'ti ti-binary',                  key: '8' },
     { src: 'qrDashBtn',  name: 'QR',         icon: 'ti ti-qrcode',                  key: '9' },
+    { src: 'favDashBtn', name: 'فافيكون',    icon: 'ti ti-icons',                   key: '5' },
     { src: 'rtDashBtn',  name: 'التحكم',     icon: 'ti ti-adjustments-horizontal',  key: '0' },
     { src: '__home',     name: 'الرئيسية',   icon: 'ti ti-home-2',                  key: 'H' },
   ];
@@ -53,7 +54,7 @@
   }
   function syncToolsUI(){
     const dash = (typeof currentDashId === 'function') ? currentDashId() : 'main';
-    const map = { sb:'sbDashBtn', css:'cssDashBtn', cv:'cssDashBtn', has:'cssDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
+    const map = { sb:'sbDashBtn', css:'cssDashBtn', cv:'cssDashBtn', has:'cssDashBtn', ed:'edDashBtn', dev:'devDashBtn', b64:'b64DashBtn', qr:'qrDashBtn', fav:'favDashBtn', cp:'cpDashBtn', rt:'rtDashBtn', home:'__home' };
     const activeSrc = map[dash] || null;
     const meta = TOOLS_META.find(t => t.src === activeSrc);
     const nameEl = document.getElementById('toolsLauncherName');
@@ -108,7 +109,8 @@
     { g:'أدوات', items:[
       { id:'devDashBtn', cls:'dev-active', label:'أدوات',  ic:'ti-tools',  k:'minify css js svg encode ضغط' },
       { id:'b64DashBtn', cls:'b64-active', label:'Base64', ic:'ti-binary', k:'base64 encode decode image' },
-      { id:'qrDashBtn',  cls:'qr-active',  label:'QR',     ic:'ti-qrcode', k:'qr code' } ]}
+      { id:'qrDashBtn',  cls:'qr-active',  label:'QR',     ic:'ti-qrcode', k:'qr code' },
+      { id:'favDashBtn', cls:'fav-active', label:'فافيكون', ic:'ti-icons', k:'favicon favicon فافيكون ايقونة أيقونة animated متحرك canvas' } ]}
   ];
   const NAV_RECENT_KEY = 'csman_v2_nav_recent';
   let navView = 'codes', navLastHtml = '', npSel = 0, npItems = [];

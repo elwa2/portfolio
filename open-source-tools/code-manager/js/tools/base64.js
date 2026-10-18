@@ -28,6 +28,9 @@
       showEdDash = false;
       showDevDash = false;
       showQrDash = false;
+      showFavDash = false;
+      const __favB1 = document.getElementById('favDashBtn');
+      if(__favB1) __favB1.classList.remove('fav-active');
       showCpDash = false;
       showRtDash = false;
 
@@ -37,6 +40,8 @@
       document.getElementById('edDashBtn').classList.remove('ed-active');
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      const __favB2 = document.getElementById('favDashBtn');
+      if(__favB2) __favB2.classList.remove('fav-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
       document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
@@ -59,6 +64,9 @@
       showEdDash = false;
       showDevDash = false;
       showB64Dash = false;
+      showFavDash = false;
+      const __favQ = document.getElementById('favDashBtn');
+      if(__favQ) __favQ.classList.remove('fav-active');
 
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
 
@@ -68,6 +76,9 @@
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       showCpDash = false;
       showRtDash = false;
+      showFavDash = false;
+      const __favQ2 = document.getElementById('favDashBtn');
+      if(__favQ2) __favQ2.classList.remove('fav-active');
       document.getElementById('cpDashBtn').classList.remove('cp-active');
       document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
@@ -91,6 +102,7 @@
       showDevDash = false;
       showB64Dash = false;
       showQrDash = false;
+      showFavDash = false;
       showRtDash = false;
 
       document.getElementById('sbDashBtn').classList.remove('scrollbar-active');
@@ -100,6 +112,8 @@
       document.getElementById('devDashBtn').classList.remove('dev-active');
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      const __favC = document.getElementById('favDashBtn');
+      if(__favC) __favC.classList.remove('fav-active');
       document.getElementById('rtDashBtn').classList.remove('rt-active');
     }
     renderAll();

@@ -30,6 +30,9 @@
       showEdDash = false;
       showB64Dash = false;
       showQrDash = false;
+      showFavDash = false;
+      const __favDev = document.getElementById('favDashBtn');
+      if(__favDev) __favDev.classList.remove('fav-active');
       showCpDash = false;
       showRtDash = false;
 

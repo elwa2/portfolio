@@ -1492,6 +1492,49 @@
   }
   .dt-builder.cp .dt-builder-title i { color: var(--accent); }
 
+  /* ===== FAVICON STUDIO DASHBOARD ===== */
+  .filter-tag.fav-active {
+    background: linear-gradient(135deg,#f736b0,#95238d); color: #fff; border-color: transparent;
+    box-shadow: 0 2px 12px rgba(247,54,176,0.4);
+  }
+  .dt-builder.fav .dt-builder-title i { color: #f736b0; }
+  .dt-builder.fav .dt-actions .btn-primary {
+    background: linear-gradient(135deg,#f736b0,#95238d); border: none;
+  }
+  .dt-builder.fav .dt-actions .btn-primary:hover { box-shadow: 0 4px 16px rgba(247,54,176,0.4); }
+  .fav-grid { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 20px; align-items: start; }
+  .fav-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--bg-overlay); border: 1px solid var(--border-sub); border-radius: var(--radius-md); padding: 20px 16px; }
+  .fav-big { width: 128px; height: 128px; border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06); image-rendering: auto; }
+  .fav-tabmock { display: flex; align-items: center; gap: 8px; background: var(--bg-elevated); border: 1px solid var(--border-sub); border-bottom: none; border-radius: 10px 10px 0 0; padding: 6px 12px; font-size: 12px; color: var(--text-2); max-width: 100%; }
+  .fav-tabimg { width: 16px; height: 16px; border-radius: 3px; background: var(--bg-overlay); }
+  .fav-tabtitle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .fav-tablive { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
+  .fav-tablive .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; animation: favBlink 1.6s infinite; }
+  @keyframes favBlink { 50% { opacity: 0.4; } }
+  .fav-mini { width: 32px; height: 32px; border-radius: 7px; border: 1px dashed var(--border-def); }
+  .fav-controls { min-width: 0; }
+  .fav-letter { height: 46px; text-align: center; font-size: 20px; font-weight: 700; }
+  .fav-fx-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .fav-fx-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 10px; background: var(--bg-overlay); border: 1px solid var(--border-sub); border-radius: var(--radius-sm); color: var(--text-1); cursor: pointer; font-family: inherit; text-align: start; transition: 0.15s; }
+  .fav-fx-btn b { font-size: 12.5px; }
+  .fav-fx-btn small { font-size: 10px; color: var(--text-3); line-height: 1.4; }
+  .fav-fx-btn:hover { border-color: rgba(247,54,176,0.5); }
+  .fav-fx-btn.on { border-color: #f736b0; background: rgba(247,54,176,0.1); box-shadow: 0 0 0 1px #f736b0 inset; }
+  .fav-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .fav-color { display: flex; align-items: center; gap: 8px; background: var(--bg-overlay); border: 1px solid var(--border-sub); border-radius: var(--radius-sm); padding: 6px 10px; cursor: pointer; font-size: 11px; color: var(--text-2); }
+  .fav-swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+  .fav-clabel { font-weight: 700; white-space: nowrap; }
+  .fav-color input[type="color"] { width: 26px; height: 26px; padding: 0; border: none; background: none; cursor: pointer; opacity: 0; position: absolute; }
+  .fav-color { position: relative; }
+  .fav-color code { margin-inline-start: auto; font-size: 10px; color: var(--text-3); }
+  .fav-code-wrap { margin-top: 16px; background: var(--bg-overlay); border: 1px solid var(--border-sub); border-radius: var(--radius-sm); overflow: hidden; }
+  .fav-code-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; font-size: 11px; color: var(--text-3); border-bottom: 1px solid var(--border-sub); }
+  .fav-code { margin: 0; padding: 12px 14px; max-height: 260px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; color: var(--text-2); white-space: pre-wrap; word-break: break-all; text-align: left; }
+  @media (max-width: 820px) {
+    .fav-grid { grid-template-columns: 1fr; }
+    .fav-fx-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
   /* aliases used by the palette markup */
   .has-dash {
     --border-subtle: var(--border-sub);

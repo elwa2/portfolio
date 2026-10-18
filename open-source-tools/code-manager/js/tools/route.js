@@ -33,10 +33,10 @@
       if(__hb) __hb.classList.remove('home-active');
       showScrollbarDash=false;
       showCssDash=false;
-      showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showCpDash=false;
+      showEdDash=false; showDevDash=false; showB64Dash=false; showQrDash=false; showFavDash=false; showCpDash=false;
       [['sbDashBtn','scrollbar-active'],['cssDashBtn','css-active'],
        ['edDashBtn','ed-active'],['devDashBtn','dev-active'],
-       ['b64DashBtn','b64-active'],['qrDashBtn','qr-active'],['cpDashBtn','cp-active']
+       ['b64DashBtn','b64-active'],['qrDashBtn','qr-active'],['favDashBtn','fav-active'],['cpDashBtn','cp-active']
       ].forEach(p => { const el=document.getElementById(p[0]); if(el) el.classList.remove(p[1]); });
     }
     renderAll();

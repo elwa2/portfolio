@@ -36,6 +36,9 @@
     showQrDash = false;
     const qr = document.getElementById('qrDashBtn');
     if(qr) qr.classList.remove('qr-active');
+    showFavDash = false;
+    const fv = document.getElementById('favDashBtn');
+    if(fv) fv.classList.remove('fav-active');
     showCpDash = false;
     const cp = document.getElementById('cpDashBtn');
     if(cp) cp.classList.remove('cp-active');
@@ -63,6 +66,9 @@
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       showQrDash = false;
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      showFavDash = false;
+      const __favCss = document.getElementById('favDashBtn');
+      if(__favCss) __favCss.classList.remove('fav-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
       showRtDash = false;

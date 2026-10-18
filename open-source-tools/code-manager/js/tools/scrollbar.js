@@ -27,6 +27,9 @@
       document.getElementById('b64DashBtn').classList.remove('b64-active');
       showQrDash = false;
       document.getElementById('qrDashBtn').classList.remove('qr-active');
+      showFavDash = false;
+      const __favSb = document.getElementById('favDashBtn');
+      if(__favSb) __favSb.classList.remove('fav-active');
       showCpDash = false;
       document.getElementById('cpDashBtn').classList.remove('cp-active');
       showRtDash = false;
