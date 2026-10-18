@@ -139,6 +139,20 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .k{color:var(--h-k)}.s{color:var(--h-s)}.cm{color:var(--h-c);font-style:italic}.n{color:var(--h-n)}.t{color:var(--h-t)}.a{color:var(--h-a)}
 
 .hint{direction:rtl;text-align:right;color:var(--faint);font:12.5px var(--font-doc);margin:36px 0 0}
+.toolbar{display:flex;align-items:center;gap:2px;padding:4px 10px;border-bottom:1px solid var(--line);border-top:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:thin}
+.toolbar .ib{width:30px;height:28px}
+.tsep{width:1px;height:18px;background:var(--line);margin:0 5px;flex:none}
+.saved{font-size:11.5px;color:var(--faint);padding:0 8px;flex:none;white-space:nowrap}
+.pop{position:fixed;z-index:50;background:var(--bg-side);border:1px solid var(--line);border-radius:8px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.4);min-width:190px;max-width:min(340px,calc(100vw - 16px))}
+.pop .row{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:5px;text-align:right;direction:rtl;font:13px var(--font-doc);color:var(--fg)}
+.pop .row:hover{background:var(--bg-hover)}
+.pop .row small{margin-right:auto;font:11px var(--font-mono);color:var(--faint);direction:ltr}
+.pop .dot{width:10px;height:10px;border-radius:50%;background:rgb(var(--c,var(--c-blue)));flex:none}
+.pop .c-blue{--c:var(--c-blue)}.pop .c-cyan{--c:var(--c-cyan)}.pop .c-green{--c:var(--c-green)}.pop .c-yellow{--c:var(--c-yellow)}.pop .c-red{--c:var(--c-red)}.pop .c-purple{--c:var(--c-purple)}.pop .c-gray{--c:var(--c-gray)}
+.pop .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.pop .seg{display:flex;gap:2px;padding:2px;background:var(--bg-bar);border-radius:6px;margin-bottom:6px;direction:rtl}
+.pop .seg button{flex:1;padding:4px 6px;border-radius:4px;font:12px var(--font-doc);color:var(--muted)}
+.pop .seg button.on{background:var(--bg-active);color:var(--fg-strong)}
 .side-scrim{display:none}
 @media (max-width:760px){
   .app{grid-template-columns:44px 0 minmax(0,1fr)}
@@ -179,9 +193,11 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
       <button class="ib" id="btnBack" title="رجوع" aria-label="رجوع"></button>
       <button class="ib" id="btnFwd" title="للأمام" aria-label="للأمام"></button>
       <div class="crumb" id="crumb"></div>
+      <span class="saved" id="saved" aria-live="polite"></span>
       <button class="ib" id="btnMode" title="تبديل وضع القراءة والتحرير (Ctrl+E)" aria-label="تبديل وضع القراءة والتحرير"></button>
       <button class="ib" id="btnTheme" title="تبديل الثيم" aria-label="تبديل الثيم"></button>
     </div>
+    <div class="toolbar" id="toolbar" role="toolbar" aria-label="أدوات التنسيق"></div>
     <div class="scroll" id="scroll"><div id="view"></div></div>
   </main>
 </div>
@@ -301,7 +317,27 @@ var P={
  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8M12 17h.01"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
  theme:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
- edit:'<path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/>'
+ edit:'<path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/>',
+ bold:'<path d="M7 4h6a4 4 0 0 1 0 8H7zM7 12h7a4 4 0 0 1 0 8H7z"/>',
+ italic:'<path d="M14 4h-4M14 20h-4M15 4L9 20"/>',
+ strike:'<path d="M4 12h16M16 7.5C15.4 6 14 5 12 5c-2.5 0-4 1.2-4 3 0 1.5 1 2.3 4 4M8 17c.8 1.3 2.2 2 4 2 2.5 0 4-1.2 4-3"/>',
+ hl:'<path d="M15 4l5 5-9 9H6v-5z"/><path d="M4 21h16"/>',
+ icode:'<path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
+ cblock:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9l-2.5 3 2.5 3M14 9l2.5 3-2.5 3"/>',
+ quote:'<path d="M9 7H5v5h4a3 3 0 0 1-3 4M19 7h-4v5h4a3 3 0 0 1-3 4"/>',
+ ol:'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5.5l1.2-1V9M3.8 13.5h2.4l-2.4 3.2h2.6"/>',
+ task:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+ callout:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 9v4M12 15.5h.01"/>',
+ table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+ wlink:'<path d="M8 4H5v16h3M16 4h3v16h-3M10 12h4"/>',
+ tag:'<path d="M9 4L7 20M17 4l-2 16M4 9h16M3.5 15h16"/>',
+ hr:'<path d="M4 12h16"/><path d="M8 6h8M8 18h8" opacity=".45"/>',
+ undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+ redo:'<path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>',
+ h1:'<text x="12" y="17" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui">H1</text>',
+ h2:'<text x="12" y="17" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui">H2</text>',
+ h3:'<text x="12" y="17" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui">H3</text>'
 };
 function ic(n){return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+P[n]+'</svg>'}
 function $(id){return document.getElementById(id)}
@@ -311,7 +347,20 @@ function set(id,n){$(id).innerHTML=ic(n)}
 var NAME1='الموسوعة المرجعية الشاملة للتنسيق في Obsidian 🗒️';
 var state={notes:[{id:1,name:NAME1,text:$('raw1').textContent.replace(/^\n+/,''),mode:'read'},{id:2,name:'Untitled',text:'',mode:'edit'}],tabs:[1,2],active:2,seq:2};
 try{var sv=JSON.parse(localStorage.getItem('vault-notes-v1')||'null');if(sv&&sv.notes&&sv.notes.length){state=sv}}catch(e){}
-function save(){try{localStorage.setItem('vault-notes-v1',JSON.stringify(state))}catch(e){}}
+var lsOk=false,idbOk=false,saveTimer=0,persisted=false;
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open('vault-notes',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv')};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}})}
+function idbGet(){return idb().then(function(d){return new Promise(function(res){var q=d.transaction('kv').objectStore('kv').get('state');q.onsuccess=function(){res(q.result||null)};q.onerror=function(){res(null)}})}).catch(function(){return null})}
+function setSaved(){var el=$('saved');if(!el)return;var ok=lsOk||idbOk;el.textContent=ok?'محفوظ ✓':'تعذّر الحفظ';el.title=ok?'يتم الحفظ تلقائياً في هذا المتصفح':'المتصفح يمنع التخزين المحلي لهذه الصفحة'}
+function flushIdb(){clearTimeout(saveTimer);saveTimer=0;idb().then(function(d){var tx=d.transaction('kv','readwrite');tx.objectStore('kv').put(JSON.parse(JSON.stringify(state)),'state');tx.oncomplete=function(){idbOk=true;setSaved()};tx.onerror=function(){idbOk=false;setSaved()}}).catch(function(){idbOk=false;setSaved()})}
+function save(){
+  state.savedAt=Date.now();
+  try{localStorage.setItem('vault-notes-v1',JSON.stringify(state));lsOk=true}catch(e){lsOk=false}
+  setSaved();
+  if(!persisted){persisted=true;try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){})}catch(e){}}
+  clearTimeout(saveTimer);saveTimer=setTimeout(flushIdb,250);
+}
+document.addEventListener('visibilitychange',function(){if(document.hidden&&saveTimer)flushIdb()});
+window.addEventListener('pagehide',function(){if(saveTimer)flushIdb()});
 function cur(){return state.notes.find(function(n){return n.id===state.active})}
 
 /* ---------- markdown ---------- */
@@ -447,7 +496,7 @@ function renderMain(){
   $('dt').textContent=n.name;
   if(n.mode==='edit'){var ed=$('editor');if(ed){ed.focus();ed.setSelectionRange(ed.value.length,ed.value.length)}}
 }
-function renderAll(){renderTabs();renderFiles();renderMain();save()}
+function renderAll(noSave){renderTabs();renderFiles();renderMain();if(!noSave)save()}
 
 function openNote(id){
   if(state.tabs.indexOf(id)<0)state.tabs.push(id);
@@ -505,6 +554,12 @@ document.addEventListener('keydown',function(e){
     if(!ok){ta.setRangeText(txt,from,to,'end')}
     ta.dispatchEvent(new Event('input',{bubbles:true}));
   }
+  if((e.ctrlKey||e.metaKey)&&!e.altKey){
+    var kk=e.key.toLowerCase();
+    if(kk==='b'){e.preventDefault();wrap('**','**','نص عريض');return}
+    if(kk==='i'){e.preventDefault();wrap('*','*','نص مائل');return}
+    if(kk==='k'){e.preventDefault();wrap('[','](https://)','نص الرابط');return}
+  }
   var li=line.match(/^(\s*)([-*+]|\d+\.)\s+(\[.\]\s+)?(.*)$/);
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='l'){
     e.preventDefault();
@@ -533,15 +588,122 @@ document.addEventListener('input',function(e){
   if(e.target.id==='editor'){n.text=e.target.value;save()}
   if(e.target.id==='dt'){n.name=e.target.textContent.replace(/\n/g,'');$('crumb').textContent=n.name||'Untitled';renderTabs();renderFiles();save()}
 });
-$('btnSide').addEventListener('click',function(){$('app').classList.toggle('collapsed')});
+$('btnSide').addEventListener('click',function(){state.collapsed=$('app').classList.toggle('collapsed');save()});
 $('btnMode').addEventListener('click',toggleMode);
 $('btnTheme').addEventListener('click',function(){
   var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-  r.dataset.theme=dark?'light':'dark';
+  r.dataset.theme=dark?'light':'dark';state.theme=r.dataset.theme;save();
 });
 $('btnCollapse').addEventListener('click',function(){state.tabs=[];state.active=0;renderAll()});
 $('btnBack').addEventListener('click',function(){var k=state.tabs.indexOf(state.active);if(k>0){state.active=state.tabs[k-1];renderAll()}});
 $('btnFwd').addEventListener('click',function(){var k=state.tabs.indexOf(state.active);if(k>-1&&k<state.tabs.length-1){state.active=state.tabs[k+1];renderAll()}});
+
+/* ---------- editing tools ---------- */
+function ensureEdit(cb){
+  var n=cur();if(!n||state.tabs.indexOf(n.id)<0)return;
+  if(n.mode!=='edit'){n.mode='edit';renderAll()}
+  var t=$('editor');if(t)cb(t);
+}
+function ins(t,from,to,txt,a,b){
+  t.focus();t.setSelectionRange(from,to);var ok=false;
+  try{ok=document.execCommand('insertText',false,txt)}catch(x){}
+  if(!ok)t.setRangeText(txt,from,to,'end');
+  t.setSelectionRange(a,b);t.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function wrap(b,a,ph){ensureEdit(function(t){
+  var v=t.value,s=t.selectionStart,e=t.selectionEnd,sel=v.slice(s,e),w=sel||ph;
+  if(sel&&v.slice(s-b.length,s)===b&&v.slice(e,e+a.length)===a){ins(t,s-b.length,e+a.length,sel,s-b.length,s-b.length+sel.length);return}
+  ins(t,s,e,b+w+a,s+b.length,s+b.length+w.length);
+})}
+function lineTool(mk,re,ph,same){ensureEdit(function(t){
+  var v=t.value,s=t.selectionStart,e=t.selectionEnd,ls=v.lastIndexOf('\n',s-1)+1,le=v.indexOf('\n',e);if(le<0)le=v.length;
+  var raw=v.slice(ls,le),lines=raw.split('\n');
+  if(!raw.trim()){var p=mk(0);ins(t,ls,le,p+ph,ls+p.length,ls+p.length+ph.length);return}
+  var chk=same||function(l){return re.test(l)};
+  var all=lines.every(function(l,i){return !l.trim()||chk(l,i)});
+  var res=lines.map(function(l,i){if(!l.trim())return l;var b=l.replace(re,'');return all?b:mk(i)+b}).join('\n');
+  ins(t,ls,le,res,ls,ls+res.length);
+})}
+function block(tpl,ph){ensureEdit(function(t){
+  var v=t.value,s=t.selectionStart,e=t.selectionEnd,w=v.slice(s,e)||ph;
+  var pre=(s>0&&v.charAt(s-1)!=='\n')?'\n':'',post=(e<v.length&&v.charAt(e)!=='\n')?'\n':'';
+  var at=pre.length+tpl.indexOf('@@');
+  ins(t,s,e,pre+tpl.replace('@@',w)+post,s+at,s+at+w.length);
+})}
+function heading(n){var h=new Array(n+1).join('#')+' ';lineTool(function(){return h},/^#{1,6}\s+/,'العنوان',function(l){return l.indexOf(h)===0})}
+var CALLOUTS=[['note','ملاحظة','blue'],['info','معلومة','blue'],['tip','نصيحة','cyan'],['abstract','ملخص','cyan'],['todo','مهمة','blue'],['success','نجاح','green'],['question','سؤال','yellow'],['warning','تحذير','yellow'],['failure','فشل','red'],['danger','خطر','red'],['bug','خطأ برمجي','red'],['example','مثال','purple'],['quote','اقتباس','gray']];
+var STATES=[[' ','مهمة عادية'],['x','مكتملة'],['/','قيد التنفيذ'],['-','ملغاة'],['!','عاجلة'],['?','تحتاج بحث']];
+var LANGS=[['python','Python'],['html','HTML'],['css','CSS'],['javascript','JavaScript'],['','نص عادي']];
+var calloutFold='-',pop=null;
+function closePop(){if(pop){pop.remove();pop=null}}
+function openPop(btn,html,pick){
+  closePop();pop=document.createElement('div');pop.className='pop';pop.innerHTML=html;document.body.appendChild(pop);
+  var r=btn.getBoundingClientRect(),w=pop.offsetWidth;
+  pop.style.top=(r.bottom+4)+'px';pop.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';
+  pop.addEventListener('mousedown',function(e){e.preventDefault()});
+  pop.addEventListener('click',function(e){var b=e.target.closest('[data-k]');if(b&&pick(b.dataset.k,b)!==false)closePop()});
+}
+function foldHtml(){return '<div class="seg">'+[['-','مغلق'],['+','مفتوح'],['','ثابت']].map(function(f){return '<button type="button" data-k="fold:'+f[0]+'" class="'+(calloutFold===f[0]?'on':'')+'">'+f[1]+'</button>'}).join('')+'</div>'}
+function openMenu(kind,btn){
+  if(kind==='callout'){
+    openPop(btn,foldHtml()+'<div class="grid">'+CALLOUTS.map(function(c){return '<button type="button" class="row c-'+c[2]+'" data-k="'+c[0]+'"><span class="dot"></span>'+c[1]+'</button>'}).join('')+'</div>',function(k,b){
+      if(k.indexOf('fold:')===0){calloutFold=k.slice(5);[].forEach.call(pop.querySelectorAll('.seg button'),function(x){x.classList.toggle('on',x.dataset.k===k)});return false}
+      block('> [!'+k+']'+calloutFold+' @@\n> المحتوى هنا','العنوان');
+    });
+  }else if(kind==='code'){
+    openPop(btn,LANGS.map(function(l){return '<button type="button" class="row" data-k="'+l[0]+'" data-n="'+l[1]+'">'+l[1]+'<small>'+(l[0]||'text')+'</small></button>'}).join(''),function(k){
+      block('```'+k+'\n@@\n```','اكتب الكود هنا');
+    });
+  }else if(kind==='task'){
+    openPop(btn,STATES.map(function(s,i){return '<button type="button" class="row" data-k="'+i+'">'+s[1]+'<small>['+s[0]+']</small></button>'}).join(''),function(k){
+      var st=STATES[+k][0],pre='- ['+st+'] ';
+      lineTool(function(){return pre},/^[-*+]\s+\[.\]\s+/,'مهمة',function(l){return l.indexOf(pre)===0});
+    });
+  }
+}
+var TOOLS=[
+ {i:'undo',t:'تراجع (Ctrl+Z)',a:function(){ensureEdit(function(t){t.focus();document.execCommand('undo')})}},
+ {i:'redo',t:'إعادة (Ctrl+Y)',a:function(){ensureEdit(function(t){t.focus();document.execCommand('redo')})}},
+ '|',
+ {i:'h1',t:'عنوان رئيسي',a:function(){heading(1)}},
+ {i:'h2',t:'عنوان فرعي',a:function(){heading(2)}},
+ {i:'h3',t:'عنوان أصغر',a:function(){heading(3)}},
+ '|',
+ {i:'bold',t:'عريض (Ctrl+B)',a:function(){wrap('**','**','نص عريض')}},
+ {i:'italic',t:'مائل (Ctrl+I)',a:function(){wrap('*','*','نص مائل')}},
+ {i:'strike',t:'مشطوب',a:function(){wrap('~~','~~','نص مشطوب')}},
+ {i:'hl',t:'تظليل',a:function(){wrap('==','==','نص مظلل')}},
+ {i:'icode',t:'كود داخل السطر',a:function(){wrap('`','`','كود')}},
+ '|',
+ {i:'list',t:'قائمة نقطية',a:function(){lineTool(function(){return '- '},/^[-*+]\s+(?!\[.\])/,'عنصر')}},
+ {i:'ol',t:'قائمة رقمية',a:function(){lineTool(function(i){return (i+1)+'. '},/^\d+\.\s+/,'عنصر')}},
+ {i:'task',t:'مهمة (اختر الحالة)',m:'task'},
+ {i:'quote',t:'اقتباس',a:function(){lineTool(function(){return '> '},/^>\s?/,'اقتباس')}},
+ '|',
+ {i:'callout',t:'صندوق توجل',m:'callout'},
+ {i:'cblock',t:'مربع كود',m:'code'},
+ {i:'table',t:'جدول',a:function(){block('| العمود 1 | العمود 2 | العمود 3 |\n| :--- | :---: | ---: |\n| @@ |  |  |\n|  |  |  |','بيانات')}},
+ {i:'hr',t:'فاصل أفقي',a:function(){block('---\n@@','')}},
+ '|',
+ {i:'link',t:'رابط (Ctrl+K)',a:function(){wrap('[','](https://)','نص الرابط')}},
+ {i:'wlink',t:'ربط بملاحظة',a:function(){wrap('[[',']]','اسم الملاحظة')}},
+ {i:'tag',t:'وسم',a:function(){wrap('#','','وسم')}}
+];
+function buildToolbar(){
+  $('toolbar').innerHTML=TOOLS.map(function(x,k){
+    if(x==='|')return '<span class="tsep"></span>';
+    return '<button type="button" class="ib" data-t="'+k+'"'+(x.m?' data-menu="1"':'')+' title="'+x.t+'" aria-label="'+x.t+'">'+ic(x.i)+'</button>';
+  }).join('');
+}
+$('toolbar').addEventListener('mousedown',function(e){e.preventDefault()});
+$('toolbar').addEventListener('click',function(e){
+  var b=e.target.closest('[data-t]');if(!b)return;
+  var x=TOOLS[+b.dataset.t];
+  if(x.m){if(pop){closePop();return}openMenu(x.m,b)}else{closePop();x.a()}
+});
+document.addEventListener('mousedown',function(e){if(pop&&!e.target.closest('.pop')&&!e.target.closest('[data-menu]'))closePop()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closePop()});
+$('scroll').addEventListener('scroll',closePop);
 
 /* static icons */
 set('btnSide','side');set('btnFiles','folder');set('btnSearch','search');set('btnMarks','mark');
@@ -550,8 +712,16 @@ set('btnBack','left');set('btnFwd','right');set('btnTheme','theme');
 $('footIcons').innerHTML='<span class="ib" style="width:26px;height:26px">'+ic('help')+'</span><span class="ib" style="width:26px;height:26px">'+ic('gear')+'</span>';
 var rail=[['file','ملفات'],['graph','عرض الرسم البياني'],['grid','لوحة'],['cal','ملاحظة يومية'],['copy','قوالب'],['term','لوحة الأوامر'],['list','قائمة']];
 $('rail').innerHTML=rail.map(function(r,k){return '<button class="ib'+(k===0?' on':'')+'" title="'+r[1]+'" aria-label="'+r[1]+'">'+ic(r[0])+'</button>'}).join('');
-if(innerWidth<=760)$('app').classList.add('collapsed');
-renderAll();
+if(state.collapsed===undefined?innerWidth<=760:state.collapsed)$('app').classList.add('collapsed');
+if(state.theme)document.documentElement.dataset.theme=state.theme;
+buildToolbar();
+renderAll(true);
+setSaved();
+idbGet().then(function(s){
+  if(s&&s.notes&&s.notes.length&&(+s.savedAt||0)>(+state.savedAt||0)){state=s;idbOk=true;renderAll(true)}
+  else if(s){idbOk=true}
+  setSaved();
+});
 })();
 </script>
 
