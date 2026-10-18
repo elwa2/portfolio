@@ -160,6 +160,12 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .code.closed pre{display:none}
 .code.plain{background:none;border:0;border-radius:0;overflow:visible}
 .code.plain pre{margin:0}
+.code .cp svg.i{width:15px;height:15px}
+.code .ch .cp{padding:3px 6px}
+.code.plain .cp{position:absolute;top:8px;right:8px;z-index:1;display:inline-flex;align-items:center;justify-content:center;padding:5px;border-radius:6px;background:var(--bg-active);color:var(--muted);cursor:pointer;opacity:.75;transition:opacity .12s,background .12s}
+.code.plain:hover .cp,.code.plain .cp:focus-visible,.code.plain .cp.ok{opacity:1}
+.code.plain .cp:hover{background:var(--bg-hover);color:var(--fg-strong)}
+.code .cp.ok{color:rgb(var(--c-green))}
 .code.wrap pre{overflow-x:hidden}
 .code.wrap pre code{white-space:pre-wrap;overflow-wrap:anywhere}
 .k{color:var(--h-k)}.s{color:var(--h-s)}.cm{color:var(--h-c);font-style:italic}.n{color:var(--h-n)}.t{color:var(--h-t)}.a{color:var(--h-a)}
@@ -351,6 +357,7 @@ var P={
  graph:'<circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="8" r="2.2"/><circle cx="9" cy="18" r="2.2"/><path d="M7.8 7l8.4.7M7 8l1.5 8M16.7 9.8L10.7 16.6"/>',
  grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
  cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ tick:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
  term:'<path d="M5 8l4 4-4 4M12 17h7"/>',
  list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
@@ -462,8 +469,8 @@ function render(md,meta){
       var f=m[1],lang=m[2],buf=[],tm=l.match(/\btitle=(?:"([^"]*)"|'([^']*)')/),ttl=tm?(tm[1]!==undefined?tm[1]:tm[2]):'',plain=/(^|\s)plain(\s|$)/.test(l.slice(m[0].length));i++;
       while(i<L.length&&!(L[i].indexOf(f)===0&&!L[i].slice(f.length).trim())){buf.push(L[i]);i++}
       i++;
-      if(plain){out+='<div class="code plain" data-plain="1" data-lang="'+lang+'"><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue}
-      out+='<div class="code" data-lang="'+lang+'"><div class="ch">'+ic(ttl?'edit':'icode')+'<span class="cl">'+(ttl?esc(ttl):codeTitle(lang))+'</span><button class="cw" type="button" title="التفاف الأسطر">'+ic('wrap')+'التفاف</button><button class="cp" type="button">نسخ</button><span class="chev">'+ic('chev')+'</span></div><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue;
+      if(plain){out+='<div class="code plain" data-plain="1" data-lang="'+lang+'"><button class="cp" type="button" title="نسخ الكود" aria-label="نسخ الكود">'+ic('copy')+'</button><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue}
+      out+='<div class="code" data-lang="'+lang+'"><div class="ch">'+ic(ttl?'edit':'icode')+'<span class="cl">'+(ttl?esc(ttl):codeTitle(lang))+'</span><button class="cw" type="button" title="التفاف الأسطر">'+ic('wrap')+'التفاف</button><button class="cp" type="button" title="نسخ الكود" aria-label="نسخ الكود">'+ic('copy')+'</button><span class="chev">'+ic('chev')+'</span></div><pre><code>'+hl(buf.join('\n'),lang)+'</code></pre></div>';continue;
     }
     if((m=l.match(/^(#{1,6})\s+(.*)$/))){out+='<h'+m[1].length+'>'+inline(m[2])+'</h'+m[1].length+'>';i++;continue}
     if(/^\s*([-*_])\1\1+\s*$/.test(l)){out+='<hr>';i++;continue}
@@ -605,8 +612,9 @@ document.addEventListener('click',function(e){
   var cp=t.closest('.cp');
   if(cp){
     var txt=cp.closest('.code').querySelector('code').textContent;
-    var done=function(){cp.textContent='تم النسخ';setTimeout(function(){cp.textContent='نسخ'},1200)};
-    var fb=function(){var r=document.createRange();r.selectNodeContents(cp.closest('.code').querySelector('code'));var s=getSelection();s.removeAllRanges();s.addRange(r);cp.textContent='حدد النص ثم Ctrl+C';setTimeout(function(){cp.textContent='نسخ'},1800)};
+    var orig=cp.innerHTML,flash=function(h,ms,t){cp.innerHTML=h;cp.classList.add('ok');cp.title=t;setTimeout(function(){cp.innerHTML=orig;cp.classList.remove('ok');cp.title='نسخ الكود'},ms)};
+    var done=function(){flash(ic('tick'),1200,'تم النسخ')};
+    var fb=function(){var r=document.createRange();r.selectNodeContents(cp.closest('.code').querySelector('code'));var s=getSelection();s.removeAllRanges();s.addRange(r);flash(ic('tick'),1800,'حدد النص ثم Ctrl+C')};
     try{navigator.clipboard.writeText(txt).then(done,fb)}catch(err){fb()}
     return;
   }
@@ -686,7 +694,7 @@ $('btnFwd').addEventListener('click',function(){var k=state.tabs.indexOf(state.a
 var wst={id:0,dirty:false,timer:0};
 function W(){var m=$('md'),n=cur();return !!(m&&m.isContentEditable&&n&&n.mode==='read')}
 function rpt(s,n){return new Array(n+1).join(s)}
-function norm(h){return h.replace(/class="([^"]*)"/g,function(m,c){return 'class="'+c.replace(/\b(closed|wrap|on)\b/g,'').replace(/\s+/g,' ').trim()+'"'}).replace(/ aria-expanded="[^"]*"/g,'')}
+function norm(h){return h.replace(/class="([^"]*)"/g,function(m,c){return 'class="'+c.replace(/\b(closed|wrap|on|ok)\b/g,'').replace(/\s+/g,' ').trim()+'"'}).replace(/ aria-expanded="[^"]*"/g,'')}
 function oneLine(s){return s.replace(/\s*\n\s*/g,' ')}
 function top(node){var m=$('md');while(node&&node.parentNode&&node.parentNode!==m)node=node.parentNode;return node&&node.parentNode===m?node:null}
 function setCaret(node,off){var r=document.createRange();r.setStart(node,off);r.collapse(true);var s=getSelection();s.removeAllRanges();s.addRange(r)}
