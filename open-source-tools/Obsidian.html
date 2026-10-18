@@ -138,6 +138,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .code:hover .cp,.code .cp:focus-visible{opacity:1}
 .k{color:var(--h-k)}.s{color:var(--h-s)}.cm{color:var(--h-c);font-style:italic}.n{color:var(--h-n)}.t{color:var(--h-t)}.a{color:var(--h-a)}
 
+.hint{direction:rtl;text-align:right;color:var(--faint);font:12.5px var(--font-doc);margin:36px 0 0}
 .side-scrim{display:none}
 @media (max-width:760px){
   .app{grid-template-columns:44px 0 minmax(0,1fr)}
@@ -308,7 +309,7 @@ function set(id,n){$(id).innerHTML=ic(n)}
 
 /* ---------- state ---------- */
 var NAME1='الموسوعة المرجعية الشاملة للتنسيق في Obsidian 🗒️';
-var state={notes:[{id:1,name:NAME1,text:$('raw1').textContent.replace(/^\n+/,''),mode:'read'},{id:2,name:'Untitled',text:'',mode:'edit'}],tabs:[1],active:1,seq:2};
+var state={notes:[{id:1,name:NAME1,text:$('raw1').textContent.replace(/^\n+/,''),mode:'read'},{id:2,name:'Untitled',text:'',mode:'edit'}],tabs:[1,2],active:2,seq:2};
 try{var sv=JSON.parse(localStorage.getItem('vault-notes-v1')||'null');if(sv&&sv.notes&&sv.notes.length){state=sv}}catch(e){}
 function save(){try{localStorage.setItem('vault-notes-v1',JSON.stringify(state))}catch(e){}}
 function cur(){return state.notes.find(function(n){return n.id===state.active})}
@@ -440,11 +441,11 @@ function renderMain(){
   set('btnMode',n.mode==='read'?'book':'pen');
   $('btnMode').title=n.mode==='read'?'التبديل إلى وضع التحرير (Ctrl+E)':'التبديل إلى وضع القراءة (Ctrl+E)';
   var body;
-  if(n.mode==='read'){taskN=0;body='<div class="md" id="md">'+(n.text.trim()?render(n.text):'')+'</div>'}
+  if(n.mode==='read'){taskN=0;body='<div class="md" id="md">'+(n.text.trim()?render(n.text):'')+'</div><p class="hint">انقر مرتين على النص للتحرير، أو اضغط Ctrl+E.</p>'}
   else body='<textarea class="editor" id="editor" dir="auto" spellcheck="false" placeholder="ابدأ الكتابة هنا">'+esc(n.text)+'</textarea>';
   view.innerHTML='<div class="doc"><div class="doc-title" id="dt" contenteditable="plaintext-only" dir="auto" data-ph="Untitled" role="textbox" aria-label="عنوان الملاحظة"></div>'+body+'</div>';
   $('dt').textContent=n.name;
-  if(n.mode==='edit'&&!n.text){var ed=$('editor');if(ed)ed.focus()}
+  if(n.mode==='edit'){var ed=$('editor');if(ed){ed.focus();ed.setSelectionRange(ed.value.length,ed.value.length)}}
 }
 function renderAll(){renderTabs();renderFiles();renderMain();save()}
 
@@ -489,6 +490,43 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='e'){e.preventDefault();toggleMode();return}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.cb,.callout .ct,.tab')){e.preventDefault();e.target.click()}
   if(e.key==='Enter'&&e.target.id==='dt'){e.preventDefault();e.target.blur()}
+});
+document.addEventListener('dblclick',function(e){
+  if(e.target.closest('#md')&&!e.target.closest('.ct,.cb,.cp,a')){var n=cur();if(n){n.mode='edit';renderAll()}}
+});
+document.addEventListener('keydown',function(e){
+  var ta=e.target;if(!ta||ta.id!=='editor')return;
+  var v=ta.value,s=ta.selectionStart,se=ta.selectionEnd;
+  var ls=v.lastIndexOf('\n',s-1)+1,le=v.indexOf('\n',s);if(le<0)le=v.length;
+  var line=v.slice(ls,le);
+  function put(txt,from,to){
+    ta.setSelectionRange(from,to);var ok=false;
+    try{ok=document.execCommand('insertText',false,txt)}catch(x){}
+    if(!ok){ta.setRangeText(txt,from,to,'end')}
+    ta.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+  var li=line.match(/^(\s*)([-*+]|\d+\.)\s+(\[.\]\s+)?(.*)$/);
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='l'){
+    e.preventDefault();
+    var t=line.match(/^(\s*)[-*+]\s+\[.\]\s?(.*)$/),b=line.match(/^(\s*)[-*+]\s+(.*)$/),r;
+    if(t)r=t[1]+t[2];else if(b)r=b[1]+'- [ ] '+b[2];else r='- '+line;
+    put(r,ls,le);return;
+  }
+  if(e.key==='Enter'&&!e.shiftKey&&!e.ctrlKey&&!e.altKey&&s===se&&s===le){
+    var q=line.match(/^(\s*>\s?)(.*)$/);
+    if(li){
+      e.preventDefault();
+      if(!li[4].trim()){put('',ls,le);return}
+      var mk=/\d/.test(li[2])?(parseInt(li[2],10)+1)+'.':li[2];
+      put('\n'+li[1]+mk+' '+(li[3]?'[ ] ':''),s,se);return;
+    }
+    if(q&&q[2].trim()){e.preventDefault();put('\n'+q[1],s,se)}
+  }
+  if(e.key==='Tab'&&li){
+    e.preventDefault();
+    if(e.shiftKey){var rm=line.match(/^( {1,4}|\t)/);if(rm)put(line.slice(rm[0].length),ls,le)}
+    else put('    '+line,ls,le);
+  }
 });
 document.addEventListener('input',function(e){
   var n=cur();if(!n)return;
