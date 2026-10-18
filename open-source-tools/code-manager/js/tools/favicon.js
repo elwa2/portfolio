@@ -197,6 +197,137 @@ function favdDownloadHtml(){
   }catch(e){ showToast('تعذّر التحميل'); }
 }
 
+let favdPrimaryColor = '#f736b0';
+
+const FAVD_PRESETS = [
+  { name: 'نيون وردي', hex: '#f736b0' },
+  { name: 'سايبر سيان', hex: '#06b6d4' },
+  { name: 'زمردي فاخر', hex: '#10b981' },
+  { name: 'بنفسجي ملكي', hex: '#8b5cf6' },
+  { name: 'عنبر ناري', hex: '#f59e0b' },
+  { name: 'أحمر قرمزي', hex: '#ef4444' },
+  { name: 'أزرق كهربائي', hex: '#3b82f6' },
+  { name: 'أخضر ليموني', hex: '#84cc16' }
+];
+
+function favdHexToRgb(hex){
+  let s = String(hex || '').trim().replace('#', '');
+  if (s.length === 3) s = s[0] + s[0] + s[1] + s[1] + s[2] + s[2];
+  if (!/^[0-9a-fA-F]{6}$/.test(s)) return { r: 247, g: 54, b: 176 };
+  return {
+    r: parseInt(s.slice(0, 2), 16),
+    g: parseInt(s.slice(2, 4), 16),
+    b: parseInt(s.slice(4, 6), 16)
+  };
+}
+
+function favdRgbToHsl(r, g, b){
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h *= 60;
+  }
+  return { h: Math.round(h), s, l };
+}
+
+function favdHslToHex(h, s, l){
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(1, s));
+  l = Math.max(0, Math.min(1, l));
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+function favdDerivePalette(baseHex){
+  const rgb = favdHexToRgb(baseHex);
+  const hsl = favdRgbToHsl(rgb.r, rgb.g, rgb.b);
+  const c1 = favdHslToHex(hsl.h, Math.min(hsl.s, 0.40), 0.11);
+  const c2 = baseHex.toLowerCase();
+  const c3 = favdHslToHex(hsl.h - 22, Math.max(hsl.s, 0.65), 0.36);
+  const c4 = favdHslToHex(hsl.h + 24, Math.max(hsl.s, 0.70), 0.65);
+  const ink = '#ffffff';
+  return { c1, c2, c3, c4, ink };
+}
+
+function favdUpdateColor(key, val){
+  favdCfg[key] = val;
+  const sw = document.getElementById('favSw_' + key);
+  if(sw) sw.style.background = val;
+  const inp = document.getElementById('favInp_' + key);
+  if(inp) inp.value = val;
+  const code = document.getElementById('favCode_' + key);
+  if(code) code.textContent = val;
+}
+
+function favdOnColorChange(key, val){
+  favdCfg[key] = val;
+  const sw = document.getElementById('favSw_' + key);
+  if(sw) sw.style.background = val;
+  const code = document.getElementById('favCode_' + key);
+  if(code) code.textContent = val;
+  if(key === 'c2'){
+    favdPrimaryColor = val;
+    const pSw = document.getElementById('favPrimarySw');
+    if(pSw) pSw.style.background = val;
+    const pInp = document.getElementById('favPrimaryInput');
+    if(pInp) pInp.value = val;
+    const pCode = document.getElementById('favPrimaryCode');
+    if(pCode) pCode.textContent = val;
+  }
+  favdRefreshCode();
+}
+
+function favdApplyPrimary(hex, notify){
+  if(!hex) return;
+  favdPrimaryColor = hex;
+  const p = favdDerivePalette(hex);
+  favdUpdateColor('c1', p.c1);
+  favdUpdateColor('c2', p.c2);
+  favdUpdateColor('c3', p.c3);
+  favdUpdateColor('c4', p.c4);
+  favdUpdateColor('ink', p.ink);
+
+  const pSw = document.getElementById('favPrimarySw');
+  if(pSw) pSw.style.background = hex;
+  const pInp = document.getElementById('favPrimaryInput');
+  if(pInp) pInp.value = hex;
+  const pCode = document.getElementById('favPrimaryCode');
+  if(pCode) pCode.textContent = hex;
+
+  favdRefreshCode();
+  if(notify && typeof showToast === 'function') showToast('تم توليد درجات اللون: ' + hex);
+}
+
+function favdRandomColor(){
+  const h = Math.floor(Math.random() * 360);
+  const s = 0.78 + Math.random() * 0.22;
+  const l = 0.48 + Math.random() * 0.12;
+  const randomHex = favdHslToHex(h, s, l);
+  favdApplyPrimary(randomHex, true);
+}
+
+function favdSetPreset(hex){
+  favdApplyPrimary(hex, true);
+}
+
 function renderFavDash(){
   const badge = document.getElementById('countBadge');
   if(badge) badge.textContent = 'استوديو الفافيكون';
@@ -204,7 +335,12 @@ function renderFavDash(){
     `<button class="fav-fx-btn${k===favdCfg.fx?' on':''}" data-fx="${k}" onclick="favdSetFx('${k}')" title="${FAVD_FX[k].desc}"><b>${FAVD_FX[k].ar}</b><small>${FAVD_FX[k].desc}</small></button>`
   ).join('');
   const colorRow = (key,label)=>
-    `<label class="fav-color"><span class="fav-swatch" style="background:${favdCfg[key]}"></span><span class="fav-clabel">${label}</span><input type="color" value="${favdCfg[key]}" oninput="this.previousElementSibling.previousElementSibling.style.background=this.value;favdSet('${key}',this.value)"><code dir="ltr">${favdCfg[key]}</code></label>`;
+    `<label class="fav-color" id="favColWrap_${key}"><span class="fav-swatch" id="favSw_${key}" style="background:${favdCfg[key]}"></span><span class="fav-clabel">${label}</span><input type="color" id="favInp_${key}" value="${favdCfg[key]}" oninput="favdOnColorChange('${key}',this.value)"><code id="favCode_${key}" dir="ltr">${favdCfg[key]}</code></label>`;
+
+  const presetsHtml = FAVD_PRESETS.map(p =>
+    `<button type="button" class="fav-preset-chip" style="--preset-col:${p.hex}" onclick="favdSetPreset('${p.hex}')" title="${p.name}"><span class="fav-preset-dot"></span>${p.name}</button>`
+  ).join('');
+
   document.getElementById('mainBody').innerHTML = `<div class="has-dash">
     <div class="dt-builder fav">
       <div class="dt-builder-title"><i class="ti ti-icons"></i> استوديو الفافيكون المتحرك
@@ -229,7 +365,33 @@ function renderFavDash(){
           <input class="dt-textarea fav-letter" id="favLetterInp" maxlength="3" spellcheck="false" value="${(favdCfg.letter||'').replace(/"/g,'&quot;')}" placeholder="عـ" oninput="favdSet('letter', this.value.slice(0,3))">
           <div class="dt-head" style="margin-top:14px"><i class="ti ti-sparkles" style="color:#f736b0"></i> التأثير — <b id="favFxName">${FAVD_FX[favdCfg.fx].ar}</b> <small id="favFxDesc" style="color:var(--text-3);font-weight:400">${FAVD_FX[favdCfg.fx].desc}</small></div>
           <div class="fav-fx-grid">${fxBtns}</div>
-          <div class="dt-head" style="margin-top:14px"><i class="ti ti-palette" style="color:#f736b0"></i> الألوان</div>
+          <div class="dt-head" style="margin-top:14px"><i class="ti ti-palette" style="color:#f736b0"></i> الألوان والتدرجات</div>
+          
+          <div class="fav-palette-box">
+            <div class="fav-palette-header">
+              <div class="fav-primary-picker">
+                <label class="fav-primary-label" title="اختر اللون الأساسي لتوليد درجات متناسقة تلقائياً">
+                  <span class="fav-primary-swatch" id="favPrimarySw" style="background:${favdPrimaryColor}"></span>
+                  <span class="fav-primary-text">اللون الأساسي:</span>
+                  <input type="color" id="favPrimaryInput" value="${favdPrimaryColor}" oninput="favdApplyPrimary(this.value)">
+                  <code id="favPrimaryCode" dir="ltr">${favdPrimaryColor}</code>
+                </label>
+              </div>
+              <div class="fav-quick-actions">
+                <button type="button" class="fav-btn-action primary" onclick="favdRandomColor()" title="توليد باليت متناسق عشوائياً بنقرة واحدة">
+                  <i class="ti ti-arrows-shuffle"></i> لون عشوائي
+                </button>
+                <button type="button" class="fav-btn-action" onclick="favdApplyPrimary(favdPrimaryColor, true)" title="إعادة اشتقاق الدرجات من اللون الأساسي">
+                  <i class="ti ti-wand"></i> اشتقاق الدرجات
+                </button>
+              </div>
+            </div>
+            <div class="fav-presets-bar">
+              <span class="fav-presets-title">باليتات سريعة:</span>
+              ${presetsHtml}
+            </div>
+          </div>
+
           <div class="fav-colors">
             ${colorRow('c1','خلفية داكنة')}
             ${colorRow('c2','لون 2')}

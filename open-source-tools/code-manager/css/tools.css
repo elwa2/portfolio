@@ -1520,6 +1520,148 @@
   .fav-fx-btn small { font-size: 10px; color: var(--text-3); line-height: 1.4; }
   .fav-fx-btn:hover { border-color: rgba(247,54,176,0.5); }
   .fav-fx-btn.on { border-color: #f736b0; background: rgba(247,54,176,0.1); box-shadow: 0 0 0 1px #f736b0 inset; }
+  .fav-palette-box {
+    background: var(--bg-overlay);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .fav-palette-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .fav-primary-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fav-primary-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-def);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+    font-size: 12px;
+    color: var(--text-1);
+    font-weight: 600;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .fav-primary-label:hover {
+    border-color: #f736b0;
+    box-shadow: 0 0 0 2px rgba(247,54,176,0.15);
+  }
+  .fav-primary-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+  .fav-primary-label input[type="color"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  .fav-primary-label code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    margin-inline-start: 4px;
+  }
+  .fav-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .fav-btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-def);
+    color: var(--text-1);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fav-btn-action:hover {
+    background: rgba(247,54,176,0.12);
+    border-color: #f736b0;
+    color: #f736b0;
+    transform: translateY(-1px);
+  }
+  .fav-btn-action.primary {
+    background: linear-gradient(135deg, rgba(247,54,176,0.2), rgba(149,35,141,0.2));
+    border-color: rgba(247,54,176,0.4);
+    color: #fca5e5;
+  }
+  .fav-btn-action.primary:hover {
+    background: linear-gradient(135deg, #f736b0, #95238d);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(247,54,176,0.35);
+  }
+  .fav-presets-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-sub);
+  }
+  .fav-presets-title {
+    font-size: 10.5px;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-inline-end: 2px;
+  }
+  .fav-preset-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-sub);
+    font-size: 10.5px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .fav-preset-chip:hover {
+    border-color: var(--preset-col, #f736b0);
+    color: var(--text-1);
+    transform: scale(1.04);
+  }
+  .fav-preset-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--preset-col, #f736b0);
+    box-shadow: 0 0 6px var(--preset-col, #f736b0);
+    flex-shrink: 0;
+  }
   .fav-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
   .fav-color { display: flex; align-items: center; gap: 8px; background: var(--bg-overlay); border: 1px solid var(--border-sub); border-radius: var(--radius-sm); padding: 6px 10px; cursor: pointer; font-size: 11px; color: var(--text-2); }
   .fav-swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
