@@ -187,6 +187,26 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .callout[data-ty="toggle"] .code .ch button{background:var(--bg-active);color:var(--muted)}
 .callout[data-ty="toggle"] .code .ch button:hover,.callout[data-ty="toggle"] .code .ch button.on{background:var(--bg-hover);color:var(--fg-strong)}
 .callout[data-ty="toggle"] .code pre{margin:4px 0 8px 22px;border:0;background:var(--code-bg);border-radius:8px;padding:14px 16px}
+.spov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;direction:rtl}
+.spbox{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;width:min(780px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);font:14px var(--font-ui);overflow:hidden}
+.sph{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.sph b{font-size:16px;color:var(--fg-strong)}.sph span{color:var(--muted);flex:1;font-size:13px}
+.spb{overflow-y:auto;padding:8px 18px;flex:1;min-height:80px}
+.spg{margin:8px 0 14px}
+.spgh{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--fg-strong);padding:4px 0;cursor:pointer}
+.spgh small{color:var(--muted);font-weight:400}
+.spr{display:flex;align-items:flex-start;gap:10px;padding:6px 8px;border-radius:6px}
+.spr:hover{background:var(--bg-hover)}.spr input{margin-top:5px}
+.spm{flex:1;min-width:0}
+.spf{color:rgb(var(--c-red));text-decoration:line-through;margin-left:6px;white-space:pre-wrap}
+.spt{color:rgb(var(--c-green));font-weight:600;white-space:pre-wrap}
+.spc{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spx{color:var(--muted);padding:2px 8px;border-radius:4px;font-size:12px}.spx:hover{background:var(--bg-active);color:var(--fg-strong)}
+.spfoot{display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);align-items:center}
+.spbtn{padding:6px 14px;border-radius:6px;background:var(--bg-active);color:var(--fg-strong);font:500 13px var(--font-ui)}
+.spbtn:hover{background:var(--bg-hover)}.spbtn.pri{background:var(--accent);color:#fff}
+.spdp{padding:8px 18px 0;border-top:1px solid var(--line)}
+.spdict{width:100%;min-height:150px;background:var(--code-bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font:13px/1.7 var(--font-doc);direction:rtl;resize:vertical;margin-top:4px}
 .hint{direction:rtl;text-align:right;color:var(--faint);font:12.5px var(--font-doc);margin:36px 0 0}
 .toolbar{display:flex;align-items:center;gap:2px;padding:4px 10px;border-bottom:1px solid var(--line);border-top:1px solid var(--line);overflow-x:auto;flex:none;scrollbar-width:thin}
 .toolbar .ib{width:30px;height:28px}
@@ -379,6 +399,7 @@ var P={
  hl:'<path d="M15 4l5 5-9 9H6v-5z"/><path d="M4 21h16"/>',
  icode:'<path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
  tcode:'<path d="M3 6h8l-4 5z"/><path d="M14 14l-2.5 2.5L14 19M19 14l2.5 2.5L19 19M3 15h5M3 19h4"/>',
+ spell:'<path d="M4 17l3-9 3 9M5.2 14h3.6"/><path d="M13 14l2.5 2.5L21 10"/>',
  cblock:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 9l-2.5 3 2.5 3M14 9l2.5 3-2.5 3"/>',
  quote:'<path d="M9 7H5v5h4a3 3 0 0 1-3 4M19 7h-4v5h4a3 3 0 0 1-3 4"/>',
  ol:'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5.5l1.2-1V9M3.8 13.5h2.4l-2.4 3.2h2.6"/>',
@@ -1231,6 +1252,205 @@ function wys(name){
   markDirty();
 }
 
+/* ---------- تدقيق إملائي ولغوي ---------- */
+var SP_WORDS=[
+'أحمد أحمر أحد أحداث أحدث أحسن أحوال أخي أخت أخبار أخرى أخطاء أخلاق أخذ أخيرا أدلة أدنى أداء أدوات أراضي أرجو أرسل أرسلت أرض أرقام أركان أريد أزمة أساس أساسي أساسية أسباب أسبوع أستاذ أسرة أسعار أسلوب أسماء أشخاص أشهر أصبح أصل أصلي أصول أطراف أطفال أعتقد أعتذر أعلى أعلم أعمال أعضاء أفراد أفضل أفكار أقل أقصى أقدم أقوم أكثر أكبر أكد أكدت أكتوبر أكمل ألف أمام أمر أمس أمور أموال أمين أمل آمل أنا أنت أنتم أنظمة أنواع أهل أهم أهمية أهداف أوراق أول أولا أولى أوضاع أوقات أيام أيضا',
+'إبلاغ إبراء إبداع إثبات إجبار إجراء إجراءات إجازة إجابة إجمالي إحالة إحدى إحراز إحضار إخطار إخفاء إخلاء إخلال إدخال إدارة إدارات إداري إدارية إذا إذن إرجاع إرسال إرشادات إرفاق إزالة إزعاج إسقاط إشارة إشعار إشراف إصابة إصدار إصرار إصلاح إضافة إضافي إضافية إضراب إطار إطلاق إعادة إعداد إعدادي إعلان إعلام إعلامي إعفاء إعاقة إفادة إفراج إقامة إقرار إقليم إقفال إقناع إكمال إلحاق إلغاء إلقاء إلكتروني إلكترونية إلى إلا إلزام إمداد إمكانية إمكان إمضاء إنتاج إنجاز إنذار إنسان إنسانية إنشاء إنفاق إنقاذ إنكار إنهاء إهانة إسلام إسلامي إسلامية إهمال إيجابي إيجار إيداع إيصال إيضاح إيقاف إيمان إيرادات',
+'آخر آخرين آلاف آلة آثار آراء الآن الآتي',
+'استلام استخدام استمرار استفسار استقبال استجابة استئناف استدعاء استعلام استقالة استثناء استمارة اتخاذ اتفاق اتصال اجتماع انتظار انتهاء انتقال انتشار انتخابات اعتبار اعتماد اعتراض اعتذار ابتداء ابتدائي ارتفاع ارتباط اختلاف اختصاص اختيار اختبار احتياج احترام احتمال اشتراك انسحاب انخفاض انضمام انقطاع اتهام ادعاء اقتراح اقتصاد اقتصادي اكتمال امتحان امتثال امتناع',
+'شركة مدرسة جامعة مؤسسة وزارة محافظة مديرية نيابة محكمة قضية مشكلة مسألة رسالة حكومة دولة مدينة قرية منطقة مصلحة هيئة لجنة جهة نقطة خدمة مهمة فرصة نتيجة مراجعة متابعة محاولة مساعدة مطالبة مذكرة ورقة وثيقة شهادة صورة نسخة فترة مدة حالة ساعة سنة فكرة طريقة نظرة قيمة ضرورة حقيقة حاجة أهمية عملية قضائية رسمية قانونية شخصية مالية عامة خاصة كاملة كافية سابقة حالية جديدة قديمة كبيرة صغيرة طويلة قصيرة كثيرة قليلة أخيرة مستمرة مختلفة مناسبة صحيحة واضحة زوجة ابنة عائلة صحة حياة حرية عدالة شرطة دراسة كتابة قراءة معرفة وظيفة ميزانية محاسبة رقابة مخالفة مسؤولية جريمة تهمة واقعة حادثة جلسة لائحة قائمة خطة خطوة فقرة صفحة جملة كلمة لغة حركة طبقة غرفة قاعة مساحة مسافة نهاية بداية علاقة عاصمة كمية مرحلة معاملة مقابلة منظمة موافقة ميزة ناحية',
+'شكوى دعوى فتوى ذكرى قصوى كبرى صغرى عظمى معنى مبنى مستشفى ملتقى منتدى مصطفى موسى عيسى يحيى'
+].join(' ');
+var SP_EXTRA_VALID='كامل كاملة كاف كافة باقي بالغ باحث باحثة بائع لاعب لاعبة لامع لاحق لاحقا لازم لازمة فاعل فاضل فاسد وافر واضح واحد واحدة وافق وارد وارث وازن وافي كاذب كاتب كاتبة';
+var SP_ALEF_EXTRA='على حتى متى أنى لدى سوى مدى هدى هوى فتى ندى رؤى لبنى سلوى نجوى مرتضى مجتبى ليلى سلمى رضوى حسنى بشرى مأوى مرمى مجرى مسعى مثنى مغزى أدنى أقصى أعلى أسمى أغنى أقوى أحرى قضى مضى مشى بقى نسى رعى سعى أتى أبى رمى بنى حمى شفى كفى وفى جرى طوى روى ادعى انتهى اشترى استدعى استوفى استولى استغنى استهوى تخطى تعدى تحدى تلاقى تلقى تبقى يبقى يرضى يسعى يرجى يتلقى يتخطى يتعدى يتحدى يسمى تسمى ينسى يأبى أعطى أوصى أملى أمضى أفتى أخفى أنهى أبقى أرضى ألقى أنسى ابتغى انتقى ارتقى ارتضى التقى اكتفى اقتضى امتد ينتهي يلقى يلتقى يشترى يستدعى يرتقى يقضى يمضى يمشى يأتى يرمى يبنى يكفى يوفى يجرى يطوى يروى يهدى يهوى يخشى يخفى يعطى يوصى يملى يمضى يفتى';
+var SP_MASC='توجيه تنبيه تمويه تشبيه تسفيه تنويه تشويه تفقيه تنزيه تعريه تلقيه';
+var SP_PHRASES=[['لاكن','لكن'],['هاذا','هذا'],['هاذه','هذه'],['ذالك','ذلك'],['هاكذا','هكذا'],['اولائك','أولئك'],['ان شاء الله','إن شاء الله'],['انشاء الله','إن شاء الله'],['حيث انه','حيث إنه'],['حيث ان','حيث أن'],['كما ان','كما أن'],['مع ان','مع أن'],['رغم ان','رغم أن'],['وذلك لان','وذلك لأن'],['ذلك لان','ذلك لأن']];
+var SP_DEF_DICT='حيث انه=حيث إنه\nنجلى=نجلي\nاحمد=أحمد\nالمواضع محل الشكوى=الموضوع محل الشكوى\nموضوع محل الشكوى=الموضوع محل الشكوى\nرافتا=رأفة\nالتؤم=التوأم\nبأخذ الإجراءات=باتخاذ الإجراءات\nالازمة=اللازمة\nعبدالسلام=عبد السلام';
+var SP_PRE=['','ال','و','ف','ب','ل','ك','وال','فال','بال','كال','لل','وب','ول','وف','وبال','وكال','ولل','فبال'];
+var SP_ORDER=['قاموسي','عبارات شائعة','همزات وتاء مربوطة وإملاء شائع','تاء مربوطة (نسبة)','ألف مقصورة ← ياء','حروف مكررة','تطويل','كلمة مكررة','فصل «عبد» عن الاسم','مسافات زائدة','مسافة قبل علامة الترقيم','مسافة بعد علامة الترقيم','علامات ترقيم عربية'];
+var SP_B1='(?<![\\u0621-\\u064A0-9_])',SP_B2='(?![\\u0621-\\u064A0-9_])';
+var spMap=null,spValid,spWL,spMasc;
+function spNorm(w){return w.replace(/[\u064B-\u0652\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ؤ/g,'و')}
+function spInit(){
+  if(spMap)return;
+  spMap={};spValid={};spWL={};spMasc={};var amb={};
+  SP_WORDS.split(/\s+/).forEach(function(w){
+    if(!w)return;spValid[w]=1;
+    if(/ى$/.test(w))spWL[w]=1;
+    var k=spNorm(w);
+    if(spMap[k]!==undefined&&spMap[k]!==w)amb[k]=1;else spMap[k]=w;
+  });
+  Object.keys(amb).forEach(function(k){delete spMap[k]});
+  SP_EXTRA_VALID.split(/\s+/).forEach(function(w){if(w)spValid[w]=1});
+  SP_ALEF_EXTRA.split(/\s+/).forEach(function(w){if(w)spWL[w]=1});
+  SP_MASC.split(/\s+/).forEach(function(w){if(w)spMasc[w]=1});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&spOv)spClose()});
+}
+function spDict(x){
+  for(var i=0;i<SP_PRE.length;i++){
+    var P=SP_PRE[i];if(x.indexOf(P)!==0)continue;
+    var b=x.slice(P.length);
+    if(b.length<(P==='ك'?4:3))continue;
+    if(spValid[b])return null;
+    var t=spMap[spNorm(b)];
+    if(t&&t!==b){
+      if(/ه$/.test(b)&&/ة$/.test(t)&&!/(ال|لل)$/.test(P))continue;
+      return P+t;
+    }
+  }
+  return null;
+}
+function spAlef(x){
+  if(x.length<2||!/ى$/.test(x))return null;
+  for(var i=0;i<SP_PRE.length;i++){var P=SP_PRE[i];if(x.indexOf(P)===0&&spWL[x.slice(P.length)])return null}
+  return x.slice(0,-1)+'ي';
+}
+function spYa(x){
+  var m=x.match(/^([وفبلك]?(?:ال|لل))([\u0621-\u064A]{3,})يه$/);
+  if(!m||spMasc[m[2]+'يه'])return null;
+  return m[1]+m[2]+'ية';
+}
+function spToken(w){
+  if(/[\u064B-\u0652\u0670]/.test(w))return null;
+  var x=w,tag=null;
+  if(x.indexOf('\u0640')>-1){x=x.replace(/\u0640/g,'');tag='تطويل'}
+  var y=x.replace(/([\u0621-\u064A])\1{2,}/g,'$1');if(y!==x){x=y;tag=tag||'حروف مكررة'}
+  if(x.length<2)return x!==w?{to:x,tag:tag}:null;
+  if(!spValid[x]){
+    var d=spDict(x);if(d){x=d;tag='همزات وتاء مربوطة وإملاء شائع'}
+    if(!spValid[x]){
+      var a=spAlef(x);if(a){x=a;tag=tag||'ألف مقصورة ← ياء';if(!spValid[x]){var d2=spDict(x);if(d2)x=d2}}
+      var yh=spYa(x);if(yh){x=yh;tag='تاء مربوطة (نسبة)'}
+    }
+  }
+  return x!==w?{to:x,tag:tag}:null;
+}
+function spEsc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function spCheck(text){
+  spInit();
+  var N=text.length,P=new Uint8Array(N),C=new Uint8Array(N),out=[],m;
+  function mark(re){re.lastIndex=0;while((m=re.exec(text))){for(var i=m.index;i<m.index+m[0].length;i++)P[i]=1;if(!m[0].length)re.lastIndex++}}
+  var pos=0,inF=null;
+  text.split('\n').forEach(function(line){
+    var st=line.replace(/^[\s>]*/,''),f=st.match(/^(`{3,}|~{3,})/),mk=false;
+    if(inF){mk=true;if(f&&f[1].indexOf(inF)===0&&!st.slice(f[1].length).trim())inF=null}
+    else if(f){inF=f[1];mk=true}
+    if(mk)for(var i=pos;i<pos+line.length;i++)P[i]=1;
+    pos+=line.length+1;
+  });
+  mark(/`[^`\n]*`/g);mark(/https?:\/\/[^\s)\]>]+/g);mark(/\]\([^)\n]*\)/g);mark(/\[\[[^\]\n]*\]\]/g);
+  mark(/(^|[\s(])#[\p{L}\p{N}_-]+/gu);mark(/\[![\w-]+\][+-]?/g);mark(/<[^>\n]+>/g);
+  var ign={};(state.fixIgnore||[]).forEach(function(w){ign[w]=1});
+  function vis(s){return s===''?'∅':s.replace(/ /g,'␣').replace(/\t/g,'⇥').replace(/\n/g,'↵')}
+  function add(s,e,rep,tag,from,to){
+    var i,cur=text.slice(s,e);
+    if(cur===rep)return;
+    from=from!=null?from:cur;if(ign[from])return;
+    for(i=s;i<e;i++)if(P[i]||C[i])return;
+    for(i=s;i<e;i++)C[i]=1;
+    out.push({s:s,e:e,rep:rep,tag:tag,fd:from===cur&&from.trim()===''?vis(from):from,td:to!=null?to:(rep.trim()===''?vis(rep):rep),
+      ctx:text.slice(Math.max(0,s-24),s).replace(/\s+/g,' ')+'【'+vis(cur).slice(0,40)+'】'+text.slice(e,e+24).replace(/\s+/g,' ')});
+  }
+  /* 1) قاموسي + عبارات شائعة */
+  var pairs=[];
+  (state.fixDictText!=null?state.fixDictText:SP_DEF_DICT).split('\n').forEach(function(l){
+    var k=l.indexOf('=');if(k<1)return;var a=l.slice(0,k).trim(),b=l.slice(k+1).trim();if(a&&b&&a!==b)pairs.push([a,b,'قاموسي']);
+  });
+  SP_PHRASES.forEach(function(p){pairs.push([p[0],p[1],'عبارات شائعة'])});
+  pairs.forEach(function(p){
+    var re=new RegExp(SP_B1+spEsc(p[0]).replace(/\s+/g,'\\s+')+SP_B2,'g');
+    while((m=re.exec(text)))add(m.index,m.index+m[0].length,p[1],p[2]);
+  });
+  /* 2) كلمة مكررة */
+  var re2=/(?<![\u0621-\u064A])([\u0621-\u064A]{2,})((?:[ \t]+\1)+)(?![\u0621-\u064A])/g;
+  while((m=re2.exec(text)))add(m.index,m.index+m[0].length,m[1],'كلمة مكررة',m[0],m[1]);
+  /* 3) عبد + ال */
+  var re3=/(?<![\u0621-\u064A])عبد(?=ال[\u0621-\u064A]{2,})/g;
+  while((m=re3.exec(text))){
+    var wm=text.slice(m.index).match(/^[\u0621-\u064A]+/)[0];
+    add(m.index,m.index+3,'عبد ','فصل «عبد» عن الاسم',wm,'عبد '+wm.slice(3));
+  }
+  /* 4) كلمات */
+  var re4=/[\u0621-\u064A\u0640\u064B-\u0652\u0670]+/g;
+  while((m=re4.exec(text))){
+    var r=spToken(m[0]);if(r)add(m.index,m.index+m[0].length,r.to,r.tag,m[0],r.to);
+  }
+  /* 5) مسافات وعلامات ترقيم */
+  function rule(re,fn,tag){while((m=re.exec(text))){var s=m.index;
+    var ls=text.lastIndexOf('\n',s-1)+1;if(text.charAt(ls)==='|'||/^\s*\|/.test(text.slice(ls,s+1)))continue;
+    add(s,s+m[0].length,fn(m[0]),tag)}}
+  rule(/(?<=\S)[ \t]{2,}(?=\S)/g,function(){return ' '},'مسافات زائدة');
+  rule(/(?<=[\u0621-\u064A])[ \t]+(?=[،؛؟])/g,function(){return ''},'مسافة قبل علامة الترقيم');
+  rule(/(?<=[\u0621-\u064A])[ \t]+(?=[.!,](?:\s|$))/g,function(){return ''},'مسافة قبل علامة الترقيم');
+  rule(/[،؛؟](?=[\u0621-\u064A\w])/g,function(c){return c+' '},'مسافة بعد علامة الترقيم');
+  rule(/(?<=[\u0621-\u064A])\.(?=[\u0621-\u064A])/g,function(c){return '. '},'مسافة بعد علامة الترقيم');
+  rule(/(?<=[\u0621-\u064A])[,;?](?=\s|$)/g,function(c){return {',':'،',';':'؛','?':'؟'}[c]},'علامات ترقيم عربية');
+  out.sort(function(a,b){return a.s-b.s});
+  return out;
+}
+var spOv=null;
+function spClose(){if(spOv){spOv.remove();spOv=null}}
+function spEl(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function spOpen(){
+  var n=cur();if(!n||state.tabs.indexOf(n.id)<0)return;
+  try{syncNow()}catch(e){}
+  n=cur();spClose();
+  var list=spCheck(n.text||''),items=list.map(function(c){return {c:c,on:true}});
+  spOv=spEl('div','spov');
+  spOv.addEventListener('mousedown',function(e){if(e.target===spOv)spClose()});
+  var box=spEl('div','spbox');spOv.appendChild(box);
+  var hd=spEl('div','sph');hd.appendChild(spEl('b',null,'تدقيق الكتابة'));
+  var sub=spEl('span');hd.appendChild(sub);
+  var x=spEl('button','ib');x.type='button';x.innerHTML=ic('x');x.title='إغلاق';x.addEventListener('click',spClose);hd.appendChild(x);
+  box.appendChild(hd);
+  var body=spEl('div','spb');box.appendChild(body);
+  var ft=spEl('div','spfoot');box.appendChild(ft);
+  var apply=spEl('button','spbtn pri');apply.type='button';
+  function upd(){var k=items.filter(function(i){return i.on}).length;apply.textContent='تطبيق المحدد ('+k+')';apply.disabled=!k;apply.style.opacity=k?1:.5;
+    sub.textContent=items.length?('التصحيحات المقترحة: '+items.length+' — راجعها قبل التطبيق'):'لم أجد أخطاء شائعة في هذه الملاحظة ✓'}
+  var groups={};items.forEach(function(it){(groups[it.c.tag]=groups[it.c.tag]||[]).push(it)});
+  Object.keys(groups).sort(function(a,b){return SP_ORDER.indexOf(a)-SP_ORDER.indexOf(b)}).forEach(function(g){
+    var gw=spEl('div','spg'),gh=spEl('label','spgh'),gc=spEl('input');gc.type='checkbox';gc.checked=true;
+    gh.appendChild(gc);gh.appendChild(spEl('span',null,g));gh.appendChild(spEl('small',null,'('+groups[g].length+')'));gw.appendChild(gh);
+    var rows=[];
+    groups[g].forEach(function(it){
+      var r=spEl('div','spr'),cb=spEl('input');cb.type='checkbox';cb.checked=true;
+      cb.addEventListener('change',function(){it.on=cb.checked;gc.checked=groups[g].every(function(i){return i.on});upd()});
+      var mid=spEl('div','spm'),l1=spEl('div');
+      l1.appendChild(spEl('span','spf',it.c.fd));l1.appendChild(document.createTextNode('← '));l1.appendChild(spEl('span','spt',it.c.td));
+      mid.appendChild(l1);mid.appendChild(spEl('div','spc',it.c.ctx));
+      var ig=spEl('button','spx','تجاهل');ig.type='button';ig.title='لا تقترح هذا التصحيح مرة أخرى';
+      ig.addEventListener('click',function(){state.fixIgnore=(state.fixIgnore||[]);if(state.fixIgnore.indexOf(it.c.fd)<0)state.fixIgnore.push(it.c.fd);save();it.on=false;items=items.filter(function(i){return i!==it});groups[g]=groups[g].filter(function(i){return i!==it});r.remove();upd()});
+      r.appendChild(cb);r.appendChild(mid);r.appendChild(ig);gw.appendChild(r);rows.push([it,cb]);
+    });
+    gc.addEventListener('change',function(){rows.forEach(function(p){p[0].on=gc.checked;p[1].checked=gc.checked});upd()});
+    body.appendChild(gw);
+  });
+  apply.addEventListener('click',function(){
+    var sel=items.filter(function(i){return i.on}).map(function(i){return i.c}).sort(function(a,b){return b.s-a.s});
+    if(!sel.length)return;
+    var t=n.text;state.fixBackup={id:n.id,text:t};
+    sel.forEach(function(c){t=t.slice(0,c.s)+c.rep+t.slice(c.e)});
+    n.text=t;spClose();renderAll();
+  });
+  ft.appendChild(apply);
+  var cancel=spEl('button','spbtn','إغلاق');cancel.type='button';cancel.addEventListener('click',spClose);ft.appendChild(cancel);
+  if(state.fixBackup&&state.fixBackup.id===n.id){
+    var un=spEl('button','spbtn','↩ تراجع عن آخر تصحيح');un.type='button';
+    un.addEventListener('click',function(){n.text=state.fixBackup.text;state.fixBackup=null;spClose();renderAll()});ft.appendChild(un);
+  }
+  var dbtn=spEl('button','spbtn','قاموسي');dbtn.type='button';ft.appendChild(dbtn);
+  var dp=spEl('div','spdp');dp.style.display='none';
+  dp.appendChild(spEl('div','spc','كل سطر: الخطأ=الصح — يُطبَّق على الكلمات والعبارات الكاملة'));
+  var ta=spEl('textarea','spdict');ta.value=state.fixDictText!=null?state.fixDictText:SP_DEF_DICT;ta.spellcheck=false;dp.appendChild(ta);
+  var row=spEl('div','spfoot');row.style.padding='8px 0 0';
+  var sv=spEl('button','spbtn pri','حفظ وإعادة الفحص');sv.type='button';sv.addEventListener('click',function(){state.fixDictText=ta.value;save();spOpen()});row.appendChild(sv);
+  if((state.fixIgnore||[]).length){var ci=spEl('button','spbtn','مسح قائمة التجاهل ('+state.fixIgnore.length+')');ci.type='button';ci.addEventListener('click',function(){state.fixIgnore=[];save();spOpen()});row.appendChild(ci)}
+  dp.appendChild(row);box.insertBefore(dp,ft);
+  dbtn.addEventListener('click',function(){dp.style.display=dp.style.display==='none'?'block':'none'});
+  upd();document.body.appendChild(spOv);
+}
+
 /* ---------- editing tools ---------- */
 function ensureEdit(cb){
   var n=cur();if(!n||state.tabs.indexOf(n.id)<0)return;
@@ -1334,7 +1554,9 @@ var TOOLS=[
  '|',
  {i:'link',t:'رابط (Ctrl+K)',a:function(){if(W())return wys('link');wrap('[','](https://)','نص الرابط')}},
  {i:'wlink',t:'ربط بملاحظة',a:function(){if(W())return wys('wlink');wrap('[[',']]','اسم الملاحظة')}},
- {i:'tag',t:'وسم',a:function(){if(W())return wys('tag');wrap('#','','وسم')}}
+ {i:'tag',t:'وسم',a:function(){if(W())return wys('tag');wrap('#','','وسم')}},
+ '|',
+ {i:'spell',t:'تدقيق إملائي ولغوي للملاحظة',a:function(){spOpen()}}
 ];
 function buildToolbar(){
   $('toolbar').innerHTML=TOOLS.map(function(x,k){
