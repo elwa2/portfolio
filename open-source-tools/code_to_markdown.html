@@ -16,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link id='favicon' rel='icon' type='image/png' href=''/>
+<canvas id='c' width='32' height='32' style='display:none'></canvas>
 <style>
   /* =====================================================
      نظام التصميم: Nocturnal Glass
@@ -711,7 +713,93 @@
   }
 </style>
 </head>
-<body>
+<body><script>
+ 
+const FAV = { fx: "bounce", c1:"#271112", c2:"#f42533", c3:"#af0951", c4:"#f68b55", ink:"#ffffff", letter: "MD" };
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const link = document.getElementById('favicon');
+function favPaint(x, F, t){
+  const s=32;
+  const pulse=(Math.sin(t*0.003)+1)/2;
+  x.clearRect(0,0,s,s);
+  const rr=(X,Y,W,H,R)=>{ if(x.roundRect){ x.roundRect(X,Y,W,H,R);} else { x.beginPath(); x.moveTo(X+R,Y); x.arcTo(X+W,Y,X+W,Y+H,R); x.arcTo(X+W,Y+H,X,Y+H,R); x.arcTo(X,Y+H,X,Y,R); x.arcTo(X,Y,X+W,Y,R); x.closePath(); } };
+  const ct=()=>{ x.textAlign='center'; x.textBaseline='middle'; };
+  if(F.fx==="glow"){
+    const bg=x.createLinearGradient(0,0,s,s); bg.addColorStop(0,F.c1); bg.addColorStop(1,F.c3); x.fillStyle=bg; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    x.save(); x.shadowColor=F.c2; x.shadowBlur=10; x.strokeStyle=F.c4; x.lineWidth=3; x.beginPath(); x.arc(16,16,9+pulse*2,0,Math.PI*2); x.stroke(); x.restore();
+    x.fillStyle=F.ink; x.font='bold 15px Cairo, sans-serif'; ct(); x.fillText(F.letter,16,17);
+  }else if(F.fx==="mono"){
+    x.fillStyle=F.c1; x.beginPath(); rr(0,0,s,s,7); x.fill(); x.fillStyle=F.c4; x.fillRect(8,23,16,3);
+    x.fillStyle=F.c2; x.font='bold 17px Cairo, sans-serif'; ct(); x.fillText(F.letter,16,14);
+  }else if(F.fx==="pulse"){
+    const g=x.createLinearGradient(0,0,s,s); g.addColorStop(0,F.c1); g.addColorStop(0.5,pulse>0.5?F.c2:F.c3); g.addColorStop(1,F.c4); x.fillStyle=g; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    x.fillStyle='rgba(255,255,255,'+(0.12+pulse*0.18)+')'; x.beginPath(); x.arc(16,16,8+pulse*4,0,Math.PI*2); x.fill();
+    x.fillStyle=F.ink; x.font='bold 20px Cairo, sans-serif'; ct(); x.shadowColor='rgba(0,0,0,0.5)'; x.shadowBlur=4; x.fillText(F.letter,16,17); x.shadowBlur=0;
+  }else if(F.fx==="spin"){
+    const g=x.createLinearGradient(0,0,s,s); g.addColorStop(0,F.c1); g.addColorStop(1,F.c3); x.fillStyle=g; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    x.save(); x.translate(16,16); x.rotate(t*0.003); x.strokeStyle=F.c2; x.lineWidth=2; x.beginPath(); x.arc(0,0,11,0,Math.PI*1.5); x.stroke(); x.restore();
+    x.save(); x.translate(16,16); x.rotate(t*0.0025); x.fillStyle=F.ink; x.font='bold 19px Cairo, sans-serif'; ct(); x.fillText(F.letter,0,1); x.restore();
+  }else if(F.fx==="bounce"){
+    const g=x.createLinearGradient(0,0,s,s); g.addColorStop(0,F.c1); g.addColorStop(1,F.c3); x.fillStyle=g; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    const b=Math.abs(Math.sin(t*0.004)); const yo=(1-b)*6;
+    x.fillStyle='rgba(0,0,0,0.35)'; x.beginPath(); x.ellipse(16,26,6,2,0,0,Math.PI*2); x.fill();
+    x.save(); x.translate(0,-yo); x.fillStyle=F.ink; x.font='bold 20px Cairo, sans-serif'; ct(); x.fillText(F.letter,16,17); x.restore();
+  }else if(F.fx==="glitch"){
+    x.fillStyle=F.c1; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    const gl=Math.random()<0.15||Math.sin(t*0.02)>0.8; const off=gl?(Math.random()*2.5):0;
+    ct(); x.font='bold 19px Cairo, sans-serif';
+    if(gl){
+      x.fillStyle=F.c2; x.fillText(F.letter,16+off,16);
+      x.fillStyle=F.c4; x.fillText(F.letter,16-off,16.6);
+      x.fillStyle=F.ink; x.fillText(F.letter,16,16);
+      x.fillStyle='rgba(255,255,255,0.08)'; for(let i=0;i<s;i+=4){ x.fillRect(0,i,s,1); }
+    }else{ x.fillStyle=F.ink; x.fillText(F.letter,16,16); }
+  }else if(F.fx==="wave"){
+    x.save(); x.beginPath(); rr(0,0,s,s,7); x.clip(); x.fillStyle=F.c1; x.fillRect(0,0,s,s);
+    for(let j=0;j<3;j++){
+      const cols=[F.c2,F.c3,F.c4]; x.strokeStyle=cols[j]; x.lineWidth=1.3; x.beginPath();
+      for(let X=0;X<=s;X+=1){
+        const Y=s*0.5+Math.sin(X*0.1+t*0.005+j)*3.8+j*2.5-3;
+        if(X===0) x.moveTo(X,Y); else x.lineTo(X,Y);
+      } x.stroke();
+    } x.restore();
+    x.fillStyle=F.ink; x.font='bold 19px Cairo, sans-serif'; ct(); x.fillText(F.letter,16,16);
+  }else if(F.fx==="neon"){
+    x.fillStyle='#0e0e1a'; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    const flick=0.7+Math.sin(t*0.01)*0.15+Math.sin(t*0.023)*0.15;
+    x.save(); x.shadowColor=F.c2; x.shadowBlur=8*flick; x.strokeStyle=F.c2; x.lineWidth=1.8; x.globalAlpha=flick; x.beginPath(); rr(2.5,2.5,27,27,5); x.stroke(); x.restore();
+    x.fillStyle=F.ink; x.font='bold 19px Cairo, sans-serif'; ct(); x.shadowColor=F.c2; x.shadowBlur=5; x.fillText(F.letter,16,16.5); x.shadowBlur=0;
+  }else if(F.fx==="liquid"){
+    x.fillStyle=F.c1; x.beginPath(); rr(0,0,s,s,7); x.fill();
+    const cx=16, cy=16;
+    const blobs=[{col:F.c2,amp:6,s:0.002,p:0},{col:F.c3,amp:4.5,s:0.003,p:2},{col:F.c4,amp:3.8,s:0.0025,p:4}];
+    for(const b of blobs){
+      x.fillStyle=b.col; x.globalAlpha=0.85; x.beginPath();
+      for(let a=0;a<Math.PI*2;a+=0.2){
+        const rad=b.amp+Math.sin(a*3+t*b.s+b.p)*1.9;
+        const X=cx+Math.cos(a)*rad, Y=cy+Math.sin(a)*rad;
+        if(a===0) x.moveTo(X,Y); else x.lineTo(X,Y);
+      } x.closePath(); x.fill();
+    } x.globalAlpha=1;
+    x.fillStyle=F.ink; x.font='bold 20px Cairo, sans-serif'; ct(); x.fillText(F.letter,16,17);
+  }
+}
+if(link&&canvas&&ctx){
+  (function draw(t){
+    favPaint(ctx,FAV,t||0);
+    link.href = canvas.toDataURL('image/png');
+    setTimeout(function(){
+      if(!document.hidden) requestAnimationFrame(draw);
+      else setTimeout(function(){ requestAnimationFrame(draw); },1000);
+    },70);
+  })(0);
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden) requestAnimationFrame(function(t){ favPaint(ctx,FAV,t); link.href = canvas.toDataURL('image/png'); });
+  });
+}
+ 
+</script>
 <div class="ambient" aria-hidden="true"></div>
 
 <main>
