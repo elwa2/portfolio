@@ -10,7 +10,6 @@
     --navy-light: #2c4270;
     --muted: #6b7280;
     --border: #d8dbe2;
-    --good: #2c6e49;
     --bad: #b3261e;
   }
   * { box-sizing: border-box; }
@@ -23,7 +22,6 @@
     color: #1a1a1a;
   }
   .wrapper { max-width: 900px; margin: 0 auto; }
-
   h2 { margin: 0 0 4px; font-size: 17px; color: var(--navy); text-align: center; }
   .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 18px; }
 
@@ -35,30 +33,11 @@
     margin-bottom: 22px;
     box-shadow: 0 4px 18px rgba(20, 30, 60, 0.06);
   }
-
-  .field label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-    font-size: 13px;
-    color: var(--navy);
-  }
-  .field input {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
-    border: 1px solid #c7cbd4;
-    border-radius: 8px;
-    background: #fafbfc;
-    font-family: inherit;
-  }
-  .field input:focus { outline: none; border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(44,66,112,.12); }
-
-  /* ---- entries controls ---- */
+  .field label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--navy); }
   .entries-list { display: flex; flex-direction: column; gap: 12px; }
   .entry-row {
     display: grid;
-    grid-template-columns: 1.1fr 1fr 1fr auto;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
     gap: 10px;
     align-items: end;
     background: #f9fafb;
@@ -66,12 +45,7 @@
     border-radius: 10px;
     padding: 12px;
   }
-  .entry-row .hint {
-    grid-column: 1 / -1;
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: -6px;
-  }
+  .entry-row .hint { grid-column: 1 / -1; font-size: 11px; color: var(--muted); margin-top: -6px; }
   @media (max-width: 640px) {
     .entry-row { grid-template-columns: 1fr 1fr; }
     .entry-row .remove-btn { grid-column: 1 / -1; }
@@ -81,35 +55,21 @@
     width: 100%;
     padding: 8px 10px;
     font-size: 14px;
+    font-family: inherit;
     border: 1px solid #c7cbd4;
     border-radius: 7px;
     background: #fff;
   }
+  .entry-row input:focus { outline: none; border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(44,66,112,.12); }
   .entry-row .remove-btn {
-    background: #fbeceb;
-    color: var(--bad);
-    border: none;
-    border-radius: 7px;
-    padding: 8px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
+    background: #fbeceb; color: var(--bad); border: none; border-radius: 7px;
+    padding: 8px 12px; font-size: 13px; cursor: pointer; white-space: nowrap;
   }
   .entry-row .remove-btn:hover { background: #f6d9d7; }
-
-  .entries-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-  }
+  .entries-actions { display: flex; gap: 10px; margin-top: 14px; }
   .add-btn, .print-btn {
-    flex: 1;
-    padding: 11px;
-    border: none;
-    border-radius: 9px;
-    font-size: 14.5px;
-    font-weight: bold;
-    cursor: pointer;
+    flex: 1; padding: 11px; border: none; border-radius: 9px;
+    font-size: 14.5px; font-weight: bold; cursor: pointer; font-family: inherit;
   }
   .add-btn { background: #eef1f6; color: var(--navy); border: 1px solid var(--border); }
   .add-btn:hover { background: #e3e7ee; }
@@ -117,82 +77,77 @@
   .print-btn { background: var(--navy); color: #fff; }
   .print-btn:hover { background: var(--navy-light); }
 
-  /* ---------- A4 sheet, styled close to the original scanned form ---------- */
+  /* ================= A4 sheet ================= */
   .a4-sheet {
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 4px;
     box-shadow: 0 4px 18px rgba(20, 30, 60, 0.06);
-    padding: 8mm;
+    width: 210mm;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 10mm;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-auto-rows: minmax(0, 1fr);
-    gap: 6mm;
+    grid-auto-rows: max-content;
+    align-content: start;
+    align-items: start;
+    gap: 8mm 7mm;
   }
   .person-block {
-    border: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    gap: 5mm;
   }
-  .person-block.empty { border: none; }
+  .person-block.empty { visibility: hidden; }
 
-  .doc-box {
-    padding: 7px 10px;
-    font-size: 10.5px;
-    line-height: 1.65;
+  /* ---- receipt box: thick outer border + thin inner line (like the original) ---- */
+  .receipt {
+    border: 1.6mm solid #000;
+    padding: 1.4mm;
+    background: #fff;
+    display: flex;
+  }
+  .receipt-inner {
+    flex: 1;
+    border: 0.35mm solid #000;
+    padding: 2.5mm 3.5mm 2.5mm;
+    display: flex;
+    flex-direction: column;
     font-family: "Arial", "Tahoma", sans-serif;
-  }
-  .doc-box + .doc-box { border-top: 1px solid #000; }
-
-  .doc-box .doc-title {
-    text-align: center;
     font-weight: bold;
-    font-size: 11px;
-    margin-bottom: 4px;
+    font-size: 13pt;
+    line-height: 1.5;
+    color: #000;
   }
-  .doc-box .acc-row {
-    text-align: center;
-  }
-  .doc-box .acc-row .acc-num {
-    direction: ltr;
-    display: inline-block;
-    unicode-bidi: embed;
-  }
-  .doc-box .amount-label {
-    margin-top: 3px;
-  }
-  .doc-box .amount-value {
-    text-align: center;
-    font-weight: bold;
-    font-size: 16px;
-    margin: 2px 0 4px;
-  }
-  .doc-box .amount-value.placeholder,
-  .doc-box .name-value.placeholder { color: #bbb; font-weight: normal; }
-  .doc-box .name-row .name-value { font-weight: bold; }
+  .receipt .title { text-align: right; }
+  .receipt .acc-row { text-align: right; }
+  .receipt .acc-num { direction: ltr; unicode-bidi: isolate; display: inline-block; letter-spacing: .3px; }
+  .receipt .amount-row { text-align: right; }
+  .receipt .name-row { text-align: right; margin-top: 3mm; min-height: 1.5em; }
+  .receipt .val { font-weight: bold; }
 
+  @page { size: A4; margin: 0; }
   @media print {
     .no-print { display: none !important; }
     body { background: #fff; padding: 0; margin: 0; }
     .wrapper { max-width: 100%; }
     .a4-sheet {
-      box-shadow: none;
-      border: none;
-      width: 210mm;
-      min-height: 297mm;
-      padding: 10mm;
-      gap: 8mm;
-      margin: 0 auto;
+      box-shadow: none; border: none; margin: 0;
+      width: 210mm; min-height: 297mm;
     }
-    .person-block { break-inside: avoid; }
+    .person-block, .receipt { break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
 <body>
 <div class="wrapper">
 
-  <h2>إيصالات الإيداع</h2>
-  <div class="sub">نقابة المهندسين — الرعاية الصحية والاجتماعية غير المنتظمة</div>
+  <div class="no-print">
+    <h2>إيصالات الإيداع</h2>
+    <div class="sub">نقابة المهندسين — الرعاية الصحية والاجتماعية غير المنتظمة</div>
+  </div>
 
-  <!-- ============ Entries (up to 4 names) ============ -->
   <div class="panel no-print">
     <h2 style="text-align:right;font-size:15px;">الأسماء (حتى 4 أسماء في الورقة)</h2>
     <div class="entries-list" id="entriesList"></div>
@@ -202,9 +157,7 @@
     </div>
   </div>
 
-  <!-- ============ A4 preview ============ -->
   <div class="a4-sheet" id="a4Sheet"></div>
-
 </div>
 
 <script>
@@ -213,20 +166,21 @@
   const SYNDICATE_RATE = 0.0045;
   const DIFF = 50;
 
-  function round2(n) {
-    return Math.round(n * 100) / 100;
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  // أرقام هندية زي الصورة
+  function toAr(v) {
+    return String(v).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]).replace('.', '٫');
   }
 
-  /* ---------------- entries (names) ---------------- */
-  let entries = [{ name: '', works: '', care: '' }];
+  let entries = [{ name: '', works: '', care: '', syn: '', synManual: false }];
   const MAX_ENTRIES = 4;
 
   function addEntry() {
     if (entries.length >= MAX_ENTRIES) return;
-    entries.push({ name: '', works: '', care: '' });
+    entries.push({ name: '', works: '', care: '', syn: '', synManual: false });
     renderAll();
   }
-
   function removeEntry(i) {
     if (entries.length <= 1) return;
     entries.splice(i, 1);
@@ -252,8 +206,12 @@
           <label>مبلغ الرعاية</label>
           <input type="number" data-idx="${i}" data-key="care" value="${escapeHtml(e.care)}" placeholder="مثال: 780">
         </div>
+        <div class="field">
+          <label>مبلغ النقابة ${e.synManual ? '(مخصص)' : '(تلقائي)'}</label>
+          <input type="number" data-idx="${i}" data-key="syn" value="${escapeHtml(e.syn)}" placeholder="تلقائي أو اكتب مبلغ">
+        </div>
         <button class="remove-btn" onclick="removeEntry(${i})" ${entries.length <= 1 ? 'style="visibility:hidden"' : ''}>حذف</button>
-        <div class="hint">اكتب قيمة الأعمال هيتحسب مبلغ الرعاية والنقابة أوتوماتيك، أو اكتب مبلغ الرعاية مباشرة لو عندك</div>
+        <div class="hint">اكتب قيمة الأعمال هيتحسب مبلغ الرعاية والنقابة أوتوماتيك. ولو كتبت مبلغ النقابة بنفسك هيثبت ومش هيتغير؛ امسحه عشان يرجع تلقائي</div>
       `;
       list.appendChild(row);
     });
@@ -262,17 +220,32 @@
       inp.addEventListener('input', (ev) => {
         const idx = parseInt(ev.target.dataset.idx);
         const key = ev.target.dataset.key;
-        entries[idx][key] = ev.target.value;
+        const en = entries[idx];
+        en[key] = ev.target.value;
+        const q = k => list.querySelector(`input[data-idx="${idx}"][data-key="${k}"]`);
 
         if (key === 'works') {
           const raw = ev.target.value.trim();
           if (raw !== '' && !isNaN(raw)) {
-            const computedCare = round2(parseFloat(raw) * SYNDICATE_RATE + DIFF);
-            entries[idx].care = String(computedCare);
-            const careInput = list.querySelector(`input[data-idx="${idx}"][data-key="care"]`);
-            if (careInput) careInput.value = computedCare;
+            en.care = String(round2(parseFloat(raw) * SYNDICATE_RATE + DIFF));
+            q('care').value = en.care;
           }
         }
+        if (key === 'syn') {
+          en.synManual = ev.target.value.trim() !== '';
+        }
+        if (key !== 'syn' && !en.synManual) {
+          const c = en.care.toString().trim();
+          en.syn = (c !== '' && !isNaN(c)) ? String(round2(parseFloat(c) - DIFF)) : '';
+          q('syn').value = en.syn;
+        }
+        if (key === 'syn' && !en.synManual) {
+          const c = en.care.toString().trim();
+          en.syn = (c !== '' && !isNaN(c)) ? String(round2(parseFloat(c) - DIFF)) : '';
+          q('syn').value = en.syn;
+        }
+        const lbl = q('syn').parentElement.querySelector('label');
+        lbl.textContent = 'مبلغ النقابة ' + (en.synManual ? '(مخصص)' : '(تلقائي)');
         renderPreview();
       });
     });
@@ -282,6 +255,16 @@
 
   function escapeHtml(s) {
     return (s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function receipt(title, account, amount, name) {
+    return `
+      <div class="receipt"><div class="receipt-inner">
+        <div class="title">${title}</div>
+        <div class="acc-row">رقم الحساب <span class="acc-num">${toAr(account)}</span></div>
+        <div class="amount-row">المبلغ المطلوب / <span class="val">${amount === null ? '' : toAr(amount)}</span></div>
+        <div class="name-row">أسم المودع / <span class="val">${escapeHtml(name)}</span></div>
+      </div></div>`;
   }
 
   function renderPreview() {
@@ -295,25 +278,13 @@
         const careRaw = e.care.toString().trim();
         const hasCare = careRaw !== '' && !isNaN(careRaw);
         const careVal = hasCare ? parseFloat(careRaw) : null;
-        const synVal = hasCare ? round2(careVal - DIFF) : null;
+        const synRaw = (e.syn || '').toString().trim();
+        const synVal = (synRaw !== '' && !isNaN(synRaw)) ? parseFloat(synRaw) : (hasCare ? round2(careVal - DIFF) : null);
 
         cell.className = 'person-block';
-        cell.innerHTML = `
-          <div class="doc-box">
-            <div class="doc-title">فرع نقابة المهندسين كفر الشيخ بالبريد المصرى<br>فرع كفر الشيخ</div>
-            <div class="acc-row">رقم الحساب <span class="acc-num">${ENG_ACCOUNT}</span></div>
-            <div class="amount-label">المبلغ المطلوب /</div>
-            <div class="amount-value ${synVal === null ? 'placeholder' : ''}">${synVal === null ? '—' : synVal}</div>
-            <div class="name-row">أسم المودع / <span class="name-value ${name ? '' : 'placeholder'}">${name ? name : '—'}</span></div>
-          </div>
-          <div class="doc-box">
-            <div class="doc-title">الرعاية الصحية والاجتماعية للعمالة غير المنتظمة بالبريد المصرى<br>فرع كفر الشيخ</div>
-            <div class="acc-row">رقم الحساب <span class="acc-num">${CARE_ACCOUNT}</span></div>
-            <div class="amount-label">المبلغ المطلوب /</div>
-            <div class="amount-value ${careVal === null ? 'placeholder' : ''}">${careVal === null ? '—' : careVal}</div>
-            <div class="name-row">أسم المودع / <span class="name-value ${name ? '' : 'placeholder'}">${name ? name : '—'}</span></div>
-          </div>
-        `;
+        cell.innerHTML =
+          receipt('فرع نقابة المهندسين كفر الشيخ بالبريد المصرى فرع كفر الشيخ', ENG_ACCOUNT, synVal, name) +
+          receipt('الرعاية الصحية والاجتماعية للعمالة غير المنتظمة بالبريد المصرى فرع كفر الشيخ', CARE_ACCOUNT, careVal, name);
       } else {
         cell.className = 'person-block empty';
       }
@@ -321,11 +292,7 @@
     }
   }
 
-  function renderAll() {
-    renderInputs();
-    renderPreview();
-  }
-
+  function renderAll() { renderInputs(); renderPreview(); }
   renderAll();
 </script>
 </body>
