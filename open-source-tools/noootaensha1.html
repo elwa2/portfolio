@@ -274,7 +274,7 @@
       <div class="receipt"><div class="receipt-inner">
         <div class="title">${title}</div>
         <div class="acc-row">رقم الحساب <span class="acc-num">${toAr(account)}</span></div>
-        <div class="amount-row">المبلغ المطلوب / <span class="val">${amount === null ? '' : toAr(amount)}</span></div>
+        <div class="amount-row">المبلغ المطلوب / <span class="val">${amount === null ? '' : toAr(Math.ceil(amount))}</span></div>
         <div class="name-row">أسم المودع / <span class="val">${escapeHtml(name)}</span></div>
       </div></div>`;
   }
