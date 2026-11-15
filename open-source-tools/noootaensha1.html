@@ -168,6 +168,18 @@
 
   function round2(n) { return Math.round(n * 100) / 100; }
 
+  function parseAmount(value) {
+    const normalized = String(value)
+      .replace(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+      .replace(/[۰-۹]/g, digit => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+      .replace(/[٬,]/g, '')
+      .replace(/[٫،]/g, '.')
+      .trim();
+    if (!normalized) return null;
+    const amount = Number(normalized);
+    return Number.isFinite(amount) ? amount : null;
+  }
+
   // أرقام هندية زي الصورة
   function toAr(v) {
     return String(v).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]).replace('.', '٫');
@@ -200,15 +212,15 @@
         </div>
         <div class="field">
           <label>قيمة الأعمال (اختياري)</label>
-          <input type="number" data-idx="${i}" data-key="works" value="${escapeHtml(e.works)}" placeholder="مثال: 200000">
+          <input type="text" inputmode="decimal" data-idx="${i}" data-key="works" value="${escapeHtml(e.works)}" placeholder="مثال: 200000">
         </div>
         <div class="field">
           <label>مبلغ الرعاية</label>
-          <input type="number" data-idx="${i}" data-key="care" value="${escapeHtml(e.care)}" placeholder="مثال: 780">
+          <input type="text" inputmode="decimal" data-idx="${i}" data-key="care" value="${escapeHtml(e.care)}" placeholder="مثال: 780">
         </div>
         <div class="field">
           <label>مبلغ النقابة ${e.synManual ? '(مخصص)' : '(تلقائي)'}</label>
-          <input type="number" data-idx="${i}" data-key="syn" value="${escapeHtml(e.syn)}" placeholder="تلقائي أو اكتب مبلغ">
+          <input type="text" inputmode="decimal" data-idx="${i}" data-key="syn" value="${escapeHtml(e.syn)}" placeholder="تلقائي أو اكتب مبلغ">
         </div>
         <button class="remove-btn" onclick="removeEntry(${i})" ${entries.length <= 1 ? 'style="visibility:hidden"' : ''}>حذف</button>
         <div class="hint">اكتب قيمة الأعمال هيتحسب مبلغ الرعاية والنقابة أوتوماتيك. ولو كتبت مبلغ النقابة بنفسك هيثبت ومش هيتغير؛ امسحه عشان يرجع تلقائي</div>
@@ -225,9 +237,9 @@
         const q = k => list.querySelector(`input[data-idx="${idx}"][data-key="${k}"]`);
 
         if (key === 'works') {
-          const raw = ev.target.value.trim();
-          if (raw !== '' && !isNaN(raw)) {
-            en.care = String(round2(parseFloat(raw) * SYNDICATE_RATE + DIFF));
+          const amount = parseAmount(ev.target.value);
+          if (amount !== null) {
+            en.care = String(round2(amount * SYNDICATE_RATE + DIFF));
             q('care').value = en.care;
           }
         }
@@ -235,13 +247,13 @@
           en.synManual = ev.target.value.trim() !== '';
         }
         if (key !== 'syn' && !en.synManual) {
-          const c = en.care.toString().trim();
-          en.syn = (c !== '' && !isNaN(c)) ? String(round2(parseFloat(c) - DIFF)) : '';
+          const care = parseAmount(en.care);
+          en.syn = care !== null ? String(round2(care - DIFF)) : '';
           q('syn').value = en.syn;
         }
         if (key === 'syn' && !en.synManual) {
-          const c = en.care.toString().trim();
-          en.syn = (c !== '' && !isNaN(c)) ? String(round2(parseFloat(c) - DIFF)) : '';
+          const care = parseAmount(en.care);
+          en.syn = care !== null ? String(round2(care - DIFF)) : '';
           q('syn').value = en.syn;
         }
         const lbl = q('syn').parentElement.querySelector('label');
@@ -262,7 +274,7 @@
       <div class="receipt"><div class="receipt-inner">
         <div class="title">${title}</div>
         <div class="acc-row">رقم الحساب <span class="acc-num">${toAr(account)}</span></div>
-        <div class="amount-row">المبلغ المطلوب / <span class="val">${amount === null ? '' : toAr(amount)}</span></div>
+        <div class="amount-row">المبلغ المطلوب / <span class="val">${amount === null ? '' : toAr(Math.ceil(amount))}</span></div>
         <div class="name-row">أسم المودع / <span class="val">${escapeHtml(name)}</span></div>
       </div></div>`;
   }
@@ -275,11 +287,9 @@
       if (i < entries.length) {
         const e = entries[i];
         const name = e.name.trim();
-        const careRaw = e.care.toString().trim();
-        const hasCare = careRaw !== '' && !isNaN(careRaw);
-        const careVal = hasCare ? parseFloat(careRaw) : null;
-        const synRaw = (e.syn || '').toString().trim();
-        const synVal = (synRaw !== '' && !isNaN(synRaw)) ? parseFloat(synRaw) : (hasCare ? round2(careVal - DIFF) : null);
+        const careVal = parseAmount(e.care);
+        const hasCare = careVal !== null;
+        const synVal = parseAmount(e.syn) ?? (hasCare ? round2(careVal - DIFF) : null);
 
         cell.className = 'person-block';
         cell.innerHTML =
